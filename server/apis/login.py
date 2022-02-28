@@ -71,7 +71,7 @@ class Login(Resource):
                 'error': 'user not found'
             }, 401
     
-    # register
+    # registerr
     def put(self):
         """
         Register New Account

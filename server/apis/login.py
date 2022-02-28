@@ -60,6 +60,11 @@ class Login(Resource):
 
         user_id = args['id']
         user_pw = args['pw']
+<<<<<<< HEAD
+=======
+        print(user_id)
+        print(user_pw)
+>>>>>>> 5ba5e9b9963d47d775d37e7a6368d1401241fe1f
         if(user_id=='guest' and user_pw=='guest'):
             return {
                 "status": "success"

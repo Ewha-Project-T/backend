@@ -11,7 +11,7 @@ Auth = Namespace(
 )
 
 user_fields = Auth.model('User', {  # Model 객체 생성
-    'name': fields.String(description='a User Name', required=True, example="justkode")
+    'name': fields.String(description='a User Name', required=True, example="USER")
 })
 
 user_fields_auth = Auth.inherit('User Auth', user_fields, {
@@ -19,7 +19,7 @@ user_fields_auth = Auth.inherit('User Auth', user_fields, {
 })
 
 jwt_fields = Auth.model('JWT', {
-    'Authorization': fields.String(description='Authorization which you must inclued in header', required=True, example="eyJ0e~~~~~~~~~")
+    'Authorization': fields.String(description='Authorization which you must inclued in header', required=True, example="nameng")
 })
 
 @Auth.route('/register')

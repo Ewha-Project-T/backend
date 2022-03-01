@@ -3,56 +3,14 @@ from flasgger import swag_from
 import re
 
 class Login(Resource):
+    @swag_from("../../docs/login/get.yml")
     def get(self):
-        """
-        Login GET
-        ---
-        tags:
-          - Login APIs
-        responses:
-          200:
-            description: Login Success
-        """
         return {
             "status": "success"
         }, 200
-    
     # login
+    @swag_from("../../docs/login/post.yml")
     def post(self):
-        """
-        Login with Account
-        ---
-        tags:
-          - Login APIs
-        parameters:
-          - in: body
-            name: user_id
-            type: string
-            required: true
-          - in: body
-            name: user_pw
-            type: string
-            required: true
-        responses:
-          200:
-            description: Login Success
-            schema:
-              id: Success
-              properties:
-                status:
-                  type: string
-                  description: success
-                  default: success
-          401:
-            description: User Not Found
-            schema:
-              id: User Not Found
-              properties:
-                status:
-                  type: string
-                  description: User Not Found
-                  default: user not found
-        """
         parser = reqparse.RequestParser()
         parser.add_argument('id', type=str, required=True, help="ID is required")
         parser.add_argument('pw', type=str, required=True, help="PW is required")
@@ -60,11 +18,6 @@ class Login(Resource):
 
         user_id = args['id']
         user_pw = args['pw']
-<<<<<<< HEAD
-=======
-        print(user_id)
-        print(user_pw)
->>>>>>> 5ba5e9b9963d47d775d37e7a6368d1401241fe1f
         if(user_id=='guest' and user_pw=='guest'):
             return {
                 "status": "success"
@@ -75,30 +28,8 @@ class Login(Resource):
             }, 401
     
     # registerr
+    @swag_from("../../docs/login/put.yml")
     def put(self):
-        """
-        Register New Account
-        ---
-        tags:
-          - Login APIs
-        parameters:
-          - in: body
-            name: user_id
-            type: string
-            required: true
-          - in: body
-            name: user_pw
-            type: string
-            required: true
-          - in: email
-            name: email
-            required: true
-        responses:
-          200:
-            description: Register Success
-            schema:
-              id: Success
-        """
         parser = reqparse.RequestParser()
         parser.add_argument('id', type=str, required=True, help="ID is required")
         parser.add_argument('pw', type=str, required=True, help="PW is required")

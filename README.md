@@ -14,7 +14,7 @@ pip install -r requirements.txt
 
 ```
 root
-ㄴ docs : API docs 관련 문서. 현재는 inline docs 를 작성하고 있으나 추후 따로 빼는 것을 고려해볼만 함
+ㄴ docs : API docs 관련 문서. API 제작 후, `@swag_from` 으로 경로명시 해줄 것.
 ㄴ server : 서버 관련한 파일들이 존재. 코딩해야할 곳
     ㄴ apis : API 코드들이 모여있는곳
     ㄴ (추후 문서 파싱이라던지 여러 작업들을 따로 빼놓을 디렉토리를 구상하여 깔끔하게 정돈해주세요)

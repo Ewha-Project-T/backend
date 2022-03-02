@@ -11,6 +11,7 @@ class Login(Resource):
     # login
     @swag_from("../../docs/login/post.yml")
     def post(self):
+        print('hi')
         parser = reqparse.RequestParser()
         parser.add_argument('id', type=str, required=True, help="ID is required")
         parser.add_argument('pw', type=str, required=True, help="PW is required")

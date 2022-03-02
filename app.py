@@ -14,13 +14,13 @@ CORS(app) # 모든 출처에 대해서 CORS 허용 세세한 설정 추후 논�
 myApi=Api(app)
 swagger = Swagger(
     app, 
-    template_file=os.path.join(os.getcwd(),'docs','template.yml'),
-    parse=True
+    template_file=r"docs/template.yml",
+    parse=False
 )
 
 @app.route("/", methods=['GET'])
 def hello():
     return "CAT-Secuirty"
 
-load_api(app,myApi)
+load_api(myApi)
 app.run(host='0.0.0.0', port = 5000)

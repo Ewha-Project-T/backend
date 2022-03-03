@@ -14,17 +14,5 @@ parameters:
 responses:
   200:
     description: Login Success
-    schema:
-      properties:
-        status:
-          type: string
-          description: Login Success
-          default: login success
   401:
     description: User Not Found
-    schema:
-      properties:
-        status:
-          type: string
-          description: User Not Found
-          default: user not found

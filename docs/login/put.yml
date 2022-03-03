@@ -1,0 +1,19 @@
+Register New Account
+---
+tags:
+  - Login APIs
+parameters:
+  - in: body
+    name: user_id
+    type: string
+    required: true
+  - in: body
+    name: user_pw
+    type: string
+    required: true
+  - in: email
+    name: email
+    required: true
+responses:
+  200:
+    description: Register Success

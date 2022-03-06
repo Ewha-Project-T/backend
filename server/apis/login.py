@@ -1,17 +1,22 @@
+from flask import jsonify
 from flask_restful import reqparse, Resource
 from flasgger import swag_from
 import re
+from flask_jwt_extended import (JWTManager, jwt_required, create_access_token, get_jwt_identity, get_jwt)
 
 class Login(Resource):
     @swag_from("../../docs/login/get.yml")
+    @jwt_required()
     def get(self):
-        return {
-            "status": "success"
-        }, 200
+        current_user = get_jwt_identity()
+        print(current_user)
+        return {"logged":current_user}, 200
+        # return {
+        #     "status": "success"
+        # }, 200
     # login
     @swag_from("../../docs/login/post.yml")
     def post(self):
-        print('hi')
         parser = reqparse.RequestParser()
         parser.add_argument('id', type=str, required=True, help="ID is required")
         parser.add_argument('pw', type=str, required=True, help="PW is required")
@@ -20,9 +25,8 @@ class Login(Resource):
         user_id = args['id']
         user_pw = args['pw']
         if(user_id=='guest' and user_pw=='guest'):
-            return {
-                "status": "success"
-            }, 200
+            access_token = create_access_token(identity=user_id)
+            return {"access_token":access_token}, 200
         else:
             return {
                 'error': 'user not found'

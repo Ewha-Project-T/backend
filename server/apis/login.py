@@ -9,13 +9,12 @@ import re
 jwt_blocklist = set() #로그아웃 사용
 
 class Login(Resource):
-
     @swag_from("../../docs/login/get.yml")
     @jwt_required()
     def get(self):
-        currend_user = get_jwt_identity()
-        return jsonify(user_id=currend_user)
-
+        current_user = get_jwt_identity()
+        return jsonify(user_id=current_user)
+        
     # login
     @swag_from("../../docs/login/post.yml")
     def post(self):
@@ -33,7 +32,7 @@ class Login(Resource):
                 refresh_token=refresh_token
             )
         else:
-            return jsonify({"msg": "Bad username or password"}), 401
+            return {"msg":"Bad username or password"}, 401
 
     # register
     @swag_from("../../docs/login/put.yml")
@@ -51,7 +50,7 @@ class Login(Resource):
             if len(user_pw)<4 or len(user_pw)>20:#비밀번호 길이 제한
                 return {
                     "error" : "Invaild password"
-                },400
+                }, 400
             else:
                 #user_pw 해쉬 암호화 추가해야됨
                 #DB에 저장및 토큰발급

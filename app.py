@@ -6,7 +6,7 @@ from server.apis import load_api
 from flask_jwt_extended import JWTManager,jwt_required
 import os
 from datetime import timedelta
-import bcrypt
+from server.apis.login import jwt_blocklist
 
 app=Flask(__name__)
 app.config['SWAGGER'] = {
@@ -27,6 +27,12 @@ swagger = Swagger(
     template_file=r"docs/template.yml",
     parse=False
 )
+
+@jwt.token_in_blocklist_loader
+def check_if_token_is_revoked(jwt_header, jwt_payload):
+    jti = jwt_payload["jti"]
+    token_in_redis = jti in jwt_blocklist
+    return token_in_redis
 
 @app.route("/", methods=['GET'])
 def hello():

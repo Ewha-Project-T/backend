@@ -71,11 +71,6 @@ class Login(Resource):
                 "error": "Invalid Email"
             }, 400
     # delete account
-    @jwt.token_in_blocklist_loader#### ...에 있는 app.py의 jwt 변수참조하는법 아시는분
-    def check_if_token_is_revoked(jwt_header, jwt_payload):
-        jti = jwt_payload["jti"]
-        token_in_redis = jti in jwt_blocklist
-        return token_in_redis is not None
 
     @jwt_required()
     def delete(self):

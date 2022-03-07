@@ -1,12 +1,12 @@
-from flask import Flask,jsonify
+from flask import Flask
 from flask_restful import Api
 from flasgger import Swagger
 from flask_cors import CORS
-from server.apis import load_api
-from flask_jwt_extended import JWTManager,jwt_required
-import os
+from flask_jwt_extended import JWTManager
 from datetime import timedelta
+from server.apis import load_api
 from server.apis.login import jwt_blocklist
+from server import db
 
 app=Flask(__name__)
 app.config['SWAGGER'] = {
@@ -18,6 +18,10 @@ app.config['SWAGGER'] = {
 #app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'CAT-Security-King-God'#토큰에 쓰일 비밀키
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
+app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://cert:cert@203.229.206.16:12344/cert"
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db.init_app(app)
 jwt=JWTManager(app)
 
 CORS(app) # 모든 출처에 대해서 CORS 허용 세세한 설정 추후 논의

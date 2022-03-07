@@ -5,7 +5,7 @@ from flask_jwt_extended import (
     jwt_required, create_access_token, get_jwt_identity, create_refresh_token,get_jwt
 )
 import re
-from ..model import User
+from ..services.login_service import login, LoginResult
 
 jwt_blocklist = set() #로그아웃 사용
 
@@ -25,8 +25,8 @@ class Login(Resource):
         args = parser.parse_args()
         user_id = args['id']
         user_pw = args['pw']
-        print(User.query.all()) # 테이블 모든 쿼리 조회
-        if(user_id=="admin" and user_pw=="admin"):
+        result, account = login(user_id, user_pw) # 계정정보 리턴
+        if(result==LoginResult.SUCCESS):
             access_token=create_access_token(identity=user_id)
             refresh_token=create_refresh_token(identity=user_id)
             return jsonify(

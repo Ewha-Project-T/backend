@@ -11,3 +11,17 @@ class User(db.Model):
     email = db.Column(db.String(50), unique=True, nullable=False)
     login_fail_limit = db.Column(db.Integer, default=0)
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.password = self.encrypt_password(password)
+    
+    # 송신 패스워드 암호화
+    def encrypt_password(self, password):
+        return password 
+    
+    # 패스워드 해시 값 체크
+    def verify_password(self, password):
+        return self.password
+
+
+

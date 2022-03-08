@@ -14,13 +14,12 @@ app.config['SWAGGER'] = {
     'doc_dir': './docs/'
 }
 
-#추후 db추가 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
-#app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 app.config['SECRET_KEY'] = 'CAT-Security-King-God'#토큰에 쓰일 비밀키
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
 app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://cert:cert@203.229.206.16:12344/cert"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
+app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True #안하면 insert문 작동안함
 db.init_app(app)
 jwt=JWTManager(app)
 

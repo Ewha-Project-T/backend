@@ -53,9 +53,9 @@ class Login(Resource):
             result=register(user_id,user_pw,user_name,user_email)
             if(result==RegisterResult.SUCCESS):
                 access_token=create_access_token(identity=user_id)
-                return jsonify(
-                    access_token=access_token#회원가입시 자동로그인 없어도 될듯?
-                )
+                return{
+                    "msg" : "success"
+                },200
             elif(result==RegisterResult.INVALID_IDPW):
                 return{
                     "error" : "invalid ID or PW"

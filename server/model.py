@@ -13,15 +13,15 @@ class User(db.Model):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.password = self.encrypt_password(password)
+        self.password = self.encrypt_password(self.password)
     
     # 송신 패스워드 암호화
-    def encrypt_password(self, password):
+    def encrypt_password(self, password):#db에서 비밀번호부분 뽑아오고 salt값을 추출하여 암호화
         return password 
     
     # 패스워드 해시 값 체크
-    def verify_password(self, password):
-        return self.password
+    #def verify_password(self, password): db자체에 해쉬값이 박히므로 암호화된 입력값이랑 비교해주면 될듯함
+    #    return self.password
 
 
 

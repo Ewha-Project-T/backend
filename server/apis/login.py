@@ -7,7 +7,6 @@ from flask_jwt_extended import (
 import re
 from ..services.login_service import login, register, delete, LoginResult, RegisterResult, create_tokens, DeleteResult
 
-
 jwt_blocklist = set() #로그아웃 사용
 
 class Login(Resource):
@@ -30,8 +29,8 @@ class Login(Resource):
         if(result==LoginResult.SUCCESS):
             access_token, refresh_token = create_tokens(account)
             return jsonify(
-                access_token = "Bearer " + access_token,
-                refresh_token = "Bearer " + refresh_token
+                access_token = access_token,
+                refresh_token = refresh_token
             )
         else:
             return {"msg":"Bad username or password"}, 401
@@ -76,6 +75,24 @@ class Login(Resource):
                 "error": "Invalid Email"
             }, 400
 
+    @jwt_required()
+    def patch(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('old_pw', type=str)
+        parser.add_argument('new_pw', type=str)
+        parser.add_argument('email', type=str)
+        parser.add_argument('name', type=str)
+        args = parser.parse_args()
+        old_pw = args['old_pw']
+        new_pw = args['new_pw']
+        email = args['email']
+        name = args['name']
+        print(old_pw)
+        print(new_pw)
+        print(email)
+        print(name)
+        return {'msg':'good'},200
+
     # logout
     @jwt_required()
     def delete(self):
@@ -96,7 +113,7 @@ class Account(Resource):#회원탈퇴용 class
             },200
         else:
             return{
-                "error": "Invalid Value"
+                "error": "delete account fail"
             },400
     
 

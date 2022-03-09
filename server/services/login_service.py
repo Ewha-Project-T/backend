@@ -19,10 +19,12 @@ class RegisterResult:
 class DeleteResult:
     SUCCESS = 0
     INVALID_ID = 1
-
-# def is_exist(column_name, value):
-#     user = User.query.filter(column_name==value).first()
-#     return user != None
+    PW_NOT_MATCHED = 2
+    INVALID_EMAIL = 3
+    
+class ChangeResult:
+    SUCCESS = 0
+    INVALID_PW = 1
 
 def login(user_id, user_pw):
     acc = User.query.filter_by(id=user_id).first()
@@ -63,6 +65,7 @@ def delete(user_id):
     db.session.commit
     return DeleteResult.SUCCESS
 
+def change(old_pw,)
 def login_required():
     def wrapper(func):
         @functools.wraps(func)

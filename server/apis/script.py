@@ -18,7 +18,8 @@ class ScriptAPI(Resource):
             return send_file(file_path, as_attachment=True, attachment_filename='')
         else:
             return {'msg':'File is not exist'}, 400
-
+            
+    @jwt_required()
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('file_name', type=werkzeug.datastructures.FileStorage, location='files', required=True, help="Not Valid File")

@@ -1,6 +1,8 @@
 from unittest import registerResult
 from ..model import User
 from server import db
+import functools
+from flask_jwt_extended import get_jwt_identity, jwt_required, create_access_token, create_refresh_token
 
 class LoginResult:
     SUCCESS = 0
@@ -44,5 +46,16 @@ def delete(user_id,user_pw,user_name,user_email):
     acc=User(id=user_id,password=user_pw,name=user_name,email=user_email)
     db.session.delete(acc)
     db.session.commit
+
+def login_required(func):
+    @functools.wraps(func)
+    @jwt_required
+    def wrapper(*args, **kwargs):
+        iden = get_jwt_identity()
+        
+        if iden == None or iden.get('type') != 'login':
+            return {'msg':'로그인이 필요합니다.'}, 401
+        return func(*args, **kwargs)
+    return wrapper
 
 

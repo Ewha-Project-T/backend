@@ -2,7 +2,7 @@ from unittest import registerResult
 from ..model import User
 from server import db
 import functools
-from flask_jwt_extended import create_refresh_token, create_access_token, verify_jwt_in_request, get_jwt
+from flask_jwt_extended import create_refresh_token, create_access_token, verify_jwt_in_request, get_jwt, get_jwt_identity
 
 class LoginResult:
     SUCCESS = 0
@@ -25,6 +25,9 @@ class DeleteResult:
 class ChangeResult:
     SUCCESS = 0
     INVALID_PW = 1
+    INCORRECT_PW = 2
+    INVALID_EMAIL = 3
+    INVALID_NAME = 4
 
 def login(user_id, user_pw):
     acc = User.query.filter_by(id=user_id).first()
@@ -58,15 +61,31 @@ def register(user_id,user_pw,user_name,user_email):
 
 
 def delete(user_id):
-    acc= User.query.filter_by(id=user_id).first()
+    acc = User.query.filter_by(id=user_id).first()
+    print(acc)
     if(acc==None):
         return DeleteResult.INVALID_ID
     db.session.delete(acc)
     db.session.commit
     return DeleteResult.SUCCESS
 
-# def change(old_pw, new_pw, new_name, new_email):
-
+def change(old_pw, new_pw, new_name, new_email):
+    userinfo = get_jwt_identity()
+    if(userinfo==None):
+        raise Exception("Not Logged In")
+    acc = User.query.filter_by(id=userinfo["user_id"]).first()
+    if(old_pw != None and new_pw != None):
+        # * old_pw 해시 한 것과 DB 내용과 비교해야함.
+        if(old_pw != acc.password):
+            return ChangeResult.INCORRECT_PW
+        acc.password = new_pw
+    if(new_name != None):
+        acc.name = new_name
+    if(new_email != None):
+        acc.email = new_email
+    db.session.add(acc)
+    db.session.commit()
+    return ChangeResult.SUCCESS
 
 def login_required():
     def wrapper(func):

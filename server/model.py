@@ -20,7 +20,7 @@ class User(db.Model):
         return password 
     
     # 패스워드 해시 값 체크
-    #def verify_password(self, password): db자체에 해쉬값이 박히므로 암호화된 입력값이랑 비교해주면 될듯함
+    #def verify_password(self, password): # db자체에 해쉬값이 박히므로 암호화된 입력값이랑 비교해주면 될듯함
     #    return self.password
     
 class Project(db.Model):

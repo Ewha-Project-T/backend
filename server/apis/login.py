@@ -5,7 +5,7 @@ from flask_jwt_extended import (
     jwt_required, get_jwt_identity, get_jwt
 )
 import re
-from ..services.login_service import login, register, delete, LoginResult, RegisterResult, create_tokens, DeleteResult
+from ..services.login_service import login, register, delete, LoginResult, RegisterResult, create_tokens, DeleteResult, change, ChangeResult
 
 jwt_blocklist = set() #로그아웃 사용
 
@@ -87,11 +87,17 @@ class Login(Resource):
         new_pw = args['new_pw']
         email = args['email']
         name = args['name']
-        print(old_pw)
-        print(new_pw)
-        print(email)
-        print(name)
-        return {'msg':'good'},200
+        res = change(old_pw, new_pw, name, email)
+        if(res==ChangeResult.SUCCESS):
+            return {'msg':'success'},200
+        elif(res==ChangeResult.INCORRECT_PW):
+            return {'msg':'Incorrect old password'}, 401
+        elif(res==ChangeResult.INVALID_PW):
+            return {'msg':'Invalid password'}, 401
+        elif(res==ChangeResult.INVALID_EMAIL):
+            return {'msg':'Invalid email'}, 401
+        elif(res==ChangeResult.INVALID_NAME):
+            return {'msg':'Invalid name'}, 401
 
     # logout
     @jwt_required()
@@ -105,7 +111,7 @@ class Account(Resource):#회원탈퇴용 class
     @jwt_required()
     def delete(self):
         current_user=get_jwt_identity()
-        result=delete(current_user)
+        result=delete(current_user["user_id"])
         if(result==DeleteResult.SUCCESS):
             return{
                 "msg":"success"

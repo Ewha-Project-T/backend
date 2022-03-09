@@ -65,7 +65,9 @@ def delete(user_id):
     db.session.commit
     return DeleteResult.SUCCESS
 
-def change(old_pw,)
+# def change(old_pw, new_pw, new_name, new_email):
+
+
 def login_required():
     def wrapper(func):
         @functools.wraps(func)

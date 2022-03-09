@@ -98,7 +98,6 @@ class Login(Resource):
     def delete(self):
         jti = get_jwt()["jti"]
         jwt_blocklist.add(jti) #redis,db를 이용하면 좋겠지만 시간이 늘어남
-        delete()
         return jsonify(msg="Access token revoked")
 
 class Account(Resource):#회원탈퇴용 class

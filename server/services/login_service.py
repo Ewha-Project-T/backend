@@ -16,6 +16,10 @@ class RegisterResult:
     USEREMAIL_EXIST = 3
     #INTERNAL_ERROR = 4 #없어도 되지않을까 싶음
 
+class DeleteResult:
+    SUCCESS = 0
+    INVALID_ID = 1
+
 # def is_exist(column_name, value):
 #     user = User.query.filter(column_name==value).first()
 #     return user != None
@@ -51,10 +55,13 @@ def register(user_id,user_pw,user_name,user_email):
     return RegisterResult.SUCCESS
 
 
-def delete(user_id,user_pw,user_name,user_email):
-    acc=User(id=user_id,password=user_pw,name=user_name,email=user_email)
+def delete(user_id):
+    acc= User.query.filter_by(id=user_id).first()
+    if(acc==None):
+        return DeleteResult.INVALID_ID
     db.session.delete(acc)
     db.session.commit
+    return DeleteResult.SUCCESS
 
 def login_required():
     def wrapper(func):

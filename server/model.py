@@ -23,7 +23,7 @@ class User(db.Model):
     #def verify_password(self, password): db자체에 해쉬값이 박히므로 암호화된 입력값이랑 비교해주면 될듯함
     #    return self.password
     
-class project(db.Model):
+class Project(db.Model):
     __tablename__ = "project"
     project_no = db.Column(db.Integer, primary_key=True)
     pm_no = db.Column(db.Integer, db.ForeignKey("user.user_no"), nullable=False)

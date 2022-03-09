@@ -51,9 +51,8 @@ def login_required(func):
     @functools.wraps(func)
     @jwt_required
     def wrapper(*args, **kwargs):
-        iden = get_jwt_identity()
-        
-        if iden == None or iden.get('type') != 'login':
+        identifier = get_jwt_identity()
+        if identifier == None:
             return {'msg':'로그인이 필요합니다.'}, 401
         return func(*args, **kwargs)
     return wrapper

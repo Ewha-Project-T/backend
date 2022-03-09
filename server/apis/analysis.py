@@ -5,7 +5,7 @@ from flask_restful import reqparse, Resource
 from ..services.login_service import login_required
 from ..services.analysis_service import *
 
-UPLOAD_PATH ='./'
+UPLOAD_PATH ='../../uploads'
 class Analysis(Resource):
     @login_required()
     def get(self):
@@ -17,14 +17,15 @@ class Analysis(Resource):
         parser.add_argument('file', type=FileStorage, location='files', action='append')
         args = parser.parse_args()
 
-        f = args['file']
-        filename = secure_filename(f.filename)
+        fd = args['file']
+        filename = secure_filename(fd.filename)
         file_ext = get_file_ext(filename)
 
-        f.save(UPLOAD_PATH + filename) #file save
-
+        
+        uploaded_path = upload_file(fd)
+     
         if file_ext == "zip" or file_ext == "tar":
-            compression_extract(UPLOAD_PATH+filename , file_ext, "./")
+            compression_extract(uploaded_path , file_ext)
             
         return {"msg":"ok"}, 200
 
@@ -36,5 +37,6 @@ class Analysis(Resource):
         parser.add_argument('file_name', type=str, required=True, help="FileName is required")
         args = parser.parse_args()
         filename = args['file_name']
+        
         return {"msg":filename}, 200
         

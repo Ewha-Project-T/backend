@@ -1,0 +1,11 @@
+Delete Account
+---
+tags:
+  - Account APIs
+parameters:
+
+responses:
+  200:
+    description: Delete Success
+  400:
+    description: invalid Token

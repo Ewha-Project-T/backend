@@ -5,7 +5,7 @@ from flask_jwt_extended import (
     jwt_required, create_access_token, get_jwt_identity, create_refresh_token,get_jwt
 )
 import re
-from ..services.login_service import login,register,delete,LoginResult,RegisterResult
+from ..services.login_service import login,register,delete,LoginResult,RegisterResult,DeleteResult
 
 jwt_blocklist = set() #로그아웃 사용
 
@@ -85,6 +85,19 @@ class Login(Resource):
         delete()
         return jsonify(msg="Access token revoked")
 
+class Account(Resource):#회원탈퇴용 class
+    @jwt_required()
+    def delete(self):
+        current_user=get_jwt_identity()
+        result=delete(current_user)
+        if(result==DeleteResult.SUCCESS):
+            return{
+                "msg":"success"
+            },200
+        else:
+            return{
+                "error": "Invalid Value"
+            },400
     
 
 

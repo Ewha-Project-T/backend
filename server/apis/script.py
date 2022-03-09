@@ -2,6 +2,7 @@ from flask import jsonify, make_response
 from flask_restful import reqparse, Resource
 from flask_jwt_extended import jwt_required
 import werkzeug
+from ..services.script_service import fileDownload
 
 class ScriptAPI(Resource):
     @jwt_required()
@@ -14,10 +15,11 @@ class ScriptAPI(Resource):
         parser.add_argument('file_name', type=str, required=True, help="FileName is required")
         args = parser.parse_args()
         filename = args['file_name']
+        data = fileDownload(filename)
         headers = {}
         headers['Content-Type'] = 'text/json'
         headers['Content-Disposition'] = 'attachment; filename=selected_items.json'
-        return {"msg": filename}, 200, headers
+        return data, 200, headers
 
     @jwt_required()
     def put(self):

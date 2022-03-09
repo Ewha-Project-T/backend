@@ -16,10 +16,10 @@ class ScriptAPI(Resource):
         args = parser.parse_args()
         filename = args['file_name']
         data = fileDownload(filename)
-        headers = {}
-        headers['Content-Type'] = 'text/json'
-        headers['Content-Disposition'] = 'attachment; filename=selected_items.json'
-        return data, 200, headers
+        response = make_response(data)
+        response.headers['Content-Type'] = 'text/json'
+        response.headers['Content-Disposition'] = 'attachment; filename=selected_items.json'
+        return response
 
     @jwt_required()
     def put(self):

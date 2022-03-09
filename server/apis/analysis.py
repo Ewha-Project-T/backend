@@ -1,9 +1,9 @@
 from flask import jsonify
 from werkzeug.datastructures import FileStorage
-from werkzeug import secure_filename
+from werkzeug.utils import secure_filename
 from flask_restful import reqparse, Resource
 from ..services.login_service import login_required
-from ..services.scan_service import *
+from ..services.analysis_service import *
 
 UPLOAD_PATH ='./'
 class Analysis(Resource):

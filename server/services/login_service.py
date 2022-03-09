@@ -25,17 +25,18 @@ def login(user_id, user_pw):
     if(acc!=None and user_pw==acc.password):
         return LoginResult.SUCCESS, acc
     return LoginResult.INVALID_IDPW, acc
-def create_tokens(user: User):
+
+def create_tokens(user: User, **kwargs):
     identities = {
         "type": "login",
         "user_id": user.id,
         "user_name": user.name,
         "user_perm": user.permission
     }
-    return create_access_token(identities), create_refresh_token(identities)
+    return create_access_token(identities, **kwargs), create_refresh_token(identities, **kwargs)
 
 def register(user_id,user_pw,user_name,user_email):
-    if(len(user_id)<4 or len(user_id)>20 or len(user_pw)<4 or len(user_pw)>20):#아이디 비번 글자수제한
+    if(len(user_id)<4 or len(user_id)>20 or len(user_pw)<4 or len(user_pw)>20): #아이디 비번 글자수제한
         return RegisterResult.INVALID_IDPW
     acc = User.query.filter_by(id=user_id).first()
     if acc !=None:
@@ -62,8 +63,7 @@ def login_required():
             try:
                 verify_jwt_in_request()
                 claims = get_jwt()
-                print(claims)
-                if claims == None:
+                if(claims == None):
                     return {'msg':'로그인이 필요합니다.'}, 401
                 return func(*args, **kwargs)
             except:

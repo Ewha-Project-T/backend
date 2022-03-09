@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask_restful import Api
 from flasgger import Swagger
 from flask_cors import CORS
@@ -36,7 +36,7 @@ def check_if_token_is_revoked(jwt_header, jwt_payload):
     jti = jwt_payload["jti"]
     token_in_redis = jti in jwt_blocklist
     return token_in_redis
-
+    
 @app.route("/", methods=['GET'])
 def hello():
     return "CAT-Secuirty"

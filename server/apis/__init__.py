@@ -1,7 +1,8 @@
-from .login import Login
-from .loginRefresh import LoginRefresh
-from .login import Account
-from .script import ScriptAPI
+from login import Login
+from loginRefresh import LoginRefresh
+from login import Account
+from script import ScriptAPI
+from scan import Scan
 
 def load_api(api_module):
     #api.add_resource(api,'path',endpoint='엔드포인트 명시')
@@ -9,3 +10,4 @@ def load_api(api_module):
     api_module.add_resource(LoginRefresh,'/login-refresh',endpoint='login_refresh')
     api_module.add_resource(Account,'/del-account',endpoint='del_account')
     api_module.add_resource(ScriptAPI,'/script',endpoint='script')
+    api_module.add_resource(Scan,'/analysis',endpoint='analysis')

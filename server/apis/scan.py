@@ -6,3 +6,5 @@ class Scan(Resource):
     @login_required()
     def get(self):
         return {"msg":"scanAPI"}, 200
+    def post(self):
+        

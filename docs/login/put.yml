@@ -11,9 +11,15 @@ parameters:
     name: user_pw
     type: string
     required: true
+  - in: body
+    name: user_name
+    type: string
+    required: true
   - in: email
     name: email
     required: true
 responses:
   200:
     description: Register Success
+  400:
+    description: invalid parameter

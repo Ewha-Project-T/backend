@@ -1,4 +1,6 @@
+from unittest import registerResult
 from ..model import User
+from server import db
 
 class LoginResult:
     SUCCESS = 0
@@ -10,7 +12,7 @@ class RegisterResult:
     INVALID_IDPW = 1
     USERID_EXIST = 2
     USEREMAIL_EXIST = 3
-    INTERNAL_ERROR = 4
+    #INTERNAL_ERROR = 4 #없어도 되지않을까 싶음
 
 # def is_exist(column_name, value):
 #     user = User.query.filter(column_name==value).first()
@@ -18,9 +20,29 @@ class RegisterResult:
 
 def login(user_id, user_pw):
     acc = User.query.filter_by(id=user_id).first()
-    # password 는 평문으로 프론트에서 입력하지만 filter_by 로 직접 걸러내지않음
-    # verify_password 함수에서 SHA256 + SALT 를 통한 체크 해주어야 할 것
-    if(acc!=None and acc.verify_password(user_pw)):
+    if(acc!=None and user_pw==acc.password):
         return LoginResult.SUCCESS, acc
     return LoginResult.INVALID_IDPW, acc
+
+def register(user_id,user_pw,user_name,user_email):
+    if(len(user_id)<4 or len(user_id)>20 or len(user_pw)<4 or len(user_pw)>20):#아이디 비번 글자수제한
+        return RegisterResult.INVALID_IDPW
+    acc = User.query.filter_by(id=user_id).first()
+    if acc !=None:
+        return RegisterResult.USERID_EXIST
+    acc = User.query.filter_by(email=user_email).first()
+    if acc !=None:
+        return RegisterResult.USEREMAIL_EXIST
+
+    acc=User(id=user_id,password=user_pw,name=user_name,email=user_email)
+    db.session.add(acc)
+    db.session.commit
+    return RegisterResult.SUCCESS
+
+
+def delete(user_id,user_pw,user_name,user_email):
+    acc=User(id=user_id,password=user_pw,name=user_name,email=user_email)
+    db.session.delete(acc)
+    db.session.commit
+
 

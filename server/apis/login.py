@@ -2,10 +2,11 @@ from flask import jsonify
 from flask_restful import reqparse, Resource
 from flasgger import swag_from
 from flask_jwt_extended import (
-    jwt_required, create_access_token, get_jwt_identity, create_refresh_token,get_jwt
+    jwt_required, get_jwt_identity, get_jwt
 )
 import re
-from ..services.login_service import login,register,delete,LoginResult,RegisterResult,DeleteResult
+from ..services.login_service import login, register, delete, LoginResult, RegisterResult, create_tokens, DeleteResult
+
 
 jwt_blocklist = set() #로그아웃 사용
 
@@ -27,11 +28,10 @@ class Login(Resource):
         user_pw = args['pw']
         result, account = login(user_id, user_pw) # 계정정보 리턴
         if(result==LoginResult.SUCCESS):
-            access_token=create_access_token(identity=user_id)
-            refresh_token=create_refresh_token(identity=user_id)
+            access_token, refresh_token = create_tokens(account)
             return jsonify(
-                access_token=access_token,
-                refresh_token=refresh_token
+                access_token = "Bearer " + access_token,
+                refresh_token = "Bearer " + refresh_token
             )
         else:
             return {"msg":"Bad username or password"}, 401
@@ -52,7 +52,6 @@ class Login(Resource):
         if re.match("^[A-Za-z0-9]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[A-Za-z0-9])*\.[A-Za-z]{2,3}$", user_email):
             result=register(user_id,user_pw,user_name,user_email)
             if(result==RegisterResult.SUCCESS):
-                access_token=create_access_token(identity=user_id)
                 return{
                     "msg" : "success"
                 },200

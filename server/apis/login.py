@@ -86,6 +86,7 @@ class Login(Resource):
         return jsonify(msg="Access token revoked")
 
 class Account(Resource):#회원탈퇴용 class
+    @swag_from("../../docs/Account/delete.yml")
     @jwt_required()
     def delete(self):
         current_user=get_jwt_identity()

@@ -5,9 +5,12 @@ from flask_jwt_extended import (
     jwt_required, get_jwt_identity, create_access_token, get_jwt
 )
 import re
-from ..services.login_service import login, register, delete, LoginResult, RegisterResult, create_tokens, DeleteResult, change, ChangeResult
+from ..services.login_service import (
+    login, register, delete, LoginResult, RegisterResult, create_tokens, 
+    DeleteResult, change, ChangeResult, login_required
+)
 
-jwt_blocklist = set() #로그아웃 사용
+jwt_blocklist = set()
 
 class Login(Resource):
     @swag_from("../../docs/login/get.yml")
@@ -15,8 +18,7 @@ class Login(Resource):
     def get(self):
         current_user = get_jwt_identity()
         return jsonify(user_id=current_user)
-        
-    # login
+
     @swag_from("../../docs/login/post.yml")
     def post(self):
         parser = reqparse.RequestParser()
@@ -25,7 +27,7 @@ class Login(Resource):
         args = parser.parse_args()
         user_id = args['id']
         user_pw = args['pw']
-        result, account = login(user_id, user_pw) # 계정정보 리턴
+        result, account = login(user_id, user_pw)
         if(result==LoginResult.SUCCESS):
             access_token, refresh_token = create_tokens(account)
             return jsonify(
@@ -33,9 +35,8 @@ class Login(Resource):
                 refresh_token = refresh_token
             )
         else:
-            return {"msg":"Bad username or password"}, 401
+            return {"msg":"Bad username or password"}, 403
 
-    # register
     @swag_from("../../docs/login/put.yml")
     def put(self):
         parser = reqparse.RequestParser()
@@ -57,23 +58,23 @@ class Login(Resource):
             elif(result==RegisterResult.INVALID_IDPW):
                 return{
                     "error" : "invalid ID or PW"
-                },400
+                },403
             elif(result==RegisterResult.USERID_EXIST):
                 return{
                     "error" : "user id exist"
-                },400
+                },403
             elif(result==RegisterResult.USEREMAIL_EXIST):
                 return{
                     "error" : "user email exist"
-                },400
+                },403
             else:
                 return{
                     "error" : "internal error"
-                },400
+                },403
         else:
             return {
                 "error": "Invalid Email"
-            }, 400
+            }, 403
 
     @jwt_required()
     def patch(self):
@@ -91,22 +92,21 @@ class Login(Resource):
         if(res==ChangeResult.SUCCESS):
             return {'msg':'success'},200
         elif(res==ChangeResult.INCORRECT_PW):
-            return {'msg':'Incorrect old password'}, 401
+            return {'msg':'Incorrect old password'}, 403
         elif(res==ChangeResult.INVALID_PW):
-            return {'msg':'Invalid password'}, 401
+            return {'msg':'Invalid password'}, 403
         elif(res==ChangeResult.INVALID_EMAIL):
-            return {'msg':'Invalid email'}, 401
+            return {'msg':'Invalid email'}, 403
         elif(res==ChangeResult.INVALID_NAME):
-            return {'msg':'Invalid name'}, 401
+            return {'msg':'Invalid name'}, 403
 
-    # logout
     @jwt_required()
     def delete(self):
         jti = get_jwt()["jti"]
-        jwt_blocklist.add(jti) #redis,db를 이용하면 좋겠지만 시간이 늘어남
+        jwt_blocklist.add(jti)
         return jsonify(msg="Access token revoked")
 
-class Account(Resource):#회원탈퇴용 class
+class Account(Resource):
     @swag_from("../../docs/Account/delete.yml")
     @jwt_required()
     def delete(self):
@@ -119,9 +119,8 @@ class Account(Resource):#회원탈퇴용 class
         else:
             return{
                 "error": "delete account fail"
-            },400
+            },403
 
-# token refreshing API
 class LoginRefresh(Resource):
     @jwt_required(refresh=True)
     def get(self):

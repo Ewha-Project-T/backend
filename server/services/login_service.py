@@ -1,7 +1,7 @@
 from unittest import registerResult
 from ..model import User
 from server import db
-import functools
+from functools import wraps
 from flask_jwt_extended import create_refresh_token, create_access_token, verify_jwt_in_request, get_jwt, get_jwt_identity
 
 class LoginResult:
@@ -14,7 +14,6 @@ class RegisterResult:
     INVALID_IDPW = 1
     USERID_EXIST = 2
     USEREMAIL_EXIST = 3
-    #INTERNAL_ERROR = 4 #없어도 되지않을까 싶음
 
 class DeleteResult:
     SUCCESS = 0
@@ -75,7 +74,6 @@ def change(old_pw, new_pw, new_name, new_email):
         raise Exception("Not Logged In")
     acc = User.query.filter_by(id=userinfo["user_id"]).first()
     if(old_pw != None and new_pw != None):
-        # * old_pw 해시 한 것과 DB 내용과 비교해야함.
         if(old_pw != acc.password):
             return ChangeResult.INCORRECT_PW
         acc.password = new_pw
@@ -88,17 +86,17 @@ def change(old_pw, new_pw, new_name, new_email):
     return ChangeResult.SUCCESS
 
 def login_required():
-    def wrapper(func):
-        @functools.wraps(func)
+    def wrapper(fn):
+        @wraps(fn)
         def decorator(*args, **kwargs):
-            try:
-                verify_jwt_in_request()
-                claims = get_jwt()
-                if(claims == None):
-                    return {'msg':'로그인이 필요합니다.'}, 401
-                return func(*args, **kwargs)
-            except:
-                return {'msg':'유효하지 않은 토큰입니다.'}, 403
+            print('hi')
+            verify_jwt_in_request()
+            print('bye')
+            current_user=get_jwt_identity()
+            if(current_user == None or current_user['type'] != 'login'):
+                return {'msg': 'login is require!'}, 401
+            else:
+                return fn(*args, **kwargs)
         return decorator
     return wrapper
 

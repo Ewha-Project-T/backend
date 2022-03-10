@@ -1,6 +1,7 @@
 from flask import jsonify, send_file, send_from_directory
 from flask_restful import reqparse, Resource
 from flask_jwt_extended import jwt_required
+from werkzeug.utils import secure_filename
 import werkzeug
 import os
 
@@ -25,9 +26,9 @@ class ScriptAPI(Resource):
         parser.add_argument('file_name', type=werkzeug.datastructures.FileStorage, location='files', required=True, help="Not Valid File")
         args = parser.parse_args()
         file_object = args['file_name']
-        if(existFile(BASE_PATH + file_object.filename)):
+        if(existFile(BASE_PATH + secure_filename(file_object.filename))):
             return {"msg": "Filename is duplicated."}, 400
         else:
-            file_object.save(BASE_PATH + file_object.filename)
+            file_object.save(BASE_PATH + secure_filename(file_object.filename))
             return {"msg":"success"}, 200
 

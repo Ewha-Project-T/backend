@@ -2,7 +2,7 @@ from flask import jsonify
 from flask_restful import reqparse, Resource
 from flasgger import swag_from
 from flask_jwt_extended import (
-    jwt_required, get_jwt_identity, get_jwt
+    jwt_required, get_jwt_identity, create_access_token, get_jwt
 )
 import re
 from ..services.login_service import login, register, delete, LoginResult, RegisterResult, create_tokens, DeleteResult, change, ChangeResult
@@ -120,6 +120,16 @@ class Account(Resource):#회원탈퇴용 class
             return{
                 "error": "delete account fail"
             },400
+
+# token refreshing API
+class LoginRefresh(Resource):
+    @jwt_required(refresh=True)
+    def get(self):
+        current_user = get_jwt_identity()
+        new_access_token = create_access_token(identity=current_user, fresh=False)
+        return {
+            "access_token": new_access_token
+        }, 200
     
 
 

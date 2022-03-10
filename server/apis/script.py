@@ -14,7 +14,7 @@ def existFile(path):
 class ScriptAPI(Resource):
     @jwt_required()
     def get(self,fname):
-        file_path = BASE_PATH + fname
+        file_path = BASE_PATH + secure_filename(fname)
         if(existFile(file_path)):
             return send_file(file_path, as_attachment=True, attachment_filename='')
         else:

@@ -6,6 +6,7 @@ import werkzeug
 import os
 
 BASE_PATH = "script_files/"
+ALLOW_EXTENSION = ["txt","bat","exe"]
 
 def existFile(path):
     res = os.path.isfile(path)
@@ -26,8 +27,11 @@ class ScriptAPI(Resource):
         parser.add_argument('file_name', type=werkzeug.datastructures.FileStorage, location='files', required=True, help="Not Valid File")
         args = parser.parse_args()
         file_object = args['file_name']
-        if(existFile(BASE_PATH + secure_filename(file_object.filename))):
+        filename = secure_filename(file_object.filename)
+        if(existFile(BASE_PATH + filename)):
             return {"msg": "Filename is duplicated."}, 400
+        elif(filename.split(".")[-1] not in ALLOW_EXTENSION):
+            return {"msg": "Not Allowed extension"}, 403
         else:
             file_object.save(BASE_PATH + secure_filename(file_object.filename))
             return {"msg":"success"}, 200

@@ -2,6 +2,7 @@ from flask import jsonify, send_file, send_from_directory
 from flask_restful import reqparse, Resource
 from flask_jwt_extended import jwt_required
 from werkzeug.utils import secure_filename
+from ..services.login_service import admin_required
 from ..services.script_service import upload_script, upload_formatter, UploadResult
 import werkzeug
 import os
@@ -41,4 +42,3 @@ class ScriptAPI(Resource):
                 return {"msg":"success"}, 200
             elif(db_upload_result == UploadResult.DUPLICATED_NAME):
                 return {"msg":"Filename is duplicated in DB"}, 402
-

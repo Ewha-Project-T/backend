@@ -100,7 +100,7 @@ def admin_required():
             verify_jwt_in_request()
             claims = get_jwt()
             print(claims)
-            if claims["sub"]["user_perm"]==2:
+            if(claims["sub"]["user_perm"]==2):
                 return fn(*args, **kwargs)
             else:
                 return {"msg":"admin only"}, 403

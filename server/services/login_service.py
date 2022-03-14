@@ -35,18 +35,11 @@ class ChangeResult:
 
 def login(user_id, user_pw):
     acc = User.query.filter_by(id=user_id).first()
-<<<<<<< HEAD
-    key = base64.b64decode(acc.password)
-    salt = key[:32]
-    encrypt_pw = hashlib.pbkdf2_hmac('sha256', user_pw.encode('utf-8'), salt, 100000, dklen=128)
-    if(acc!=None and encrypt_pw==key[32:]):
-=======
     if(acc.login_fail_limit>=5):
         return LoginResult.LOGIN_COUNT_EXCEEDED, acc
     if(acc!=None and user_pw==acc.password):
         acc.login_fail_limit=0
         db.session.commit
->>>>>>> 3b16fd49661009d6495ae1a6519a5f01e83ea0ee
         return LoginResult.SUCCESS, acc
     acc.login_fail_limit+=1
     db.session.commit

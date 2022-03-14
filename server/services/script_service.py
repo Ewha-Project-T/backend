@@ -1,6 +1,8 @@
 from ..model import Script
 from server import db
 from datetime import datetime
+from sqlalchemy import text
+from sqlalchemy import select
 
 class UploadResult:
     SUCCESS = 0 
@@ -22,3 +24,17 @@ def upload_script(script_type, proj_no, file_name):
     db.session.add(file)
     db.session.commit
     return UploadResult.SUCCESS
+
+def script_listing():
+    script_list = Script.query.all()
+    script_list_result = []
+    for script in script_list:
+        tmp = {}
+        tmp["id"] = vars(script)["id"]
+        tmp["type"] = vars(script)["type"]
+        tmp["project_no"] = vars(script)["project_no"]
+        tmp["script_name"] = vars(script)["script_name"]
+        script_list_result.append(tmp)
+    return script_list_result
+
+

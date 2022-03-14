@@ -3,9 +3,6 @@ from ..model import User
 from server import db
 from functools import wraps
 from flask_jwt_extended import create_refresh_token, create_access_token, verify_jwt_in_request, get_jwt, get_jwt_identity
-import hashlib
-import os
-import base64
 
 
 class LoginResult:

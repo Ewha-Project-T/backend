@@ -30,8 +30,12 @@ class ChangeResult:
 
 def login(user_id, user_pw):
     acc = User.query.filter_by(id=user_id).first()
-    if(acc!=None and user_pw==acc.password):
+    if(acc!=None and user_pw==acc.password and acc.login_fail_limit<5):
+        acc.login_fail_limit=0
+        db.session.commit
         return LoginResult.SUCCESS, acc
+    acc.login_fail_limit+=1
+    db.session.commit
     return LoginResult.INVALID_IDPW, acc
 
 def create_tokens(user: User, **kwargs):

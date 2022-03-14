@@ -7,7 +7,8 @@ from flask_jwt_extended import create_refresh_token, create_access_token, verify
 class LoginResult:
     SUCCESS = 0
     INVALID_IDPW = 1
-    INTERNAL_ERROR = 2
+    LOGIN_COUNT_EXCEEDED=2
+    INTERNAL_ERROR = 3
 
 class RegisterResult:
     SUCCESS = 0
@@ -30,8 +31,14 @@ class ChangeResult:
 
 def login(user_id, user_pw):
     acc = User.query.filter_by(id=user_id).first()
+    if(acc.login_fail_limit>=5):
+        return LoginResult.LOGIN_COUNT_EXCEEDED, acc
     if(acc!=None and user_pw==acc.password):
+        acc.login_fail_limit=0
+        db.session.commit
         return LoginResult.SUCCESS, acc
+    acc.login_fail_limit+=1
+    db.session.commit
     return LoginResult.INVALID_IDPW, acc
 
 def create_tokens(user: User, **kwargs):

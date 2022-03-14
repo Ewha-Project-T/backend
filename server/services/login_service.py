@@ -1,4 +1,3 @@
-from unittest import registerResult
 from ..model import User
 from server import db
 from functools import wraps

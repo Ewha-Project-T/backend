@@ -27,7 +27,7 @@ class Project(db.Model):
     __tablename__ = "project"
     project_no = db.Column(db.Integer, primary_key=True)
     pm_no = db.Column(db.Integer, db.ForeignKey("user.user_no"), nullable=False)
-    project_name = db.Column(db.String(50), nullable=False)
+    project_name = db.Column(db.String(50),unique=True ,nullable=False)
     start_date = db.Column(db.DateTime,nullable=False)
     end_date = db.Column(db.DateTime,nullable=False)
 

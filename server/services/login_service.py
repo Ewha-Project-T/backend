@@ -1,7 +1,7 @@
 from unittest import registerResult
 from ..model import User
 from server import db
-import functools
+from functools import wraps
 from flask_jwt_extended import create_refresh_token, create_access_token, verify_jwt_in_request, get_jwt, get_jwt_identity
 import hashlib
 import os
@@ -11,14 +11,14 @@ import base64
 class LoginResult:
     SUCCESS = 0
     INVALID_IDPW = 1
-    INTERNAL_ERROR = 2
+    LOGIN_COUNT_EXCEEDED=2
+    INTERNAL_ERROR = 3
 
 class RegisterResult:
     SUCCESS = 0
     INVALID_IDPW = 1
     USERID_EXIST = 2
     USEREMAIL_EXIST = 3
-    #INTERNAL_ERROR = 4 #없어도 되지않을까 싶음
 
 class DeleteResult:
     SUCCESS = 0
@@ -35,11 +35,21 @@ class ChangeResult:
 
 def login(user_id, user_pw):
     acc = User.query.filter_by(id=user_id).first()
+<<<<<<< HEAD
     key = base64.b64decode(acc.password)
     salt = key[:32]
     encrypt_pw = hashlib.pbkdf2_hmac('sha256', user_pw.encode('utf-8'), salt, 100000, dklen=128)
     if(acc!=None and encrypt_pw==key[32:]):
+=======
+    if(acc.login_fail_limit>=5):
+        return LoginResult.LOGIN_COUNT_EXCEEDED, acc
+    if(acc!=None and user_pw==acc.password):
+        acc.login_fail_limit=0
+        db.session.commit
+>>>>>>> 3b16fd49661009d6495ae1a6519a5f01e83ea0ee
         return LoginResult.SUCCESS, acc
+    acc.login_fail_limit+=1
+    db.session.commit
     return LoginResult.INVALID_IDPW, acc
 
 def create_tokens(user: User, **kwargs):
@@ -88,7 +98,6 @@ def change(old_pw, new_pw, new_name, new_email):
         raise Exception("Not Logged In")
     acc = User.query.filter_by(id=userinfo["user_id"]).first()
     if(old_pw != None and new_pw != None):
-        # * old_pw 해시 한 것과 DB 내용과 비교해야함.
         if(old_pw != acc.password):
             return ChangeResult.INCORRECT_PW
         acc.password = new_pw
@@ -101,17 +110,17 @@ def change(old_pw, new_pw, new_name, new_email):
     return ChangeResult.SUCCESS
 
 def login_required():
-    def wrapper(func):
-        @functools.wraps(func)
+    def wrapper(fn):
+        @wraps(fn)
         def decorator(*args, **kwargs):
-            try:
-                verify_jwt_in_request()
-                claims = get_jwt()
-                if(claims == None):
-                    return {'msg':'로그인이 필요합니다.'}, 401
-                return func(*args, **kwargs)
-            except:
-                return {'msg':'유효하지 않은 토큰입니다.'}, 403
+            print('hi')
+            verify_jwt_in_request()
+            print('bye')
+            current_user=get_jwt_identity()
+            if(current_user == None or current_user['type'] != 'login'):
+                return {'msg': 'login is require!'}, 401
+            else:
+                return fn(*args, **kwargs)
         return decorator
     return wrapper
 

@@ -15,16 +15,16 @@ app.config['SWAGGER'] = {
 }
 
 
-app.config['SECRET_KEY'] = 'CAT-Security-King-God'#토큰에 쓰일 비밀키
+app.config['SECRET_KEY'] = 'CAT-Security-King-God'
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
 app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://cert:cert@203.229.206.16:12344/cert"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True #안하면 insert문 작동안함
+app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True 
 db.init_app(app)
 jwt=JWTManager(app)
 
-CORS(app) # 모든 출처에 대해서 CORS 허용 세세한 설정 추후 논의
-myApi=Api(app)
+CORS(app)
+myApi=Api(app, errors=Flask.errorhandler)
 swagger = Swagger(
     app, 
     template_file=r"docs/template.yml",

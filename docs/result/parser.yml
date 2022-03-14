@@ -1,0 +1,15 @@
+XML Log Parser
+---
+tags:
+  - Parser APIs
+parameters:
+  - in: body
+    name: xmlname
+    type: string
+    requierd: True
+
+responses:
+  200:
+    description: XML Parse Success
+  400:
+    description: File Not Found

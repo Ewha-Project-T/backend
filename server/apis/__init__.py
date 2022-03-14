@@ -12,3 +12,4 @@ def load_api(api_module):
     api_module.add_resource(ScriptAPI,'/script/<fname>',endpoint='script_get')
     api_module.add_resource(ScriptAPI,'/script',endpoint='script')
     api_module.add_resource(Analysis,'/analysis',endpoint='analysis')
+    #api_module.add_resource(Result,'/result',endpoint='result')

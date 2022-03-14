@@ -64,13 +64,7 @@ def register(user_id,user_pw,user_name,user_email):
     if acc !=None:
         return RegisterResult.USEREMAIL_EXIST
 
-    salt = os.urandom(32)
-    key = hashlib.pbkdf2_hmac('sha256', user_pw.encode('utf-8'), salt, 100000, dklen=128)
-    encrypt_pw = salt + key # [:32] = salt, [32:] = key
-    encrypt_pw = base64.b64encode(encrypt_pw)
-
-    acc=User(id=user_id,password=encrypt_pw,name=user_name,email=user_email)
-    #acc=User(id=user_id,password=user_pw,name=user_name,email=user_email)
+    acc=User(id=user_id,password=user_pw,name=user_name,email=user_email)
     db.session.add(acc)
     db.session.commit
     return RegisterResult.SUCCESS

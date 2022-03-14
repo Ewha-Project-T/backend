@@ -42,3 +42,9 @@ class ScriptAPI(Resource):
             elif(db_upload_result == UploadResult.DUPLICATED_NAME):
                 return {"msg":"Filename is duplicated in DB"}, 402
 
+class ListAPI(Resource):
+    @swag_from("../../docs/login/get.yml")
+    def get(self):
+        return jsonify({'filename':scriptListing()})
+                
+

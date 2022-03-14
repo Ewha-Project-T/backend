@@ -7,6 +7,7 @@ import hashlib
 import os
 import base64
 
+from flask import jsonify
 
 class LoginResult:
     SUCCESS = 0
@@ -99,19 +100,19 @@ def change(old_pw, new_pw, new_name, new_email):
     db.session.commit()
     return ChangeResult.SUCCESS
 
-def login_required():
+def admin_required():
     def wrapper(fn):
         @wraps(fn)
         def decorator(*args, **kwargs):
-            print('hi')
             verify_jwt_in_request()
-            print('bye')
-            current_user=get_jwt_identity()
-            if(current_user == None or current_user['type'] != 'login'):
-                return {'msg': 'login is require!'}, 401
-            else:
+            claims = get_jwt()
+            print(claims)
+            if claims["sub"]["user_perm"]==2:
                 return fn(*args, **kwargs)
-        return decorator
-    return wrapper
+            else:
+                return {"msg":"admin only"}, 403
 
+        return decorator
+
+    return wrapper
 

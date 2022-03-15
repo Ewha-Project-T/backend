@@ -1,33 +1,52 @@
 from unittest import registerResult
 from ..model import User
 from server import db
-import functools
-from flask_jwt_extended import create_refresh_token, create_access_token, verify_jwt_in_request, get_jwt
+from functools import wraps
+from flask_jwt_extended import create_refresh_token, create_access_token, verify_jwt_in_request, get_jwt, get_jwt_identity
+import hashlib
+import os
+import base64
+
+from flask import jsonify
 
 class LoginResult:
     SUCCESS = 0
     INVALID_IDPW = 1
-    INTERNAL_ERROR = 2
+    LOGIN_COUNT_EXCEEDED=2
+    INTERNAL_ERROR = 3
 
 class RegisterResult:
     SUCCESS = 0
     INVALID_IDPW = 1
     USERID_EXIST = 2
     USEREMAIL_EXIST = 3
-    #INTERNAL_ERROR = 4 #없어도 되지않을까 싶음
 
 class DeleteResult:
     SUCCESS = 0
     INVALID_ID = 1
-
-# def is_exist(column_name, value):
-#     user = User.query.filter(column_name==value).first()
-#     return user != None
+    PW_NOT_MATCHED = 2
+    INVALID_EMAIL = 3
+    
+class ChangeResult:
+    SUCCESS = 0
+    INVALID_PW = 1
+    INCORRECT_PW = 2
+    INVALID_EMAIL = 3
+    INVALID_NAME = 4
 
 def login(user_id, user_pw):
     acc = User.query.filter_by(id=user_id).first()
-    if(acc!=None and user_pw==acc.password):
+    passwd = base64.b64decode(acc.password)
+    salt = passwd[:32]
+    encrypt_pw = hashlib.pbkdf2_hmac('sha256', user_pw.encode('utf-8'), salt, 100000, dklen=128)
+    if(acc.login_fail_limit>=5):
+        return LoginResult.LOGIN_COUNT_EXCEEDED, acc
+    if(acc!=None and encrypt_pw==passwd[32:]):
+        acc.login_fail_limit=0
+        db.session.commit
         return LoginResult.SUCCESS, acc
+    acc.login_fail_limit+=1
+    db.session.commit
     return LoginResult.INVALID_IDPW, acc
 
 def create_tokens(user: User, **kwargs):
@@ -56,26 +75,44 @@ def register(user_id,user_pw,user_name,user_email):
 
 
 def delete(user_id):
-    acc= User.query.filter_by(id=user_id).first()
+    acc = User.query.filter_by(id=user_id).first()
+    print(acc)
     if(acc==None):
         return DeleteResult.INVALID_ID
     db.session.delete(acc)
     db.session.commit
     return DeleteResult.SUCCESS
 
-def login_required():
-    def wrapper(func):
-        @functools.wraps(func)
-        def decorator(*args, **kwargs):
-            try:
-                verify_jwt_in_request()
-                claims = get_jwt()
-                if(claims == None):
-                    return {'msg':'로그인이 필요합니다.'}, 401
-                return func(*args, **kwargs)
-            except:
-                return {'msg':'유효하지 않은 토큰입니다.'}, 403
-        return decorator
-    return wrapper
+def change(old_pw, new_pw, new_name, new_email):
+    userinfo = get_jwt_identity()
+    if(userinfo==None):
+        raise Exception("Not Logged In")
+    acc = User.query.filter_by(id=userinfo["user_id"]).first()
+    if(old_pw != None and new_pw != None):
+        if(old_pw != acc.password):
+            return ChangeResult.INCORRECT_PW
+        acc.password = new_pw
+    if(new_name != None):
+        acc.name = new_name
+    if(new_email != None):
+        acc.email = new_email
+    db.session.add(acc)
+    db.session.commit()
+    return ChangeResult.SUCCESS
 
+def admin_required():
+    def wrapper(fn):
+        @wraps(fn)
+        def decorator(*args, **kwargs):
+            verify_jwt_in_request()
+            claims = get_jwt()
+            print(claims)
+            if(claims["sub"]["user_perm"]==2):
+                return fn(*args, **kwargs)
+            else:
+                return {"msg":"admin only"}, 403
+
+        return decorator
+
+    return wrapper
 

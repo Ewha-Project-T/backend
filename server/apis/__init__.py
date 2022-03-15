@@ -3,7 +3,10 @@ from .script import ScriptAPI, ScriptListingAPI
 from .analysis import Analysis
 from .project import Project
 from .parser import XML_Parser
+<<<<<<< HEAD
 
+=======
+>>>>>>> c81623c9640b19b6ff2ed65dce3da555f9c2dae8
 
 def load_api(api_module):
     api_module.add_resource(Login,'/login',endpoint='login') # GET POST PUT PATCH DELETE

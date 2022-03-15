@@ -2,10 +2,11 @@ import zipfile
 import tarfile
 import os
 import time
+import shutil
 from werkzeug.utils import secure_filename
 ALLOWED_EXTENSIONS = set(['zip', 'xml','tar'])
 
-UPLOAD_PATH ='../../uploads/'
+UPLOAD_PATH ='./uploads/'
 
 def compression_extract(file_path, ext):
 
@@ -27,7 +28,12 @@ def get_file_ext(filename):
             return filename.rsplit('.',1)[1]
     return ''
 
-
+def delete_analysis_file(file_path):
+    folder_path = os.path.dirname(file_path)
+    if os.path.exists(folder_path):
+        shutil.rmtree(folder_path)
+        
+    return ''
 
 def upload_file(fd):
     random_dir = time.strftime("%Y%m%d_%H%M%S")[2:]

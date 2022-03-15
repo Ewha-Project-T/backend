@@ -4,7 +4,7 @@ tags:
   - Parser APIs
 parameters:
   - in: body
-    name: xmlname
+    name: xml_name
     type: string
     requierd: True
 

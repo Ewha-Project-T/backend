@@ -1,8 +1,6 @@
-from sre_constants import SUCCESS
-from unittest import registerResult
 from ..model import Project,User
 from server import db
-from flask_jwt_extended import create_refresh_token, create_access_token, verify_jwt_in_request, get_jwt, get_jwt_identity
+
 
 class LoginResult:
     SUCCESS = 0

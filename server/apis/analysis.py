@@ -2,16 +2,16 @@ from flask import jsonify
 from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
 from flask_restful import reqparse, Resource
-from ..services.login_service import login_required
+from flask_jwt_extended import jwt_required
 from ..services.analysis_service import *
 
 UPLOAD_PATH ='../../uploads'
 class Analysis(Resource):
-    @login_required()
+    @jwt_required()
     def get(self):
         return {"msg":"scanAPI"}, 200
 
-    @login_required()
+    @jwt_required()
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('file', type=FileStorage, location='files', action='append')
@@ -31,7 +31,7 @@ class Analysis(Resource):
 
 
 
-    @login_required()
+    @jwt_required()
     def put(self):
         parser = reqparse.RequestParser()
         parser.add_argument('file_name', type=str, required=True, help="FileName is required")

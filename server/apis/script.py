@@ -1,7 +1,10 @@
-from flask import jsonify, send_file, send_from_directory
+from flask import jsonify, send_file
 from flask_restful import reqparse, Resource
 from flask_jwt_extended import jwt_required
 from werkzeug.utils import secure_filename
+from ..services.login_service import admin_required
+from ..services.script_service import upload_script, upload_formatter, UploadResult, script_listing
+import json
 import werkzeug
 import os
 
@@ -28,11 +31,22 @@ class ScriptAPI(Resource):
         args = parser.parse_args()
         file_object = args['file_name']
         filename = secure_filename(file_object.filename)
+        filename = upload_formatter(filename)
         if(existFile(BASE_PATH + filename)):
             return {"msg": "Filename is duplicated."}, 400
         elif(filename.split(".")[-1] not in ALLOW_EXTENSION):
             return {"msg": "Not Allowed extension"}, 403
         else:
-            file_object.save(BASE_PATH + secure_filename(file_object.filename))
-            return {"msg":"success"}, 200
+            db_upload_result = upload_script("web",1,filename)
+            if(db_upload_result == UploadResult.SUCCESS):    
+                file_object.save(BASE_PATH + secure_filename(file_object.filename))
+                return {"msg":"success"}, 200
+            elif(db_upload_result == UploadResult.DUPLICATED_NAME):
+                return {"msg":"Filename is duplicated in DB"}, 402
+
+class ScriptListingAPI(Resource):
+    def get(self):
+        script_list = script_listing()
+        return jsonify(script_list=script_list)
+                
 

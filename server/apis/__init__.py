@@ -1,5 +1,5 @@
 from .login import Login, LoginRefresh, Account
-from .script import ScriptAPI
+from .script import ScriptAPI, ScriptListingAPI
 from .analysis import Analysis
 from .project import Project
 
@@ -11,3 +11,6 @@ def load_api(api_module):
     api_module.add_resource(ScriptAPI,'/script',endpoint='script') # POST - UPLOAD
     api_module.add_resource(Analysis,'/analysis',endpoint='analysis')
     api_module.add_resource(Project,'/project',endpoint='project')
+    api_module.add_resource(Project,'/project/<project_no>',endpoint='project_del')
+    api_module.add_resource(ScriptListingAPI,'/script-list',endpoint='script_list')
+

@@ -2,6 +2,7 @@ from ..model import User
 from server import db
 from functools import wraps
 from flask_jwt_extended import create_refresh_token, create_access_token, verify_jwt_in_request, get_jwt, get_jwt_identity
+from flask import jsonify
 
 class LoginResult:
     SUCCESS = 0
@@ -67,7 +68,6 @@ def register(user_id,user_pw,user_name,user_email):
 
 def delete(user_id):
     acc = User.query.filter_by(id=user_id).first()
-    print(acc)
     if(acc==None):
         return DeleteResult.INVALID_ID
     db.session.delete(acc)
@@ -91,19 +91,19 @@ def change(old_pw, new_pw, new_name, new_email):
     db.session.commit()
     return ChangeResult.SUCCESS
 
-def login_required():
+def admin_required():
     def wrapper(fn):
         @wraps(fn)
         def decorator(*args, **kwargs):
-            print('hi')
             verify_jwt_in_request()
-            print('bye')
-            current_user=get_jwt_identity()
-            if(current_user == None or current_user['type'] != 'login'):
-                return {'msg': 'login is require!'}, 401
-            else:
+            claims = get_jwt()
+            print(claims)
+            if(claims["sub"]["user_perm"]==2):
                 return fn(*args, **kwargs)
-        return decorator
-    return wrapper
+            else:
+                return {"msg":"admin only"}, 403
 
+        return decorator
+
+    return wrapper
 

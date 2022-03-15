@@ -6,7 +6,7 @@ import shutil
 from werkzeug.utils import secure_filename
 ALLOWED_EXTENSIONS = set(['zip', 'xml','tar'])
 
-UPLOAD_PATH ='../../uploads/'
+UPLOAD_PATH ='./uploads/'
 
 def compression_extract(file_path, ext):
 

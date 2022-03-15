@@ -6,7 +6,7 @@ from flask_jwt_extended import jwt_required
 from server.services.login_service import delete
 from ..services.analysis_service import *
 
-UPLOAD_PATH ='../../uploads'
+
 class Analysis(Resource):
     @jwt_required()
     def get(self,filename):

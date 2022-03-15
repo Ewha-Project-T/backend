@@ -3,6 +3,7 @@ from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
 from flask_restful import reqparse, Resource
 from flask_jwt_extended import jwt_required
+from server.services.login_service import delete
 from ..services.analysis_service import *
 
 UPLOAD_PATH ='../../uploads'
@@ -15,10 +16,6 @@ class Analysis(Resource):
 
         return send_file(file_path, as_attachment=True, attachment_filename=pure_name)
 
-        
-
-
-        return {"msg":"scanAPI"}, 200
 
     @jwt_required()
     def post(self):
@@ -38,14 +35,12 @@ class Analysis(Resource):
         if file_ext == "zip" or file_ext == "tar":
             compression_extract(uploaded_path , file_ext)
 
-
         '''
         insert paring code ()
         save parinsg result
         '''
             
         return {"msg":"ok"}, 200
-
 
 
     @jwt_required()
@@ -56,4 +51,17 @@ class Analysis(Resource):
         filename = args['file_name']
         
         return {"msg":filename}, 200
-        
+    
+    @jwt_required()
+    def delete(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('file_name', type=str, required=True, help="FileName is required")
+        args = parser.parse_args()
+
+        filename = args['file_name']        
+
+        file_path = ''# Get analysis file path From DB
+
+        delete_analysis_file(file_path)
+
+        return ''

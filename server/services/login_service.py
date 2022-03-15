@@ -3,6 +3,10 @@ from ..model import User
 from server import db
 from functools import wraps
 from flask_jwt_extended import create_refresh_token, create_access_token, verify_jwt_in_request, get_jwt, get_jwt_identity
+import hashlib
+import os
+import base64
+
 from flask import jsonify
 
 class LoginResult:
@@ -32,9 +36,12 @@ class ChangeResult:
 
 def login(user_id, user_pw):
     acc = User.query.filter_by(id=user_id).first()
+    passwd = base64.b64decode(acc.password)
+    salt = passwd[:32]
+    encrypt_pw = hashlib.pbkdf2_hmac('sha256', user_pw.encode('utf-8'), salt, 100000, dklen=128)
     if(acc.login_fail_limit>=5):
         return LoginResult.LOGIN_COUNT_EXCEEDED, acc
-    if(acc!=None and user_pw==acc.password):
+    if(acc!=None and encrypt_pw==passwd[32:]):
         acc.login_fail_limit=0
         db.session.commit
         return LoginResult.SUCCESS, acc

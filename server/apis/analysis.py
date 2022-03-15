@@ -9,6 +9,10 @@ UPLOAD_PATH ='../../uploads'
 class Analysis(Resource):
     @login_required()
     def get(self):
+
+        
+
+
         return {"msg":"scanAPI"}, 200
 
     @login_required()
@@ -23,9 +27,19 @@ class Analysis(Resource):
 
         
         uploaded_path = upload_file(fd)
-     
+        
+        #insert sql uploaded_path
+
         if file_ext == "zip" or file_ext == "tar":
             compression_extract(uploaded_path , file_ext)
+
+
+
+        '''
+        insert paring code ()
+        save parinsg result
+
+        '''
             
         return {"msg":"ok"}, 200
 

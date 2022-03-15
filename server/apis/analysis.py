@@ -1,4 +1,4 @@
-from flask import jsonify
+from flask import jsonify, send_file
 from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
 from flask_restful import reqparse, Resource
@@ -8,7 +8,16 @@ from ..services.analysis_service import *
 UPLOAD_PATH ='../../uploads'
 class Analysis(Resource):
     @jwt_required()
-    def get(self):
+    def get(self,filename):
+
+        file_path = ''# Get File Path From DB
+        pure_name = os.path.basename(file_path)
+
+        return send_file(file_path, as_attachment=True, attachment_filename=pure_name)
+
+        
+
+
         return {"msg":"scanAPI"}, 200
 
     @jwt_required()
@@ -23,9 +32,17 @@ class Analysis(Resource):
 
         
         uploaded_path = upload_file(fd)
-     
+        
+        # Insert 'uploaded_path' in DB 
+
         if file_ext == "zip" or file_ext == "tar":
             compression_extract(uploaded_path , file_ext)
+
+
+        '''
+        insert paring code ()
+        save parinsg result
+        '''
             
         return {"msg":"ok"}, 200
 

@@ -17,7 +17,11 @@ class XML_Parser(Resource):
         result, group_code, group_name, title_code, title_name, important, decision, issue = parse_xml(xml_name)
         if(result==ParseResult.SUCCESS):
             #return group_code, group_name, title_code, title_name, important, decision, issue
-            return {"msg":"success"}, 200
+            xml_result = []
+            for i in range(len(group_code)):
+                xml_result.append(["{ group_code : \"" + group_code[i] + "\",title_code : \"" + title_code[i] + "\",title_name : \"" + title_name[i] + "\",important : \"" + important[i] + "\",decision : \"" + decision[i] + "\",issue : \"" + issue[i] + "\" }"])
+            return xml_result
+            #return {"msg":"success"}, 200
         else:
             return {"msg":"invalid file name"}, 401
 			

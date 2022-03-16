@@ -45,8 +45,10 @@ class ScriptAPI(Resource):
                 return {"msg":"Filename is duplicated in DB"}, 402
 
 class ScriptListingAPI(Resource):
+    @jwt_required
     def get(self):
-        script_list = script_listing()
+        current_user = get_jwt_identity()
+        script_list = script_listing(current_user["project_no"])
         return jsonify(script_list=script_list)
                 
 

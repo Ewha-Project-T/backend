@@ -59,7 +59,7 @@ def create_tokens(user: User, **kwargs):
     }
     return create_access_token(identities, **kwargs), create_refresh_token(identities, **kwargs)
 
-def register(user_id,user_pw,user_name,user_email):
+def register(user_id,user_pw,user_name,user_email, project_no):
     if(len(user_id)<4 or len(user_id)>20 or len(user_pw)<4 or len(user_pw)>20): #아이디 비번 글자수제한
         return RegisterResult.INVALID_IDPW
     acc = User.query.filter_by(id=user_id).first()
@@ -69,7 +69,7 @@ def register(user_id,user_pw,user_name,user_email):
     if acc !=None:
         return RegisterResult.USEREMAIL_EXIST
 
-    acc=User(id=user_id,password=user_pw,name=user_name,email=user_email,project_no=0)
+    acc=User(id=user_id,password=user_pw,name=user_name,email=user_email,project_no=project_no)
     db.session.add(acc)
     db.session.commit
     return RegisterResult.SUCCESS

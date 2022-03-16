@@ -52,7 +52,7 @@ class Login(Resource):
         user_name=args['name']
         user_email = args['email']
         if re.match("^[A-Za-z0-9]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[A-Za-z0-9])*\.[A-Za-z]{2,3}$", user_email):
-            result=register(user_id,user_pw,user_name,user_email)
+            result=register(user_id,user_pw,user_name,user_email, 1)
             if(result==RegisterResult.SUCCESS):
                 return{
                     "msg" : "success"

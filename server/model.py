@@ -44,6 +44,16 @@ class Script(db.Model):
     type = db.Column(db.String(10), nullable=False)
     project_no = db.Column(db.Integer, db.ForeignKey("project.project_no"), nullable=False)
     script_name = db.Column(db.String(50), unique=True, nullable=False)
+
+class Analysis(db.Model):
+    __tablename__ = "analysis"
+    
+    xml_no = db.Column(db.Integer, primary_key=True)
+    upload_time = db.Column(db.DateTime, nullable=False)
+    project_no = db.Column(db.Integer, db.ForeignKey("project.project_no"), nullable=False)
+    user_no = db.Column(db.Integer, db.ForeignKey("user.user_no"), nullable=False)
+    path = db.Column(db.String(100), nullable=False, unique=True)
+    comment = db.Column(db.String(1000), nullable=True)
     
 
 

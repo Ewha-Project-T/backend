@@ -17,7 +17,7 @@ class Login(Resource):
     @jwt_required()
     def get(self):
         current_user = get_jwt_identity()
-        return jsonify(user_id=current_user)
+        return jsonify(user_account=current_user)
 
     @swag_from("../../docs/login/post.yml")
     def post(self):

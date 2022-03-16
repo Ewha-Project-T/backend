@@ -14,6 +14,7 @@ class User(db.Model):
     name = db.Column(db.String(100), unique=True, nullable=False)
     email = db.Column(db.String(50), unique=True, nullable=False)
     login_fail_limit = db.Column(db.Integer, default=0)
+    project_no = db.Column(db.Integer, db.ForeignKey("project.project_no"), nullable=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -32,7 +33,6 @@ class User(db.Model):
 class Project(db.Model):
     __tablename__ = "project"
     project_no = db.Column(db.Integer, primary_key=True)
-    pm_no = db.Column(db.Integer, db.ForeignKey("user.user_no"), nullable=False)
     project_name = db.Column(db.String(50), nullable=False)
     start_date = db.Column(db.DateTime,nullable=False)
     end_date = db.Column(db.DateTime,nullable=False)

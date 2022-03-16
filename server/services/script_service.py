@@ -25,8 +25,8 @@ def upload_script(script_type, proj_no, file_name):
     db.session.commit
     return UploadResult.SUCCESS
 
-def script_listing():
-    script_list = Script.query.all()
+def script_listing(proj_no):
+    script_list = Script.query.filter_by(project_no=proj_no)
     script_list_result = []
     for script in script_list:
         tmp = {}

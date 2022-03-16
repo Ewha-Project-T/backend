@@ -63,8 +63,8 @@ def register(user_id,user_pw,user_name,user_email):
     acc = User.query.filter_by(email=user_email).first()
     if acc !=None:
         return RegisterResult.USEREMAIL_EXIST
-
-    acc=User(id=user_id,password=user_pw,name=user_name,email=user_email)
+    passwd=User.encrypt_password(user_pw)
+    acc=User(id=user_id,password=passwd,name=user_name,email=user_email)
     db.session.add(acc)
     db.session.commit
     return RegisterResult.SUCCESS

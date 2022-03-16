@@ -54,7 +54,8 @@ def create_tokens(user: User, **kwargs):
         "type": "login",
         "user_id": user.id,
         "user_name": user.name,
-        "user_perm": user.permission
+        "user_perm": user.permission,
+        "project_no": user.project_no
     }
     return create_access_token(identities, **kwargs), create_refresh_token(identities, **kwargs)
 

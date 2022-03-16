@@ -132,6 +132,14 @@ class LoginRefresh(Resource):
             "access_token": new_access_token
         }, 200
     
+class Admin(Resource):
+    @admin_required()
+    def get(self):
+        current_admin = get_jwt_identity()
+        if(current_admin["user_perm"]==2):
+            return {"msg":"admin authenticated"}, 200
+        return {"msg": "you're not admin"}, 403
+
 
 
 

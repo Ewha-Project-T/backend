@@ -10,6 +10,10 @@ class UploadResult:
     INVALID_EXTENSION = 2
     INTERNAL_ERROR = 3
 
+class DownloadAuthResult:
+    SUCCESS = 0
+    INVALID = 1
+    
 def upload_formatter(file_name):
     now = datetime.now()
     current_time = now.strftime("%H_%M_%S")
@@ -24,6 +28,13 @@ def upload_script(script_type, proj_no, file_name):
     db.session.add(file)
     db.session.commit
     return UploadResult.SUCCESS
+
+def download_auth_check(proj_no, file_name):
+    file = Script.query.filter_by(script_name=file_name).first()
+    if(file.project_no == proj_no):
+        return DownloadAuthResult.SUCCESS
+    else:
+        return DownloadAuthResult.INVALID
 
 def script_listing(proj_no):
     script_list = Script.query.filter_by(project_no=proj_no)

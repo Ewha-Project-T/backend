@@ -3,7 +3,10 @@ from flask_restful import reqparse, Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from werkzeug.utils import secure_filename
 from ..services.login_service import admin_required
-from ..services.script_service import upload_script, upload_formatter, UploadResult, script_listing
+from ..services.script_service import (
+    upload_script, upload_formatter, UploadResult, script_listing, 
+    DownloadAuthResult, download_auth_check
+)
 import json
 import werkzeug
 import os
@@ -18,9 +21,13 @@ def existFile(path):
 class ScriptAPI(Resource):
     @jwt_required()
     def get(self,fname):
+        current_user = get_jwt_identity()
         file_path = BASE_PATH + secure_filename(fname)
         if(existFile(file_path)):
-            return send_file(file_path, as_attachment=True, attachment_filename='')
+            if(download_auth_check(current_user["project_no"], fname) == DownloadAuthResult.SUCCESS):
+                return send_file(file_path, as_attachment=True, attachment_filename='')
+            else:
+                return {"msg": "check your project"}, 402
         else:
             return {'msg':'File is not exist'}, 400
             

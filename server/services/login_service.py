@@ -69,7 +69,7 @@ def register(user_id,user_pw,user_name,user_email):
     if acc !=None:
         return RegisterResult.USEREMAIL_EXIST
 
-    acc=User(id=user_id,password=user_pw,name=user_name,email=user_email)
+    acc=User(id=user_id,password=user_pw,name=user_name,email=user_email,project_no=0)
     db.session.add(acc)
     db.session.commit
     return RegisterResult.SUCCESS

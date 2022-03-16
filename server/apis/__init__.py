@@ -14,7 +14,7 @@ def load_api(api_module):
     api_module.add_resource(Account,'/del-account',endpoint='del_account') # DELETE
     api_module.add_resource(ScriptAPI,'/script/<fname>',endpoint='script_get') # GET - DOWNLOAD
     api_module.add_resource(ScriptAPI,'/script',endpoint='script') # POST - UPLOAD
-    api_module.add_resource(Analysis,'/analysis/<filename>') # download
+    api_module.add_resource(Analysis,'/analysis/<filename>',endpoint="analysis_get") # download
     api_module.add_resource(Analysis,'/analysis',endpoint='analysis')
     api_module.add_resource(Project,'/project',endpoint='project')
     api_module.add_resource(Project,'/project/<project_no>',endpoint='project_del')

@@ -39,7 +39,7 @@ class ScriptAPI(Resource):
         else:
             db_upload_result = upload_script("web",1,filename)
             if(db_upload_result == UploadResult.SUCCESS):    
-                file_object.save(BASE_PATH + secure_filename(file_object.filename))
+                file_object.save(BASE_PATH + secure_filename(filename))
                 return {"msg":"success"}, 200
             elif(db_upload_result == UploadResult.DUPLICATED_NAME):
                 return {"msg":"Filename is duplicated in DB"}, 402

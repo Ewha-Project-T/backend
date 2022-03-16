@@ -37,7 +37,7 @@ class ScriptAPI(Resource):
         elif(filename.split(".")[-1] not in ALLOW_EXTENSION):
             return {"msg": "Not Allowed extension"}, 403
         else:
-            db_upload_result = upload_script("web",1,filename)
+            db_upload_result = upload_script("web",get_jwt_identity()["project_no"],filename)
             if(db_upload_result == UploadResult.SUCCESS):    
                 file_object.save(BASE_PATH + secure_filename(filename))
                 return {"msg":"success"}, 200

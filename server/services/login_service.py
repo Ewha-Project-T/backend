@@ -95,6 +95,7 @@ def change(old_pw, new_pw, new_name, new_email):
         if(old_pw != password[32:]):
             return ChangeResult.INCORRECT_PW
         new_pw = base64.b64encode(salt + hashlib.pbkdf2_hmac('sha256', new_pw.encode('utf-8'), salt, 100000, dklen=128))
+        print(new_pw)
         acc.password = new_pw
     if(new_name != None):
         acc.name = new_name

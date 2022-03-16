@@ -14,7 +14,7 @@ jwt_blocklist = set()
 
 class Login(Resource):
     @swag_from("../../docs/login/get.yml")
-    @admin_required()
+    @jwt_required()
     def get(self):
         current_user = get_jwt_identity()
         return jsonify(user_id=current_user)

@@ -5,9 +5,8 @@ from werkzeug.utils import secure_filename
 from ..services.login_service import admin_required
 from ..services.script_service import (
     upload_script, upload_formatter, UploadResult, script_listing, 
-    DownloadAuthResult, download_auth_check
+    DownloadAuthResult, download_auth_check, delete_script, DeleteResult
 )
-import json
 import werkzeug
 import os
 
@@ -50,6 +49,17 @@ class ScriptAPI(Resource):
                 return {"msg":"success"}, 200
             elif(db_upload_result == UploadResult.DUPLICATED_NAME):
                 return {"msg":"Filename is duplicated in DB"}, 402
+                
+    @admin_required()
+    def delete(self,fname):
+        file_path = BASE_PATH + secure_filename(fname)
+        if(existFile(file_path)):
+            if(delete_script(secure_filename(fname), file_path)==DeleteResult.SUCCESS):
+                return {"msg": "delete success"}, 200
+            else:
+                return {"msg": "delete faile"}, 402
+        else:
+            return {'msg':'File is not exist'}, 400
 
 class ScriptListingAPI(Resource):
     @jwt_required()

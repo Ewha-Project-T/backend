@@ -1,6 +1,6 @@
 from flask import jsonify, send_file
 from flask_restful import reqparse, Resource
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from werkzeug.utils import secure_filename
 from ..services.login_service import admin_required
 from ..services.script_service import upload_script, upload_formatter, UploadResult, script_listing
@@ -45,7 +45,7 @@ class ScriptAPI(Resource):
                 return {"msg":"Filename is duplicated in DB"}, 402
 
 class ScriptListingAPI(Resource):
-    @jwt_required
+    @jwt_required()
     def get(self):
         current_user = get_jwt_identity()
         script_list = script_listing(current_user["project_no"])

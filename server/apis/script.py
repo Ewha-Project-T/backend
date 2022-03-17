@@ -1,10 +1,12 @@
 from flask import jsonify, send_file
 from flask_restful import reqparse, Resource
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from werkzeug.utils import secure_filename
 from ..services.login_service import admin_required
-from ..services.script_service import upload_script, upload_formatter, UploadResult, script_listing
-import json
+from ..services.script_service import (
+    upload_script, upload_formatter, UploadResult, script_listing, 
+    DownloadAuthResult, download_auth_check, delete_script, DeleteResult
+)
 import werkzeug
 import os
 
@@ -18,9 +20,13 @@ def existFile(path):
 class ScriptAPI(Resource):
     @jwt_required()
     def get(self,fname):
+        current_user = get_jwt_identity()
         file_path = BASE_PATH + secure_filename(fname)
         if(existFile(file_path)):
-            return send_file(file_path, as_attachment=True, attachment_filename='')
+            if(download_auth_check(current_user["project_no"], fname) == DownloadAuthResult.SUCCESS):
+                return send_file(file_path, as_attachment=True, attachment_filename='')
+            else:
+                return {"msg": "check your project"}, 402
         else:
             return {'msg':'File is not exist'}, 400
             
@@ -37,16 +43,29 @@ class ScriptAPI(Resource):
         elif(filename.split(".")[-1] not in ALLOW_EXTENSION):
             return {"msg": "Not Allowed extension"}, 403
         else:
-            db_upload_result = upload_script("web",1,filename)
+            db_upload_result = upload_script("web",get_jwt_identity()["project_no"],filename)
             if(db_upload_result == UploadResult.SUCCESS):    
                 file_object.save(BASE_PATH + secure_filename(filename))
                 return {"msg":"success"}, 200
             elif(db_upload_result == UploadResult.DUPLICATED_NAME):
                 return {"msg":"Filename is duplicated in DB"}, 402
+                
+    @admin_required()
+    def delete(self,fname):
+        file_path = BASE_PATH + secure_filename(fname)
+        if(existFile(file_path)):
+            if(delete_script(secure_filename(fname), file_path)==DeleteResult.SUCCESS):
+                return {"msg": "delete success"}, 200
+            else:
+                return {"msg": "delete faile"}, 402
+        else:
+            return {'msg':'File is not exist'}, 400
 
 class ScriptListingAPI(Resource):
+    @jwt_required()
     def get(self):
-        script_list = script_listing()
+        current_user = get_jwt_identity()
+        script_list = script_listing(current_user["project_no"])
         return jsonify(script_list=script_list)
                 
 

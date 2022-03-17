@@ -14,10 +14,10 @@ jwt_blocklist = set()
 
 class Login(Resource):
     @swag_from("../../docs/login/get.yml")
-    @admin_required()
+    @jwt_required()
     def get(self):
         current_user = get_jwt_identity()
-        return jsonify(user_id=current_user)
+        return jsonify(user_account=current_user)
 
     @swag_from("../../docs/login/post.yml")
     def post(self):
@@ -46,13 +46,15 @@ class Login(Resource):
         parser.add_argument('pw', type=str, required=True, help="PW is required")
         parser.add_argument('name', type=str, required=True, help="name is required")
         parser.add_argument('email', type=str, required=True, help="Email is required")
+        parser.add_argument('pro_id', type=str, required=True, help="Project id is required")
         args = parser.parse_args()
         user_id = args['id']
         user_pw = args['pw']
         user_name=args['name']
         user_email = args['email']
+        user_project= args['pro_id']
         if re.match("^[A-Za-z0-9]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[A-Za-z0-9])*\.[A-Za-z]{2,3}$", user_email):
-            result=register(user_id,user_pw,user_name,user_email)
+            result=register(user_id,user_pw,user_name,user_email, user_project)
             if(result==RegisterResult.SUCCESS):
                 return{
                     "msg" : "success"
@@ -132,6 +134,14 @@ class LoginRefresh(Resource):
             "access_token": new_access_token
         }, 200
     
+class Admin(Resource):
+    @admin_required()
+    def get(self):
+        current_admin = get_jwt_identity()
+        if(current_admin["user_perm"]==2):
+            return {"msg":"admin authenticated"}, 200
+        return {"msg": "you're not admin"}, 403
+
 
 
 

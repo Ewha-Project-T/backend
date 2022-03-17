@@ -30,6 +30,15 @@ class Project(Resource):
 
         return {"msg":"success"},200
     
+    def put(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('prj_name', type=str, required=True, help="Project Name is required")
+        parser.add_argument('prj_start', type=str, required=True, help="Start Date required")
+        parser.add_argument('prj_end', type=str, required=True, help="End Date is required")
+        args = parser.parse_args()
+        prj_name = args['prj_name']
+        prj_start = args['prj_start']
+        prj_end = args['prj_end']
     @admin_required()
     def delete(self,project_no):
         result=delete_project(project_no)

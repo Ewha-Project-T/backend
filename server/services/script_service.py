@@ -1,14 +1,22 @@
 from ..model import Script
 from server import db
 from datetime import datetime
-from sqlalchemy import text
-from sqlalchemy import select
+from sqlalchemy import delete
+import os
 
 class UploadResult:
     SUCCESS = 0 
     DUPLICATED_NAME = 1
     INVALID_EXTENSION = 2
     INTERNAL_ERROR = 3
+
+class DownloadAuthResult:
+    SUCCESS = 0
+    INVALID = 1
+
+class DeleteResult:
+    SUCCESS = 0
+    FAIL = 1
 
 def upload_formatter(file_name):
     now = datetime.now()
@@ -25,8 +33,27 @@ def upload_script(script_type, proj_no, file_name):
     db.session.commit
     return UploadResult.SUCCESS
 
-def script_listing():
-    script_list = Script.query.all()
+def download_auth_check(proj_no, file_name):
+    file = Script.query.filter_by(script_name=file_name).first()
+    if(file.project_no == proj_no):
+        return DownloadAuthResult.SUCCESS
+    else:
+        return DownloadAuthResult.INVALID
+
+def delete_script(file_name, file_path):
+    os.remove(file_path)
+    try:
+        file = delete(Script).where(Script.script_name==file_name)
+        db.session.execute(file)
+        db.session.commit()
+    except:
+        return DeleteResult.FAIL
+    else:
+        return DeleteResult.SUCCESS
+
+
+def script_listing(proj_no):
+    script_list = Script.query.filter_by(project_no=proj_no)
     script_list_result = []
     for script in script_list:
         tmp = {}

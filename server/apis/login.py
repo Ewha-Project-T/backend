@@ -46,13 +46,15 @@ class Login(Resource):
         parser.add_argument('pw', type=str, required=True, help="PW is required")
         parser.add_argument('name', type=str, required=True, help="name is required")
         parser.add_argument('email', type=str, required=True, help="Email is required")
+        parser.add_argument('pro_id', type=str, required=True, help="Project id is required")
         args = parser.parse_args()
         user_id = args['id']
         user_pw = args['pw']
         user_name=args['name']
         user_email = args['email']
+        user_project= args['pro_id']
         if re.match("^[A-Za-z0-9]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[A-Za-z0-9])*\.[A-Za-z]{2,3}$", user_email):
-            result=register(user_id,user_pw,user_name,user_email, 1)
+            result=register(user_id,user_pw,user_name,user_email, user_project)
             if(result==RegisterResult.SUCCESS):
                 return{
                     "msg" : "success"

@@ -1,13 +1,9 @@
-from unittest import registerResult
 from ..model import User
 from server import db
 from functools import wraps
 from flask_jwt_extended import create_refresh_token, create_access_token, verify_jwt_in_request, get_jwt, get_jwt_identity
 import hashlib
-import os
 import base64
-
-from flask import jsonify
 
 class LoginResult:
     SUCCESS = 0
@@ -77,7 +73,6 @@ def register(user_id,user_pw,user_name,user_email, project_no):
 
 def delete(user_id):
     acc = User.query.filter_by(id=user_id).first()
-    print(acc)
     if(acc==None):
         return DeleteResult.INVALID_ID
     db.session.delete(acc)
@@ -96,7 +91,6 @@ def change(old_pw, new_pw, new_name, new_email):
         if(old_pw != password[32:]):
             return ChangeResult.INCORRECT_PW
         new_pw = base64.b64encode(salt + hashlib.pbkdf2_hmac('sha256', new_pw.encode('utf-8'), salt, 100000, dklen=128))
-        print(new_pw)
         acc.password = new_pw
     if(new_name != None):
         acc.name = new_name

@@ -18,10 +18,10 @@ class User(db.Model):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.password = self.encrypt_password(self.password)
+        self.password = self.encrypt_password(self.password) #함수로 그냥 쓸라우
     
     # 송신 패스워드 암호화
-    def encrypt_password(self, password):#db에서 비밀번호부분 뽑아오고 salt값을 추출하여 암호화
+    def encrypt_password(self,password):#db에서 비밀번호부분 뽑아오고 salt값을 추출하여 암호화
         salt = os.urandom(32)
         encrypt_passwd = base64.b64encode(salt + hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 100000, dklen=128))
         return encrypt_passwd

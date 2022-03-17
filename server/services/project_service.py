@@ -2,11 +2,14 @@ from ..model import Project,User
 from server import db
 
 
-class LoginResult:
+class CreateResult:
     SUCCESS = 0
     NAME_EXIST=1
     INVALID_DATE = 2
-
+class ChangeResult:
+    SUCCESS = 0
+    NAME_EXIST=1
+    INVALID_DATE = 2
 class DeleteResult:
     SUCCESS = 0
     ALREADY_DELETE=1
@@ -14,9 +17,9 @@ class DeleteResult:
 def create_project(name,start,end):
     check = Project.query.filter_by(project_name=name).first()
     if(check!=None):
-        return LoginResult.NAME_EXIST
+        return CreateResult.NAME_EXIST
     if(start>end):
-        return LoginResult.INVALID_DATE
+        return CreateResult.INVALID_DATE
 
     #프로젝트 생성
     acc=Project(project_name=name,start_date=start,end_date=end)
@@ -34,7 +37,7 @@ def create_project(name,start,end):
     db.session.add(acc_pm)
     db.session.commit
     
-    return LoginResult.SUCCESS
+    return CreateResult.SUCCESS
 
 def delete_project(del_no):
     target_project = Project.query.get(del_no)
@@ -51,3 +54,33 @@ def delete_project(del_no):
     db.session.delete(target_project)
     db.session.commit
     return DeleteResult.SUCCESS
+
+def change_project(change_no,name,start,end):
+    target_project = Project.query.get(change_no)
+    check = Project.query.filter_by(project_name=name).first()
+    if(check!=None):
+        return ChangeResult.NAME_EXIST
+    if(start>end):
+        return ChangeResult.INVALID_DATE
+
+
+    #USER변경
+    target_user =User.query.filter_by(id=target_project.project_name+"_USER1").first()
+    target_user.id=name+"_USER1"
+    db.session.add(target_user)
+    db.session.commit
+
+    #PM변경
+    target_pm=User.query.filter_by(id=target_project.project_name+"_PM1").first()
+    target_pm.id=name+"_PM1"
+    db.session.add(target_pm)
+    db.session.commit
+    
+    #프로젝트 변경
+    target_project.project_name=name
+    target_project.start_date=start
+    target_project.end_date=end
+    db.session.add(target_project)
+    db.session.commit
+
+    return CreateResult.SUCCESS

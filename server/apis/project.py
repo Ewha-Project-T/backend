@@ -1,7 +1,5 @@
-from flask import jsonify
 from flask_restful import reqparse, Resource
 from flask_jwt_extended import jwt_required
-from numpy import delete
 from ..services.login_service import admin_required
 from ..services.project_service import (
     create_project, delete_project,change_project,CreateResult,DeleteResult,ChangeResult

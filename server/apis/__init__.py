@@ -3,6 +3,7 @@ from .script import ScriptAPI, ScriptListingAPI
 from .analysis import Analysis
 from .project import Project
 from .parser import XML_Parser
+from .users import Users
 
 def load_api(api_module):
     api_module.add_resource(Admin,'/admin',endpoint='admin')
@@ -16,4 +17,5 @@ def load_api(api_module):
     api_module.add_resource(Project,'/project/<project_no>',endpoint='project_del-patch')
     api_module.add_resource(XML_Parser,'/parser',endpoint='parser')
     api_module.add_resource(ScriptListingAPI,'/script-list',endpoint='script_list')
+    api_module.add_resource(Users,'/users',endpoint='users')
 

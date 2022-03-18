@@ -18,4 +18,5 @@ def load_api(api_module):
     api_module.add_resource(XML_Parser,'/parser',endpoint='parser')
     api_module.add_resource(ScriptListingAPI,'/script-list',endpoint='script_list')
     api_module.add_resource(Users,'/users',endpoint='users')
+    api_module.add_resource(Users,'/users/<user_no>',endpoint='users_del')
 

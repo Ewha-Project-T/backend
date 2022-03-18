@@ -4,28 +4,26 @@ from flask_jwt_extended import (
     jwt_required, get_jwt_identity
 )
 from ..services.login_service import (
-    admin_required
+    admin_required, DeleteResult
+)
+from ..services.admin_service import (
+    get_users_info, delete_user
 )
 from server import db
 from ..model import User
-
-def get_users_info():
-    acc_list = User.query.all()
-    info_list = []
-    for info in acc_list:
-        tmp_info = {}
-        tmp_info["project_no"] = info.project_no
-        tmp_info["user_no"] = info.user_no
-        tmp_info["id"] = info.id
-        tmp_info["permission"] = info.permission
-        tmp_info["name"] = info.name
-        tmp_info["email"] = info.email
-        tmp_info["login_fail"] = info.login_fail_limit
-        info_list.append(tmp_info)
-    return info_list
 
 class Users(Resource):
     @admin_required()
     def get(self):
         res=get_users_info()
         return jsonify(users_info=res)
+    @admin_required()
+    def delete(self,user_no):
+        result = delete_user(user_no)
+        if(result == DeleteResult.SUCCESS):
+            return {"msg": "Delete User SUCCESS"}, 200
+        else:
+            return {"msg": "INVALID User No"}, 403
+
+        
+

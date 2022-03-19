@@ -48,7 +48,7 @@ class Login(Resource):
         parser.add_argument('name', type=str, required=True, help="name is required")
         parser.add_argument('email', type=str, required=True, help="Email is required")
         parser.add_argument('pro_id', type=str, required=True, help="Project id is required")
-        parser.add_argument('perm', type=str, required=True, help="Permission is required")
+        parser.add_argument('perm', type=int, required=True, help="Permission is required")
         args = parser.parse_args()
         user_id = args['id']
         user_pw = args['pw']

@@ -8,8 +8,8 @@ class ParseResult:
     INVALID_FILE = 1
 
 def parse_xml(file_name):
-    file_name = "OS_Linux_LUCYSWORD_172.17.114.118.xml" # 샘플 xml
-    path = "server/services/" # 경로는 추후에 파일 실제 저장 경로로 맞춰야함
+    #file_name = "OS_Linux_LUCYSWORD_172.17.114.118.xml" # 샘플 xml
+    path = "uploads/" # 경로는 추후에 파일 실제 저장 경로로 맞춰야함
     encoding = XMLParser(encoding="utf-8")
     try:
         tree = parse(path + file_name, parser=encoding)

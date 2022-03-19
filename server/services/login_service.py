@@ -1,4 +1,4 @@
-from ..model import User
+from ..model import User, Project
 from server import db
 from functools import wraps
 from flask_jwt_extended import create_refresh_token, create_access_token, verify_jwt_in_request, get_jwt, get_jwt_identity
@@ -17,6 +17,7 @@ class RegisterResult:
     USERID_EXIST = 2
     USEREMAIL_EXIST = 3
     INVALID_PERM = 4
+    INVALID_PROJECT = 5
 
 class DeleteResult:
     SUCCESS = 0
@@ -30,6 +31,7 @@ class ChangeResult:
     INCORRECT_PW = 2
     INVALID_EMAIL = 3
     INVALID_NAME = 4
+    DUPLICATED_EMAIL = 5
 
 def login(user_id, user_pw):
     acc = User.query.filter_by(id=user_id).first()
@@ -60,6 +62,9 @@ def register(user_id,user_pw,user_name,user_email, project_no, perm):
     if(len(user_id)<4 or len(user_id)>20 or len(user_pw)<4 or len(user_pw)>20): #아이디 비번 글자수제한
         return RegisterResult.INVALID_IDPW
     acc = User.query.filter_by(id=user_id).first()
+    proj = Project.query.filter_by(project_no=project_no).first()
+    if(proj == None):
+        return RegisterResult.INVALID_PROJECT
     if acc !=None:
         return RegisterResult.USERID_EXIST
     acc = User.query.filter_by(email=user_email).first()
@@ -85,6 +90,9 @@ def change(old_pw, new_pw, new_name, new_email):
     userinfo = get_jwt_identity()
     if(userinfo==None):
         raise Exception("Not Logged In")
+    email_check = User.query.filter_by(email=new_email).first()
+    if(email_check != None):
+        return ChangeResult.DUPLICATED_EMAIL
     acc = User.query.filter_by(id=userinfo["user_id"]).first()
     if(old_pw != None and new_pw != None):
         password = base64.b64decode(acc.password)

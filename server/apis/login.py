@@ -40,6 +40,7 @@ class Login(Resource):
             return {"msg":"Bad username or password"}, 403
 
     @swag_from("../../docs/login/put.yml")
+    @admin_required()
     def put(self):
         parser = reqparse.RequestParser()
         parser.add_argument('id', type=str, required=True, help="ID is required")
@@ -53,8 +54,9 @@ class Login(Resource):
         user_name=args['name']
         user_email = args['email']
         user_project= args['pro_id']
+        user_perm = args['perm']
         if re.match("^[A-Za-z0-9]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[A-Za-z0-9])*\.[A-Za-z]{2,3}$", user_email):
-            result=register(user_id,user_pw,user_name,user_email, user_project)
+            result=register(user_id,user_pw,user_name,user_email, user_project, user_perm)
             if(result==RegisterResult.SUCCESS):
                 return{
                     "msg" : "success"
@@ -71,10 +73,18 @@ class Login(Resource):
                 return{
                     "error" : "user email exist"
                 },403
+            elif(result==RegisterResult.INVALID_PERM):
+                return {
+                    "error" : "invalid permission"
+                }, 403
+            elif(result==RegisterResult.INVALID_PROJECT):
+                return {
+                    "error" : "invalid project"
+                }, 403
             else:
                 return{
                     "error" : "internal error"
-                },403
+                },405
         else:
             return {
                 "error": "Invalid Email"
@@ -103,6 +113,10 @@ class Login(Resource):
             return {'msg':'Invalid email'}, 403
         elif(res==ChangeResult.INVALID_NAME):
             return {'msg':'Invalid name'}, 403
+        elif(res==ChangeResult.DUPLICATED_EMAIL):
+            return {'msg':'Duplicated EMAIL'}, 403
+        else:
+            return {'msg':'Internal Error'}, 405
 
     @jwt_required()
     def delete(self):

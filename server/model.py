@@ -56,7 +56,7 @@ class Analysis(db.Model):
     comment = db.Column(db.String(1000), nullable=True)
     safe = db.Column(db.Integer, nullable=True)
     vuln = db.Column(db.Integer, nullable=True)
-    
+
 
 
 

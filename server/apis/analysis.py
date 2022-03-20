@@ -5,6 +5,9 @@ from flask_restful import reqparse, Resource
 from flask_jwt_extended import jwt_required
 from server.services.login_service import delete
 from ..services.analysis_service import *
+from ..services.xml_parser import add_vuln
+import time
+
 
 
 class Analysis(Resource):
@@ -21,25 +24,33 @@ class Analysis(Resource):
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('file', type=FileStorage, location='files', action='append')
+        parser.add_argument('project_no', type=int, required=True, help="Project_no is required")
+        parser.add_argument('user_no', type=int, required=True, help="User_no is required")
         args = parser.parse_args()
-
+        
         fd = args['file']
-        filename = secure_filename(fd.filename)
-        file_ext = get_file_ext(filename)
-
+        
+        filename = secure_filename(fd[0].filename)
+        result ,file_ext = get_file_ext(filename)
         
         uploaded_path = upload_file(fd)
         
         # Insert 'uploaded_path' in DB 
-
-        if file_ext == "zip" or file_ext == "tar":
-            compression_extract(uploaded_path , file_ext)
-
+        if(result == ExtensionsResult.SUCCESS):
+            if file_ext == "zip" or file_ext == "tar":
+                compression_extract(uploaded_path , file_ext)
+        else:
+            return{"msg":"denied file extensions"}, 400
         '''
         insert paring code ()
         save parinsg result
         '''
-            
+        upload_time = time.strftime("%Y-%m-%d %H:%M:%S")
+        project_no = args['project_no']
+        user_no = args['user_no']
+        path = uploaded_path
+        safe, vuln = add_vuln(path)
+        insert_db(upload_time, project_no, user_no, path, safe, vuln)
         return {"msg":"ok"}, 200
 
 

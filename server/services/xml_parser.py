@@ -29,3 +29,18 @@ def parse_xml(file_name):
     issue = [x.findtext("Issue") for x in row]
 
     return ParseResult.SUCCESS, group_code, group_name, title_code, title_name, important, decision, issue
+
+def add_vuln(file_name):
+    path = "uploads/" # 경로는 추후에 파일 실제 저장 경로로 맞춰야함
+    encoding = XMLParser(encoding="utf-8")
+    try:
+        tree = parse(path + file_name, parser=encoding)
+    except:
+        return ParseResult.INVALID_FILE, {'msg':'File Not Found'}, 400, None, None, None, None, None
+
+    root = tree.getroot()
+    row = root.findall("row")
+    decision = [x.findtext("Decision") for x in row]
+    safe = decision.count('양호')
+    vuln = decision.count('취약')
+    return safe, vuln

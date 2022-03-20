@@ -83,19 +83,9 @@ def insert_db(upload_time, project_no, user_no, path, safe, vuln):
     if(acc != None):
         return UploadResult.INVALID_PATH
     
-    acc = Analysis(upload_time=upload_time, project_no=project_no, user_no=user_no, path=path, safe=None, vuln=None)    
-    print(acc)
+    acc = Analysis(upload_time=upload_time, project_no=project_no, user_no=user_no, path=path, safe=safe, vuln=vuln)    
+    #print(acc)
     db.session.add(acc)
     db.session.commit
 
     return UploadResult.SUCCESS
-    
-def add_vuln(xml_name, safe, vuln):
-    acc = Analysis.query.filter_by(path=xml_name).first()
-    if(acc == None):
-        return VulnResult.INVALID_PATH
-    acc.safe = safe
-    acc.vuln = vuln
-    db.session.add(acc)
-    db.session.commit()
-    return VulnResult.SUCCESS

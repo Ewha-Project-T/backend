@@ -5,6 +5,7 @@ from flask_restful import reqparse, Resource
 from flask_jwt_extended import jwt_required
 from server.services.login_service import delete
 from ..services.analysis_service import *
+from ..services.xml_parser import add_vuln
 import time
 
 
@@ -48,9 +49,7 @@ class Analysis(Resource):
         project_no = args['project_no']
         user_no = args['user_no']
         path = uploaded_path
-        safe = 0
-        vuln = 0
-        print(path)
+        safe, vuln = add_vuln(path)
         insert_db(upload_time, project_no, user_no, path, safe, vuln)
         return {"msg":"ok"}, 200
 

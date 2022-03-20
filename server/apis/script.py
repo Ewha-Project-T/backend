@@ -2,6 +2,7 @@ from flask import jsonify, send_file
 from flask_restful import reqparse, Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from werkzeug.utils import secure_filename
+from ..services.admin_service import all_script_listing
 from ..services.login_service import admin_required
 from ..services.script_service import (
     upload_script, upload_formatter, UploadResult, script_listing, 
@@ -67,5 +68,10 @@ class ScriptListingAPI(Resource):
         current_user = get_jwt_identity()
         script_list = script_listing(current_user["project_no"])
         return jsonify(script_list=script_list)
-                
+    
+class AdminScript(Resource):
+    @admin_required()
+    def get(self):
+        script_list = all_script_listing()
+        return jsonify(all_script_list=script_list)
 

@@ -1,5 +1,5 @@
 from .login_service import DeleteResult
-from ..model import User
+from ..model import User,Script
 from server import db
 
 class InitResult:
@@ -37,3 +37,15 @@ def delete_user(user_no):
     db.session.delete(acc)
     db.session.commit
     return DeleteResult.SUCCESS
+
+def all_script_listing():
+    script_list = Script.query.all()
+    script_list_result = []
+    for script in script_list:
+        tmp = {}
+        tmp["id"] = vars(script)["id"]
+        tmp["type"] = vars(script)["type"]
+        tmp["project_no"] = vars(script)["project_no"]
+        tmp["script_name"] = vars(script)["script_name"]
+        script_list_result.append(tmp)
+    return script_list_result

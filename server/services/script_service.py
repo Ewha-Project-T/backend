@@ -1,4 +1,4 @@
-from ..model import Script
+from ..model import Script, Project
 from server import db
 from datetime import datetime
 from sqlalchemy import delete
@@ -9,6 +9,7 @@ class UploadResult:
     DUPLICATED_NAME = 1
     INVALID_EXTENSION = 2
     INTERNAL_ERROR = 3
+    INVALID_PROJECT_NO = 4
 
 class DownloadAuthResult:
     SUCCESS = 0
@@ -25,6 +26,9 @@ def upload_formatter(file_name):
     return filename
     
 def upload_script(script_type, proj_no, file_name):
+    proj = Project.query.filter_by(project_no=proj_no).first()
+    if(proj == None):
+        return UploadResult.INVALID_PROJECT_NO
     file = Script.query.filter_by(script_name=file_name).first()
     if(file!=None):
         return UploadResult.DUPLICATED_NAME

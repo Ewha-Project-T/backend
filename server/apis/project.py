@@ -1,9 +1,12 @@
+from flask import jsonify
 from flask_restful import reqparse, Resource
 from flask_jwt_extended import jwt_required
 from ..services.login_service import admin_required
 from ..services.project_service import (
-    create_project, delete_project,change_project,CreateResult,DeleteResult,ChangeResult
+    create_project, delete_project,change_project,CreateResult,DeleteResult,ChangeResult,
+    listing_project
 )
+
 class Project(Resource):
     @jwt_required()
     def get(self):
@@ -22,11 +25,11 @@ class Project(Resource):
         result=create_project(prj_name,prj_start,prj_end)
 
         if(result==CreateResult.NAME_EXIST):
-            return {"msg":"Project Name Exist"},400
+            return {"msg":"Project Name Exist"}, 400
         if(result==CreateResult.INVALID_DATE):
-            return {"msg":"Invalid Date"},400
+            return {"msg":"Invalid Date"}, 400
 
-        return {"msg":"success"},200
+        return {"msg":"success"}, 200
     @admin_required()
     def patch(self,project_no):
         parser = reqparse.RequestParser()
@@ -50,3 +53,8 @@ class Project(Resource):
         if(result==DeleteResult.ALREADY_DELETE):
             return {"msg":"aleady delete"},400
         return {"msg":"success"},200
+
+class ProjectList(Resource):
+    @admin_required()
+    def get(self):
+        return jsonify(listing_project())

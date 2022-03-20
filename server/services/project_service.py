@@ -84,3 +84,15 @@ def change_project(change_no,name,start,end):
     db.session.commit
 
     return CreateResult.SUCCESS
+
+def listing_project():
+    project_list = Project.query.all()
+    project_list_result = []
+    for proj in project_list:
+        tmp = {}
+        tmp["proj_no"] = vars(proj)["project_no"]
+        tmp["project_name"] = vars(proj)["project_name"]
+        tmp["start_date"] = vars(proj)["start_date"]
+        tmp["end_date"] = vars(proj)["end_date"]
+        project_list_result.append(tmp)
+    return project_list_result

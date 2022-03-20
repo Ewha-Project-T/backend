@@ -57,4 +57,4 @@ class Project(Resource):
 class ProjectList(Resource):
     @admin_required()
     def get(self):
-        return jsonify(listing_project())
+        return jsonify(projects_info = listing_project())

@@ -78,8 +78,8 @@ class AdminScript(Resource):
     @admin_required()
     def post(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('type', type=werkzeug.datastructures.FileStorage, location='files', required=True, help="Need Script Type")
-        parser.add_argument('proj_no', type=werkzeug.datastructures.FileStorage, location='files', required=True, help="Need Project Number")
+        parser.add_argument('type', type=str, required=True, help="Need Script Type")
+        parser.add_argument('proj_no', type=str, required=True, help="Need Project Number")
         parser.add_argument('file_name', type=werkzeug.datastructures.FileStorage, location='files', required=True, help="Not Valid File")
         args = parser.parse_args()
         type = args['type']

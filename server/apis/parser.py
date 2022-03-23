@@ -5,7 +5,6 @@ from flask_jwt_extended import (
 )
 import re
 from ..services.xml_parser import parse_xml, ParseResult, add_vuln
-#from ..services.analysis_service import add_vuln
 
 class XML_Parser(Resource):
     @swag_from("../../docs/parser/post.yml")
@@ -20,13 +19,14 @@ class XML_Parser(Resource):
             #return group_code, group_name, title_code, title_name, important, decision, issue
             xml_result = []
             '''
-            safe = decision.count('양호')
-            vuln = decision.count('취약')
             add_vuln(xml_name, safe, vuln)
             '''
             for i in range(len(group_code)):
                 #xml_result.append(["{ group_code : \"" + group_code[i] + "\",title_code : \"" + title_code[i] + "\",title_name : \"" + title_name[i] + "\",important : \"" + important[i] + "\",decision : \"" + decision[i] + "\",issue : \"" + issue[i] + "\" }"])
                 xml_result.append({ 'group_code' : group_code[i],'group_name' : group_name[i],'title_code' : title_code[i],'title_name' : title_name[i],'important' : important[i],'decision' : decision[i],'issue' : issue[i]})
+            safe = decision.count('양호')
+            vuln = decision.count('취약')
+            xml_result = {'safe' : + safe , 'vuln' : vuln, 'details' : xml_result} 
             return xml_result
             #return {"msg":"success"}, 200
         else:

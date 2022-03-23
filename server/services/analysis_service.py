@@ -40,17 +40,19 @@ class VulnResult:
     INVALID_PATH = 1
 
 def compression_extract(file_path, ext):
-
     if ext == "zip":
-        f = zipfile.ZipFile(file_path)
+        f = zipfile.ZipFile(UPLOAD_PATH + file_path)
     elif ext == "tar":
-        f = tarfile.open(file_path)
+        f = tarfile.open(UPLOAD_PATH + file_path)
 
-    f.extractall()
-    
-    os.remove(file_path)
+    f.extractall(UPLOAD_PATH + file_path.split('/')[0] + "/")
+    os.remove(UPLOAD_PATH + file_path)
     f.close()
-
+    path = []
+    file_list = os.listdir(UPLOAD_PATH + file_path.split('/')[0] + "/")
+    for i in range(len(file_list)):
+        path.append(file_path.split('/')[0] + "/" + file_list[i])
+    return path
 
 def get_file_ext(filename):
     if '.' in filename:
@@ -79,13 +81,14 @@ def upload_file(fd):
 
 def insert_db(upload_time, project_no, user_no, path, safe, vuln):
     comment = ''
-    acc = Analysis.query.filter_by(path=path).first()
-    if(acc != None):
-        return UploadResult.INVALID_PATH
-    
-    acc = Analysis(upload_time=upload_time, project_no=project_no, user_no=user_no, path=path, safe=safe, vuln=vuln)    
-    #print(acc)
-    db.session.add(acc)
-    db.session.commit
+    for i in range(len(path)):
+        acc = Analysis.query.filter_by(path=path[i]).first()
+        if(acc != None):
+            return UploadResult.INVALID_PATH
+        
+        acc = Analysis(upload_time=upload_time, project_no=project_no, user_no=user_no, path=path[i], safe=safe[i], vuln=vuln[i])    
+        #print(acc)
+        db.session.add(acc)
+        db.session.commit
 
     return UploadResult.SUCCESS

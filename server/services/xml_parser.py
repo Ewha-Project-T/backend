@@ -27,12 +27,13 @@ def parse_xml(file_name):
     important = [x.findtext("Import") for x in row]
     decision = [x.findtext("Decision") for x in row]
     issue = [x.findtext("Issue") for x in row]
-
     return ParseResult.SUCCESS, group_code, group_name, title_code, title_name, important, decision, issue
 
 def add_vuln(file_name):
     path = "uploads/" # 경로는 추후에 파일 실제 저장 경로로 맞춰야함
     encoding = XMLParser(encoding="utf-8")
+    safe = []
+    vuln = []
     try:
         tree = parse(path + file_name, parser=encoding)
     except:

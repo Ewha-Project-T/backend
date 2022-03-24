@@ -56,6 +56,18 @@ class Analysis(db.Model):
     comment = db.Column(db.String(1000), nullable=True)
     safe = db.Column(db.Integer, nullable=True)
     vuln = db.Column(db.Integer, nullable=True)
+    host_no = db.Column(db.Integer, db.ForeignKey("host_info.no"), nullable=False)
+
+class HostInfo(db.Model):
+    __tablename__ = "host_info"
+
+    no = db.Column(db.Integer, primary_key=True)
+    project_no = db.Column(db.Integer, db.ForeignKey("project.project_no"), nullable=False)
+    host_name = db.Column(db.String(100), nullable=True)
+    analysis_count = db.Column(db.Integer, default=0)
+    timestamp = db.Column(db.DateTime, nullable=True)
+    types = db.Column(db.String(100), nullable=False)
+
 
 
 

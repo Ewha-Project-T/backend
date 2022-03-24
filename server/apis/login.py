@@ -40,7 +40,7 @@ class Login(Resource):
             return {"msg":"Bad username or password"}, 403
 
     @swag_from("../../docs/login/put.yml")
-    @admin_required()
+    @jwt_required()
     def put(self):
         parser = reqparse.RequestParser()
         parser.add_argument('id', type=str, required=True, help="ID is required")

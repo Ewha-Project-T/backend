@@ -9,7 +9,8 @@ class LoginResult:
     SUCCESS = 0
     INVALID_IDPW = 1
     LOGIN_COUNT_EXCEEDED=2
-    INTERNAL_ERROR = 3
+    ACC_IS_NOT_FOUND = 3
+    INTERNAL_ERROR = 4
 
 class RegisterResult:
     SUCCESS = 0
@@ -35,6 +36,8 @@ class ChangeResult:
 
 def login(user_id, user_pw):
     acc = User.query.filter_by(id=user_id).first()
+    if(acc == None):
+        return LoginResult.ACC_IS_NOT_FOUND, acc
     passwd = base64.b64decode(acc.password)
     salt = passwd[:32]
     encrypt_pw = hashlib.pbkdf2_hmac('sha256', user_pw.encode('utf-8'), salt, 100000, dklen=128)

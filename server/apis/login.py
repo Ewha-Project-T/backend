@@ -28,14 +28,22 @@ class Login(Resource):
         user_id = args['id']
         user_pw = args['pw']
         result, account = login(user_id, user_pw)
+        if(result==LoginResult.ACC_IS_NOT_FOUND):
+            return {"msg":"User Not Found"}, 403
         if(result==LoginResult.LOGIN_COUNT_EXCEEDED):
             return {"msg":"LOGIN_COUNT_EXCEEDED"}, 400
         if(result==LoginResult.SUCCESS):
             access_token, refresh_token = create_tokens(account)
-            return jsonify(
-                access_token = access_token,
-                refresh_token = refresh_token
-            )
+            if(account.permission==2):
+                return {
+                    'access_token' : access_token,
+                    'refresh_token' : refresh_token
+                }, 201, {'location':'/adminpage'}
+            else:
+                return {
+                    'access_token' : access_token,
+                    'refresh_token': refresh_token
+                }, 201, {'location':'/'}
         else:
             return {"msg":"Bad username or password"}, 403
 

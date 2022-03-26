@@ -23,7 +23,7 @@ app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
 db.init_app(app)
 jwt=JWTManager(app)
 
-CORS(app)
+CORS(app,expose_headers='Location')
 myApi=Api(app, errors=Flask.errorhandler)
 swagger = Swagger(
     app, 

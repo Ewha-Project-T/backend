@@ -84,3 +84,7 @@ class Analysis(Resource):
         delete_analysis_file(file_path)
 
         return ''
+    
+# class Hosts(Resource):
+#     @jwt_required()
+#     def get(self):

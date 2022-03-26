@@ -67,8 +67,15 @@ class HostInfo(db.Model):
     analysis_count = db.Column(db.Integer, default=0)
     timestamp = db.Column(db.DateTime, nullable=True)
     types = db.Column(db.String(100), nullable=False)
+    ip = db.Column(db.String(50), nullable=False)
 
-
+class Code(db.Model):
+    __tablename__="code"
+    
+    code_no = db.Column(db.Integer,primary_key=True)
+    os = db.Column(db.String(20), nullable=True)
+    title_code = db.Column(db.String(10), nullable=True)
+    kisa_code = db.Column(db.String(10), nullable=True)
 
 
 

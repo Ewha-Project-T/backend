@@ -1,0 +1,14 @@
+Delete Analysis
+---
+tags:
+  - Analysis APIs
+parameters:
+- in: body
+    name: file_name
+    type: string
+    required: True
+responses:
+  200:
+    description: Delete Success
+  401:
+    description: Invalid File Name

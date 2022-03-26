@@ -38,7 +38,9 @@ class Analysis(Resource):
         # Insert 'uploaded_path' in DB 
         if(result == ExtensionsResult.SUCCESS):
             if file_ext == "zip" or file_ext == "tar":
-                compression_extract(uploaded_path , file_ext)
+                path = compression_extract(uploaded_path , file_ext)
+            else:
+                path = [uploaded_path]
         else:
             return{"msg":"denied file extensions"}, 400
         '''
@@ -48,8 +50,14 @@ class Analysis(Resource):
         upload_time = time.strftime("%Y-%m-%d %H:%M:%S")
         project_no = args['project_no']
         user_no = args['user_no']
-        path = uploaded_path
-        safe, vuln = add_vuln(path)
+        safe = []
+        vuln = []
+        #safe, vuln = add_vuln(path)
+        for i in range(len(path)):
+            tmp_safe, tmp_vuln = add_vuln(path[i])
+            safe.append(tmp_safe)
+            vuln.append(tmp_vuln)
+        
         insert_db(upload_time, project_no, user_no, path, safe, vuln)
         return {"msg":"ok"}, 200
 
@@ -69,14 +77,13 @@ class Analysis(Resource):
         parser.add_argument('file_name', type=str, required=True, help="FileName is required")
         args = parser.parse_args()
 
-        filename = args['file_name']        
+        filename = args['file_name']
+        result = delete_analysis_file(filename)
+        if(result == DeleteResult.SUCCESS):
+            return {"msg":"ok"}, 200
+        else:
+            return {"msg": "fail"}, 401
 
-        file_path = ''# Get analysis file path From DB
-
-        delete_analysis_file(file_path)
-
-        return ''
-    
 # class Hosts(Resource):
 #     @jwt_required()
 #     def get(self):

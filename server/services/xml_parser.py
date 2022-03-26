@@ -16,7 +16,7 @@ def parse_xml(file_name):
     try:
         tree = parse(path + file_name, parser=encoding)
     except:
-        return ParseResult.INVALID_FILE, {'msg':'File Not Found'}, 400, None, None, None, None, None, None
+        return {'msg':'File Not Found'}, 400
 
     root = tree.getroot()
 

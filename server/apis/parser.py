@@ -14,7 +14,7 @@ class XML_Parser(Resource):
         parser.add_argument('xml_name', type=str, required=True, help="File Not Found")
         args = parser.parse_args()
         xml_name = args['xml_name']
-        result, group_code, group_name, title_code, title_name, important, decision, issue = parse_xml(xml_name)
+        result, group_code, group_name, title_code, title_name, important, decision, issue, code = parse_xml(xml_name)
         if(result==ParseResult.SUCCESS):
             #return group_code, group_name, title_code, title_name, important, decision, issue
             xml_result = []
@@ -23,7 +23,7 @@ class XML_Parser(Resource):
             '''
             for i in range(len(group_code)):
                 #xml_result.append(["{ group_code : \"" + group_code[i] + "\",title_code : \"" + title_code[i] + "\",title_name : \"" + title_name[i] + "\",important : \"" + important[i] + "\",decision : \"" + decision[i] + "\",issue : \"" + issue[i] + "\" }"])
-                xml_result.append({ 'group_code' : group_code[i],'group_name' : group_name[i],'title_code' : title_code[i],'title_name' : title_name[i],'important' : important[i],'decision' : decision[i],'issue' : issue[i]})
+                xml_result.append({ 'group_code' : group_code[i],'group_name' : group_name[i],'title_code' : title_code[i],'title_name' : title_name[i],'important' : important[i],'decision' : decision[i],'issue' : issue[i], 'code' : code[i]})
             safe = decision.count('양호')
             vuln = decision.count('취약')
             xml_result = {'safe' : + safe , 'vuln' : vuln, 'details' : xml_result} 

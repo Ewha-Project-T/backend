@@ -2,6 +2,8 @@ from xml.etree.ElementTree import parse, XMLParser
 from flask_restful import reqparse
 from flasgger import swag_from
 from flask_jwt_extended import jwt_required
+from server import db
+from ..model import Code
 
 class ParseResult:
     SUCCESS = 0
@@ -27,7 +29,16 @@ def parse_xml(file_name):
     important = [x.findtext("Import") for x in row]
     decision = [x.findtext("Decision") for x in row]
     issue = [x.findtext("Issue") for x in row]
-    return ParseResult.SUCCESS, group_code, group_name, title_code, title_name, important, decision, issue
+
+    codes = []
+    for title in title_code:
+        acc = Code.query.filter_by(title_code=title).first()
+        if(acc == None):
+            codes.append(None)
+        else:
+            codes.append(acc.kisa_code)
+    
+    return ParseResult.SUCCESS, group_code, group_name, title_code, title_name, important, decision, issue, codes
 
 def add_vuln(file_name):
     path = "uploads/" # 경로는 추후에 파일 실제 저장 경로로 맞춰야함

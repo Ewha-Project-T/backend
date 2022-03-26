@@ -77,14 +77,13 @@ class Analysis(Resource):
         parser.add_argument('file_name', type=str, required=True, help="FileName is required")
         args = parser.parse_args()
 
-        filename = args['file_name']        
+        filename = args['file_name']
+        result = delete_analysis_file(filename)
+        if(result == DeleteResult.SUCCESS):
+            return {"msg":"ok"}, 200
+        else:
+            return {"msg": "fail"}, 401
 
-        file_path = ''# Get analysis file path From DB
-
-        delete_analysis_file(file_path)
-
-        return ''
-    
 # class Hosts(Resource):
 #     @jwt_required()
 #     def get(self):

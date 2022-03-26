@@ -63,11 +63,28 @@ def get_file_ext(filename):
     return ''
 
 def delete_analysis_file(file_path):
+    '''
     folder_path = os.path.dirname(file_path)
     if os.path.exists(folder_path):
         shutil.rmtree(folder_path)
+    '''
+    acc = Analysis.query.filter_by(path=file_path).first()
+    if(acc == None):
+        return DeleteResult.INVALID_PATH
+
+    db.session.delete(acc)
+    db.session.commit()
+    acc = HostInfo.query.filter_by(no=acc.host_no).first()
+    if(acc.analysis_count == 1):
+        db.session.delete(acc)
+    else:
+        acc.analysis_count -= 1
+        db.session.add(acc)
         
-    return ''
+    db.session.commit()
+    os.remove(UPLOAD_PATH + file_path)
+
+    return DeleteResult.SUCCESS
 
 def upload_file(fd):
     random_dir = time.strftime("%y%m%d_%H%M%S")
@@ -78,7 +95,7 @@ def upload_file(fd):
     abs_path = os.path.abspath(p)
     fd[0].save(abs_path)
     return random_dir + "/" + secure_filename(fd[0].filename)
-    
+
 def insert_db(upload_time, project_no, user_no, path, safe, vuln):
     comment = ''
     for i in range(len(path)):

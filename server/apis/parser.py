@@ -3,18 +3,18 @@ from flasgger import swag_from
 from flask_jwt_extended import (
 		jwt_required, get_jwt_identity, get_jwt
 )
-import re
 from ..services.xml_parser import parse_xml, ParseResult, add_vuln
+
 
 class XML_Parser(Resource):
     @swag_from("../../docs/parser/post.yml")
     #@jwt_required()
     def post(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('xml_name', type=str, required=True, help="File Not Found")
+        parser.add_argument('xml_no', type=str, required=True, help="File Not Found")
         args = parser.parse_args()
-        xml_name = args['xml_name']
-        parsed = parse_xml(xml_name)
+        xml_no = args['xml_no']
+        parsed = parse_xml(xml_no)
         if(type(parsed)==type({})):
             xml_result = []
             for i in range(len(parsed["group_code"])):

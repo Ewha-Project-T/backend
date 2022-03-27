@@ -3,18 +3,19 @@ from flask_restful import reqparse
 from flasgger import swag_from
 from flask_jwt_extended import jwt_required
 from server import db
-from ..model import Code
+from ..model import Code, Analysis, HostInfo
 
 class ParseResult:
     SUCCESS = 0
     INVALID_FILE = 1
 
-def parse_xml(file_name):
+def parse_xml(xml_no):
     path = "uploads/"
     encoding = XMLParser(encoding="utf-8")
+    xml_row = Analysis.query.filter_by(xml_no=xml_no).first()
+    file_name = xml_row.path
     try:
         tree = parse(path + file_name, parser=encoding)
-        print(tree)
     except:
         return ParseResult.INVALID_FILE
 

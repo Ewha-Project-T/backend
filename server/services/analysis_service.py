@@ -118,4 +118,18 @@ def insert_db(upload_time, project_no, user_no, path, safe, vuln):
         db.session.add(acc)
         db.session.commit
 
-    return UploadResult.SUCCESS    
+    return UploadResult.SUCCESS
+
+def get_hosts(project_no):
+    host_list = HostInfo.query.filter_by(project_no=project_no).all()
+    host_list_result = []
+    for host in host_list:
+        tmp = {}
+        tmp["no"] = host.no
+        tmp["host_name"] = host.host_name
+        tmp["analysis_count"] = host.analysis_count
+        tmp["timestamp"] = host.timestamp
+        tmp["type"] = host.types
+        tmp["ip"] = host.ip
+        host_list_result.append(tmp)
+    return host_list_result

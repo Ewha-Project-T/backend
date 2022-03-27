@@ -84,6 +84,8 @@ class Analysis(Resource):
         else:
             return {"msg": "fail"}, 401
 
-# class Hosts(Resource):
-#     @jwt_required()
-#     def get(self):
+class Hosts(Resource):
+    @jwt_required()
+    def get(self,proj_no):
+        hosts = get_hosts(proj_no)
+        return jsonify(hosts=hosts)

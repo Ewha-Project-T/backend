@@ -17,9 +17,6 @@ class XML_Parser(Resource):
         parsed = parse_xml(xml_name)
         if(type(parsed)==type({})):
             xml_result = []
-            '''
-            add_vuln(xml_name, safe, vuln)
-            '''
             for i in range(len(parsed["group_code"])):
                 xml_result.append({ 'group_code' : parsed["group_code"][i],
                     'group_name' : parsed["group_name"][i],

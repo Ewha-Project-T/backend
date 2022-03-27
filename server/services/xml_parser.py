@@ -10,18 +10,17 @@ class ParseResult:
     INVALID_FILE = 1
 
 def parse_xml(file_name):
-    #file_name = "OS_Linux_LUCYSWORD_172.17.114.118.xml" # 샘플 xml
-    path = "uploads/" # 경로는 추후에 파일 실제 저장 경로로 맞춰야함
+    path = "uploads/"
     encoding = XMLParser(encoding="utf-8")
     try:
         tree = parse(path + file_name, parser=encoding)
+        print(tree)
     except:
-        return {'msg':'File Not Found'}, 400
+        return ParseResult.INVALID_FILE
 
     root = tree.getroot()
 
     row = root.findall("row")
-    #total_cnt = len(row) # 항목 
     group_code = [x.findtext("Group_Code") for x in row]
     group_name = [x.findtext("Group_Name") for x in row]
     title_code = [x.findtext("Title_Code") for x in row]
@@ -37,11 +36,21 @@ def parse_xml(file_name):
             codes.append(None)
         else:
             codes.append(acc.kisa_code)
-    
-    return ParseResult.SUCCESS, group_code, group_name, title_code, title_name, important, decision, issue, codes
+            
+    parsed = {}
+    parsed["group_code"] = group_code
+    parsed["group_name"] = group_name
+    parsed["title_code"] = title_code
+    parsed["title_name"] = title_name
+    parsed["important"] = important
+    parsed["decision"] = decision
+    parsed["issue"] = issue
+    parsed["codes"] = codes
+
+    return parsed
 
 def add_vuln(file_name):
-    path = "uploads/" # 경로는 추후에 파일 실제 저장 경로로 맞춰야함
+    path = "uploads/"
     encoding = XMLParser(encoding="utf-8")
     safe = []
     vuln = []

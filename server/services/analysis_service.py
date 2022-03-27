@@ -133,3 +133,16 @@ def get_hosts(project_no):
         tmp["ip"] = host.ip
         host_list_result.append(tmp)
     return host_list_result
+
+def get_host_analysis(host_no):
+    analysis_list = Analysis.query.filter_by(host_no=host_no).all()
+    analysis_list_result = []
+    for analysis in analysis_list:
+        tmp = {}
+        tmp["no"] = analysis.xml_no
+        tmp["timestamp"] = analysis.upload_time
+        tmp["path"] = analysis.path
+        tmp["safe"] = analysis.safe
+        tmp["vuln"] = analysis.vuln
+        analysis_list_result.append(tmp)
+    return analysis_list_result

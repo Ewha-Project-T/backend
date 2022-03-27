@@ -2,7 +2,7 @@ from flask import jsonify, send_file
 from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
 from flask_restful import reqparse, Resource
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from server.services.login_service import delete
 from ..services.analysis_service import *
 from ..services.xml_parser import add_vuln
@@ -87,5 +87,19 @@ class Analysis(Resource):
 class Hosts(Resource):
     @jwt_required()
     def get(self,proj_no):
+        current_user = get_jwt_identity()
+        if(proj_no != str(current_user["project_no"])):
+            return {"msg":"Forbidden Project"}, 403
         hosts = get_hosts(proj_no)
         return jsonify(hosts=hosts)
+    @jwt_required()
+    def post(self,proj_no):
+        parser = reqparse.RequestParser()
+        parser.add_argument('host_no', type=int, required=True, help="FileName is required")
+        args = parser.parse_args()
+        current_user = get_jwt_identity()
+        if(proj_no != str(current_user["project_no"])):
+            return {"msg":"Forbidden Project"}, 403
+        host_no = args["host_no"]
+        analysises = get_host_analysis(host_no)
+        return jsonify(analysises=analysises)

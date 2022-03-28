@@ -6,6 +6,10 @@ import shutil
 from werkzeug.utils import secure_filename
 from server import db
 from ..model import Analysis, HostInfo
+from ..services.xml_parser import parse_xml, ParseResult
+import pandas as pd
+import xlsxwriter
+from flask import send_file
 
 ALLOWED_EXTENSIONS = set(['zip', 'xml','tar'])
 UPLOAD_PATH ='./uploads/'
@@ -119,3 +123,44 @@ def insert_db(upload_time, project_no, user_no, path, safe, vuln):
         db.session.commit
 
     return UploadResult.SUCCESS    
+
+def make_xlsx(file_name):
+    df_list = []
+    '''
+    print(files)
+    for file_name in files:
+        result, group_code, group_name, title_code, title_name, important, decision, issue, code = parse_xml(file_name)
+        print(file_name)
+        if(result != ParseResult.SUCCESS):
+            return {'msg' : "INVALID FILE NAME"}, 400
+        
+        df_cols = ['group_code', 'group_name', 'title_code', 'title_name', 'important', 'decision', 'issue', 'code']
+        rows = []
+        for i in range(len(group_code)):
+            rows.append([group_code[i], group_name[i], title_code[i], title_name[i], important[i], decision[i], issue[i], code[i]])
+        
+        df = pd.DataFrame(rows, columns = df_cols)
+        print(df)
+    
+        df_list.append(df)
+        
+    xlsx_file = "analysis_result_" + time.strftime("%y%m%d_%H%M") + ".xlsx"
+    with pd.ExcelWriter(xlsx_file, engine='xlsxwriter') as writer:
+        for i in range(len(file_name)):
+            df[i].to_excel(writer, sheet_name=file_name[i])
+    '''
+    result, group_code, group_name, title_code, title_name, important, decision, issue, code = parse_xml(file_name)
+    
+    if(result != ParseResult.SUCCESS):
+        return {'msg' : "INVALID FILE NAME"}, 400
+    
+    df_cols = ['group_code', 'group_name', 'title_code', 'title_name', 'important', 'decision', 'issue', 'code']
+    rows = []
+    for i in range(len(group_code)):
+        rows.append([group_code[i], group_name[i], title_code[i], title_name[i], important[i], decision[i], issue[i], code[i]])
+    df = pd.DataFrame(rows, columns = df_cols)
+
+    xlsx_file = "analysis_result_" + time.strftime("%y%m%d_%H%M") + ".xlsx"
+    with pd.ExcelWriter(UPLOAD_PATH + xlsx_file, engine='xlsxwriter') as writer:
+        df.to_excel(writer, sheet_name='_'.join(file_name.split("/")[1].split('_')[:-1]))
+    return UPLOAD_PATH + xlsx_file

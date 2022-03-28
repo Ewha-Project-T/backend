@@ -7,18 +7,25 @@ from server.services.login_service import delete
 from ..services.analysis_service import *
 from ..services.xml_parser import add_vuln
 import time
+import pandas as pd
 
 
 
 class Analysis(Resource):
     @jwt_required()
-    def get(self,filename):
-
-        file_path = ''# Get File Path From DB
-        pure_name = os.path.basename(file_path)
-
-        return send_file(file_path, as_attachment=True, attachment_filename=pure_name)
-
+    def get(self):
+        
+        parser = reqparse.RequestParser()
+        parser.add_argument('file_name', type=str, required=True, help="FileName is required")
+        args = parser.parse_args()
+        file_name = args['file_name']
+        xlsx_file = make_xlsx(file_name)
+        send = send_file(xlsx_file)
+        os.remove(xlsx_file)
+        return send
+        #return send_file(xlsx_file)
+        #return df
+        #return send_file(file_path, as_attachment=True, attachment_filename=pure_name)
 
     @jwt_required()
     def post(self):

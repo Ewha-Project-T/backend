@@ -5,3 +5,6 @@ flask_cors
 flasgger
 pymysql
 flask_sqlalchemy
+pandas
+openpyxl
+xlsxwriter

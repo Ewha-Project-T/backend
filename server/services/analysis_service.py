@@ -3,9 +3,10 @@ import tarfile
 import os
 import time
 import shutil
+from flask_jwt_extended import create_refresh_token, create_access_token, verify_jwt_in_request, get_jwt, get_jwt_identity
 from werkzeug.utils import secure_filename
 from server import db
-from ..model import Analysis, HostInfo
+from ..model import User, Analysis, HostInfo
 
 ALLOWED_EXTENSIONS = set(['zip', 'xml','tar'])
 UPLOAD_PATH ='./uploads/'
@@ -96,28 +97,29 @@ def upload_file(fd):
     fd[0].save(abs_path)
     return random_dir + "/" + secure_filename(fd[0].filename)
 
-def insert_db(upload_time, project_no, user_no, path, safe, vuln):
+def insert_db(upload_time,  path, safe, vuln):
+    current_user = get_jwt_identity()
+    acc = User.query.filter_by(id=current_user["user_id"]).first()
     comment = ''
     for i in range(len(path)):
-        acc = Analysis.query.filter_by(path=path[i]).first()
-        if(acc != None):
+        an = Analysis.query.filter_by(path=path[i]).first()
+        if(an != None):
             return UploadResult.INVALID_PATH
         host_name='_'.join(path[i].split("/")[1].split('_')[:-1])
         types=path[i].split("/")[1].split('_')[1]    
         ip = '.'.join(path[i].split("/")[1].split("_")[-1].split(".")[:-1])
-        acc = HostInfo.query.filter_by(ip=ip).first()
-        if (acc == None):
-            acc = HostInfo(project_no=project_no, host_name=host_name, analysis_count=1, timestamp=upload_time, types=types, ip=ip)
+        an = HostInfo.query.filter_by(ip=ip).first()
+        if (an == None):
+            an = HostInfo(project_no=current_user["project_no"], host_name=host_name, analysis_count=1, timestamp=upload_time, types=types, ip=ip)
         else:
-            acc.analysis_count += 1
-            acc.timestamp = upload_time
-        db.session.add(acc)
-        acc = HostInfo.query.filter_by(ip=ip).first()
-        host_no = acc.no
-        acc = Analysis(upload_time=upload_time, project_no=project_no, user_no=user_no, path=path[i], safe=safe[i], vuln=vuln[i], host_no=host_no)
-        db.session.add(acc)
+            an.analysis_count += 1
+            an.timestamp = upload_time
+        db.session.add(an)
+        host = HostInfo.query.filter_by(ip=ip).first()
+        host_no = host.no
+        an = Analysis(upload_time=upload_time, project_no=current_user["project_no"], user_no=acc.user_no, path=path[i], safe=safe[i], vuln=vuln[i], host_no=host_no)
+        db.session.add(an)
         db.session.commit
-
     return UploadResult.SUCCESS
 
 def get_hosts(project_no):

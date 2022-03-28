@@ -24,8 +24,6 @@ class Analysis(Resource):
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('file', type=FileStorage, location='files', action='append')
-        parser.add_argument('project_no', type=int, required=True, help="Project_no is required")
-        parser.add_argument('user_no', type=int, required=True, help="User_no is required")
         args = parser.parse_args()
         
         fd = args['file']
@@ -48,8 +46,6 @@ class Analysis(Resource):
         save parinsg result
         '''
         upload_time = time.strftime("%Y-%m-%d %H:%M:%S")
-        project_no = args['project_no']
-        user_no = args['user_no']
         safe = []
         vuln = []
         #safe, vuln = add_vuln(path)
@@ -58,7 +54,7 @@ class Analysis(Resource):
             safe.append(tmp_safe)
             vuln.append(tmp_vuln)
         
-        insert_db(upload_time, project_no, user_no, path, safe, vuln)
+        insert_db(upload_time, path, safe, vuln)
         return {"msg":"ok"}, 200
 
 

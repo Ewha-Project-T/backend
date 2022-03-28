@@ -1,6 +1,6 @@
 from .login import Login, LoginRefresh, Account, Admin
 from .script import ScriptAPI, ScriptListingAPI, AdminScript
-from .analysis import Analysis, Hosts
+from .analysis import Analysis, Hosts, HostAnalysis
 from .project import Project, ProjectList
 from .parser import XML_Parser
 from .users import Users
@@ -22,5 +22,6 @@ def load_api(api_module):
     api_module.add_resource(Users,'/users',endpoint='users')
     api_module.add_resource(Users,'/users/<user_no>',endpoint='users_del')
     api_module.add_resource(Hosts,'/hosts/<proj_no>',endpoint='hosts_list')
+    api_module.add_resource(HostAnalysis,'/hosts/<proj_no>/<host_no>',endpoint='host_analysis')
     
 

@@ -92,14 +92,12 @@ class Hosts(Resource):
             return {"msg":"Forbidden Project"}, 403
         hosts = get_hosts(proj_no)
         return jsonify(hosts=hosts)
+
+class HostAnalysis(Resource):
     @jwt_required()
-    def post(self,proj_no):
-        parser = reqparse.RequestParser()
-        parser.add_argument('host_no', type=int, required=True, help="FileName is required")
-        args = parser.parse_args()
+    def get(self,proj_no,host_no):
         current_user = get_jwt_identity()
         if(proj_no != str(current_user["project_no"])):
             return {"msg":"Forbidden Project"}, 403
-        host_no = args["host_no"]
         analysises = get_host_analysis(host_no)
         return jsonify(analysises=analysises)

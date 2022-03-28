@@ -2,7 +2,7 @@ from flask import jsonify, send_file
 from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
 from flask_restful import reqparse, Resource
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from server.services.login_service import delete
 from ..services.analysis_service import *
 from ..services.xml_parser import add_vuln
@@ -14,25 +14,19 @@ import pandas as pd
 class Analysis(Resource):
     @jwt_required()
     def get(self):
-        
         parser = reqparse.RequestParser()
-        parser.add_argument('file_name', type=str, required=True, help="FileName is required")
+        parser.add_argument('xml_no', type=str, required=True, help="File Not Found")
         args = parser.parse_args()
-        file_name = args['file_name']
-        xlsx_file = make_xlsx(file_name)
+        xml_no = args['xml_no']
+        xlsx_file = make_xlsx(xml_no)
         send = send_file(xlsx_file)
         os.remove(xlsx_file)
         return send
-        #return send_file(xlsx_file)
-        #return df
-        #return send_file(file_path, as_attachment=True, attachment_filename=pure_name)
-
+        
     @jwt_required()
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('file', type=FileStorage, location='files', action='append')
-        parser.add_argument('project_no', type=int, required=True, help="Project_no is required")
-        parser.add_argument('user_no', type=int, required=True, help="User_no is required")
         args = parser.parse_args()
         
         fd = args['file']
@@ -55,8 +49,6 @@ class Analysis(Resource):
         save parinsg result
         '''
         upload_time = time.strftime("%Y-%m-%d %H:%M:%S")
-        project_no = args['project_no']
-        user_no = args['user_no']
         safe = []
         vuln = []
         #safe, vuln = add_vuln(path)
@@ -65,7 +57,7 @@ class Analysis(Resource):
             safe.append(tmp_safe)
             vuln.append(tmp_vuln)
         
-        insert_db(upload_time, project_no, user_no, path, safe, vuln)
+        insert_db(upload_time, path, safe, vuln)
         return {"msg":"ok"}, 200
 
 
@@ -81,16 +73,30 @@ class Analysis(Resource):
     @jwt_required()
     def delete(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('file_name', type=str, required=True, help="FileName is required")
+        parser.add_argument('xml_no', type=str, required=True, help="FileName is required")
         args = parser.parse_args()
 
-        filename = args['file_name']
-        result = delete_analysis_file(filename)
+        xml_no = args['xml_no']
+        result = delete_analysis_file(xml_no)
         if(result == DeleteResult.SUCCESS):
             return {"msg":"ok"}, 200
         else:
             return {"msg": "fail"}, 401
 
-# class Hosts(Resource):
-#     @jwt_required()
-#     def get(self):
+class Hosts(Resource):
+    @jwt_required()
+    def get(self,proj_no):
+        current_user = get_jwt_identity()
+        if(proj_no != str(current_user["project_no"])):
+            return {"msg":"Forbidden Project"}, 403
+        hosts = get_hosts(proj_no)
+        return jsonify(hosts=hosts)
+
+class HostAnalysis(Resource):
+    @jwt_required()
+    def get(self,proj_no,host_no):
+        current_user = get_jwt_identity()
+        if(proj_no != str(current_user["project_no"])):
+            return {"msg":"Forbidden Project"}, 403
+        analysises = get_host_analysis(host_no)
+        return jsonify(analysises=analysises)

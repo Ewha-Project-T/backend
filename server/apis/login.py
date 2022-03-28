@@ -9,6 +9,7 @@ from ..services.login_service import (
     login, register, delete, LoginResult, RegisterResult, create_tokens, 
     DeleteResult, change, ChangeResult, admin_required
 )
+from ..services.admin_service import patch_user, UserChangeResult
 
 jwt_blocklist = set()
 
@@ -164,6 +165,27 @@ class Admin(Resource):
         if(current_admin["user_perm"]==2):
             return {"msg":"admin authenticated"}, 200
         return {"msg": "you're not admin"}, 403
+    @admin_required()
+    def patch(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('user_no', type=int, required=True)
+        parser.add_argument('new_pw', type=str)
+        parser.add_argument('email', type=str)
+        parser.add_argument('name', type=str)
+        args = parser.parse_args()
+        user_no = args['user_no']
+        new_pw = args['new_pw']
+        email = args['email']
+        name = args['name']
+        result = patch_user(user_no,new_pw,email,name)
+        if(result == UserChangeResult.DUPLICATED_EMAIL):
+            return {"msg":"duplicated email"}, 400
+        elif(result == UserChangeResult.INVALID_USER):
+            return {"msg": "Invalid User"}, 400
+        else:
+            return {"msg":"success"}, 200
+
+
 
 
 

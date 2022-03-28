@@ -10,6 +10,7 @@ class ChangeResult:
     SUCCESS = 0
     NAME_EXIST=1
     INVALID_DATE = 2
+    INVALID_ACC = 3
 class DeleteResult:
     SUCCESS = 0
     ALREADY_DELETE=1
@@ -56,7 +57,7 @@ def delete_project(del_no):
     return DeleteResult.SUCCESS
 
 def change_project(change_no,name,start,end):
-    target_project = Project.query.get(change_no)
+    target_project = Project.query.filter_by(project_no=change_no).first()
     check = Project.query.filter_by(project_name=name).first()
     if(check!=None):
         return ChangeResult.NAME_EXIST
@@ -66,12 +67,16 @@ def change_project(change_no,name,start,end):
 
     #USER변경
     target_user =User.query.filter_by(id=target_project.project_name+"_USER1").first()
+    if(target_user == None):
+        return ChangeResult.INVALID_ACC
     target_user.id=name+"_USER1"
     db.session.add(target_user)
     db.session.commit
 
     #PM변경
     target_pm=User.query.filter_by(id=target_project.project_name+"_PM1").first()
+    if(target_pm == None):
+        return ChangeResult.INVALID_ACC
     target_pm.id=name+"_PM1"
     db.session.add(target_pm)
     db.session.commit

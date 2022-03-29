@@ -119,11 +119,25 @@ def admin_required():
         def decorator(*args, **kwargs):
             verify_jwt_in_request()
             claims = get_jwt()
-            print(claims)
             if(claims["sub"]["user_perm"]==2):
                 return fn(*args, **kwargs)
             else:
                 return {"msg":"admin only"}, 403
+
+        return decorator
+
+    return wrapper
+
+def pm_required():
+    def wrapper(fn):
+        @wraps(fn)
+        def decorator(*args, **kwargs):
+            verify_jwt_in_request()
+            claims = get_jwt()
+            if(claims["sub"]["user_perm"]>=1):
+                return fn(*args, **kwargs)
+            else:
+                return {"msg":"pm only"}, 403
 
         return decorator
 

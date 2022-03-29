@@ -33,19 +33,21 @@ class Project(Resource):
     @admin_required()
     def patch(self,project_no):
         parser = reqparse.RequestParser()
-        parser.add_argument('prj_name', type=str, required=True, help="Project Name is required")
-        parser.add_argument('prj_start', type=str, required=True, help="Start Date required")
-        parser.add_argument('prj_end', type=str, required=True, help="End Date is required")
+        parser.add_argument('prj_name', type=str)
+        parser.add_argument('prj_start', type=str)
+        parser.add_argument('prj_end', type=str)
         args = parser.parse_args()
         prj_name = args['prj_name']
         prj_start = args['prj_start']
         prj_end = args['prj_end']
-        result=change_project(project_no,prj_name,prj_start,prj_end)
+        result=change_project(project_no, prj_name, prj_start, prj_end)
         if(result==ChangeResult.NAME_EXIST):
-            return {"msg":"Project Name Exist"},400
-        if(result==ChangeResult.INVALID_DATE):
-            return {"msg":"Invalid Date"},400
-
+            return {"msg":"Project Name Exist"}, 400
+        elif(result==ChangeResult.INVALID_DATE):
+            return {"msg":"Invalid Date"}, 400
+        elif(result==ChangeResult.INVALID_ACC):
+            return {"msg":"Invalid Account"}, 400
+        
         return {"msg":"success"},200
     @admin_required()
     def delete(self,project_no):

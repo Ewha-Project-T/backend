@@ -51,7 +51,9 @@ class Analysis(Resource):
         vuln = []
         #safe, vuln = add_vuln(path)
         for i in range(len(path)):
-            tmp_safe, tmp_vuln = add_vuln(path[i])
+            result, tmp_safe, tmp_vuln = add_vuln(path[i])
+            if(result != ParseResult.SUCCESS):
+                return {"msg" : "Invalid File Name"}, 400
             safe.append(tmp_safe)
             vuln.append(tmp_vuln)
         

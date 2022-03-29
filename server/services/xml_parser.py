@@ -59,11 +59,11 @@ def add_vuln(file_name):
     try:
         tree = parse(path + file_name, parser=encoding)
     except:
-        return ParseResult.INVALID_FILE, {'msg':'File Not Found'}, 400, None, None, None, None, None, None
+        return ParseResult.INVALID_FILE, 0, 0
 
     root = tree.getroot()
     row = root.findall("row")
     decision = [x.findtext("Decision") for x in row]
     safe = decision.count('양호')
     vuln = decision.count('취약')
-    return safe, vuln
+    return ParseResult.SUCCESS, safe, vuln

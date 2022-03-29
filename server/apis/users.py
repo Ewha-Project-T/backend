@@ -1,10 +1,8 @@
 from flask import jsonify
+from flask_jwt_extended import get_jwt_identity
 from flask_restful import reqparse, Resource
-from flask_jwt_extended import (
-    jwt_required, get_jwt_identity
-)
 from ..services.login_service import (
-    admin_required, DeleteResult
+    admin_required, DeleteResult, pm_required
 )
 from ..services.admin_service import (
     get_users_info, delete_user, init_user_limit, InitResult
@@ -13,9 +11,13 @@ from server import db
 from ..model import User
 
 class Users(Resource):
-    @admin_required()
+    @pm_required()
     def get(self):
-        res=get_users_info()
+        cur_user = get_jwt_identity()
+        if(cur_user["user_perm"]==2):
+            res=get_users_info()
+        else:
+            res=get_users_info(cur_user["project_no"])
         return jsonify(users_info=res)
         
     @admin_required()

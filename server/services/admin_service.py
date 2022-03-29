@@ -12,8 +12,11 @@ class UserChangeResult:
     DUPLICATED_EMAIL = 1
     INVALID_USER = 2
 
-def get_users_info():
-    acc_list = User.query.all()
+def get_users_info(proj_no=None):
+    if(proj_no==None):
+        acc_list = User.query.all()
+    else:
+        acc_list = User.query.filter_by(project_no=proj_no).all()
     info_list = []
     for info in acc_list:
         tmp_info = {}

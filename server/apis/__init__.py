@@ -26,4 +26,3 @@ def load_api(api_module):
     api_module.add_resource(ProjectAnalysis,'/project_analysis',endpoint='project_analysis')
     api_module.add_resource(Comments,'/comments',endpoint='comments')
 
-``

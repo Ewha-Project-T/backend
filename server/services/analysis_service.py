@@ -44,6 +44,10 @@ class VulnResult:
     SUCCESS = 0
     INVALID_PATH = 1
 
+class CommentingResult:
+    SUCCESS = 0
+    INVALID_XML = 1
+
 def compression_extract(file_path, ext):
     if ext == "zip":
         f = zipfile.ZipFile(UPLOAD_PATH + file_path)
@@ -101,7 +105,6 @@ def upload_file(fd):
 def insert_db(upload_time,  path, safe, vuln):
     current_user = get_jwt_identity()
     acc = User.query.filter_by(id=current_user["user_id"]).first()
-    comment = ''
     for i in range(len(path)):
         an = Analysis.query.filter_by(path=path[i]).first()
         if(an != None):
@@ -118,9 +121,9 @@ def insert_db(upload_time,  path, safe, vuln):
         db.session.add(an)
         host = HostInfo.query.filter_by(ip=ip).first()
         host_no = host.no
-        an = Analysis(upload_time=upload_time, project_no=current_user["project_no"], user_no=acc.user_no, path=path[i], safe=safe[i], vuln=vuln[i], host_no=host_no)
+        an = Analysis(upload_time=upload_time, project_no=current_user["project_no"], user_no=acc.user_no, path=path[i], comment="", safe=safe[i], vuln=vuln[i], host_no=host_no)
         db.session.add(an)
-        db.session.commit
+        db.session.commit()
 
     return UploadResult.SUCCESS    
 
@@ -199,4 +202,21 @@ def get_project_analysis():
         tmp["host_no"] = rows[i].host_no
         analysis_list_result.append(tmp)
     return analysis_list_result
-    
+
+def get_comments(xml_no):
+    cur_user = get_jwt_identity()
+    analysis_res = Analysis.query.filter_by(xml_no=xml_no).first()
+    if(analysis_res == None or cur_user["project_no"] != analysis_res.project_no):
+        return CommentingResult.INVALID_XML, ""
+    return CommentingResult.SUCCESS, analysis_res.comment
+
+
+def commenting(content, xml_no):
+    cur_user = get_jwt_identity()
+    analysis_res = Analysis.query.filter_by(xml_no=xml_no).first()
+    if(analysis_res == None or cur_user["project_no"] != analysis_res.project_no):
+        return CommentingResult.INVALID_XML
+    analysis_res.comment = content
+    db.session.add(analysis_res)
+    db.session.commit()
+    return CommentingResult.SUCCESS

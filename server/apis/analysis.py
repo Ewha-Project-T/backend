@@ -113,6 +113,20 @@ class ProjectAnalysis(Resource):
         
 class Comments(Resource):
     @jwt_required()
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('xml_no', type=int, required=True, help="xml_no is required")
+        args = parser.parse_args()
+        num = args['xml_no']
+        res, content = get_comments(num)
+        if(res==CommentingResult.SUCCESS):
+            return {"comment":content}, 200
+        elif(res==CommentingResult.INVALID_XML):
+            return {"msg":"Invalid xml"}, 400
+        else:
+            return {"msg":"Internal Error"}, 400
+
+    @jwt_required()
     def patch(self):
         parser = reqparse.RequestParser()
         parser.add_argument('comment', type=str, required=True, help="comments is required")
@@ -121,12 +135,12 @@ class Comments(Resource):
 
         comments = args['comment']
         num = args['xml_no']
-
-        analysis_res = Analysis.query.filter_by(xml_no=num).first()
-
-        if(analysis_res != None):
-            analysis_res.comment = comments
-
-        db.session.add(analysis_res)
-        db.session.commit
+        res = commenting(comments,num)
+        if(res==CommentingResult.SUCCESS):
+            return {"msg":"success"}, 200
+        elif(res==CommentingResult.INVALID_XML):
+            return {"msg":"Invalid xml"}, 400
+        else:
+            return {"msg":"Internal Error"}, 400
+        
         

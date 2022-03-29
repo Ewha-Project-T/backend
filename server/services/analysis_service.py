@@ -181,8 +181,9 @@ def get_host_analysis(host_no):
         analysis_list_result.append(tmp)
     return analysis_list_result
 
-def get_project_analysis(project_no):
-    rows = Analysis.query.filter_by(project_no=project_no).all()
+def get_project_analysis():
+    cur_user = get_jwt_identity()
+    rows = Analysis.query.filter_by(project_no=cur_user['project_no']).all()
     analysis_list_result=[]
     for i in range(0,len(rows)):
         if(i==30):

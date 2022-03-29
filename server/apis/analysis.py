@@ -101,11 +101,11 @@ class HostAnalysis(Resource):
 
 class ProjectAnalysis(Resource):
     @jwt_required()
-    def get(self, proj_no):
+    def get(self):
         '''
         current_project = get_jwt_identity()
         if(proj_no != str(current_project["project_no"])):
             return {"msg":"Access Denied"}, 403
             '''
-        proj_analysises = get_project_analysis(proj_no)
+        proj_analysises = get_project_analysis()
         return jsonify(proj_analysises=proj_analysises)

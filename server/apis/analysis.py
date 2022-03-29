@@ -7,19 +7,20 @@ from server.services.login_service import delete
 from ..services.analysis_service import *
 from ..services.xml_parser import add_vuln
 import time
-
-
+import pandas as pd
 
 class Analysis(Resource):
     @jwt_required()
-    def get(self,filename):
-
-        file_path = ''# Get File Path From DB
-        pure_name = os.path.basename(file_path)
-
-        return send_file(file_path, as_attachment=True, attachment_filename=pure_name)
-
-
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('xml_no', type=str, required=True, help="File Not Found")
+        args = parser.parse_args()
+        xml_no = args['xml_no']
+        xlsx_file = make_xlsx(xml_no)
+        send = send_file(xlsx_file)
+        os.remove(xlsx_file)
+        return send
+        
     @jwt_required()
     def post(self):
         parser = reqparse.RequestParser()
@@ -70,11 +71,11 @@ class Analysis(Resource):
     @jwt_required()
     def delete(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('file_name', type=str, required=True, help="FileName is required")
+        parser.add_argument('xml_no', type=str, required=True, help="FileName is required")
         args = parser.parse_args()
 
-        filename = args['file_name']
-        result = delete_analysis_file(filename)
+        xml_no = args['xml_no']
+        result = delete_analysis_file(xml_no)
         if(result == DeleteResult.SUCCESS):
             return {"msg":"ok"}, 200
         else:
@@ -97,3 +98,14 @@ class HostAnalysis(Resource):
             return {"msg":"Forbidden Project"}, 403
         analysises = get_host_analysis(host_no)
         return jsonify(analysises=analysises)
+
+class ProjectAnalysis(Resource):
+    @jwt_required()
+    def get(self, proj_no):
+        '''
+        current_project = get_jwt_identity()
+        if(proj_no != str(current_project["project_no"])):
+            return {"msg":"Access Denied"}, 403
+            '''
+        proj_analysises = get_project_analysis(proj_no)
+        return jsonify(proj_analysises=proj_analysises)

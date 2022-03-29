@@ -184,7 +184,9 @@ def get_host_analysis(host_no):
 def get_project_analysis(project_no):
     rows = Analysis.query.filter_by(project_no=project_no).all()
     analysis_list_result=[]
-    for i in range(0,30):
+    for i in range(0,len(rows)):
+        if(i==30):
+            break
         tmp = {}
         tmp["upload_time"] = rows[i].upload_time
         tmp["project_no"] = rows[i].project_no

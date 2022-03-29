@@ -27,7 +27,7 @@ def create_project(name,start,end):
     db.session.add(acc)
     db.session.commit
 
-    default_passwd="iy87nSG+BMOjcgssU2mxrB8iwPriXHCj48tCax4uTjT6L2ProGRzo4B+QCRhNMQy9KYw53UhMSoNFf72hlv8nHWhGA8ZoRQOZv69XTME1RF73/PsZy4YowLPOQkznwlSThnpyq3d/HypLVj6CHb80Ym//Dt1stVcQkX5Aceqa0upJj9HbhsfISIPcKtVZF/Les1WXaegkDfCFkOqdAiY7w=="
+    default_passwd="1234"
     my_pro = Project.query.filter_by(project_name=name).first()
     #user계정생성    
     acc_user=User(id=name+"_USER1",password=default_passwd,name=name+"_USER1",email=name+"_USER1@email.com",project_no=my_pro.project_no)#입력값에 대한 보안처리 해야되나 고민중

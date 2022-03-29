@@ -189,6 +189,7 @@ def get_project_analysis():
         if(i==30):
             break
         tmp = {}
+        tmp["xml_no"] = rows[i].xml_no
         tmp["upload_time"] = rows[i].upload_time
         tmp["project_no"] = rows[i].project_no
         tmp["host_name"] = '_'.join(rows[i].path.split("/")[1].split('_')[:-1])

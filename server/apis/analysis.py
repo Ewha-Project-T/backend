@@ -109,3 +109,24 @@ class ProjectAnalysis(Resource):
             '''
         proj_analysises = get_project_analysis()
         return jsonify(proj_analysises=proj_analysises)
+
+        
+class Comments(Resource):
+    @jwt_required()
+    def patch(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('comment', type=str, required=True, help="comments is required")
+        parser.add_argument('xml_no', type=int, required=True, help="xml_no is required")
+        args = parser.parse_args()
+
+        comments = args['comment']
+        num = args['xml_no']
+
+        analysis_res = Analysis.query.filter_by(xml_no=num).first()
+
+        if(analysis_res != None):
+            analysis_res.comment = comments
+
+        db.session.add(analysis_res)
+        db.session.commit
+        

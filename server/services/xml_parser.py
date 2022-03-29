@@ -33,11 +33,11 @@ def parse_xml(xml_no):
 
     codes = []
     for title in title_code:
-        acc = Code.query.filter_by(title_code=title).first()
-        if(acc == None):
+        kcode = Code.query.filter_by(title_code=title).first()
+        if(kcode == None):
             codes.append(None)
         else:
-            codes.append(acc.kisa_code)
+            codes.append(kcode.kisa_code)
             
     parsed = {}
     parsed["group_code"] = group_code
@@ -59,7 +59,7 @@ def add_vuln(file_name):
     try:
         tree = parse(path + file_name, parser=encoding)
     except:
-        return ParseResult.INVALID_FILE, {'msg':'File Not Found'}, 400, None, None, None, None, None
+        return ParseResult.INVALID_FILE, {'msg':'File Not Found'}, 400, None, None, None, None, None, None
 
     root = tree.getroot()
     row = root.findall("row")

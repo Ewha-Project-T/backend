@@ -9,8 +9,6 @@ from ..services.xml_parser import add_vuln
 import time
 import pandas as pd
 
-
-
 class Analysis(Resource):
     @jwt_required()
     def get(self):
@@ -100,3 +98,14 @@ class HostAnalysis(Resource):
             return {"msg":"Forbidden Project"}, 403
         analysises = get_host_analysis(host_no)
         return jsonify(analysises=analysises)
+
+class ProjectAnalysis(Resource):
+    @jwt_required()
+    def get(self, proj_no):
+        '''
+        current_project = get_jwt_identity()
+        if(proj_no != str(current_project["project_no"])):
+            return {"msg":"Access Denied"}, 403
+            '''
+        proj_analysises = get_project_analysis(proj_no)
+        return jsonify(proj_analysises=proj_analysises)

@@ -180,3 +180,19 @@ def get_host_analysis(host_no):
         tmp["vuln"] = analysis.vuln
         analysis_list_result.append(tmp)
     return analysis_list_result
+
+def get_project_analysis(project_no):
+    rows = Analysis.query.filter_by(project_no=project_no).all()
+    analysis_list_result=[]
+    for i in range(0,30):
+        tmp = {}
+        tmp["upload_time"] = rows[i].upload_time
+        tmp["project_no"] = rows[i].project_no
+        tmp["host_name"] = '_'.join(rows[i].path.split("/")[1].split('_')[:-1])
+        tmp["comment"] = rows[i].comment
+        tmp["safe"] = rows[i].safe
+        tmp["vuln"] = rows[i].vuln
+        tmp["host_no"] = rows[i].host_no
+        analysis_list_result.append(tmp)
+    return analysis_list_result
+    

@@ -183,7 +183,7 @@ def get_host_analysis(host_no):
 
 def get_project_analysis():
     cur_user = get_jwt_identity()
-    rows = Analysis.query.filter_by(project_no=cur_user['project_no']).all()
+    rows = Analysis.query.filter_by(project_no=cur_user['project_no']).order_by(Analysis.upload_time.desc()).all()
     analysis_list_result=[]
     for i in range(0,len(rows)):
         if(i==30):

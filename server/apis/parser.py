@@ -1,9 +1,6 @@
 from flask_restful import reqparse, Resource
 from flasgger import swag_from
-from flask_jwt_extended import (
-		jwt_required, get_jwt_identity, get_jwt
-)
-from ..services.xml_parser import parse_xml, ParseResult, add_vuln
+from ..services.xml_parser import parse_xml
 
 
 class XML_Parser(Resource):

@@ -11,13 +11,9 @@ from server import db
 from ..model import User
 
 class Users(Resource):
-    @pm_required()
+    @admin_required()
     def get(self):
-        cur_user = get_jwt_identity()
-        if(cur_user["user_perm"]==2):
-            res=get_users_info()
-        else:
-            res=get_users_info(cur_user["project_no"])
+        res=get_users_info()
         return jsonify(users_info=res)
         
     @admin_required()
@@ -39,6 +35,13 @@ class Users(Resource):
             return {"msg": "Delete User SUCCESS"}, 200
         else:
             return {"msg": "INVALID User No"}, 403
+
+class PMUsers(Resource):
+    @pm_required()
+    def get(self):
+        cur_user = get_jwt_identity()
+        res=get_users_info(cur_user["project_no"])
+        return jsonify(users_info=res)
 
         
 

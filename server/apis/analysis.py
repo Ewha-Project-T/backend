@@ -103,11 +103,46 @@ class HostAnalysis(Resource):
 
 class ProjectAnalysis(Resource):
     @jwt_required()
-    def get(self, proj_no):
+    def get(self):
         '''
         current_project = get_jwt_identity()
         if(proj_no != str(current_project["project_no"])):
             return {"msg":"Access Denied"}, 403
             '''
-        proj_analysises = get_project_analysis(proj_no)
+        proj_analysises = get_project_analysis()
         return jsonify(proj_analysises=proj_analysises)
+
+        
+class Comments(Resource):
+    @jwt_required()
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('xml_no', type=int, required=True, help="xml_no is required")
+        args = parser.parse_args()
+        num = args['xml_no']
+        res, content = get_comments(num)
+        if(res==CommentingResult.SUCCESS):
+            return {"comment":content}, 200
+        elif(res==CommentingResult.INVALID_XML):
+            return {"msg":"Invalid xml"}, 400
+        else:
+            return {"msg":"Internal Error"}, 400
+
+    @jwt_required()
+    def patch(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('comment', type=str, required=True, help="comments is required")
+        parser.add_argument('xml_no', type=int, required=True, help="xml_no is required")
+        args = parser.parse_args()
+
+        comments = args['comment']
+        num = args['xml_no']
+        res = commenting(comments,num)
+        if(res==CommentingResult.SUCCESS):
+            return {"msg":"success"}, 200
+        elif(res==CommentingResult.INVALID_XML):
+            return {"msg":"Invalid xml"}, 400
+        else:
+            return {"msg":"Internal Error"}, 400
+        
+        

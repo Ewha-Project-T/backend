@@ -112,7 +112,7 @@ def insert_db(upload_time,  path, safe, vuln):
         host_name='_'.join(path[i].split("/")[1].split('_')[:-1])
         types=path[i].split("/")[1].split('_')[1]    
         ip = '.'.join(path[i].split("/")[1].split("_")[-1].split(".")[:-1])
-        an = HostInfo.query.filter_by(ip=ip).first()
+        an = HostInfo.query.filter_by(ip=ip, project_no=current_user["project_no"]).first()
         if (an == None):
             an = HostInfo(project_no=current_user["project_no"], host_name=host_name, analysis_count=1, timestamp=upload_time, types=types, ip=ip)
         else:
@@ -128,34 +128,35 @@ def insert_db(upload_time,  path, safe, vuln):
     return UploadResult.SUCCESS    
 
 def make_xlsx(xml_no):
-    parsed = parse_xml(xml_no)
-
-    if(type(parsed)==type({})):
-        xml_result = []
-        for i in range(len(parsed["group_code"])):
-            xml_result.append({
-                'group_code' : parsed["group_code"][i],
-                'group_name' : parsed["group_name"][i],
-                'title_code' : parsed["title_code"][i],
-                'title_name' : parsed["title_name"][i],
-                'important' : parsed["important"][i],
-                'decision' : parsed["decision"][i],
-                'issue' : parsed["issue"][i], 
-                'code' : parsed["codes"][i]})
-    print(xml_result)
-    df_cols = ['group_code', 'group_name', 'title_code', 'title_name', 'important', 'decision', 'issue', 'code']
-    rows = []
-    for i in range(len(parsed["group_code"])):
-        rows.append([parsed["group_code"][i], parsed["group_name"][i], parsed["title_code"][i], parsed["title_name"][i], parsed["important"][i], parsed["decision"][i], parsed["issue"][i], parsed["codes"][i]])
-    df = pd.DataFrame(rows, columns = df_cols)
-
-    xml_row = Analysis.query.filter_by(xml_no=xml_no).first()
-    file_name = xml_row.path
+    xml_no = xml_no.split("_")
     xlsx_file = "analysis_result_" + time.strftime("%y%m%d_%H%M") + ".xlsx"
     with pd.ExcelWriter(UPLOAD_PATH + xlsx_file, engine='xlsxwriter') as writer:
-        df.to_excel(writer, sheet_name='_'.join(file_name.split("/")[1].split('_')[:-1]))
+        for xml in xml_no:
+            parsed = parse_xml(xml)
+
+            if(type(parsed)==type({})):
+                xml_result = []
+                for i in range(len(parsed["group_code"])):
+                    xml_result.append({
+                        'group_code' : parsed["group_code"][i],
+                        'group_name' : parsed["group_name"][i],
+                        'title_code' : parsed["title_code"][i],
+                        'title_name' : parsed["title_name"][i],
+                        'important' : parsed["important"][i],
+                        'decision' : parsed["decision"][i],
+                        'issue' : parsed["issue"][i], 
+                        'code' : parsed["codes"][i]})
+            
+            df_cols = ['group_code', 'group_name', 'title_code', 'title_name', 'important', 'decision', 'issue', 'code']
+            rows = []
+            for i in range(len(parsed["group_code"])):
+                rows.append([parsed["group_code"][i], parsed["group_name"][i], parsed["title_code"][i], parsed["title_name"][i], parsed["important"][i], parsed["decision"][i], parsed["issue"][i], parsed["codes"][i]])
+            df = pd.DataFrame(rows, columns = df_cols)
+            
+            xml_row = Analysis.query.filter_by(xml_no=xml).first()
+            file_name = xml_row.path
+            df.to_excel(writer, sheet_name='_'.join(file_name.split("/")[1].split('_')[:-1]))
     return UPLOAD_PATH + xlsx_file
-    #return UploadResult.SUCCESS 
 
 def get_hosts(project_no):
     host_list = HostInfo.query.filter_by(project_no=project_no).all()

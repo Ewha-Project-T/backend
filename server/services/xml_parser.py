@@ -12,7 +12,6 @@ class ParseResult:
 def parse_xml(xml_no):
     path = "uploads/"
     encoding = XMLParser(encoding="utf-8")
-
     xml_row = Analysis.query.filter_by(xml_no=xml_no).first()
     file_name = xml_row.path
     try:
@@ -48,7 +47,7 @@ def parse_xml(xml_no):
     parsed["decision"] = decision
     parsed["issue"] = issue
     parsed["codes"] = codes
-
+    
     return parsed
 
 def add_vuln(file_name):

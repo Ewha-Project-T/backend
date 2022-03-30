@@ -112,7 +112,7 @@ def insert_db(upload_time,  path, safe, vuln):
         host_name='_'.join(path[i].split("/")[1].split('_')[:-1])
         types=path[i].split("/")[1].split('_')[1]    
         ip = '.'.join(path[i].split("/")[1].split("_")[-1].split(".")[:-1])
-        an = HostInfo.query.filter_by(ip=ip).first()
+        an = HostInfo.query.filter_by(ip=ip, project_no=current_user["project_no"]).first()
         if (an == None):
             an = HostInfo(project_no=current_user["project_no"], host_name=host_name, analysis_count=1, timestamp=upload_time, types=types, ip=ip)
         else:

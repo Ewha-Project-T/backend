@@ -46,7 +46,7 @@ class Login(Resource):
                     'refresh_token': refresh_token
                 }, 201, {'location':'/'}
         else:
-            return {"msg":"Bad username or password"}, 403
+            return {"msg":"Bad username or password"}, 400
 
     @swag_from("../../docs/login/put.yml")
     @jwt_required()
@@ -70,19 +70,19 @@ class Login(Resource):
             if(result==RegisterResult.SUCCESS):
                 return{"msg" : "register success"},201
             elif(result==RegisterResult.INVALID_IDPW):
-                return{"msg" : "invalid id or pw"},403
+                return{"msg" : "invalid id or pw"},400
             elif(result==RegisterResult.USERID_EXIST):
-                return{"msg" : "user id exist"},403
+                return{"msg" : "user id exist"},400
             elif(result==RegisterResult.USEREMAIL_EXIST):
-                return{"msg" : "user email exist"},403
+                return{"msg" : "user email exist"},400
             elif(result==RegisterResult.INVALID_PERM):
-                return {"msg" : "invalid permission"}, 403
+                return {"msg" : "invalid permission"}, 400
             elif(result==RegisterResult.INVALID_PROJECT):
-                return {"msg" : "invalid project"}, 403
+                return {"msg" : "invalid project"}, 400
             else:
                 return{"msg" : "bad parameters"},400
         else:
-            return {"msg": "Invalid Email"}, 403
+            return {"msg": "Invalid Email"}, 400
 
     @jwt_required()
     def patch(self):
@@ -100,15 +100,15 @@ class Login(Resource):
         if(res==ChangeResult.SUCCESS):
             return {'msg':'success'},200
         elif(res==ChangeResult.INCORRECT_PW):
-            return {'msg':'Incorrect old password'}, 403
+            return {'msg':'Incorrect old password'}, 400
         elif(res==ChangeResult.INVALID_PW):
-            return {'msg':'Invalid password'}, 403
+            return {'msg':'Invalid password'}, 400
         elif(res==ChangeResult.INVALID_EMAIL):
-            return {'msg':'Invalid email'}, 403
+            return {'msg':'Invalid email'}, 400
         elif(res==ChangeResult.INVALID_NAME):
-            return {'msg':'Invalid name'}, 403
+            return {'msg':'Invalid name'}, 400
         elif(res==ChangeResult.DUPLICATED_EMAIL):
-            return {'msg':'Duplicated EMAIL'}, 403
+            return {'msg':'Duplicated EMAIL'}, 400
         else:
             return {'msg':'Internal Error'}, 400
 
@@ -127,16 +127,14 @@ class Account(Resource):
         if(result==DeleteResult.SUCCESS):
             return{"msg":"success"},200
         else:
-            return{"msg": "delete account fail"},403
+            return{"msg": "invalid user id"},400
 
 class LoginRefresh(Resource):
     @jwt_required(refresh=True)
     def get(self):
         current_user = get_jwt_identity()
         new_access_token = create_access_token(identity=current_user, fresh=False)
-        return {
-            "access_token": new_access_token
-        }, 200
+        return {"access_token": new_access_token}, 200
     
 class Admin(Resource):
     @admin_required()

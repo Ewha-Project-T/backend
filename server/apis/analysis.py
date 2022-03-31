@@ -72,6 +72,19 @@ class Analysis(Resource):
         return {"msg":filename}, 200
     
     @jwt_required()
+    def patch(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('host_no', type=int, required=True, help="Host Number is required")
+        parser.add_argument('host_name', type=str, required=True, help="Host Name is required")
+        args = parser.parse_args()
+        host_no = args['host_no']
+        host_name = args['host_name']
+        res = modify_host_name(host_no, host_name)
+        if(res == HostInfoResult.INVALID_HOST):
+            return {"msg":"Invalid host"}, 404
+        return {"msg":"Success"}, 200
+
+    @jwt_required()
     def delete(self):
         parser = reqparse.RequestParser()
         parser.add_argument('xml_no', type=str, required=True, help="FileName is required")

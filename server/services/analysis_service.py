@@ -52,6 +52,11 @@ class XlsxResult:
     SUCCESS = 0
     NO_ARGS = 1
 
+class HostInfoResult:
+    SUCCESS = 0
+    INVALID_HOST = 1
+    DUPLICATED_NAME = 2
+
 def compression_extract(file_path, ext):
     if ext == "zip":
         f = zipfile.ZipFile(UPLOAD_PATH + file_path)
@@ -228,3 +233,13 @@ def commenting(content, xml_no):
     db.session.add(analysis_res)
     db.session.commit()
     return CommentingResult.SUCCESS
+
+def modify_host_name(host_no, host_name):
+    cur_user = get_jwt_identity()
+    host_res = HostInfo.query.filter_by(no = host_no).first()
+    if(host_res == None or cur_user["project_no"] != host_res.project_no):
+        return HostInfoResult.INVALID_HOST
+    host_res.host_name = host_name
+    db.session.add(host_res)
+    db.session.commit()
+    return HostInfoResult.SUCCESS

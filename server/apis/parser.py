@@ -28,5 +28,5 @@ class XML_Parser(Resource):
             xml_result = {'safe' : + safe , 'vuln' : vuln, 'details' : xml_result} 
             return xml_result
         else:
-            return {"msg":"invalid file name"}, 400
+            return {"msg":"invalid file name"}, 404
 			

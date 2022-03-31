@@ -16,8 +16,13 @@ class Analysis(Resource):
         parser.add_argument('xml_no', type=str, required=True, help="File Not Found")
         args = parser.parse_args()
         xml_no = args['xml_no']
-        xlsx_file = make_xlsx(xml_no)
-        send = send_file(xlsx_file)
+        result, xlsx_file = make_xlsx(xml_no)
+        if(result == XlsxResult.NO_ARGS):
+            return {"msg" : "No Argments"}, 404
+        try:
+            send = send_file(xlsx_file)
+        except:
+            return {"msg" : "File Download Fail"}, 403
         os.remove(xlsx_file)
         return send
         
@@ -41,11 +46,8 @@ class Analysis(Resource):
             else:
                 path = [uploaded_path]
         else:
-            return{"msg":"denied file extensions"}, 400
-        '''
-        insert paring code ()
-        save parinsg result
-        '''
+            return{"msg":"denied file extensions"}, 403
+
         upload_time = time.strftime("%Y-%m-%d %H:%M:%S")
         safe = []
         vuln = []
@@ -53,13 +55,12 @@ class Analysis(Resource):
         for i in range(len(path)):
             result, tmp_safe, tmp_vuln = add_vuln(path[i])
             if(result != ParseResult.SUCCESS):
-                return {"msg" : "Invalid File Name"}, 400
+                return {"msg" : "Invalid File Name"}, 404
             safe.append(tmp_safe)
             vuln.append(tmp_vuln)
         
         insert_db(upload_time, path, safe, vuln)
         return {"msg":"ok"}, 200
-
 
     @jwt_required()
     def put(self):
@@ -81,7 +82,7 @@ class Analysis(Resource):
         if(result == DeleteResult.SUCCESS):
             return {"msg":"ok"}, 200
         else:
-            return {"msg": "fail"}, 401
+            return {"msg": "Analysis Delete Fail"}, 403
 
 class Hosts(Resource):
     @jwt_required()
@@ -104,14 +105,8 @@ class HostAnalysis(Resource):
 class ProjectAnalysis(Resource):
     @jwt_required()
     def get(self):
-        '''
-        current_project = get_jwt_identity()
-        if(proj_no != str(current_project["project_no"])):
-            return {"msg":"Access Denied"}, 403
-            '''
         proj_analysises = get_project_analysis()
         return jsonify(proj_analysises=proj_analysises)
-
         
 class Comments(Resource):
     @jwt_required()
@@ -124,7 +119,7 @@ class Comments(Resource):
         if(res==CommentingResult.SUCCESS):
             return {"comment":content}, 200
         elif(res==CommentingResult.INVALID_XML):
-            return {"msg":"Invalid xml"}, 400
+            return {"msg":"Invalid xml"}, 404
         else:
             return {"msg":"Internal Error"}, 400
 
@@ -144,5 +139,3 @@ class Comments(Resource):
             return {"msg":"Invalid xml"}, 400
         else:
             return {"msg":"Internal Error"}, 400
-        
-        

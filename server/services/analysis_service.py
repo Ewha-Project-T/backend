@@ -48,6 +48,10 @@ class CommentingResult:
     SUCCESS = 0
     INVALID_XML = 1
 
+class XlsxResult:
+    SUCCESS = 0
+    NO_ARGS = 1
+
 def compression_extract(file_path, ext):
     if ext == "zip":
         f = zipfile.ZipFile(UPLOAD_PATH + file_path)
@@ -129,6 +133,9 @@ def insert_db(upload_time,  path, safe, vuln):
 
 def make_xlsx(xml_no):
     xml_no = xml_no.split("_")
+    print(xml_no)
+    if(xml_no==['']):
+        return XlsxResult.NO_ARGS, None
     xlsx_file = "analysis_result_" + time.strftime("%y%m%d_%H%M") + ".xlsx"
     with pd.ExcelWriter(UPLOAD_PATH + xlsx_file, engine='xlsxwriter') as writer:
         for xml in xml_no:
@@ -152,11 +159,10 @@ def make_xlsx(xml_no):
             for i in range(len(parsed["group_code"])):
                 rows.append([parsed["group_code"][i], parsed["group_name"][i], parsed["title_code"][i], parsed["title_name"][i], parsed["important"][i], parsed["decision"][i], parsed["issue"][i], parsed["codes"][i]])
             df = pd.DataFrame(rows, columns = df_cols)
-            
             xml_row = Analysis.query.filter_by(xml_no=xml).first()
             file_name = xml_row.path
             df.to_excel(writer, sheet_name='_'.join(file_name.split("/")[1].split('_')[:-1]))
-    return UPLOAD_PATH + xlsx_file
+    return XlsxResult.SUCCESS, UPLOAD_PATH + xlsx_file
 
 def get_hosts(project_no):
     host_list = HostInfo.query.filter_by(project_no=project_no).all()
@@ -187,6 +193,7 @@ def get_host_analysis(host_no):
 
 def get_project_analysis():
     cur_user = get_jwt_identity()
+    
     rows = Analysis.query.filter_by(project_no=cur_user['project_no']).order_by(Analysis.upload_time.desc()).all()
     analysis_list_result=[]
     for i in range(0,len(rows)):

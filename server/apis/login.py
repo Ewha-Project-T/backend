@@ -32,7 +32,7 @@ class Login(Resource):
         if(result==LoginResult.ACC_IS_NOT_FOUND):
             return {"msg":"User Not Found"}, 403
         if(result==LoginResult.LOGIN_COUNT_EXCEEDED):
-            return {"msg":"LOGIN_COUNT_EXCEEDED"}, 400
+            return {"msg":"login count exceeded"}, 403
         if(result==LoginResult.SUCCESS):
             access_token, refresh_token = create_tokens(account)
             if(account.permission==2):
@@ -68,37 +68,21 @@ class Login(Resource):
         if re.match("^[A-Za-z0-9]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[A-Za-z0-9])*\.[A-Za-z]{2,3}$", user_email):
             result=register(user_id,user_pw,user_name,user_email, user_project, user_perm)
             if(result==RegisterResult.SUCCESS):
-                return{
-                    "msg" : "success"
-                },200
+                return{"msg" : "register success"},201
             elif(result==RegisterResult.INVALID_IDPW):
-                return{
-                    "error" : "invalid ID or PW"
-                },403
+                return{"msg" : "invalid id or pw"},403
             elif(result==RegisterResult.USERID_EXIST):
-                return{
-                    "error" : "user id exist"
-                },403
+                return{"msg" : "user id exist"},403
             elif(result==RegisterResult.USEREMAIL_EXIST):
-                return{
-                    "error" : "user email exist"
-                },403
+                return{"msg" : "user email exist"},403
             elif(result==RegisterResult.INVALID_PERM):
-                return {
-                    "error" : "invalid permission"
-                }, 403
+                return {"msg" : "invalid permission"}, 403
             elif(result==RegisterResult.INVALID_PROJECT):
-                return {
-                    "error" : "invalid project"
-                }, 403
+                return {"msg" : "invalid project"}, 403
             else:
-                return{
-                    "error" : "internal error"
-                },405
+                return{"msg" : "bad parameters"},400
         else:
-            return {
-                "error": "Invalid Email"
-            }, 403
+            return {"msg": "Invalid Email"}, 403
 
     @jwt_required()
     def patch(self):
@@ -126,7 +110,7 @@ class Login(Resource):
         elif(res==ChangeResult.DUPLICATED_EMAIL):
             return {'msg':'Duplicated EMAIL'}, 403
         else:
-            return {'msg':'Internal Error'}, 405
+            return {'msg':'Internal Error'}, 400
 
     @jwt_required()
     def delete(self):
@@ -141,13 +125,9 @@ class Account(Resource):
         current_user=get_jwt_identity()
         result=delete(current_user["user_id"])
         if(result==DeleteResult.SUCCESS):
-            return{
-                "msg":"success"
-            },200
+            return{"msg":"success"},200
         else:
-            return{
-                "error": "delete account fail"
-            },403
+            return{"msg": "delete account fail"},403
 
 class LoginRefresh(Resource):
     @jwt_required(refresh=True)
@@ -179,9 +159,9 @@ class Admin(Resource):
         name = args['name']
         result = patch_user(user_no,new_pw,email,name)
         if(result == UserChangeResult.DUPLICATED_EMAIL):
-            return {"msg":"duplicated email"}, 400
+            return {"msg":"duplicated email"}, 403
         elif(result == UserChangeResult.INVALID_USER):
-            return {"msg": "Invalid User"}, 400
+            return {"msg": "Invalid User"}, 403
         else:
             return {"msg":"success"}, 200
 

@@ -10,7 +10,8 @@ class ChangeResult:
     SUCCESS = 0
     NAME_EXIST=1
     INVALID_DATE = 2
-    INVALID_ACC = 3
+    INVALID_USER = 3
+    INVALID_PM = 4
 class DeleteResult:
     SUCCESS = 0
     ALREADY_DELETE=1
@@ -44,13 +45,10 @@ def delete_project(del_no):
     target_project = Project.query.get(del_no)
     if(target_project==None):
         return DeleteResult.ALREADY_DELETE
-    target_user=User.query.filter_by(id=target_project.project_name+"_USER1").first()#user삭제
-    db.session.delete(target_user)
-    db.session.commit
-
-    target_pm=User.query.filter_by(id=target_project.project_name+"_PM1").first()#pm삭제
-    db.session.delete(target_pm)
-    db.session.commit
+    target_acc=User.query.filter_by(project_no=target_project.project_no).first()
+    if(target_acc!=None):
+        db.session.delete(target_acc)
+        db.session.commit
 
     db.session.delete(target_project)
     db.session.commit
@@ -68,7 +66,7 @@ def change_project(change_no,name,start,end):
     #USER변경
     target_user =User.query.filter_by(id=target_project.project_name+"_USER1").first()
     if(target_user == None):
-        return ChangeResult.INVALID_ACC
+        return ChangeResult.INVALID_USER
     target_user.id=name+"_USER1"
     db.session.add(target_user)
     db.session.commit
@@ -76,7 +74,7 @@ def change_project(change_no,name,start,end):
     #PM변경
     target_pm=User.query.filter_by(id=target_project.project_name+"_PM1").first()
     if(target_pm == None):
-        return ChangeResult.INVALID_ACC
+        return ChangeResult.INVALID_PM
     target_pm.id=name+"_PM1"
     db.session.add(target_pm)
     db.session.commit

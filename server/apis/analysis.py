@@ -22,7 +22,7 @@ class Analysis(Resource):
         try:
             send = send_file(xlsx_file)
         except:
-            return {"msg" : "File Download Fail"}, 403
+            return {"msg" : "File Download Fail"}, 400
         os.remove(xlsx_file)
         return send
         
@@ -46,7 +46,7 @@ class Analysis(Resource):
             else:
                 path = [uploaded_path]
         else:
-            return{"msg":"denied file extensions"}, 403
+            return{"msg":"denied file extensions"}, 400
 
         upload_time = time.strftime("%Y-%m-%d %H:%M:%S")
         safe = []
@@ -55,7 +55,7 @@ class Analysis(Resource):
         for i in range(len(path)):
             result, tmp_safe, tmp_vuln = add_vuln(path[i])
             if(result != ParseResult.SUCCESS):
-                return {"msg" : "Invalid File Name"}, 404
+                return {"msg" : "Invalid File Name"}, 400
             safe.append(tmp_safe)
             vuln.append(tmp_vuln)
         
@@ -81,7 +81,7 @@ class Analysis(Resource):
         host_name = args['host_name']
         res = modify_host_name(host_no, host_name)
         if(res == HostInfoResult.INVALID_HOST):
-            return {"msg":"Invalid host"}, 404
+            return {"msg":"Invalid host"}, 400
         return {"msg":"Success"}, 200
 
     @jwt_required()
@@ -95,7 +95,7 @@ class Analysis(Resource):
         if(result == DeleteResult.SUCCESS):
             return {"msg":"ok"}, 200
         else:
-            return {"msg": "Analysis Delete Fail"}, 403
+            return {"msg": "Analysis Delete Fail"}, 400
 
 class Hosts(Resource):
     @jwt_required()
@@ -132,7 +132,7 @@ class Comments(Resource):
         if(res==CommentingResult.SUCCESS):
             return {"comment":content}, 200
         elif(res==CommentingResult.INVALID_XML):
-            return {"msg":"Invalid xml"}, 404
+            return {"msg":"Invalid xml"}, 400
         else:
             return {"msg":"Internal Error"}, 400
 

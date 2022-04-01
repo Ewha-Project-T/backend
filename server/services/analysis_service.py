@@ -130,7 +130,7 @@ def insert_db(upload_time,  path, safe, vuln):
         db.session.add(an)
         host = HostInfo.query.filter_by(ip=ip).first()
         host_no = host.no
-        an = Analysis(upload_time=upload_time, project_no=current_user["project_no"], user_no=acc.user_no, path=path[i], comment="", safe=safe[i], vuln=vuln[i], host_no=host_no)
+        an = Analysis(upload_time=upload_time, project_no=current_user["project_no"], user_no=acc.user_no, path=path[i], safe=safe[i], vuln=vuln[i], host_no=host_no)
         db.session.add(an)
         db.session.commit()
 

@@ -28,9 +28,9 @@ class ScriptAPI(Resource):
             if(download_auth_check(current_user["project_no"], fname) == DownloadAuthResult.SUCCESS):
                 return send_file(file_path, as_attachment=True, attachment_filename='')
             else:
-                return {"msg": "check your project"}, 402
+                return {"msg": "check your project"}, 400
         else:
-            return {'msg':'File is not exist'}, 400
+            return {'msg':'File is not exist'}, 404
             
     @jwt_required()
     def post(self):
@@ -50,7 +50,7 @@ class ScriptAPI(Resource):
                 file_object.save(BASE_PATH + secure_filename(filename))
                 return {"msg":"success"}, 200
             elif(db_upload_result == UploadResult.DUPLICATED_NAME):
-                return {"msg":"Filename is duplicated in DB"}, 402
+                return {"msg":"Filename is duplicated in DB"}, 400
                 
     @admin_required()
     def delete(self,fname):
@@ -59,9 +59,9 @@ class ScriptAPI(Resource):
             if(delete_script(secure_filename(fname), file_path)==DeleteResult.SUCCESS):
                 return {"msg": "delete success"}, 200
             else:
-                return {"msg": "delete faile"}, 402
+                return {"msg": "delete faile"}, 400
         else:
-            return {'msg':'File is not exist'}, 400
+            return {'msg':'File is not exist'}, 404
 
 class ScriptListingAPI(Resource):
     @jwt_required()
@@ -86,7 +86,7 @@ class AdminScript(Resource):
         project_no = args['proj_no']
         file_object = args['file_name']
         if(type not in TYPE):
-            return {"msg": "Invalid Script Type"}, 403
+            return {"msg": "Invalid Script Type"}, 400
         filename = secure_filename(file_object.filename)
         filename = upload_formatter(filename)
         if(existFile(BASE_PATH + filename)):
@@ -99,7 +99,7 @@ class AdminScript(Resource):
                 file_object.save(BASE_PATH + secure_filename(filename))
                 return {"msg":"success"}, 200
             elif(db_upload_result == UploadResult.INVALID_PROJECT_NO):
-                return {"msg": "Invalid Project No"}, 402
+                return {"msg": "Invalid Project No"}, 400
             elif(db_upload_result == UploadResult.DUPLICATED_NAME):
-                return {"msg":"Filename is duplicated in DB"}, 402
+                return {"msg":"Filename is duplicated in DB"}, 400
 

@@ -53,7 +53,6 @@ class Analysis(db.Model):
     project_no = db.Column(db.Integer, db.ForeignKey("project.project_no"), nullable=False)
     user_no = db.Column(db.Integer, db.ForeignKey("user.user_no"), nullable=False)
     path = db.Column(db.String(100), nullable=False, unique=True)
-    comment = db.Column(db.String(1000), nullable=True)
     safe = db.Column(db.Integer, nullable=True)
     vuln = db.Column(db.Integer, nullable=True)
     host_no = db.Column(db.Integer, db.ForeignKey("host_info.no"), nullable=False)

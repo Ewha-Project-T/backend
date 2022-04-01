@@ -209,7 +209,6 @@ def get_project_analysis():
         tmp["upload_time"] = rows[i].upload_time
         tmp["project_no"] = rows[i].project_no
         tmp["host_name"] = '_'.join(rows[i].path.split("/")[1].split('_')[:-1])
-        tmp["comment"] = rows[i].comment
         tmp["safe"] = rows[i].safe
         tmp["vuln"] = rows[i].vuln
         tmp["host_no"] = rows[i].host_no

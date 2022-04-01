@@ -199,19 +199,20 @@ def get_host_analysis(host_no):
 def get_project_analysis():
     cur_user = get_jwt_identity()
     
-    rows = Analysis.query.filter_by(project_no=cur_user['project_no']).order_by(Analysis.upload_time.desc()).all()
+    analysis_rows = Analysis.query.filter_by(project_no=cur_user['project_no']).order_by(Analysis.upload_time.desc()).all()
     analysis_list_result=[]
-    for i in range(0,len(rows)):
+    for i in range(0,len(analysis_rows)):
+        host_row = HostInfo.query.filter_by(no=analysis_rows[i].host_no).first()
         if(i==30):
             break
         tmp = {}
-        tmp["xml_no"] = rows[i].xml_no
-        tmp["upload_time"] = rows[i].upload_time
-        tmp["project_no"] = rows[i].project_no
-        tmp["host_name"] = '_'.join(rows[i].path.split("/")[1].split('_')[:-1])
-        tmp["safe"] = rows[i].safe
-        tmp["vuln"] = rows[i].vuln
-        tmp["host_no"] = rows[i].host_no
+        tmp["xml_no"] = analysis_rows[i].xml_no
+        tmp["upload_time"] = analysis_rows[i].upload_time
+        tmp["project_no"] = analysis_rows[i].project_no
+        tmp["host_name"] = host_row.host_name
+        tmp["safe"] = analysis_rows[i].safe
+        tmp["vuln"] = analysis_rows[i].vuln
+        tmp["host_no"] = analysis_rows[i].host_no
         analysis_list_result.append(tmp)
     return analysis_list_result
 

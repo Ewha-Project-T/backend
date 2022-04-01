@@ -82,7 +82,7 @@ class Analysis(Resource):
         res = modify_host_name(host_no, host_name)
         if(res == HostInfoResult.INVALID_HOST):
             return {"msg":"Invalid host"}, 404
-        return {"msg":"Success"}, 200
+        return {"msg":host_name}, 200
 
     @jwt_required()
     def delete(self):

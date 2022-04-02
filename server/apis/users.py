@@ -26,7 +26,7 @@ class Users(Resource):
         if(result == InitResult.SUCCESS):
             return {"msg":"Init fail limit success"}, 200
         else:
-            return {"msg":"INVALID USER No"}, 403
+            return {"msg":"INVALID USER No"}, 400
 
     @admin_required()
     def delete(self,user_no):
@@ -34,7 +34,7 @@ class Users(Resource):
         if(result == DeleteResult.SUCCESS):
             return {"msg": "Delete User SUCCESS"}, 200
         else:
-            return {"msg": "INVALID User No"}, 403
+            return {"msg": "INVALID User No"}, 400
 
 class PMUsers(Resource):
     @pm_required()

@@ -1,0 +1,809 @@
+﻿<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>group_code</th>
+      <th>group_name</th>
+      <th>title_code</th>
+      <th>title_name</th>
+      <th>important</th>
+      <th>decision</th>
+      <th>issue</th>
+      <th>code</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>G01</td>
+      <td>1. 계정관리</td>
+      <td>G0101</td>
+      <td>1.01 root 계정 원격 접속 제한</td>
+      <td>상</td>
+      <td>취약</td>
+      <td>\n□ 기준\n원격 서비스를 사용하지 않거나, 사용 시 root 직접 접속을 차단한 경우 양호\n\n■ 현황\n\n \n① Telnet 프로세스 데몬 동작 확인 \n------------------------------------------------------------------------------\n▷ Telnet Service disable\n \n \n① SSH 프로세스 데몬 동작 확인 \n------------------------------------------------------------------------------\nroot        4170       1  0 Mar21 ?        00:00:00 sshd: tw0n3 [priv]\ntw0n3       4254    4170  0 Mar21 ?        00:00:08 sshd: tw0n3@pts/1\nroot       83763       1  0 Mar23 ?        00:00:00 sshd: tw0n3 [priv]\ntw0n3      83897   83763  0 Mar23 ?        00:00:00 sshd: tw0n3@notty\nroot       84501       1  0 Mar23 ?        00:00:00 sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups\nroot      141729   84501  0 17:39 ?        00:00:00 sshd: tw0n3 [priv]\ntw0n3     141860  141729  0 17:39 ?        00:00:00 sshd: tw0n3@pts/2\n \n▷ SSH Service Enable\n \n \n② sshd_config파일 확인\n------------------------------------------------------------------------------\n \nSSH 설정파일(/etc/ssh/sshd_config): \n#PermitRootLogin prohibit-password\n \n \n[1.01] 취약\n \n------------------------------------------------------------------------------\n[1.01] root 계정 원격 접속 제한 TIP\nPermitRootLogin // 주석(#)제거 후 yes를 no로 변경 sftp 에서 root 제한도 해당 부분의 설정을 따라감\n</td>
+      <td>U-01</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>G01</td>
+      <td>1. 계정관리</td>
+      <td>G0102</td>
+      <td>1.02 패스워드 복잡성 설정</td>
+      <td>상</td>
+      <td>수동점검</td>
+      <td>\n□ 기준\n영문·숫자·특수문자를 조합하여 2종류 조합 시 10자리 이상, 3종류 이상 조합 시 8자리 이상의 패스워드가 설정된 경우 (공공기관 9자리 이상) 양호\n\n■ 현황\n\n① /etc/shadow 파일 설정 현황_공통확인\nroot:$6$BfC3zlKE93CBn4/P$.3LAje6XtzpsPV5P9sCHBWorDgej7p6PfkaLwVAESNx569zFH2dRh.oLcudAuYvSt6JdpAzTdCoey21wWdCzh.:19063:0:99999:7:::\ntw0n3:$6$qzseUfe.wIV0xiBa$Z53wcFpFgjxg012qPAMbCOjsX5CcqVPYOwUMKRV7Q2lYur17Sb8RTZ7E6h42eFbM9V92a7dfbdj9zSarpzA3H1:19049:0:99999:7:::\n \n------------------------------------------------------------------------------\n \n② Linux 6.x 미만설정 /etc/login.defs \n#PASS_MIN_LEN\n \n② PAM 모듈 사용 시\n/etc/pam.d/system-auth\ngrep: /etc/pam.d/system-auth: No such file or directory\n \n------------------------------------------------------------------------------\n \n③ Linux 7.x 이상설정 /etc/security/pwquality.conf \n/etc/security/pwquality.conf 파일이 없습니다.\n \n------------------------------------------------------------------------------\n \n④ /etc/pam.d/system-auth-ac 설정\ngrep: /etc/pam.d/system-auth-ac: No such file or directory\n \n④ /etc/pam.d/password-auth 설정\ngrep: /etc/pam.d/password-auth: No such file or directory\n \n④ /etc/pam.d/password-auth-ac 설정\ngrep: /etc/pam.d/password-auth-ac: No such file or directory\n \n[1.02] 수동점검\n \n------------------------------------------------------------------------------\n[1.02] 패스워드 복잡성 TIP\n담당자에게 패스워드 관리대장 확인 필요함\nmd5 = $ 1 $ 으로 시작\nsha256 = $ 5 $ 으로 시작\nsha512 = $ 6 $ 으로 시작\n \n \n</td>
+      <td>U-02</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>G01</td>
+      <td>1. 계정관리</td>
+      <td>G0103</td>
+      <td>1.03 계정 잠금 임계값 설정</td>
+      <td>상</td>
+      <td>취약</td>
+      <td>\n□ 기준\n계정 잠금 임계값이 10이하의 값으로 설정되어 있는 경우 양호\n\n■ 현황\n\n/etc/pam.d/system-auth 파일이 존재하지 않습니다.\n \n[1.03] 취약\n \n \n</td>
+      <td>U-03</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>G01</td>
+      <td>1. 계정관리</td>
+      <td>G0104</td>
+      <td>1.04 패스워드 파일 보호</td>
+      <td>상</td>
+      <td>양호</td>
+      <td>\n□ 기준\n쉐도우 패스워드를 사용하거나, 패스워드를 암호화하여 저장하는 경우 양호\n\n■ 현황\n\n[/etc/passwd 파일 설정 현황]\nroot:x:0:0:root:/root:/bin/bash\ndaemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin\nbin:x:2:2:bin:/bin:/usr/sbin/nologin\nsys:x:3:3:sys:/dev:/usr/sbin/nologin\nsync:x:4:65534:sync:/bin:/bin/sync\ngames:x:5:60:games:/usr/games:/usr/sbin/nologin\nman:x:6:12:man:/var/cache/man:/usr/sbin/nologin\nlp:x:7:7:lp:/var/spool/lpd:/usr/sbin/nologin\nmail:x:8:8:mail:/var/mail:/usr/sbin/nologin\nnews:x:9:9:news:/var/spool/news:/usr/sbin/nologin\nuucp:x:10:10:uucp:/var/spool/uucp:/usr/sbin/nologin\nproxy:x:13:13:proxy:/bin:/usr/sbin/nologin\nwww-data:x:33:33:www-data:/var/www:/usr/sbin/nologin\nbackup:x:34:34:backup:/var/backups:/usr/sbin/nologin\nlist:x:38:38:Mailing List Manager:/var/list:/usr/sbin/nologin\nirc:x:39:39:ircd:/var/run/ircd:/usr/sbin/nologin\ngnats:x:41:41:Gnats Bug-Reporting System (admin):/var/lib/gnats:/usr/sbin/nologin\nnobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin\nsystemd-network:x:100:102:systemd Network Management,,,:/run/systemd:/usr/sbin/nologin\nsystemd-resolve:x:101:103:systemd Resolver,,,:/run/systemd:/usr/sbin/nologin\nsystemd-timesync:x:102:104:systemd Time Synchronization,,,:/run/systemd:/usr/sbin/nologin\nmessagebus:x:103:106::/nonexistent:/usr/sbin/nologin\nsyslog:x:104:110::/home/syslog:/usr/sbin/nologin\n_apt:x:105:65534::/nonexistent:/usr/sbin/nologin\ntss:x:106:111:TPM software stack,,,:/var/lib/tpm:/bin/false\nuuidd:x:107:112::/run/uuidd:/usr/sbin/nologin\ntcpdump:x:108:113::/nonexistent:/usr/sbin/nologin\nlandscape:x:109:115::/var/lib/landscape:/usr/sbin/nologin\npollinate:x:110:1::/var/cache/pollinate:/bin/false\nusbmux:x:111:46:usbmux daemon,,,:/var/lib/usbmux:/usr/sbin/nologin\nsshd:x:112:65534::/run/sshd:/usr/sbin/nologin\nsystemd-coredump:x:999:999:systemd Core Dumper:/:/usr/sbin/nologin\ntw0n3:x:1000:1000:tw0n3:/home/tw0n3:/bin/bash\nlxd:x:998:100::/var/snap/lxd/common/lxd:/bin/false\n \n \n[/etc/shadow 파일 설정 현황]\nroot:$6$BfC3zlKE93CBn4/P$.3LAje6XtzpsPV5P9sCHBWorDgej7p6PfkaLwVAESNx569zFH2dRh.oLcudAuYvSt6JdpAzTdCoey21wWdCzh.:19063:0:99999:7:::\ntw0n3:$6$qzseUfe.wIV0xiBa$Z53wcFpFgjxg012qPAMbCOjsX5CcqVPYOwUMKRV7Q2lYur17Sb8RTZ7E6h42eFbM9V92a7dfbdj9zSarpzA3H1:19049:0:99999:7:::\n \n[1.04] 양호\n \n \n</td>
+      <td>U-04</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>G01</td>
+      <td>1. 계정관리</td>
+      <td>G0105</td>
+      <td>1.05 root 이외의 uid가 '0' 금지</td>
+      <td>중</td>
+      <td>양호</td>
+      <td>\n□ 기준\nroot 계정과 동일한 UID를 갖는 계정이 존재하지 않는 경우 양호\n\n■ 현황\n\nroot -&gt; UID=0\n \n[/etc/passwd 파일 내용]\nroot:x:0:0:root:/root:/bin/bash\n \n[1.05] 양호\n \n \n</td>
+      <td>U-44</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>G01</td>
+      <td>1. 계정관리</td>
+      <td>G0106</td>
+      <td>1.06 root 계정 su 제한</td>
+      <td>하</td>
+      <td>취약</td>
+      <td>\n□ 기준\nsu 명령어를 특정 그룹에 속한 사용자만 사용하도록 제한되어 있는 경우 양호\npam 설정 없더라도 su파일 퍼미션(4750)과 별도 사용그룹이 설정 되어있는 경우 양호\n\n■ 현황\n\n① /etc/pam.d/su 파일 내 pam_wheel.so 설정\n------------------------------------------------------------------------------\n▷ pam 설정 되어있지 않음\n \n \n② su 파일 퍼미션(기반시설 기준 /usr/bin/su) \n------------------------------------------------------------------------------\n-rwsr-xr-x 1 root root 67816 Feb  7 22:33 /usr/bin/su\n \n-rwsr-xr-x 1 root root 67816 Feb  7 22:33 /bin/su\n \n \n③ /etc/group 파일 내역(wheel 또는 su 제한 그룹 포함계정 리스트 확인)\n------------------------------------------------------------------------------\nroot:x:0:\ndaemon:x:1:\nbin:x:2:\nsys:x:3:\nadm:x:4:syslog,tw0n3\ntty:x:5:syslog\ndisk:x:6:\nlp:x:7:\nmail:x:8:\nnews:x:9:\nuucp:x:10:\nman:x:12:\nproxy:x:13:\nkmem:x:15:\ndialout:x:20:\nfax:x:21:\nvoice:x:22:\ncdrom:x:24:tw0n3\nfloppy:x:25:\ntape:x:26:\nsudo:x:27:tw0n3\naudio:x:29:\ndip:x:30:tw0n3\nwww-data:x:33:\nbackup:x:34:\noperator:x:37:\nlist:x:38:\nirc:x:39:\nsrc:x:40:\ngnats:x:41:\nshadow:x:42:\nutmp:x:43:\nvideo:x:44:\nsasl:x:45:\nplugdev:x:46:tw0n3\nstaff:x:50:\ngames:x:60:\nusers:x:100:\nnogroup:x:65534:\nsystemd-journal:x:101:\nsystemd-network:x:102:\nsystemd-resolve:x:103:\nsystemd-timesync:x:104:\ncrontab:x:105:\nmessagebus:x:106:\ninput:x:107:\nkvm:x:108:\nrender:x:109:\nsyslog:x:110:\ntss:x:111:\nuuidd:x:112:\ntcpdump:x:113:\nssh:x:114:\nlandscape:x:115:\nlxd:x:116:tw0n3\nsystemd-coredump:x:999:\ntw0n3:x:1000:\ndocker:x:998:\n \n[1.06] 취약\n \n \n</td>
+      <td>U-45</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>G01</td>
+      <td>1. 계정관리</td>
+      <td>G0107</td>
+      <td>1.07 패스워드 최소 길이 설정</td>
+      <td>중</td>
+      <td>취약</td>
+      <td>\n□ 기준\n패스워드 최소 길이가 8자 이상으로 설정되어 있는 경우 양호(국정원 기준 9자리)\n\n■ 현황\n\n[패스워드 설정 현황]\n#PASS_MIN_LEN\n \n[1.07] 취약\n \n \n</td>
+      <td>U-46</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>G01</td>
+      <td>1. 계정관리</td>
+      <td>G0108</td>
+      <td>1.08 패스워드 최대 사용기간 설정</td>
+      <td>중</td>
+      <td>취약</td>
+      <td>\n□ 기준\n패스워드 최대 사용기간이 90일(12주) 이하로 설정되어 있을 경우 양호\n\n■ 현황\n\n[패스워드 설정 현황]\nPASS_MAX_DAYS\t99999\n \n[1.08] 취약\n \n \n</td>
+      <td>U-47</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>G01</td>
+      <td>1. 계정관리</td>
+      <td>G0109</td>
+      <td>1.09 패스워드 최소 사용기간 설정</td>
+      <td>중</td>
+      <td>취약</td>
+      <td>\n□ 기준\n패스워드 최소 사용기간이 1일(1주)로 설정되어 있는 경우 양호\n\n■ 현황\n\n[패스워드 설정 현황]\nPASS_MIN_DAYS\t0\n \n[1.09] 취약\n \n \n</td>
+      <td>U-48</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>G01</td>
+      <td>1. 계정관리</td>
+      <td>G0110</td>
+      <td>1.10 불필요한 계정 제거</td>
+      <td>하</td>
+      <td>수동점검</td>
+      <td>\n□ 기준\n불필요한 계정이 존재하지 않는 경우 양호\n기본 설치되는 시스템 계정 중 불필요한 계정 확인\n오랫동안 로그인 기록이 없는 사용자 계정 확인\n\n■ 현황\n\n① 기본 시스템 계정(adm, lp, sync, shutdown, halt, news, uucp, nuucp, operator, games, gopher, nfsnobody, squid) \n------------------------------------------------------------------------------\ngames:x:5:60:games:/usr/games:/usr/sbin/nologin\nlp:x:7:7:lp:/var/spool/lpd:/usr/sbin/nologin\nnews:x:9:9:news:/var/spool/news:/usr/sbin/nologin\nuucp:x:10:10:uucp:/var/spool/uucp:/usr/sbin/nologin\n \n② 계정 접속 로그(lastlog) \n------------------------------------------------------------------------------\nUsername         Port     From             Latest\nroot                                       **Never logged in**\ndaemon                                     **Never logged in**\nbin                                        **Never logged in**\nsys                                        **Never logged in**\nsync                                       **Never logged in**\ngames                                      **Never logged in**\nman                                        **Never logged in**\nlp                                         **Never logged in**\nmail                                       **Never logged in**\nnews                                       **Never logged in**\nuucp                                       **Never logged in**\nproxy                                      **Never logged in**\nwww-data                                   **Never logged in**\nbackup                                     **Never logged in**\nlist                                       **Never logged in**\nirc                                        **Never logged in**\ngnats                                      **Never logged in**\nnobody                                     **Never logged in**\nsystemd-network                            **Never logged in**\nsystemd-resolve                            **Never logged in**\nsystemd-timesync                           **Never logged in**\nmessagebus                                 **Never logged in**\nsyslog                                     **Never logged in**\n_apt                                       **Never logged in**\ntss                                        **Never logged in**\nuuidd                                      **Never logged in**\ntcpdump                                    **Never logged in**\nlandscape                                  **Never logged in**\npollinate                                  **Never logged in**\nusbmux                                     **Never logged in**\nsshd                                       **Never logged in**\nsystemd-coredump                           **Never logged in**\ntw0n3            pts/2    172.16.136.1     Thu Mar 24 14:34:57 +0900 2022\nlxd                                        **Never logged in**\n \n[1.10] 수동점검\n \n \n</td>
+      <td>U-49</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>G01</td>
+      <td>1. 계정관리</td>
+      <td>G0111</td>
+      <td>1.11 관리자 그룹에 최소한의 계정 포함</td>
+      <td>하</td>
+      <td>양호</td>
+      <td>\n□ 기준\n관리자 그룹에 불필요한 계정이 등록되어 있지 않은 경우 양호(계정이 여러개 있을경우 담당자 확인 필요)\n\n■ 현황\n\n[관리자 그룹 계정 현황]\nroot:x:0:\n \n[1.11] 양호\n \n \n</td>
+      <td>U-50</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>G01</td>
+      <td>1. 계정관리</td>
+      <td>G0112</td>
+      <td>1.12 계정이 존재하지 않는 GID 금지</td>
+      <td>하</td>
+      <td>취약</td>
+      <td>\n□ 기준\n존재하지 않는 계정에 GID 설정을 금지한 경우 양호(기본 시스템 계정 외 신규 생성된 계정만 확인)\n\n■ 현황\n\n▷ 구성원이 존재하지 않는 그룹\n------------------------------------------------------------------------------\nadm 4\ntty 5\ndisk 6\nkmem 15\ndialout 20\nfax 21\nvoice 22\ncdrom 24\nfloppy 25\ntape 26\nsudo 27\naudio 29\ndip 30\noperator 37\nsrc 40\nshadow 42\nutmp 43\nvideo 44\nsasl 45\nstaff 50\nsystemd-journal 101\ncrontab 105\ninput 107\nkvm 108\nrender 109\nssh 114\nlxd 116\ndocker 998\n \n[1.12] 취약\n \n \n</td>
+      <td>U-51</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>G01</td>
+      <td>1. 계정관리</td>
+      <td>G0113</td>
+      <td>1.13 동일한 UID 금지</td>
+      <td>중</td>
+      <td>양호</td>
+      <td>\n□ 기준\n동일한 UID로 설정된 사용자 계정이 존재하지 않는 경우 양호\n\n■ 현황\n\n동일한 UID를 사용하는 계정이 발견되지 않았습니다.\n \n[1.13] 양호\n \n \n</td>
+      <td>U-52</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>G01</td>
+      <td>1. 계정관리</td>
+      <td>G0114</td>
+      <td>1.14 사용자 Shell 점검</td>
+      <td>하</td>
+      <td>양호</td>
+      <td>\n□ 기준\n로그인이 필요하지 않은 계정에 /bin/false(nologin) 쉘이 부여되어 있는 경우 양호\n\n■ 현황\n\ndaemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin\nbin:x:2:2:bin:/bin:/usr/sbin/nologin\nsys:x:3:3:sys:/dev:/usr/sbin/nologin\ngames:x:5:60:games:/usr/games:/usr/sbin/nologin\nnobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin\nsystemd-network:x:100:102:systemd Network Management,,,:/run/systemd:/usr/sbin/nologin\nsystemd-resolve:x:101:103:systemd Resolver,,,:/run/systemd:/usr/sbin/nologin\nsystemd-timesync:x:102:104:systemd Time Synchronization,,,:/run/systemd:/usr/sbin/nologin\nsyslog:x:104:110::/home/syslog:/usr/sbin/nologin\nsystemd-coredump:x:999:999:systemd Core Dumper:/:/usr/sbin/nologin\n \n로그인이 필요하지 않은 모든 계정에 /bin/false(nologin)이 부여되어 있습니다.\n \n[1.14] 양호\n \n \n</td>
+      <td>U-53</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>G01</td>
+      <td>1. 계정관리</td>
+      <td>G0115</td>
+      <td>1.15 Session Timeout 설정</td>
+      <td>하</td>
+      <td>취약</td>
+      <td>\n□ 기준\nSession Timeout이 600초(10분) 이하로 설정되어 있는 경우 양호\n\n■ 현황\n\n① /etc/profile 파일설정\n------------------------------------------------------------------------------\n/etc/profile 파일 내 TMOUT/TIMEOUT 설정이 없습니다.\n \n/etc/csh.login, /etc/csh.cshrc 파일이 없습니다.\n \n[1.15] 취약\n \n \n</td>
+      <td>U-54</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>G02</td>
+      <td>2. 파일 및 디렉터리 관리</td>
+      <td>G0201</td>
+      <td>2.01 root 홈, 패스 디렉터리 권한 및 패스 설정</td>
+      <td>상</td>
+      <td>양호</td>
+      <td>\n□ 기준\nPATH 환경변수에 '.' 이 맨 앞이나 중간에 포함되지 않은 경우 양호\n\n■ 현황\n\n \n① PATH 환경변수 현황\n------------------------------------------------------------------------------\n/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin\n \n \n[2.01] 양호\n \n \n</td>
+      <td>U-05</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>G02</td>
+      <td>2. 파일 및 디렉터리 관리</td>
+      <td>G0202</td>
+      <td>2.02 파일 및 디렉터리 소유자 설정</td>
+      <td>상</td>
+      <td>양호</td>
+      <td>\n□ 기준\n소유자가 존재하지 않은 파일 및 디렉터리가 존재하지 않은 경우 양호\n\n■ 현황\n\n① 소유자가 존재하지 않는 파일 (소유자 =&gt; 파일위치: 경로)\n------------------------------------------------------------------------------\n소유자가 존재하지 않는 파일이 발견되지 않았습니다.\n \n[2.02] 양호\n \n \n</td>
+      <td>U-06</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>G02</td>
+      <td>2. 파일 및 디렉터리 관리</td>
+      <td>G0203</td>
+      <td>2.03 /etc/passwd 파일 소유자 및 권한 설정</td>
+      <td>상</td>
+      <td>양호</td>
+      <td>\n□ 기준\n/etc/passwd 파일의 소유자가 root이고, 권한이 644 이하인 경우 양호\n\n■ 현황\n\n① /etc/passwd 파일 퍼미션 확인\n------------------------------------------------------------------------------\n-rw-r--r-- 1 root root 1824 Feb 27 08:24 /etc/passwd\n \n[2.03] 양호\n \n \n</td>
+      <td>U-07</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>G02</td>
+      <td>2. 파일 및 디렉터리 관리</td>
+      <td>G0204</td>
+      <td>2.04 /etc/shadow 파일 소유자 및 권한 설정</td>
+      <td>상</td>
+      <td>취약</td>
+      <td>\n□ 기준\n/etc/shadow 파일의 소유자가 root이고, 권한이 400 이하인 경우 양호\n\n■ 현황\n\n① /etc/shadow 파일 퍼미션 확인\n------------------------------------------------------------------------------\n-rw-r----- 1 root shadow 1157 Mar 12 14:33 /etc/shadow\n \n[2.04] 취약\n \n \n</td>
+      <td>U-08</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>G02</td>
+      <td>2. 파일 및 디렉터리 관리</td>
+      <td>G0205</td>
+      <td>2.05 /etc/hosts 파일 소유자 및 권한 설정</td>
+      <td>상</td>
+      <td>취약</td>
+      <td>\n□ 기준\n/etc/hosts 파일의 소유자가 root이고, 권한이 600 이하인 경우 양호\n\n■ 현황\n\n① /etc/hosts 파일 퍼미션 확인\n----------------------------------------------------------------\n-rw-r--r-- 1 root adm 233 Feb 26 23:37 /etc/hosts\n \n[2.05] 취약\n \n \n</td>
+      <td>U-09</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>G02</td>
+      <td>2. 파일 및 디렉터리 관리</td>
+      <td>G0206</td>
+      <td>2.06 /etc/(x)inetd.conf 파일 소유자 및 권한 설정</td>
+      <td>상</td>
+      <td>양호</td>
+      <td>\n□ 기준\n/etc/(X)inetd.conf파일의 소유자가 root이고, 권한이 600 이하인 경우 양호\n\n■ 현황\n\n/etc/xinetd.d 디렉토리가 없습니다.\n \n/etc/xinetd.conf 파일이 없습니다.\n \n/etc/inetd.conf 파일이 없습니다.\n \n \n[2.06] 양호\n \n \n</td>
+      <td>U-10</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>G02</td>
+      <td>2. 파일 및 디렉터리 관리</td>
+      <td>G0207</td>
+      <td>2.07 /etc/syslog.conf 파일 소유자 및 권한 설정</td>
+      <td>상</td>
+      <td>양호</td>
+      <td>\n□ 기준\n/etc/syslog.conf 파일의 소유자가 root이고, 권한이 644 이하인 경우 양호\n\n■ 현황\n\n▷ rsyslog.conf 파일 권한 \n-rw-r--r-- 1 root root 1382 Feb 12  2020 /etc/rsyslog.conf\n \n/etc/syslog-ng.conf 파일이 없습니다\n \n[2.07] 양호\n \n \n</td>
+      <td>U-11</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>G02</td>
+      <td>2. 파일 및 디렉터리 관리</td>
+      <td>G0208</td>
+      <td>2.08 /etc/services 파일 소유자 및 권한 설정</td>
+      <td>상</td>
+      <td>양호</td>
+      <td>\n□ 기준\n/etc/service 파일의 소유자가 root이고, 권한이 644 이하인 경우 양호\n\n■ 현황\n\n① /etc/services 파일 퍼미션 확인\n------------------------------------------------------------------------------\n-rw-r--r-- 1 root root 14464 Feb 17  2020 /etc/services\n \n[2.08] 양호\n \n \n</td>
+      <td>U-12</td>
+    </tr>
+    <tr>
+      <th>23</th>
+      <td>G02</td>
+      <td>2. 파일 및 디렉터리 관리</td>
+      <td>G0209</td>
+      <td>2.09 SUID, SGID, Sticky bit 설정 파일 점검</td>
+      <td>상</td>
+      <td>취약</td>
+      <td>\n□ 기준\n주요 파일의 권한에 SUID와 SGID에 대한 설정이 부여되어 있지 않으면 양호\n\n■ 현황\n\n/sbin/dump 이 없습니다\n/usr/bin/lpq-lpd 이 없습니다\n-rwsr-xr-x 1 root root 44784 Jul 15 2021 /usr/bin/newgrp\n/sbin/restore 이 없습니다\n/usr/bin/lpr 이 없습니다\n/usr/sbin/lpc 이 없습니다\n-rwxr-sr-x 1 root shadow 43160 Sep 17 2021 /sbin/unix_chkpwd\n/usr/bin/lpr-lpd 이 없습니다\n/usr/sbin/lpc-lpd 이 없습니다\n-rwsr-sr-x 1 daemon daemon 55560 Nov 13 2018 /usr/bin/at\n/usr/bin/lprm 이 없습니다\n/usr/sbin/traceroute 이 없습니다\n/usr/bin/lpq 이 없습니다\n/usr/bin/lprm-lpd 이 없습니다\n \n[2.09] 취약\n \n \n</td>
+      <td>U-13</td>
+    </tr>
+    <tr>
+      <th>24</th>
+      <td>G02</td>
+      <td>2. 파일 및 디렉터리 관리</td>
+      <td>G0210</td>
+      <td>2.10 사용자, 시스템 시작파일 및 환경파일 소유자 및 권한 설정</td>
+      <td>상</td>
+      <td>양호</td>
+      <td>\n□ 기준\n홈 디렉터리 환경변수 파일 소유자가 root 또는 해당 계정으로 지정되어 있고, 홈 디렉터리 환경변수 파일에 root와 소유자만 쓰기 권한이 부여되어 있는 경우 양호\n■ 현황\n-rw-r--r-- 1 tw0n3 tw0n3 894 Feb 27 01:41 /home/tw0n3/.profile\n-rw-r--r-- 1 tw0n3 tw0n3 3771 Mar  9 16:37 /home/tw0n3/.bashrc\n-rw------- 1 tw0n3 tw0n3 20085 Mar 24 12:59 /home/tw0n3/.bash_history\n-rw-r--r-- 1 root root 161 Dec  5  2019 /root/.profile\n-rw-r--r-- 1 root root 3106 Dec  5  2019 /root/.bashrc\n-rw------- 1 root root 678 Mar 12 18:15 /root/.bash_history\n \n[2.10] 양호\n\n</td>
+      <td>U-14</td>
+    </tr>
+    <tr>
+      <th>25</th>
+      <td>G02</td>
+      <td>2. 파일 및 디렉터리 관리</td>
+      <td>G0211</td>
+      <td>2.11 world writable 파일 점검</td>
+      <td>상</td>
+      <td>취약</td>
+      <td>\n□ 기준\nworld writable 파일이 존재하지 않거나, 존재 시 설정이유를 확인하고 있는 경우 양호\n■ 현황\nWorld Writable 파일\n------------------------------------------------------------------------------\ndrwxrwxrwt : root : root : /var/crash\ndrwxrwxrwt : root : root : /var/tmp\ndrwxrwxrwt : root : root : /var/tmp/systemd-private-e1f85286dca840969c9a8c79988fb0d7-systemd-timesyncd.service-VNdaPi/tmp\ndrwxrwxrwt : root : root : /var/tmp/systemd-private-e1f85286dca840969c9a8c79988fb0d7-systemd-logind.service-gyxwbg/tmp\ndrwxrwxrwt : root : root : /var/tmp/systemd-private-e1f85286dca840969c9a8c79988fb0d7-upower.service-4ru5Qg/tmp\ndrwxrwxrwt : root : root : /var/tmp/systemd-private-e1f85286dca840969c9a8c79988fb0d7-fwupd.service-IDbRng/tmp\ndrwxrwxrwt : root : root : /var/tmp/systemd-private-e1f85286dca840969c9a8c79988fb0d7-systemd-resolved.service-PHGjQh/tmp\ndrwxrwxrwt : root : root : /tmp\ndrwxrwxrwt : root : root : /tmp/systemd-private-e1f85286dca840969c9a8c79988fb0d7-upower.service-ryHAYf/tmp\ndrwxrwxrwt : root : root : /tmp/.X11-unix\ndrwxrwxrwt : root : root : /tmp/.font-unix\ndrwxrwxrwt : root : root : /tmp/systemd-private-e1f85286dca840969c9a8c79988fb0d7-fwupd.service-wpxi5h/tmp\ndrwxrwxrwt : root : root : /tmp/.XIM-unix\ndrwxrwxrwt : root : root : /tmp/systemd-private-e1f85286dca840969c9a8c79988fb0d7-systemd-resolved.service-Sx2A7f/tmp\ndrwxrwxrwt : root : root : /tmp/.ICE-unix\ndrwxrwxrwt : root : root : /tmp/systemd-private-e1f85286dca840969c9a8c79988fb0d7-systemd-timesyncd.service-D5sNXh/tmp\ndrwxrwxrwt : root : root : /tmp/systemd-private-e1f85286dca840969c9a8c79988fb0d7-systemd-logind.service-IxbS7h/tmp\ndrwxrwxrwt : root : root : /tmp/snap.lxd/tmp\ndrwxrwxrwt : root : root : /tmp/.Test-unix\n-rwxrwxrwx : tw0n3 : tw0n3 : /home/tw0n3/CAT-CERT/Out-Sourcing/ESS/OS_Linux_v2.1.sh\n-rwxrwxrwx : tw0n3 : tw0n3 : /home/tw0n3/pwn/ctf/2022/codegate/pwn/ARVM/app\n-rwxrwxrwx : tw0n3 : tw0n3 : /home/tw0n3/pwn/ctf/2022/codegate/pwn/VIMT/app\n-rwxrwxrwx : tw0n3 : tw0n3 : /home/tw0n3/pwn/ctf/2022/codegate/pwn/File-V/file-v\n-rwxrwxrwx : tw0n3 : tw0n3 : /home/tw0n3/pwn/study/test/ROP2\n-rwxrwxrwx : tw0n3 : tw0n3 : /home/tw0n3/pwn/study/test/DROP\n 총 25개 파일 존재\n[2.11] 취약\n\n</td>
+      <td>U-15</td>
+    </tr>
+    <tr>
+      <th>26</th>
+      <td>G02</td>
+      <td>2. 파일 및 디렉터리 관리</td>
+      <td>G0212</td>
+      <td>2.12 /dev에 존재하지 않는 device 파일 점검</td>
+      <td>상</td>
+      <td>양호</td>
+      <td>\n□ 기준\ndev에 대한 파일 점검 후 존재하지 않은 device 파일을 제거한 경우 양호\n■ 현황\n① 기반시설 점검기준 명령 : find /dev -type f -exec ls -l {} \;\n------------------------------------------------------------------------------\n▷ /dev 에 존재하지 않은 Device 파일이 발견되지 않았습니다.\n \n \n디바이스 파일(charactor, block file) 점검 : find /dev -type [C B] -exec ls -l {} \;  \nmajor, minor 필드에 값이 올바르지 않은 경우 취약  \n------------------------------------------------------------------------------\nbrw-rw---- 1 root disk 7, 9 Mar 17 18:07 /dev/loop9\nbrw-rw---- 1 root disk 7, 8 Mar 15 14:37 /dev/loop8\nbrw-rw---- 1 root disk 253, 0 Mar 12 15:15 /dev/dm-0\nbrw-rw----+ 1 root cdrom 11, 1 Mar 12 15:15 /dev/sr1\nbrw-rw----+ 1 root cdrom 11, 0 Mar 12 15:15 /dev/sr0\nbrw-rw---- 1 root disk 8, 3 Mar 12 15:15 /dev/sda3\nbrw-rw---- 1 root disk 8, 2 Mar 12 15:15 /dev/sda2\nbrw-rw---- 1 root disk 8, 1 Mar 12 15:15 /dev/sda1\nbrw-rw---- 1 root disk 8, 0 Mar 12 15:15 /dev/sda\nbrw-rw---- 1 root disk 2, 0 Mar 12 15:15 /dev/fd0\nbrw-rw---- 1 root disk 7, 7 Mar 12 15:15 /dev/loop7\nbrw-rw---- 1 root disk 7, 6 Mar 12 15:15 /dev/loop6\nbrw-rw---- 1 root disk 7, 5 Mar 12 15:15 /dev/loop5\nbrw-rw---- 1 root disk 7, 4 Mar 12 15:15 /dev/loop4\nbrw-rw---- 1 root disk 7, 3 Mar 12 15:15 /dev/loop3\nbrw-rw---- 1 root disk 7, 2 Mar 12 15:15 /dev/loop2\nbrw-rw---- 1 root disk 7, 1 Mar 12 15:15 /dev/loop1\nbrw-rw---- 1 root disk 7, 0 Mar 12 15:15 /dev/loop0\n \n[2.12] 양호\n \n------------------------------------------------------------------------------\n[U-16] r/dev에 존재하지 않는 device 파일 점검\n.devlink_db_lock/.devfsadm_daemon.lock/.devfsadm_synch_door/.devlink_db는 Default로 존재 예외 (거의 솔라리스 해당항목)\n\n</td>
+      <td>U-16</td>
+    </tr>
+    <tr>
+      <th>27</th>
+      <td>G02</td>
+      <td>2. 파일 및 디렉터리 관리</td>
+      <td>G0213</td>
+      <td>2.13 $HOME/.rhosts, hosts.equiv 사용 금지</td>
+      <td>상</td>
+      <td>양호</td>
+      <td>\n□ 기준\nexec(512/tcp), login(513/tcp), shell(514/tcp)서비스를 사용하지 않거나, 사용 시 아래와 같은 설정이 적용된 경우 양호\n1. /etc/hosts.equiv 및 /root/.rhosts 파일 소유자가 root 또는, 해당 계정인 경우\n2. /etc/hosts.equiv 및 /root/.rhosts 파일 권한이 600 이하인 경우\n3. /etc/hosts.equiv 및 /root/.rhosts 파일 설정에 '+' 설정이 없는 경우\n■ 현황\n■ 서비스 포트 활성화 여부 확인\n------------------------- \n \nr command Sevice Disable\n \n[2.13] 양호\n \n\n</td>
+      <td>U-17</td>
+    </tr>
+    <tr>
+      <th>28</th>
+      <td>G02</td>
+      <td>2. 파일 및 디렉터리 관리</td>
+      <td>G0214</td>
+      <td>2.14 접속 IP 및 포트 제한</td>
+      <td>상</td>
+      <td>취약</td>
+      <td>\n□ 기준\n/etc/hosts.deny 파일에 ALL Deny 설정 후, /etc/hosts.allow 파일에 접근을 허용할 특정 호스트를 등록한 경우 양호\n■ 현황\n/etc/hosts.deny 파일 내용\n# /etc/hosts.deny: list of hosts that are _not_ allowed to access the system.\n#                  See the manual pages hosts_access(5) and hosts_options(5).\n#\n# Example:    ALL: some.host.name, .some.domain\n#             ALL EXCEPT in.fingerd: other.host.name, .other.domain\n#\n# If you're going to protect the portmapper use the name "rpcbind" for the\n# daemon name. See rpcbind(8) and rpc.mountd(8) for further information.\n#\n# The PARANOID wildcard matches any host whose name does not match its\n# address.\n#\n# You may wish to enable this to ensure any programs that don't\n# validate looked up hostnames still leave understandable logs. In past\n# versions of Debian this has been the default.\n# ALL: PARANOID\n\n \n/etc/hosts.allow 파일 내용\n# /etc/hosts.allow: list of hosts that are allowed to access the system.\n#                   See the manual pages hosts_access(5) and hosts_options(5).\n#\n# Example:    ALL: LOCAL @some_netgroup\n#             ALL: .foobar.edu EXCEPT terminalserver.foobar.edu\n#\n# If you're going to protect the portmapper use the name "rpcbind" for the\n# daemon name. See rpcbind(8) and rpc.mountd(8) for further information.\n#\n\n \n[2.14] 취약\n\n</td>
+      <td>U-18</td>
+    </tr>
+    <tr>
+      <th>29</th>
+      <td>G02</td>
+      <td>2. 파일 및 디렉터리 관리</td>
+      <td>G0215</td>
+      <td>2.15 hosts.lpd 파일 소유자 및 권한 설정</td>
+      <td>하</td>
+      <td>양호</td>
+      <td>\n□ 기준\nhosts.lpd파일을 사용할 시 소유자가 root이고, 권한이 600인 경우 양호\n■ 현황\n/etc/hosts.lpd 파일이 없습니다\n \n[2.15] 양호\n\n</td>
+      <td>U-55</td>
+    </tr>
+    <tr>
+      <th>30</th>
+      <td>G02</td>
+      <td>2. 파일 및 디렉터리 관리</td>
+      <td>G0216</td>
+      <td>2.16 UMASK 설정 관리</td>
+      <td>중</td>
+      <td>취약</td>
+      <td>\n□ 기준\nUMASK 값이 022 이상으로 설정된 경우 양호\n■ 현황\n▷ UMASK 명령어(root계정 umask)  \n0022\n  \n▷ /etc/profile 파일  \n \n▷ /etc/bashrc 파일  \n/etc/bashrc 파일이 없습니다.(수동점검)\n  \n[2.16] 취약\n\n</td>
+      <td>U-56</td>
+    </tr>
+    <tr>
+      <th>31</th>
+      <td>G02</td>
+      <td>2. 파일 및 디렉터리 관리</td>
+      <td>G0217</td>
+      <td>2.17 홈디렉토리 소유자 및 권한 설정</td>
+      <td>중</td>
+      <td>양호</td>
+      <td>\n□ 기준\n홈 디렉터리 소유자가 해당 계정이고, 타 사용자 쓰기 권한이 제거된 경우 양호\n■ 현황\ndrwxr-xr-x 19 root root 4096 Feb 26 23:22 /\ndrwxr-xr-x 21 root root 4340 Mar 15 14:37 /dev\ndrwxr-xr-x 19 tw0n3 tw0n3 4096 Mar 24 14:36 /home/tw0n3\ndrwx------ 7 root root 4096 Mar 21 12:44 /root\ndrwxr-xr-x 2 root root 40 Mar 21 12:48 /run/sshd\ndrwxr-xr-x 25 root root 580 Mar 21 12:44 /run/systemd\ndrwxr-xr-x 2 root root 60 Mar 12 15:15 /run/uuidd\ndrwxr-xr-x 2 root root 4096 Apr 15  2020 /usr/games\ndrwxr-xr-x 2 root root 16384 Mar 24 18:03 /usr/sbin\n \n \n[2.17] 양호\n\n</td>
+      <td>U-57</td>
+    </tr>
+    <tr>
+      <th>32</th>
+      <td>G02</td>
+      <td>2. 파일 및 디렉터리 관리</td>
+      <td>G0218</td>
+      <td>2.18 홈디렉토리로 지정한 디렉토리의 존재 관리</td>
+      <td>중</td>
+      <td>양호</td>
+      <td>\n□ 기준\n홈 디렉터리가 존재하지 않는 계정이 발견되지 않은 경우 양호\nroot 계정을 제외한 일반 계정의 홈 디렉터리가 '/'가 아닌 경우 양호\n■ 현황\n홈 디렉터리가 존재하지 않는 계정리스트\n------------------------------------------------------------------------------\n \n \n \nroot 계정 외 '/'를 홈디렉터리로 사용하는 계정리스트\n------------------------------------------------------------------------------\nroot 계정 외 '/'를 홈 디렉터리로 사용하는 계정이 존재하지 않습니다.\n \n[2.18] 양호\n\n</td>
+      <td>U-58</td>
+    </tr>
+    <tr>
+      <th>33</th>
+      <td>G02</td>
+      <td>2. 파일 및 디렉터리 관리</td>
+      <td>G0219</td>
+      <td>2.19 숨겨진 파일 및 디렉토리 검색 및 제거</td>
+      <td>하</td>
+      <td>수동점검</td>
+      <td>\n□ 기준\n디렉터리 내 숨겨진 파일을 확인하여, 불필요한 파일 삭제를 완료한 경우 양호\n■ 현황\n숨겨진 파일 및 디렉터리 현황\n--------------------------------------------------------------------\n \n \n[2.19] 수동점검\n\n</td>
+      <td>U-59</td>
+    </tr>
+    <tr>
+      <th>34</th>
+      <td>G03</td>
+      <td>3. 서비스 관리</td>
+      <td>G0301</td>
+      <td>3.01 finger 서비스 비활성화</td>
+      <td>상</td>
+      <td>양호</td>
+      <td>\n□ 기준\nFinger 서비스가 비활성화 되어 있는 경우 양호\n■ 현황\nfinger 포트 활성화 상태\n--------------------------------------\nfinger 서비스 포트 비활성화\n \n finger Service Disable\n \n[3.01] 양호\n\n</td>
+      <td>U-19</td>
+    </tr>
+    <tr>
+      <th>35</th>
+      <td>G03</td>
+      <td>3. 서비스 관리</td>
+      <td>G0302</td>
+      <td>3.02 Anonymous FTP 비활성화</td>
+      <td>상</td>
+      <td>양호</td>
+      <td>\n□ 기준\nAnonymous FTP (익명 ftp) 접속을 차단한 경우 양호\n참고 : 기본 FTP, ProFTP경우 ftp계정 삭제여부, vsFTP 경우 설정파일에서 anonymous_enable 부분 확인\n■ 현황\nFTP 프로세스 활성화 상태\n------------------------------------------------------------------------------\n \ntw0n3      83898   83897  0 Mar23 ?        00:00:00 /usr/lib/openssh/sftp-server\n▷ ftp 서비스 실행중 \n \nFTP Anonymous 관련 현황\n------------------------------------------------------------------------------\n/etc/passwd 파일 ftp 계정 존재여부\n \n \n[3.02] 양호\n\n</td>
+      <td>U-20</td>
+    </tr>
+    <tr>
+      <th>36</th>
+      <td>G03</td>
+      <td>3. 서비스 관리</td>
+      <td>G0303</td>
+      <td>3.03 r 계열 서비스 비활성화</td>
+      <td>상</td>
+      <td>양호</td>
+      <td>\n□ 기준\nr 계열 서비스가 비활성화 되어 있는 경우 양호\n■ 현황\n서비스 포트 활성화 여부 확인\n------------------------- \nr command Sevice Disable\n \n[3.03] 양호\n \n\n</td>
+      <td>U-21</td>
+    </tr>
+    <tr>
+      <th>37</th>
+      <td>G03</td>
+      <td>3. 서비스 관리</td>
+      <td>G0304</td>
+      <td>3.04 cron 파일 소유자 및 권한설정</td>
+      <td>상</td>
+      <td>취약</td>
+      <td>\n□ 기준\ncron 파일 소유자가 root이고, 권한이 640 이하인 경우 양호\n두개의 파일 모두 없을 경우 OS 버전마다 루트만 사용할 수 있는 경우와 모든 사용자가 사용할 수 있는 경우가 있으므로 담당자 확인 필요\n■ 현황\nCron 프로세스 활성화 상태\n----------------------------\nroot         894       1  0 Mar21 ?        00:00:01 /usr/sbin/cron -f\n \n▷ cron Service Enable\n \nCron 파일 권한  \n----------------------------\n-rwxr-sr-x 1 root crontab 43720 Feb 14  2020 /usr/bin/crontab\n-rw-r--r-- 1 root root 1042 Feb 14  2020 /etc/crontab\n-rwxr-xr-x 1 root root 376 Dec  5  2019 /etc/cron.daily/apport\n-rwxr-xr-x 1 root root 1478 Apr  9  2020 /etc/cron.daily/apt-compat\n-rwxr-xr-x 1 root root 355 Dec 29  2017 /etc/cron.daily/bsdmainutils\n-rwxr-xr-x 1 root root 1187 Sep  6  2019 /etc/cron.daily/dpkg\n-rwxr-xr-x 1 root root 17357 Feb 27 03:09 /etc/cron.daily/google-chrome\n-rwxr-xr-x 1 root root 377 Jan 21  2019 /etc/cron.daily/logrotate\n-rwxr-xr-x 1 root root 1123 Feb 26  2020 /etc/cron.daily/man-db\n-rwxr-xr-x 1 root root 4574 Jul 19  2019 /etc/cron.daily/popularity-contest\n-rwxr-xr-x 1 root root 214 May 15  2021 /etc/cron.daily/update-notifier-common\n/etc/cron.hourly/* 이 없습니다\n/etc/cron.monthly/* 이 없습니다\n-rwxr-xr-x 1 root root 813 Feb 26  2020 /etc/cron.weekly/man-db\n-rwxr-xr-x 1 root root 403 Aug  5  2021 /etc/cron.weekly/update-notifier-common\n/var/spool/cron/atjobs 이 없습니다\n/var/spool/cron/atspool 이 없습니다\n/var/spool/cron/crontabs 이 없습니다\n \nCron.allow, Cron.deny 파일 내용\n----------------------------\n/etc/cron.deny파일이 없습니다\n/etc/cron.allow파일이 없습니다\n \n \n[3.04] 취약\n\n</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>38</th>
+      <td>G03</td>
+      <td>3. 서비스 관리</td>
+      <td>G0305</td>
+      <td>3.05 Dos 공격에 취약한 서비스 비활성화</td>
+      <td>상</td>
+      <td>양호</td>
+      <td>\n□ 기준\nDoS 공격에 취약한 echo, discard, daytime, chargen 서비스가 비활성화 된 경우 양호\n■ 현황\ninetd.conf 파일에서 echo, discard, daytime, chargen 상태\n----------------------------------------------------------- \n/etc/inetd.conf 파일 존재하지 않음\n \n \n/etc/xinetd.d 서비스\n-------------------------\n \n \n/etc/xinetd.d 내용 \n------------------------\n \n[3.05] 양호\n\n</td>
+      <td>U-23</td>
+    </tr>
+    <tr>
+      <th>39</th>
+      <td>G03</td>
+      <td>3. 서비스 관리</td>
+      <td>G0306</td>
+      <td>3.06 NFS 서비스 비활성화</td>
+      <td>상</td>
+      <td>양호</td>
+      <td>\n□ 기준\nNFS 서비스 관련 데몬이 비활성화 되어 있는 경우 양호\n■ 현황\nNFS Server Daemon(nfsd)확인\n------------------------------------------------------------------------------\nNFS Service Disable\n \nNFS Client Daemon(statd,lockd)확인\n------------------------------------------------------------------------------\nNFS Client(statd,lockd) Disable\n \n[3.06] 양호\n\n</td>
+      <td>U-24</td>
+    </tr>
+    <tr>
+      <th>40</th>
+      <td>G03</td>
+      <td>3. 서비스 관리</td>
+      <td>G0307</td>
+      <td>3.07 NFS 접근 통제</td>
+      <td>상</td>
+      <td>양호</td>
+      <td>\n□ 기준\nNFS 서비스를 사용하지 않거나, 사용 시 everyone 공유를 제한한 경우 양호\n■ 현황\n \nNFS Service Disable\n \n[3.07] 양호\n\n</td>
+      <td>U-25</td>
+    </tr>
+    <tr>
+      <th>41</th>
+      <td>G03</td>
+      <td>3. 서비스 관리</td>
+      <td>G0308</td>
+      <td>3.08 automountd 제거</td>
+      <td>상</td>
+      <td>양호</td>
+      <td>\n□ 기준\nautomountd 서비스가 비활성화 되어 있는 경우 양호\n■ 현황\nAutomount 데몬 확인 \n \nautomount 데몬이 없습니다.\n \n[3.08] 양호\n\n</td>
+      <td>U-26</td>
+    </tr>
+    <tr>
+      <th>42</th>
+      <td>G03</td>
+      <td>3. 서비스 관리</td>
+      <td>G0309</td>
+      <td>3.09 RPC 서비스 확인</td>
+      <td>상</td>
+      <td>양호</td>
+      <td>\n□ 기준\n불필요한 RPC 서비스가 비활성화 되어 있는 경우 양호\n■ 현황\ninetd.conf 파일에서 RPC 관련 서비스 상태\n---------------------------------------------- \n/etc/inetd.conf 파일 존재하지 않음\n \n \n/etc/xinetd.d 서비스\n--------------------------\n/etc/xinetd.d 디렉토리가 존재하지 않습니다. \n \n \n/etc/xinetd.d 내용 \n---------------------\n \n[3.09] 양호\n\n</td>
+      <td>U-27</td>
+    </tr>
+    <tr>
+      <th>43</th>
+      <td>G03</td>
+      <td>3. 서비스 관리</td>
+      <td>G0310</td>
+      <td>3.10 NIS, NIS+ 점검</td>
+      <td>상</td>
+      <td>양호</td>
+      <td>\n□ 기준\nNIS 서비스가 비활성화 되어 있거나, 필요 시 NIS+를 사용하는 경우 양호\n■ 현황\nNIS, NIS+ Service Disable\n \n[3.10] 양호\n\n</td>
+      <td>U-28</td>
+    </tr>
+    <tr>
+      <th>44</th>
+      <td>G03</td>
+      <td>3. 서비스 관리</td>
+      <td>G0311</td>
+      <td>3.11 tftp, talk 서비스 비활성화</td>
+      <td>상</td>
+      <td>양호</td>
+      <td>\n□ 기준\ntftp, talk, ntalk 서비스가 비활성화 되어 있는 경우 양호\n■ 현황\ninetd.conf 파일에서 tftp, talk 상태\n-------------------------------------- \n/etc/inetd.conf 파일 존재하지 않음\n \n \n/etc/xinetd.d 서비스\n-------------------------\n \n/etc/xinetd.d 내용 \n-----------------------\n \ntftp, talk, ntalk 프로세스 활성화 여부\n-------------------------------------- \n▷ tftp, talk, ntalk 프로세스가 실행중이지 않음\n \n[3.11] 양호\n\n</td>
+      <td>U-29</td>
+    </tr>
+    <tr>
+      <th>45</th>
+      <td>G03</td>
+      <td>3. 서비스 관리</td>
+      <td>G0312</td>
+      <td>3.12 Sendmail 버전 점검</td>
+      <td>상</td>
+      <td>양호</td>
+      <td>\n□ 기준\nSendmail 버전이 최신버전인 경우 양호 (21.06.04기준 8.16.1 이상)\n■ 현황\nSendmail 프로세스 확인\n-------------------------------------- \n▷ Sendmail Service Disable\n \n/etc/mail/sendmail.cf, /etc/sendmail.cf 파일 없음\n \n[3.12] 양호\n\n</td>
+      <td>U-30</td>
+    </tr>
+    <tr>
+      <th>46</th>
+      <td>G03</td>
+      <td>3. 서비스 관리</td>
+      <td>G0313</td>
+      <td>3.13 스팸 메일 릴레이 제한</td>
+      <td>상</td>
+      <td>양호</td>
+      <td>\n□ 기준\nSMTP 서비스를 사용하지 않거나 릴레이 제한이 설정되어 있는 경우 양호\n■ 현황\nSendmail 프로세스 확인\n-------------------------------------- \nSendmail Service Disable\n \n \n/etc/mail/sendmail.cf 파일의 옵션 확인\n-------------------------------------- \n/etc/mail/sendmail.cf 파일 없음\n \n[3.13] 양호\n\n</td>
+      <td>U-31</td>
+    </tr>
+    <tr>
+      <th>47</th>
+      <td>G03</td>
+      <td>3. 서비스 관리</td>
+      <td>G0314</td>
+      <td>3.14 일반 사용자의 sendmail 실행 방지</td>
+      <td>상</td>
+      <td>양호</td>
+      <td>\n□ 기준\nSMTP 서비스 미사용 또는, 일반 사용자의 Sendmail 실행 방지가 설정된 경우 양호(restrictqrun 옵션 확인)\n■ 현황\nSendmail 프로세스 확인\n-------------------------------------- \n▷ Sendmail Service Disable\n \n/etc/mail/sendmail.cf 파일의 옵션 확인\n-------------------------------------- \n/etc/mail/sendmail.cf 파일 없음\n \n[3.14] 양호\n\n</td>
+      <td>U-32</td>
+    </tr>
+    <tr>
+      <th>48</th>
+      <td>G03</td>
+      <td>3. 서비스관리</td>
+      <td>G0315</td>
+      <td>3.15 DNS 보안 버전 패치</td>
+      <td>상</td>
+      <td>양호</td>
+      <td>\n \n▷ DNS Service Disable\n \n</td>
+      <td>U-33</td>
+    </tr>
+    <tr>
+      <th>49</th>
+      <td>G03</td>
+      <td>3. 서비스관리</td>
+      <td>G0316</td>
+      <td>3.16 DNS Zone Transfer 설정</td>
+      <td>상</td>
+      <td>양호</td>
+      <td>\n \n① DNS 프로세스 확인 \n-------------------------------------- \n▷ DNS Service Disable\n \n② /etc/named.conf 파일의 allow-transfer 확인\n-------------------------------------- \n/etc/named.conf 파일 없음\n \n③ /etc/named.boot 파일의 xfrnets 확인\n-------------------------------------- \n/etc/named.boot 파일 없음\n \n</td>
+      <td>U-34</td>
+    </tr>
+    <tr>
+      <th>50</th>
+      <td>G03</td>
+      <td>3. 서비스관리</td>
+      <td>G0317</td>
+      <td>3.17 웹서비스 디렉터리 리스팅 제거</td>
+      <td>상</td>
+      <td>양호</td>
+      <td>\n▷ 웹 서비스가 구동중이지 않음\n</td>
+      <td>U-35</td>
+    </tr>
+    <tr>
+      <th>51</th>
+      <td>G03</td>
+      <td>3. 서비스관리</td>
+      <td>G0318</td>
+      <td>3.18 웹서비스 웹 프로세스 권한 제한</td>
+      <td>상</td>
+      <td>양호</td>
+      <td>\n▷ 웹 서비스가 구동중이지 않음\n \n</td>
+      <td>U-36</td>
+    </tr>
+    <tr>
+      <th>52</th>
+      <td>G03</td>
+      <td>3. 서비스관리</td>
+      <td>G0319</td>
+      <td>3.19 웹서비스 상위 디렉터리 접근 금지</td>
+      <td>상</td>
+      <td>양호</td>
+      <td>\n▷ 웹 서비스가 구동중이지 않음\n \n</td>
+      <td>U-37</td>
+    </tr>
+    <tr>
+      <th>53</th>
+      <td>G03</td>
+      <td>3. 서비스관리</td>
+      <td>G0320</td>
+      <td>3.20 웹서비스 불필요한 파일 제거</td>
+      <td>상</td>
+      <td>양호</td>
+      <td>\n▷ 웹 서비스가 구동중이지 않음\n \n</td>
+      <td>U-38</td>
+    </tr>
+    <tr>
+      <th>54</th>
+      <td>G03</td>
+      <td>3. 서비스관리</td>
+      <td>G0321</td>
+      <td>3.21 웹서비스 링크 사용금지</td>
+      <td>상</td>
+      <td>양호</td>
+      <td>\n▷ 웹 서비스가 구동중이지 않음\n \n</td>
+      <td>U-39</td>
+    </tr>
+    <tr>
+      <th>55</th>
+      <td>G03</td>
+      <td>3. 서비스관리</td>
+      <td>G0322</td>
+      <td>3.22 웹서비스 파일 업로드 및 다운로드 제한</td>
+      <td>상</td>
+      <td>양호</td>
+      <td>\n▷ 웹 서비스가 구동중이지 않음\n \n</td>
+      <td>U-40</td>
+    </tr>
+    <tr>
+      <th>56</th>
+      <td>G03</td>
+      <td>3. 서비스관리</td>
+      <td>G0323</td>
+      <td>3.23 웹 서비스 영역의 분리</td>
+      <td>상</td>
+      <td>양호</td>
+      <td>\n▷ 웹 서비스가 구동중이지 않음\n \n</td>
+      <td>U-41</td>
+    </tr>
+    <tr>
+      <th>57</th>
+      <td>G03</td>
+      <td>3. 서비스관리</td>
+      <td>G0324</td>
+      <td>3.24 ssh 원격접속 허용</td>
+      <td>중</td>
+      <td>양호</td>
+      <td>\n① 프로세스 데몬 동작 확인\n------------------------------------------------------------------------------\nroot        4170       1  0 Mar21 ?        00:00:00 sshd: tw0n3 [priv]\ntw0n3       4254    4170  0 Mar21 ?        00:00:08 sshd: tw0n3@pts/1\nroot       83763       1  0 Mar23 ?        00:00:00 sshd: tw0n3 [priv]\ntw0n3      83897   83763  0 Mar23 ?        00:00:00 sshd: tw0n3@notty\nroot       84501       1  0 Mar23 ?        00:00:00 sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups\nroot      141729   84501  0 17:39 ?        00:00:00 sshd: tw0n3 [priv]\ntw0n3     141860  141729  0 17:39 ?        00:00:00 sshd: tw0n3@pts/2\n \n② 서비스 포트 확인\n------------------------------------------------------------------------------\nSSH 설정파일(/etc/ssh/sshd_config): 포트 설정 X (Default 설정: 22포트 사용)\n \n③ 서비스 포트 활성화 여부 확인\n------------------------------------------------------------------------------\ntcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN     \ntcp6       0      0 :::22                   :::*                    LISTEN     \n \n</td>
+      <td>U-60</td>
+    </tr>
+    <tr>
+      <th>58</th>
+      <td>G03</td>
+      <td>3. 서비스관리</td>
+      <td>G0325</td>
+      <td>3.25 ftp 서비스 확인</td>
+      <td>하</td>
+      <td>양호</td>
+      <td>\n① /etc/services 파일에서 포트 확인\n------------------------------------------------------------------------------\n(1)/etc/service파일:ftp 21/tcp\n(2)VsFTP 포트: VsFTP가 설치되어 있지 않습니다.\n(3)ProFTP 포트: ProFTP가 설치되어 있지 않습니다.\n \n② 서비스 포트 활성화 여부 확인\n------------------------------------------------------------------------------\n \n③서비스 활성화 확인\n------------------------------------------------------------------------------\n \n▷ ftp Service Enable\n \n</td>
+      <td>U-61</td>
+    </tr>
+    <tr>
+      <th>59</th>
+      <td>G03</td>
+      <td>3. 서비스관리</td>
+      <td>G0326</td>
+      <td>3.26 ftp 계정 shell 확인</td>
+      <td>중</td>
+      <td>양호</td>
+      <td>\n▷ FTP Service Enable\n \n① ftp 계정 쉘 확인(ftp 계정에 false 또는 nologin 설정시 양호)\n------------------------------------------------------------------------------\nftp 계정이 존재하지 않음.\n</td>
+      <td>U-62</td>
+    </tr>
+    <tr>
+      <th>60</th>
+      <td>G03</td>
+      <td>3. 서비스관리</td>
+      <td>G0327</td>
+      <td>3.27 ftpuser 파일 소유자 및 권한 설정</td>
+      <td>하</td>
+      <td>양호</td>
+      <td>\n▷ FTP Service Enable\n \n /etc/ftpd/ftpusers 파일이 없습니다.\n \n /etc/ftpusers 파일이 없습니다.\n \n /etc/vsftpd.ftpusers 파일이 없습니다.\n \n /etc/vsftpd/ftpusers 파일이 없습니다.\n \n /etc/vsftpd.user_list 파일이 없습니다.\n \n /etc/vsftpd/user_list 파일이 없습니다.\n</td>
+      <td>U-63</td>
+    </tr>
+    <tr>
+      <th>61</th>
+      <td>G03</td>
+      <td>3. 서비스관리</td>
+      <td>G0328</td>
+      <td>3.28 ftpuser 파일 소유자 및 권한 설정</td>
+      <td>중</td>
+      <td>양호</td>
+      <td>\n▷ ftp Service Disable\n</td>
+      <td>U-64</td>
+    </tr>
+    <tr>
+      <th>62</th>
+      <td>G03</td>
+      <td>3. 서비스관리</td>
+      <td>G0329</td>
+      <td>3.29 at 파일 소유자 및 권한 설정</td>
+      <td>중</td>
+      <td>양호</td>
+      <td>\n/etc/at.allow 파일이 없습니다.\n/etc/at.deny 파일이 존재합니다.\n-rw-r----- 1 root daemon 144 Nov 13 2018 /etc/at.deny\n \n■/etc/at.deny 파일 내용\n----------------------\nalias\nbackup\nbin\ndaemon\nftp\ngames\ngnats\nguest\nirc\nlp\nmail\nman\nnobody\noperator\nproxy\nqmaild\nqmaill\nqmailp\nqmailq\nqmailr\nqmails\nsync\nsys\nwww-data\n----------------------\n</td>
+      <td>U-65</td>
+    </tr>
+    <tr>
+      <th>63</th>
+      <td>G03</td>
+      <td>3. 서비스관리</td>
+      <td>G0330</td>
+      <td>3.30 SNMP 서비스 구동 점검</td>
+      <td>중</td>
+      <td>양호</td>
+      <td>\n① SNMP 서비스 여부\n \n▷ SNMP Service Disable. \n</td>
+      <td>U-66</td>
+    </tr>
+    <tr>
+      <th>64</th>
+      <td>G03</td>
+      <td>3. 서비스관리</td>
+      <td>G0331</td>
+      <td>3.31 SNMP 서비스 Community String의 복잡성 설정</td>
+      <td>중</td>
+      <td>양호</td>
+      <td>\n① SNMP 서비스 여부 \n \nSNMP가 비실행중입니다. \n \n \n② 설정파일 Default CcmunityString 현황 \n------------------------------------------------------------------------------\n■ /etc/snmpd.conf파일이 발견되지 않았습니다.\n \n■ /etc/snmpdv3.conf파일이 발견되지 않았습니다.\n \n■ /etc/snmp/snmpd.conf파일이 발견되지 않았습니다.\n \n■ /etc/snmp/conf/snmpd.conf파일이 발견되지 않았습니다.\n \n■ /etc/sma/snmp/snmpd.conf파일이 발견되지 않았습니다.\n \n</td>
+      <td>U-67</td>
+    </tr>
+    <tr>
+      <th>65</th>
+      <td>G03</td>
+      <td>3. 서비스관리</td>
+      <td>G0332</td>
+      <td>3.32 로그온 시 경고 메시지 제공</td>
+      <td>하</td>
+      <td>취약</td>
+      <td>\n① 서버 로그온 시 출력 배너(/etc/motd) 확인\n------------------------------------------------------------------------------\n/etc/motd 파일이 존재하지 않습니다.\n  \n② SSH 관련 설정 \n------------------------------------------------------------------------------\n▷ SSH Service Enable\n  \n■ ssh 배너 연동 여부\n \nSSH 설정파일(/etc/ssh/sshd_config): #Banner none\nSSH 설정파일(/etc/ssh/sshd_config): #Banner none\n  \n■ 연동된 ssh 배너파일 존재시 해당 파일 내용\n \n  \n  \n③ telnet 관련 설정 \n------------------------------------------------------------------------------\n▷ Telnet Service Disable\n  \n  \n</td>
+      <td>U-68</td>
+    </tr>
+    <tr>
+      <th>66</th>
+      <td>G03</td>
+      <td>3. 서비스관리</td>
+      <td>G0333</td>
+      <td>3.33 NFS 설정파일 접근권한</td>
+      <td>중</td>
+      <td>양호</td>
+      <td>\n▷ NFS Service Disable\n</td>
+      <td>U-69</td>
+    </tr>
+    <tr>
+      <th>67</th>
+      <td>G03</td>
+      <td>3. 서비스관리</td>
+      <td>G0334</td>
+      <td>3.34 expn, vrfy 명령어 제한</td>
+      <td>중</td>
+      <td>양호</td>
+      <td>\n▶ 점검기준 : SMTP 서비스 미사용 또는, noexpn, novrfy 옵션이 설정되어 있는 경우 양호\n▶ 시스템 현황\n \n① Sendmail 프로세스 확인\nSendmail Service Disable\n \n② /etc/mail/sendmail.cf 파일의 옵션 확인\n/etc/mail/sendmail.cf 파일 없음\n</td>
+      <td>U-70</td>
+    </tr>
+    <tr>
+      <th>68</th>
+      <td>G03</td>
+      <td>3. 서비스관리</td>
+      <td>G0335</td>
+      <td>3.35 Apache 웹서비스 정보 숨김</td>
+      <td>중</td>
+      <td>양호</td>
+      <td>\n▶ 점검기준 : ServerTokens 지시자에 Prod 옵션이 설정되어 있는 경우 양호\n▶ 시스템 현황\n \n▷ 웹 서비스가 구동중이지 않음\n \n</td>
+      <td>U-71</td>
+    </tr>
+    <tr>
+      <th>69</th>
+      <td>G04</td>
+      <td>4. 패치관리</td>
+      <td>G0401</td>
+      <td>4.01 최신 보안패치 및 벤더 권고사항 적용</td>
+      <td>상</td>
+      <td>수동점검</td>
+      <td>\n▶ 점검기준 : 패치 적용 정책을 수립하여 주기적으로 패치를 관리하고 있는 경우 양호(담당자 인터뷰를 통해 확인)\n▶ 시스템 현황\n \n</td>
+      <td>U-42</td>
+    </tr>
+    <tr>
+      <th>70</th>
+      <td>G05</td>
+      <td>5. 로그관리</td>
+      <td>G0501</td>
+      <td>5.01 로그의 정기적 검토 및 보고</td>
+      <td>상</td>
+      <td>수동점검</td>
+      <td>\n▶ 점검기준 : 로그 기록의 검토, 분석, 리포트 작성 및 보고 등이 정기적으로 이루어지는 경우 양호\n▶ 시스템 현황\n \n▷ 관리파트 진단결과 반영\n \n</td>
+      <td>U-43</td>
+    </tr>
+    <tr>
+      <th>71</th>
+      <td>G05</td>
+      <td>5. 로그관리</td>
+      <td>G0502</td>
+      <td>5.02 정책에 따른 시스템 로깅 설정</td>
+      <td>하</td>
+      <td>취약</td>
+      <td>\n▶ 점검기준 : 정책에 따라 로그를 남기고 있을 경우 양호\n▶ 시스템 현황\n \n▷ syslog 프로세스\nmessage+     895       1  0 Mar21 ?        00:00:06 /usr/bin/dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation --syslog-only\nsyslog       905       1  0 Mar21 ?        00:01:01 /usr/sbin/rsyslogd -n -iNONE\n \n \n▷ 시스템 로깅 설정\n \n■ /etc/syslog.conf파일이 발견되지 않았습니다.\n \n■ /etc/rsyslog.conf파일 설정\n-------------------------------------------------------\nmodule(load="imklog" permitnonkernelfacility="on")\n$ActionFileDefaultTemplate RSYSLOG_TraditionalFileFormat\n$RepeatedMsgReduction on\n$FileOwner syslog\n$FileGroup adm\n$FileCreateMode 0640\n$DirCreateMode 0755\n$Umask 0022\n$PrivDropToUser syslog\n$PrivDropToGroup syslog\n$WorkDirectory /var/spool/rsyslog\n$IncludeConfig /etc/rsyslog.d/*.conf\n \n■ /etc/syslog-ng.conf파일이 발견되지 않았습니다.\n \n</td>
+      <td>U-72</td>
+    </tr>
+  </tbody>
+</table>

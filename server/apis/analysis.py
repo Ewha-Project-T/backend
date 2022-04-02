@@ -113,29 +113,43 @@ class Comments(Resource):
     def get(self):
         parser = reqparse.RequestParser()
         parser.add_argument('xml_no', type=int, required=True, help="xml_no is required")
+        parser.add_argument('title_code', type=str, required=True, help="title_code is required")
         args = parser.parse_args()
-        num = args['xml_no']
-        res, content = get_comments(num)
-        if(res==CommentingResult.SUCCESS):
-            return {"comment":content}, 200
-        elif(res==CommentingResult.INVALID_XML):
-            return {"msg":"Invalid xml"}, 404
+        xml_no = args['xml_no']
+        title_code = args['title_code']
+
+        result, comment = get_comments(xml_no, title_code)
+        if(result == CommentingResult.INVALID_PROJECT_NO):
+            return {"msg":"Invalid Project No"}, 404
+        elif(result == CommentingResult.NOCOMMENT):
+            return ''
         else:
-            return {"msg":"Internal Error"}, 400
+            return jsonify(comment=comment)
 
     @jwt_required()
-    def patch(self):
+    def post(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('comment', type=str, required=True, help="comments is required")
         parser.add_argument('xml_no', type=int, required=True, help="xml_no is required")
+        parser.add_argument('title_code', type=str, required=True, help="title_code is required")
+        parser.add_argument('comment', type=str, required=True, help="comments is required")
+        parser.add_argument('vuln', type=str, required=True, help="vuln is required")
         args = parser.parse_args()
 
+        xml_no = args['xml_no']
+        title_code = args['title_code']
         comments = args['comment']
-        num = args['xml_no']
-        res = commenting(comments,num)
-        if(res==CommentingResult.SUCCESS):
+        vuln = args['vuln']
+        
+        result = commenting(xml_no, title_code, comments, vuln)
+        if(result == CommentingResult.SUCCESS):
             return {"msg":"success"}, 200
-        elif(res==CommentingResult.INVALID_XML):
-            return {"msg":"Invalid xml"}, 400
+        elif(result == CommentingResult.INVALID_PROJECT_NO):
+            return {"msg":"Invalid xml"}, 404
+        elif(result == ComementingResult.INVALID_FILE):
+            return {"msg":"Invalid File"}, 404
+        elif(result == CommentingResult.WRITE_FAIL):
+            return {"msg":"XML Patch Fail"}, 404
+        elif(result == CommentingResult.INVALID_DECISION):
+            return {"msg":"Invaild Decision"}, 404
         else:
             return {"msg":"Internal Error"}, 400

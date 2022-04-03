@@ -234,8 +234,8 @@ def get_comments(xml_no, title_code):
     comment_list = []
     for comment in comments:
         tmp = {}
-        tmp["old_vuln"] = comment.old_vuln
-        tmp["new_vuln"] = comment.new_vuln
+        tmp["old_vuln"] = comment.old_
+        tmp["new_vuln"] = comment.new_comment
         tmp["comment"] = comment.comment
         tmp["timestamp"] = comment.timestamp
         tmp["modifier"] = comment.modifier
@@ -246,11 +246,7 @@ def get_comments(xml_no, title_code):
 
 def commenting(xml_no, title_code, comment, vuln):
     cur_user = get_jwt_identity()
-    print(xml_no)
     analysis_res = Analysis.query.filter_by(xml_no=xml_no).first()
-    print(analysis_res)
-    print(cur_user["project_no"])
-    print(analysis_res.project_no)
     if(analysis_res == None or cur_user["project_no"] != analysis_res.project_no):
         return CommentingResult.INVALID_PROJECT_NO
     if(comment == None):
@@ -260,7 +256,7 @@ def commenting(xml_no, title_code, comment, vuln):
     if(comments == None):
         comments = Comment(xml_no=xml_no, title_code=title_code, old_vuln='', new_vuln=vuln, comment=comment, timestamp=timestamp, modifier=cur_user["user_id"])
     else:
-        comments = Comment(xml_no=xml_no, title_code=title_code, old_vuln=comment.new_vuln, new_vuln=vuln, comment=comment, timestamp=timestamp, modifier=cur_user["user_id"])
+        comments = Comment(xml_no=xml_no, title_code=title_code, old_vuln=comments.new_vuln, new_vuln=vuln, comment=comment, timestamp=timestamp, modifier=cur_user["user_id"])
     
     result = patch_vuln(xml_no, title_code, vuln)
     if(result == CommentingResult.INVALID_FILE):

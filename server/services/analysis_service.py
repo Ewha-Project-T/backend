@@ -227,7 +227,7 @@ def get_comments(xml_no, title_code):
     analysis_res = Analysis.query.filter_by(xml_no=xml_no).first()
     if(analysis_res == None or cur_user["project_no"] != analysis_res.project_no):
         return CommentingResult.INVALID_PROJECT_NO, ''
-    comments = Comment.query.filter_by(xml_no=xml_no, title_code=title_code).all()
+    comments = Comment.query.filter_by(xml_no=xml_no, title_code=title_code).order_by(Comment.timestamp.desc()).all()
     if(comments == None):
         return CommentingResult.NOCOMMENT, ''
     

@@ -234,6 +234,7 @@ def get_comments(xml_no, title_code):
     comment_list = []
     for comment in comments:
         tmp = {}
+        tmp["no"] = comment.comment_no
         tmp["old_vuln"] = comment.old_vuln
         tmp["new_vuln"] = comment.new_vuln
         tmp["comment"] = comment.comment

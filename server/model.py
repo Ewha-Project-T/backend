@@ -77,5 +77,13 @@ class Code(db.Model):
     kisa_code = db.Column(db.String(10), nullable=True)
 
 
-
-
+class Comment(db.Model):
+    __tablename__="comment"
+    comment_no = db.Column(db.Integer, primary_key=True)
+    xml_no = db.Column(db.Integer, db.ForeignKey("analysis.xml_no"), nullable=False)
+    title_code = db.Column(db.String(10), nullable=False)
+    old_vuln = db.Column(db.String(20), nullable=True)
+    new_vuln = db.Column(db.String(20), nullable=False)
+    comment = db.Column(db.String(500), nullable=False)
+    timestamp = db.Column(db.DateTime, nullable=False)
+    modifier = db.Column(db.String(20), nullable=False)

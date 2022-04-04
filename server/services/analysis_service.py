@@ -48,11 +48,13 @@ class VulnResult:
 
 class CommentingResult:
     SUCCESS = 0
-    NOCOMMENT = 1
+    INVALID_COMMENT = 1
     INVALID_PROJECT_NO = 2
     INVALID_FILE = 3
     WRITE_FAIL = 4
     INVALID_DECISION = 5
+    INVALID_XML = 6
+    NOCOMMENT = 7
 
 class XlsxResult:
     SUCCESS = 0
@@ -234,7 +236,11 @@ def get_comments(xml_no, title_code):
     comment_list = []
     for comment in comments:
         tmp = {}
+<<<<<<< Updated upstream
         tmp["no"] = comment.comment_no
+=======
+        tmp["no"] = comment.comment_no 
+>>>>>>> Stashed changes
         tmp["old_vuln"] = comment.old_vuln
         tmp["new_vuln"] = comment.new_vuln
         tmp["comment"] = comment.comment
@@ -253,13 +259,15 @@ def commenting(xml_no, title_code, comment, vuln):
     if(comment == None):
         return CommentingResult.NOCOMMENT
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+
+    result, prev = patch_vuln(xml_no, title_code, vuln)
     comments = Comment.query.filter_by(xml_no=xml_no, title_code=title_code).order_by(Comment.comment_no.desc()).first()
+    
     if(comments == None):
-        comments = Comment(xml_no=xml_no, title_code=title_code, old_vuln='', new_vuln=vuln, comment=comment, timestamp=timestamp, modifier=cur_user["user_id"])
+        comments = Comment(xml_no=xml_no, title_code=title_code, old_vuln=prev, new_vuln=vuln, comment=comment, timestamp=timestamp, modifier=cur_user["user_id"])
     else:
         comments = Comment(xml_no=xml_no, title_code=title_code, old_vuln=comments.new_vuln, new_vuln=vuln, comment=comment, timestamp=timestamp, modifier=cur_user["user_id"])
     
-    result = patch_vuln(xml_no, title_code, vuln)
     if(result == CommentingResult.INVALID_FILE):
         return CommentingResult.INVALID_FILE
     elif(result == CommentingResult.WRITE_FAIL):
@@ -302,22 +310,88 @@ def patch_vuln(xml_no, title_code, vuln):
         an.safe -= 1
         if(vuln == '취약'):
             an.vuln += 1
+        elif(vuln == '양호'):
+            an.safe += 1
     elif(prev == '취약'):
         an.vuln -= 1
         if(vuln == '양호'):
             an.safe += 1
+        elif(vuln == '취약'):
+            an.vuln += 1
     db.session.add(an)
     db.session.commit()
+    return CommentingResult.SUCCESS, prev
+
+def delete_comment(comment_no):
+    path = "uploads/"
+    cur_user = get_jwt_identity()
+
+    co = Comment.query.filter_by(comment_no=comment_no).first()
+    if(co == None):
+        return CommentingResult.INVALID_COMMENT
+    an = Analysis.query.filter_by(xml_no=co.xml_no).first()
+    if(an == None):
+        return CommentingResult.INVALID_XML
+    elif(an.project_no != cur_user["project_no"]):
+        return CommentingResult.INVALID_PROJECT_NO
+    
+    encoding = XMLParser(encoding='utf-8')
+    try:
+        tree = parse(path + an.path, parser=encoding)
+    except:
+        return CommentingResult.INVALID_FILE
+    
+    root = tree.getroot()
+    row = root.findall("row")
+    code = [x.findtext("Title_Code") for x in row]
+
+    for i in range(len(code)):
+        if(code[i] == co.title_code):
+            row[i][5].text = co.old_vuln
+    try:
+        tree.write(path + an.path, encoding='utf-8')
+    except:
+        return CommentingResult.WRITE_FAIL
+
+    if(co.new_vuln == "양호"):
+        an.safe -= 1
+        if(co.old_vuln == '취약'):
+            an.vuln += 1
+        elif(co.old_vuln == '양호'):
+            an.safe += 1
+    elif(co.new_vuln == '취약'):
+        an.vuln -= 1
+        if(co.old_vuln == '양호'):
+            an.safe += 1
+        elif(co.old_vuln == '취약'):
+            an.vuln += 1
+    db.session.add(an)
+    db.session.delete(co)
+    db.session.commit()
+
     return CommentingResult.SUCCESS
 
-def modify_host_name(host_no, host_name):
+def patch_comment(comment, comment_no):
+    path = "uploads/"
     cur_user = get_jwt_identity()
-    host_res = HostInfo.query.filter_by(no = host_no).first()
-    if(host_res == None or cur_user["project_no"] != host_res.project_no):
-        return HostInfoResult.INVALID_HOST
-    host_res.host_name = host_name
-    db.session.add(host_res)
+
+    co = Comment.query.filter_by(comment_no=comment_no).first()
+    if(co == None):
+        return CommentingResult.INVALID_COMMENT
+    an = Analysis.query.filter_by(xml_no=co.xml_no).first()
+    if(an == None):
+        return CommentingResult.INVALID_XML
+    elif(an.project_no != cur_user["project_no"]):
+        return CommentingResult.INVALID_PROJECT_NO
+
+    timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+    co.comment = comment
+    co.timestamp = timestamp
+    co.modifier = cur_user["user_id"]
+
+    db.session.add(co)
     db.session.commit()
+
     return CommentingResult.SUCCESS
 
 def modify_host_name(host_no, host_name):

@@ -323,6 +323,7 @@ def delete_comment(comment_no):
     cur_user = get_jwt_identity()
 
     co = Comment.query.filter_by(comment_no=comment_no).first()
+    tmp = Comment.query.filter_by(xml_no=co.xml_no).order_by(Comment.comment_no.desc()).first()
     if(co == None):
         return CommentingResult.INVALID_COMMENT
     an = Analysis.query.filter_by(xml_no=co.xml_no).first()
@@ -331,37 +332,38 @@ def delete_comment(comment_no):
     elif(an.project_no != cur_user["project_no"]):
         return CommentingResult.INVALID_PROJECT_NO
     
-    encoding = XMLParser(encoding='utf-8')
-    try:
-        tree = parse(path + an.path, parser=encoding)
-    except:
-        return CommentingResult.INVALID_FILE
-    
-    root = tree.getroot()
-    row = root.findall("row")
-    code = [x.findtext("Title_Code") for x in row]
+    if(co.comment_no == tmp.comment_no):
+        encoding = XMLParser(encoding='utf-8')
+        try:
+            tree = parse(path + an.path, parser=encoding)
+        except:
+            return CommentingResult.INVALID_FILE
+        
+        root = tree.getroot()
+        row = root.findall("row")
+        code = [x.findtext("Title_Code") for x in row]
 
-    for i in range(len(code)):
-        if(code[i] == co.title_code):
-            row[i][5].text = co.old_vuln
-    try:
-        tree.write(path + an.path, encoding='utf-8')
-    except:
-        return CommentingResult.WRITE_FAIL
+        for i in range(len(code)):
+            if(code[i] == co.title_code):
+                row[i][5].text = co.old_vuln
+        try:
+            tree.write(path + an.path, encoding='utf-8')
+        except:
+            return CommentingResult.WRITE_FAIL
 
-    if(co.new_vuln == "양호"):
-        an.safe -= 1
-        if(co.old_vuln == '취약'):
-            an.vuln += 1
-        elif(co.old_vuln == '양호'):
-            an.safe += 1
-    elif(co.new_vuln == '취약'):
-        an.vuln -= 1
-        if(co.old_vuln == '양호'):
-            an.safe += 1
-        elif(co.old_vuln == '취약'):
-            an.vuln += 1
-    db.session.add(an)
+        if(co.new_vuln == "양호"):
+            an.safe -= 1
+            if(co.old_vuln == '취약'):
+                an.vuln += 1
+            elif(co.old_vuln == '양호'):
+                an.safe += 1
+        elif(co.new_vuln == '취약'):
+            an.vuln -= 1
+            if(co.old_vuln == '양호'):
+                an.safe += 1
+            elif(co.old_vuln == '취약'):
+                an.vuln += 1
+        db.session.add(an)
     db.session.delete(co)
     db.session.commit()
 

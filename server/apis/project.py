@@ -45,8 +45,6 @@ class Project(Resource):
             return {"msg":"Project Name Exist"}, 400
         elif(result==ChangeResult.INVALID_DATE):
             return {"msg":"Invalid Date"}, 400
-        elif(result==ChangeResult.INVALID_ACC):
-            return {"msg":"Invalid Account"}, 400
         
         return {"msg":"success"},200
     @admin_required()

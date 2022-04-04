@@ -6,13 +6,15 @@ import shutil
 from flask_jwt_extended import create_refresh_token, create_access_token, verify_jwt_in_request, get_jwt, get_jwt_identity
 from werkzeug.utils import secure_filename
 from server import db
-from ..model import User, Analysis, HostInfo
+from ..model import User, Analysis, HostInfo, Comment
 from ..services.xml_parser import parse_xml, ParseResult
 import pandas as pd
 import xlsxwriter
 from flask import send_file
+from xml.etree.ElementTree import parse, XMLParser, dump
 
 ALLOWED_EXTENSIONS = set(['zip', 'xml','tar'])
+ALLOWED_DECISION = set(['양호', '취약', '수동점검', 'N/A'])
 UPLOAD_PATH ='./uploads/'
 
 class UploadResult:
@@ -46,7 +48,11 @@ class VulnResult:
 
 class CommentingResult:
     SUCCESS = 0
-    INVALID_XML = 1
+    NOCOMMENT = 1
+    INVALID_PROJECT_NO = 2
+    INVALID_FILE = 3
+    WRITE_FAIL = 4
+    INVALID_DECISION = 5
 
 class XlsxResult:
     SUCCESS = 0
@@ -118,7 +124,7 @@ def insert_db(upload_time,  path, safe, vuln):
         an = Analysis.query.filter_by(path=path[i]).first()
         if(an != None):
             return UploadResult.INVALID_PATH
-        host_name='_'.join(path[i].split("/")[1].split('_')[:-1])
+        host_name=path[i].split('_')[-2]
         types=path[i].split("/")[1].split('_')[1]    
         ip = '.'.join(path[i].split("/")[1].split("_")[-1].split(".")[:-1])
         an = HostInfo.query.filter_by(ip=ip, project_no=current_user["project_no"]).first()
@@ -130,7 +136,7 @@ def insert_db(upload_time,  path, safe, vuln):
         db.session.add(an)
         host = HostInfo.query.filter_by(ip=ip).first()
         host_no = host.no
-        an = Analysis(upload_time=upload_time, project_no=current_user["project_no"], user_no=acc.user_no, path=path[i], comment="", safe=safe[i], vuln=vuln[i], host_no=host_no)
+        an = Analysis(upload_time=upload_time, project_no=current_user["project_no"], user_no=acc.user_no, path=path[i], safe=safe[i], vuln=vuln[i], host_no=host_no)
         db.session.add(an)
         db.session.commit()
 
@@ -199,38 +205,118 @@ def get_host_analysis(host_no):
 def get_project_analysis():
     cur_user = get_jwt_identity()
     
-    rows = Analysis.query.filter_by(project_no=cur_user['project_no']).order_by(Analysis.upload_time.desc()).all()
+    analysis_rows = Analysis.query.filter_by(project_no=cur_user['project_no']).order_by(Analysis.upload_time.desc()).all()
     analysis_list_result=[]
-    for i in range(0,len(rows)):
+    for i in range(0,len(analysis_rows)):
+        host_row = HostInfo.query.filter_by(no=analysis_rows[i].host_no).first()
         if(i==30):
             break
         tmp = {}
-        tmp["xml_no"] = rows[i].xml_no
-        tmp["upload_time"] = rows[i].upload_time
-        tmp["project_no"] = rows[i].project_no
-        tmp["host_name"] = '_'.join(rows[i].path.split("/")[1].split('_')[:-1])
-        tmp["comment"] = rows[i].comment
-        tmp["safe"] = rows[i].safe
-        tmp["vuln"] = rows[i].vuln
-        tmp["host_no"] = rows[i].host_no
+        tmp["xml_no"] = analysis_rows[i].xml_no
+        tmp["upload_time"] = analysis_rows[i].upload_time
+        tmp["project_no"] = analysis_rows[i].project_no
+        tmp["host_name"] = host_row.host_name
+        tmp["safe"] = analysis_rows[i].safe
+        tmp["vuln"] = analysis_rows[i].vuln
+        tmp["host_no"] = analysis_rows[i].host_no
         analysis_list_result.append(tmp)
     return analysis_list_result
 
-def get_comments(xml_no):
+def get_comments(xml_no, title_code):
     cur_user = get_jwt_identity()
     analysis_res = Analysis.query.filter_by(xml_no=xml_no).first()
     if(analysis_res == None or cur_user["project_no"] != analysis_res.project_no):
-        return CommentingResult.INVALID_XML, ""
-    return CommentingResult.SUCCESS, analysis_res.comment
+        return CommentingResult.INVALID_PROJECT_NO, ''
+    comments = Comment.query.filter_by(xml_no=xml_no, title_code=title_code).order_by(Comment.timestamp.desc()).all()
+    if(comments == None):
+        return CommentingResult.NOCOMMENT, ''
+    
+    comment_list = []
+    for comment in comments:
+        tmp = {}
+        tmp["no"] = comment.comment_no
+        tmp["old_vuln"] = comment.old_vuln
+        tmp["new_vuln"] = comment.new_vuln
+        tmp["comment"] = comment.comment
+        tmp["timestamp"] = comment.timestamp
+        tmp["modifier"] = comment.modifier
+        comment_list.append(tmp)
+
+    return CommentingResult.SUCCESS, comment_list
 
 
-def commenting(content, xml_no):
+def commenting(xml_no, title_code, comment, vuln):
     cur_user = get_jwt_identity()
     analysis_res = Analysis.query.filter_by(xml_no=xml_no).first()
     if(analysis_res == None or cur_user["project_no"] != analysis_res.project_no):
-        return CommentingResult.INVALID_XML
-    analysis_res.comment = content
-    db.session.add(analysis_res)
+        return CommentingResult.INVALID_PROJECT_NO
+    if(comment == None):
+        return CommentingResult.NOCOMMENT
+    timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+    comments = Comment.query.filter_by(xml_no=xml_no, title_code=title_code).order_by(Comment.comment_no.desc()).first()
+    if(comments == None):
+        comments = Comment(xml_no=xml_no, title_code=title_code, old_vuln='', new_vuln=vuln, comment=comment, timestamp=timestamp, modifier=cur_user["user_id"])
+    else:
+        comments = Comment(xml_no=xml_no, title_code=title_code, old_vuln=comments.new_vuln, new_vuln=vuln, comment=comment, timestamp=timestamp, modifier=cur_user["user_id"])
+    
+    result = patch_vuln(xml_no, title_code, vuln)
+    if(result == CommentingResult.INVALID_FILE):
+        return CommentingResult.INVALID_FILE
+    elif(result == CommentingResult.WRITE_FAIL):
+        return CommentingResult.WRITE_FAIL
+    elif(result == CommentingResult.INVALID_DECISION):
+        return CommentingResult.INVALID_DECISION
+    elif(result == CommentingResult.SUCCESS):
+        db.session.add(comments)
+        db.session.commit()
+        return CommentingResult.SUCCESS
+    else:
+        return ''
+
+def patch_vuln(xml_no, title_code, vuln):
+    if vuln not in ALLOWED_DECISION:
+        return CommentingResult.INVALID_DECISION
+    path = "uploads/"
+    an = Analysis.query.filter_by(xml_no=xml_no).first()
+    encoding = XMLParser(encoding='utf-8')
+    try:
+        tree = parse(path + an.path, parser=encoding)
+    except:
+        return CommentingResult.INVALID_FILE
+    
+    root = tree.getroot()
+    row = root.findall("row")
+    code = [x.findtext("Title_Code") for x in row]
+
+    for i in range(len(code)):
+        if(code[i] == title_code):
+            prev = row[i][5].text
+            row[i][5].text = vuln
+    try:
+        tree.write(path + an.path, encoding='utf-8')
+    except:
+        return CommentingResult.WRITE_FAIL
+     
+    an = Analysis.query.filter_by(xml_no=xml_no).first()
+    if(prev == '양호'):
+        an.safe -= 1
+        if(vuln == '취약'):
+            an.vuln += 1
+    elif(prev == '취약'):
+        an.vuln -= 1
+        if(vuln == '양호'):
+            an.safe += 1
+    db.session.add(an)
+    db.session.commit()
+    return CommentingResult.SUCCESS
+
+def modify_host_name(host_no, host_name):
+    cur_user = get_jwt_identity()
+    host_res = HostInfo.query.filter_by(no = host_no).first()
+    if(host_res == None or cur_user["project_no"] != host_res.project_no):
+        return HostInfoResult.INVALID_HOST
+    host_res.host_name = host_name
+    db.session.add(host_res)
     db.session.commit()
     return CommentingResult.SUCCESS
 

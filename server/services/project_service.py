@@ -65,6 +65,8 @@ def change_project(change_no,name,start,end):
     target_user =User.query.filter_by(id=target_project.project_name+"_USER1").first()
     if(target_user != None):
         target_user.id=name+"_USER1"
+        target_user.name=name+"_USER1"
+        target_user.email=name+"_USER1@email.com"
         db.session.add(target_user)
         db.session.commit
 
@@ -72,6 +74,8 @@ def change_project(change_no,name,start,end):
     target_pm=User.query.filter_by(id=target_project.project_name+"_PM1").first()
     if(target_pm != None):
         target_pm.id=name+"_PM1"
+        target_pm.name=name+"_PM1"
+        target_pm.email=name+"_PM1@email.com"
         db.session.add(target_pm)
         db.session.commit
     

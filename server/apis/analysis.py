@@ -157,12 +157,60 @@ class Comments(Resource):
         if(result == CommentingResult.SUCCESS):
             return {"msg":"success"}, 200
         elif(result == CommentingResult.INVALID_PROJECT_NO):
-            return {"msg":"Invalid xml"}, 404
+            return {"msg":"Invalid Project"}, 404
         elif(result == ComementingResult.INVALID_FILE):
             return {"msg":"Invalid File"}, 404
         elif(result == CommentingResult.WRITE_FAIL):
             return {"msg":"XML Patch Fail"}, 404
         elif(result == CommentingResult.INVALID_DECISION):
             return {"msg":"Invaild Decision"}, 404
+        else:
+            return {"msg":"Internal Error"}, 400
+    
+    @jwt_required()
+    def delete(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('comment_no', type=str, required=True, help="comments is required")
+        args = parser.parse_args()
+
+        comment_no = args['comment_no']
+
+        result = delete_comment(comment_no)
+        
+        if(result == CommentingResult.SUCCESS):
+            return {"msg":"success"}, 200
+        elif(result == CommentingResult.INVALID_PROJECT_NO):
+            return {"msg":"Invalid xml"}, 404
+        elif(result == CommentingResult.INVALID_FILE):
+            return {"msg":"Invalid File"}, 404
+        elif(result == CommentingResult.WRITE_FAIL):
+            return {"msg":"XML Patch Fail"}, 404
+        elif(result == CommentingResult.INVALID_COMMENT):
+            return {"msg":"Invaild Comment"}, 404
+        elif(result == CommentingResult.INVALID_XML):
+            return {"msg":"Invaild XML No"}, 404
+        else:
+            return {"msg":"Internal Error"}, 400
+
+    @jwt_required()
+    def patch(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('comment', type=str, required=True, help="comments is required")
+        parser.add_argument('comment_no', type=str, required=True, help="comments is required")
+        args = parser.parse_args()
+        
+        comment = args['comment']
+        comment_no = args['comment_no']
+
+        result = patch_comment(comment, comment_no)
+
+        if(result == CommentingResult.SUCCESS):
+            return {"msg":"success"}, 200
+        elif(result == CommentingResult.INVALID_PROJECT_NO):
+            return {"msg":"Invalid project_no"}, 404
+        elif(result == CommentingResult.INVALID_COMMENT):
+            return {"msg":"Invaild Comment"}, 404
+        elif(result == CommentingResult.INVALID_XML):
+            return {"msg":"Invaild XML No"}, 404
         else:
             return {"msg":"Internal Error"}, 400

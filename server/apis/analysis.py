@@ -213,4 +213,4 @@ class Comments(Resource):
         elif(result == CommentingResult.INVALID_XML):
             return {"msg":"Invaild XML No"}, 404
         else:
-            return {"msg":"Internal Error"}, 400
+            return {"msg":"Internal Error"}, 500

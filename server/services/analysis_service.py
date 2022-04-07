@@ -59,6 +59,7 @@ class CommentingResult:
 class XlsxResult:
     SUCCESS = 0
     NO_ARGS = 1
+    INVALID_FILE = 2
 
 class HostInfoResult:
     SUCCESS = 0
@@ -119,16 +120,13 @@ def upload_file(fd):
     fd[0].save(abs_path)
     return random_dir + "/" + secure_filename(fd[0].filename)
 
-def insert_db(upload_time,  path, safe, vuln):
+def insert_db(upload_time,  path, safe, vuln, host_name, ip, types):
     current_user = get_jwt_identity()
     acc = User.query.filter_by(id=current_user["user_id"]).first()
     for i in range(len(path)):
         an = Analysis.query.filter_by(path=path[i]).first()
         if(an != None):
             return UploadResult.INVALID_PATH
-        host_name=path[i].split('_')[-2]
-        types=path[i].split("/")[1].split('_')[1]    
-        ip = '.'.join(path[i].split("/")[1].split("_")[-1].split(".")[:-1])
         an = HostInfo.query.filter_by(ip=ip, project_no=current_user["project_no"]).first()
         if (an == None):
             an = HostInfo(project_no=current_user["project_no"], host_name=host_name, analysis_count=1, timestamp=upload_time, types=types, ip=ip)
@@ -146,35 +144,29 @@ def insert_db(upload_time,  path, safe, vuln):
 
 def make_xlsx(xml_no):
     xml_no = xml_no.split("_")
-    print(xml_no)
     if(xml_no==['']):
         return XlsxResult.NO_ARGS, None
     xlsx_file = "analysis_result_" + time.strftime("%y%m%d_%H%M") + ".xlsx"
     with pd.ExcelWriter(UPLOAD_PATH + xlsx_file, engine='xlsxwriter') as writer:
-        for xml in xml_no:
-            parsed = parse_xml(xml)
-
+        #for xml in xml_no:
+        rows = []
+        for i in range(len(xml_no)):
+            parsed = parse_xml(xml_no[i])
+            if(parsed == ParseResult.INVALID_FILE):
+                return XlsxResult.INVALID_FILE, ''
             if(type(parsed)==type({})):
                 xml_result = []
-                for i in range(len(parsed["group_code"])):
-                    xml_result.append({
-                        'group_code' : parsed["group_code"][i],
-                        'group_name' : parsed["group_name"][i],
-                        'title_code' : parsed["title_code"][i],
-                        'title_name' : parsed["title_name"][i],
-                        'important' : parsed["important"][i],
-                        'decision' : parsed["decision"][i],
-                        'issue' : parsed["issue"][i], 
-                        'code' : parsed["codes"][i]})
-            
-            df_cols = ['group_code', 'group_name', 'title_code', 'title_name', 'important', 'decision', 'issue', 'code']
-            rows = []
-            for i in range(len(parsed["group_code"])):
-                rows.append([parsed["group_code"][i], parsed["group_name"][i], parsed["title_code"][i], parsed["title_name"][i], parsed["important"][i], parsed["decision"][i], parsed["issue"][i], parsed["codes"][i]])
-            df = pd.DataFrame(rows, columns = df_cols)
-            xml_row = Analysis.query.filter_by(xml_no=xml).first()
-            file_name = xml_row.path
-            df.to_excel(writer, sheet_name='_'.join(file_name.split("/")[1].split('_')[:-1]))
+                an = Analysis.query.filter_by(xml_no=xml_no[i]).first()
+                ho = HostInfo.query.filter_by(no=an.host_no).first()
+            df_cols = ['No', 'Host_Name', 'IPaddress', 'OSVersion', 'group_name', 'title_name', 'important', 'decision', 'issue']
+
+            for j in range(len(parsed["group_code"])):
+                rows.append([i+1, ho.host_name, ho.ip, ho.types, parsed["group_name"][j], parsed["title_name"][j], parsed["important"][j], parsed["decision"][j], parsed["issue"][j]])
+
+        df = pd.DataFrame(rows, columns = df_cols)
+        xml_row = Analysis.query.filter_by(xml_no=xml_no[i]).first()
+        file_name = xml_row.path
+        df.to_excel(writer, index=False)
     return XlsxResult.SUCCESS, UPLOAD_PATH + xlsx_file
 
 def get_hosts(project_no):
@@ -392,12 +384,17 @@ def patch_comment(comment, comment_no):
 
     return CommentingResult.SUCCESS
 
-def modify_host_name(host_no, host_name):
+def modify_host_name(host_no, host_name, ip, types):
     cur_user = get_jwt_identity()
     host_res = HostInfo.query.filter_by(no = host_no).first()
     if(host_res == None or cur_user["project_no"] != host_res.project_no):
         return HostInfoResult.INVALID_HOST
-    host_res.host_name = host_name
+    if(host_name != ''):
+        host_res.host_name = host_name
+    if(ip != ''):
+        host_res.ip = ip
+    if(types != ''):
+        host_res.types = types
     db.session.add(host_res)
     db.session.commit()
     return HostInfoResult.SUCCESS

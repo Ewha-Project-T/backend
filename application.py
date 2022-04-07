@@ -17,6 +17,7 @@ app.config['SWAGGER'] = {
 
 app.config['SECRET_KEY'] = 'CAT-Security-King-God'
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
+app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=1)
 app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://cert:cert@203.229.206.16:12344/cert"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True 

@@ -8,6 +8,7 @@ from ..model import Code, Analysis, HostInfo
 class ParseResult:
     SUCCESS = 0
     INVALID_FILE = 1
+    WRONG_XML = 2
 
 def parse_xml(xml_no):
     path = "uploads/"
@@ -55,14 +56,18 @@ def add_vuln(file_name):
     encoding = XMLParser(encoding="utf-8")
     safe = []
     vuln = []
+    
     try:
         tree = parse(path + file_name, parser=encoding)
     except:
-        return ParseResult.INVALID_FILE, 0, 0
+        return ParseResult.INVALID_FILE, 0, 0, 0, 0, 0
 
     root = tree.getroot()
+    host_name = root.find("Hostname").text
+    ip = root.find("Ipaddress").text
+    types = root.find("OSversion").text
     row = root.findall("row")
     decision = [x.findtext("Decision") for x in row]
     safe = decision.count('양호')
     vuln = decision.count('취약')
-    return ParseResult.SUCCESS, safe, vuln
+    return ParseResult.SUCCESS, safe, vuln, host_name, ip, types

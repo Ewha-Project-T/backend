@@ -80,7 +80,7 @@ class Login(Resource):
             elif(result==RegisterResult.INVALID_PROJECT):
                 return {"msg" : "invalid project"}, 400
             else:
-                return{"msg" : "bad parameters"},400
+                return{"msg" : "bad parameters"},404
         else:
             return {"msg": "Invalid Email"}, 400
 

@@ -19,6 +19,8 @@ class Analysis(Resource):
         result, xlsx_file = make_xlsx(xml_no)
         if(result == XlsxResult.NO_ARGS):
             return {"msg" : "No Argments"}, 404
+        elif(result == XlsxResult.INVALID_FILE):
+            return {"msg" : "No Search File"}, 404
         try:
             send = send_file(xlsx_file)
         except:
@@ -38,28 +40,35 @@ class Analysis(Resource):
         result ,file_ext = get_file_ext(filename)
         
         uploaded_path = upload_file(fd)
-        
         # Insert 'uploaded_path' in DB 
         if(result == ExtensionsResult.SUCCESS):
             if file_ext == "zip" or file_ext == "tar":
                 path = compression_extract(uploaded_path , file_ext)
-            else:
+            elif file_ext == "xml":
                 path = [uploaded_path]
+            else:
+                return {"msg":"denied file extensions"}, 403
         else:
             return{"msg":"denied file extensions"}, 403
 
         upload_time = time.strftime("%Y-%m-%d %H:%M:%S")
         safe = []
         vuln = []
+        host_name = []
+        ip = []
+        types = []
         #safe, vuln = add_vuln(path)
         for i in range(len(path)):
-            result, tmp_safe, tmp_vuln = add_vuln(path[i])
-            if(result != ParseResult.SUCCESS):
-                return {"msg" : "Invalid File Name"}, 404
+            result, tmp_safe, tmp_vuln, tmp_host, tmp_ip, tmp_os = add_vuln(path[i])
+            if(result == ParseResult.INVALID_FILE):
+                return {"msg" : "Invalid File"}, 404
             safe.append(tmp_safe)
             vuln.append(tmp_vuln)
+            host_name.append(tmp_host)
+            ip.append(tmp_ip)
+            types.append(tmp_os)
         
-        insert_db(upload_time, path, safe, vuln)
+        insert_db(upload_time, path, safe, vuln, host_name, ip, types)
         return {"msg":"ok"}, 200
 
     @jwt_required()
@@ -76,10 +85,14 @@ class Analysis(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('host_no', type=int, required=True, help="Host Number is required")
         parser.add_argument('host_name', type=str, required=True, help="Host Name is required")
+        parser.add_argument('ip', type=str, required=True, help="IP is required")
+        parser.add_argument('types', type=str, required=True, help="Type is required")
         args = parser.parse_args()
         host_no = args['host_no']
         host_name = args['host_name']
-        res = modify_host_name(host_no, host_name)
+        ip = args['ip']
+        types = args['types']
+        res = modify_host_name(host_no, host_name, ip, types)
         if(res == HostInfoResult.INVALID_HOST):
             return {"msg":"Invalid host"}, 404
         return {"msg":host_name}, 200
@@ -213,4 +226,4 @@ class Comments(Resource):
         elif(result == CommentingResult.INVALID_XML):
             return {"msg":"Invaild XML No"}, 404
         else:
-            return {"msg":"Internal Error"}, 500
+            return {"msg":"Internal Error"}, 400

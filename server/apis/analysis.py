@@ -218,7 +218,7 @@ class Comments(Resource):
         result = patch_comment(comment, comment_no)
 
         if(result == CommentingResult.SUCCESS):
-            return {"msg":"success"}, 200
+            return {"msg":comment}, 200
         elif(result == CommentingResult.INVALID_PROJECT_NO):
             return {"msg":"Invalid project_no"}, 404
         elif(result == CommentingResult.INVALID_COMMENT):

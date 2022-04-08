@@ -65,6 +65,7 @@ class HostInfoResult:
     SUCCESS = 0
     INVALID_HOST = 1
     DUPLICATED_NAME = 2
+    INVALID_PROJECT = 3
 
 def compression_extract(file_path, ext):
     if ext == "zip":
@@ -384,16 +385,24 @@ def patch_comment(comment, comment_no):
 
     return CommentingResult.SUCCESS
 
-def modify_host_name(host_no, host_name, ip, types):
+def modify_host(host_no, host_name, ip, types):
     cur_user = get_jwt_identity()
     host_res = HostInfo.query.filter_by(no = host_no).first()
-    if(host_res == None or cur_user["project_no"] != host_res.project_no):
+    # 같은 프로젝트넘버에 같은 이름이 존재하면 DUPLICATED_NAME 리턴
+    
+    if(cur_user["project_no"] != host_res.project_no):
+        return HostInfoResult.INVALID_PROJECT
+    if(host_res == None):
         return HostInfoResult.INVALID_HOST
-    if(host_name != ''):
+    if(host_name != None):
+        project_hosts = HostInfo.query.filter_by(project_no = cur_user["project_no"]).all()
+        for host in project_hosts:
+            if(host.host_name == host_name):
+                return HostInfoResult.DUPLICATED_NAME
         host_res.host_name = host_name
-    if(ip != ''):
+    if(ip != None):
         host_res.ip = ip
-    if(types != ''):
+    if(types != None):
         host_res.types = types
     db.session.add(host_res)
     db.session.commit()

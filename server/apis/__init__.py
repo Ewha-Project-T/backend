@@ -1,7 +1,7 @@
 from .login import Login, LoginRefresh, Account, Admin
 from .script import ScriptAPI, ScriptListingAPI, AdminScript
 from .analysis import Analysis, Hosts, HostAnalysis, ProjectAnalysis, Comments
-from .project import Project, ProjectList
+from .project import Project, ProjectList, ProjectScripts
 from .parser import XML_Parser
 from .users import Users, PMUsers
 
@@ -14,6 +14,7 @@ def load_api(api_module):
     api_module.add_resource(ScriptAPI,'/script',endpoint='script') # POST - UPLOAD
     api_module.add_resource(ScriptListingAPI,'/script-list',endpoint='script_list')
     api_module.add_resource(AdminScript,'/scripts',endpoint='admin_scripts')
+    api_module.add_resource(ProjectScripts, '/project-scripts', endpoint='project_scripts')
     api_module.add_resource(Analysis,'/analysis',endpoint='analysis')
     api_module.add_resource(Project,'/project',endpoint='project')
     api_module.add_resource(Project,'/project/<project_no>',endpoint='project_del-patch')
@@ -26,4 +27,5 @@ def load_api(api_module):
     api_module.add_resource(HostAnalysis,'/hosts/<proj_no>/<host_no>',endpoint='host_analysis')
     api_module.add_resource(ProjectAnalysis,'/project_analysis',endpoint='project_analysis')
     api_module.add_resource(Comments,'/comments',endpoint='comments')
+
 

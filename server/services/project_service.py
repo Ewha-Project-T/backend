@@ -17,6 +17,10 @@ class EnrollResult:
     SUCCESS = 0
     INVALID_SCRIPT_NO = 1
     DUPLICATED_SCRIPT = 2
+class DeleteScriptResult:
+    SUCCESS = 0
+    INVALID_SCRIPT_NO = 1
+    INVALID_PROJECT_NO = 2
 
 def create_project(name,start,end):
     check = Project.query.filter_by(project_name=name).first()
@@ -116,3 +120,13 @@ def enroll_project_scripts(project_no, script_no):
     db.session.commit
     return EnrollResult.SUCCESS
 
+def delete_project_scripts(project_no, script_no):
+    script = PROJECT_SCRIPT.query.filter_by(no=script_no).first()
+    if(script == None):
+        return DeleteScriptResult.INVALID_SCRIPT_NO
+    project_script = PROJECT_SCRIPT.query.filter_by(project_no=project_no, no=script_no).first()
+    if(project_script == None):
+        return DeleteScriptResult.INVALID_PROJECT_NO
+    db.session.delete(project_script)
+    db.session.commit
+    return DeleteScriptResult.SUCCESS

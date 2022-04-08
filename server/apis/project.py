@@ -4,7 +4,8 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from ..services.login_service import admin_required, pm_required
 from ..services.project_service import (
     create_project, delete_project,change_project,CreateResult,DeleteResult,ChangeResult,
-    listing_project, enroll_project_scripts, EnrollResult
+    listing_project, enroll_project_scripts, EnrollResult,delete_project_scripts,
+    DeleteScriptResult
 )
 
 class Project(Resource):
@@ -73,5 +74,19 @@ class ProjectScripts(Resource):
         elif(result == EnrollResult.DUPLICATED_SCRIPT):
             return {"msg":"Duplicated Script"}, 403
         return {"msg":"success"}, 200
+    @pm_required()
+    def delete(self):
+        current_user = get_jwt_identity()
+        parser = reqparse.RequestParser()
+        parser.add_argument('script_no', type=int)
+        args = parser.parse_args()
+        script_no = args['script_no']
+        result = delete_project_scripts(current_user["project_no"], script_no)
+        if(result == DeleteScriptResult.INVALID_SCRIPT_NO):
+            return {"msg": "Invalid Script No"}, 404
+        elif(result == DeleteScriptResult.INVALID_PROJECT_NO):
+            return {"msg": "Invalid Project No"}, 404
+        return {"msg":"success"}, 200
+
         
         

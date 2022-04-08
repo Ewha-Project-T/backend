@@ -1,4 +1,4 @@
-from ..model import Script, Project
+from ..model import Script, Project, PROJECT_SCRIPT
 from server import db
 from datetime import datetime
 from sqlalchemy import delete
@@ -39,7 +39,7 @@ def upload_script(script_type, proj_no, file_name):
 
 def download_auth_check(proj_no, file_name):
     file = Script.query.filter_by(script_name=file_name).first()
-    if(file.project_no == proj_no):
+    if(file!=None):
         return DownloadAuthResult.SUCCESS
     else:
         return DownloadAuthResult.INVALID
@@ -57,11 +57,11 @@ def delete_script(file_name, file_path):
 
 
 def script_listing(proj_no):
-    script_list = Script.query.filter_by(project_no=proj_no)
+    script_list = PROJECT_SCRIPT.query.filter_by(project_no=proj_no).all()
     script_list_result = []
     for script in script_list:
         tmp = {}
-        tmp["id"] = vars(script)["id"]
+        tmp["id"] = vars(script)["no"]
         tmp["type"] = vars(script)["type"]
         tmp["project_no"] = vars(script)["project_no"]
         tmp["script_name"] = vars(script)["script_name"]

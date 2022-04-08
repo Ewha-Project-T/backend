@@ -65,13 +65,9 @@ class ProjectScripts(Resource):
         current_user = get_jwt_identity()
         parser = reqparse.RequestParser()
         parser.add_argument('script_no', type=int)
-        parser.add_argument('project_no', type=int)
         args = parser.parse_args()
         script_no = args['script_no']
-        project_no = args['project_no']  
-        if(current_user["project_no"] != project_no):
-            return {"msg":"Invalid Project"}, 403
-        result = enroll_project_scripts(project_no, script_no)
+        result = enroll_project_scripts(current_user["project_no"], script_no)
         if(result == EnrollResult.INVALID_SCRIPT_NO):
             return {"msg":"Invalid Script"}, 404
         elif(result == EnrollResult.DUPLICATED_SCRIPT):

@@ -87,3 +87,11 @@ class Comment(db.Model):
     comment = db.Column(db.String(500), nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False)
     modifier = db.Column(db.String(20), nullable=False)
+
+class PROJECT_SCRIPT(db.Model):
+    __tablename__ = "PROJECT_SCRIPTS_TB"
+    no = db.Column(db.Integer,primary_key=True)
+    project_no = db.Column(db.Integer, db.ForeignKey("project.project_no"), nullable=False)
+    script_name = db.Column(db.String(100), db.ForeignKey("script.script_name"), nullable=False)
+    type = db.Column(db.String(10))
+    script_no = db.Column(db.Integer, db.ForeignKey("script.id"), nullable=False)

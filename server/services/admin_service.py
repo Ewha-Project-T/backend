@@ -81,17 +81,17 @@ def all_project_script_listing(project_no):
 
     
 def patch_user(user_no,new_id,new_pw,email,name):
+    acc = User.query.filter_by(user_no=user_no).first()
     if(new_id != None):
         new_id_check = User.query.filter_by(id=new_id).first()
         if(new_id_check != None):
             return UserChangeResult.DUPLICATED_ID
+        acc.id = new_id
     if(email != None):
         email_check = User.query.filter_by(email=email).first()
         if(email_check != None):
             return UserChangeResult.DUPLICATED_EMAIL
-    acc = User.query.filter_by(user_no=user_no).first()
-    acc.id = new_id
-    acc.email = email
+        acc.email = email
     if(acc == None):
         return UserChangeResult.INVALID_USER
     if(new_pw!=None):

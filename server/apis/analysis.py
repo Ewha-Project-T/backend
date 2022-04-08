@@ -83,18 +83,22 @@ class Analysis(Resource):
     @jwt_required()
     def patch(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('host_no', type=int, required=True, help="Host Number is required")
-        parser.add_argument('host_name', type=str, required=True, help="Host Name is required")
-        parser.add_argument('ip', type=str, required=True, help="IP is required")
-        parser.add_argument('types', type=str, required=True, help="Type is required")
+        parser.add_argument('host_no', type=int, required=True, help="host no is required")
+        parser.add_argument('host_name', type=str)
+        parser.add_argument('ip', type=str)
+        parser.add_argument('types', type=str)
         args = parser.parse_args()
         host_no = args['host_no']
         host_name = args['host_name']
         ip = args['ip']
         types = args['types']
-        res = modify_host_name(host_no, host_name, ip, types)
+        res = modify_host(host_no, host_name, ip, types)
         if(res == HostInfoResult.INVALID_HOST):
             return {"msg":"Invalid host"}, 404
+        elif(res == HostInfoResult.INVALID_PROJECT):
+            return {"msg":"Invalid project"}, 403
+        elif(res == HostInfoResult.DUPLICATED_NAME):
+            return {"msg":"Duplicated name"}, 400
         return {"msg":host_name}, 200
 
     @jwt_required()

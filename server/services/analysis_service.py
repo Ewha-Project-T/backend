@@ -388,8 +388,6 @@ def patch_comment(comment, comment_no):
 def modify_host(host_no, host_name, ip, types):
     cur_user = get_jwt_identity()
     host_res = HostInfo.query.filter_by(no = host_no).first()
-    # 같은 프로젝트넘버에 같은 이름이 존재하면 DUPLICATED_NAME 리턴
-    
     if(cur_user["project_no"] != host_res.project_no):
         return HostInfoResult.INVALID_PROJECT
     if(host_res == None):

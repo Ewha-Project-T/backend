@@ -1,10 +1,10 @@
 from flask import jsonify
 from flask_restful import reqparse, Resource
-from flask_jwt_extended import jwt_required
-from ..services.login_service import admin_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from ..services.login_service import admin_required, pm_required
 from ..services.project_service import (
     create_project, delete_project,change_project,CreateResult,DeleteResult,ChangeResult,
-    listing_project
+    listing_project, enroll_project_scripts, EnrollResult
 )
 
 class Project(Resource):
@@ -58,3 +58,24 @@ class ProjectList(Resource):
     @admin_required()
     def get(self):
         return jsonify(projects_info = listing_project())
+
+class ProjectScripts(Resource):
+    @pm_required()
+    def post(self):
+        current_user = get_jwt_identity()
+        parser = reqparse.RequestParser()
+        parser.add_argument('script_no', type=int)
+        parser.add_argument('project_no', type=int)
+        args = parser.parse_args()
+        script_no = args['script_no']
+        project_no = args['project_no']  
+        if(current_user["project_no"] != project_no):
+            return {"msg":"Invalid Project"}, 403
+        result = enroll_project_scripts(project_no, script_no)
+        if(result == EnrollResult.INVALID_SCRIPT_NO):
+            return {"msg":"Invalid Script"}, 404
+        elif(result == EnrollResult.DUPLICATED_SCRIPT):
+            return {"msg":"Duplicated Script"}, 403
+        return {"msg":"success"}, 200
+        
+        

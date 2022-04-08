@@ -1,5 +1,5 @@
 from .login_service import DeleteResult
-from ..model import User,Script
+from ..model import User,Script, PROJECT_SCRIPT
 from server import db
 import hashlib
 import base64
@@ -60,6 +60,26 @@ def all_script_listing():
         script_list_result.append(tmp)
     return script_list_result
 
+def all_project_script_listing(project_no):
+    duplicated_scripts_no = []
+    duplicated_scripts = PROJECT_SCRIPT.query.filter_by(project_no = project_no).all()
+    # print(duplicated_scripts_no[0].script_no)
+    for i in range(0,len(duplicated_scripts)):
+        duplicated_scripts_no.append(duplicated_scripts[i].script_no)
+    script_list = Script.query.all()
+    script_list_result = []
+    for script in script_list:
+        if(script.id in duplicated_scripts_no):
+            continue
+        tmp = {}
+        tmp["id"] = vars(script)["id"]
+        tmp["type"] = vars(script)["type"]
+        tmp["project_no"] = vars(script)["project_no"]
+        tmp["script_name"] = vars(script)["script_name"]
+        script_list_result.append(tmp)
+    return script_list_result
+
+    
 def patch_user(user_no,new_id,new_pw,email,name):
     if(new_id != None):
         new_id_check = User.query.filter_by(id=new_id).first()

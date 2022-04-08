@@ -1,4 +1,4 @@
-from ..model import Project,User
+from ..model import Project,User, PROJECT_SCRIPT, Script
 from server import db
 
 
@@ -13,6 +13,10 @@ class ChangeResult:
 class DeleteResult:
     SUCCESS = 0
     ALREADY_DELETE=1
+class EnrollResult:
+    SUCCESS = 0
+    INVALID_SCRIPT_NO = 1
+    DUPLICATED_SCRIPT = 2
 
 def create_project(name,start,end):
     check = Project.query.filter_by(project_name=name).first()
@@ -99,3 +103,16 @@ def listing_project():
         tmp["end_date"] = vars(proj)["end_date"]
         project_list_result.append(tmp)
     return project_list_result
+
+def enroll_project_scripts(project_no, script_no):
+    script = Script.query.filter_by(id=script_no).first()
+    if(script==None):
+        return EnrollResult.INVALID_SCRIPT_NO
+    project_script = PROJECT_SCRIPT.query.filter_by(project_no=project_no, script_no=script.id).first()
+    if(project_script!=None):
+        return EnrollResult.DUPLICATED_SCRIPT
+    new_script = PROJECT_SCRIPT(project_no=project_no, type=script.type, script_name=script.script_name, script_no=script.id)
+    db.session.add(new_script)
+    db.session.commit
+    return EnrollResult.SUCCESS
+

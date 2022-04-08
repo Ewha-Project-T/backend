@@ -2,8 +2,8 @@ from flask import jsonify, send_file
 from flask_restful import reqparse, Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from werkzeug.utils import secure_filename
-from ..services.admin_service import all_script_listing
-from ..services.login_service import admin_required
+from ..services.admin_service import all_script_listing, all_project_script_listing
+from ..services.login_service import admin_required, pm_required
 from ..services.script_service import (
     upload_script, upload_formatter, UploadResult, script_listing, 
     DownloadAuthResult, download_auth_check, delete_script, DeleteResult
@@ -71,10 +71,15 @@ class ScriptListingAPI(Resource):
         return jsonify(script_list=script_list)
     
 class AdminScript(Resource):
-    @admin_required()
+    @pm_required()
     def get(self):
-        script_list = all_script_listing()
+        current_user = get_jwt_identity()
+        if(current_user["user_perm"] == 2):
+            script_list = all_script_listing()
+        else:
+            script_list = all_project_script_listing(current_user["project_no"])
         return jsonify(all_script_list=script_list)
+
     @admin_required()
     def post(self):
         parser = reqparse.RequestParser()

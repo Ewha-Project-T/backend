@@ -16,7 +16,7 @@ class Users(Resource):
         res=get_users_info()
         return jsonify(users_info=res)
         
-    @admin_required()
+    @pm_required()
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('user_no', type=str, required=True, help="user_no is required")

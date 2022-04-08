@@ -11,6 +11,7 @@ class UserChangeResult:
     SUCCESS = 0
     DUPLICATED_EMAIL = 1
     INVALID_USER = 2
+    DUPLICATED_ID = 3
 
 def get_users_info(proj_no=None):
     if(proj_no==None):
@@ -59,12 +60,18 @@ def all_script_listing():
         script_list_result.append(tmp)
     return script_list_result
 
-def patch_user(user_no,new_pw,email,name):
+def patch_user(user_no,new_id,new_pw,email,name):
+    if(new_id != None):
+        new_id_check = User.query.filter_by(id=new_id).first()
+        if(new_id_check != None):
+            return UserChangeResult.DUPLICATED_ID
     if(email != None):
         email_check = User.query.filter_by(email=email).first()
         if(email_check != None):
             return UserChangeResult.DUPLICATED_EMAIL
     acc = User.query.filter_by(user_no=user_no).first()
+    acc.id = new_id
+    acc.email = email
     if(acc == None):
         return UserChangeResult.INVALID_USER
     if(new_pw!=None):

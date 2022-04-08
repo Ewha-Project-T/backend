@@ -147,17 +147,21 @@ class Admin(Resource):
     def patch(self):
         parser = reqparse.RequestParser()
         parser.add_argument('user_no', type=int, required=True)
+        parser.add_argument('new_id', type=str)
         parser.add_argument('new_pw', type=str)
         parser.add_argument('email', type=str)
         parser.add_argument('name', type=str)
         args = parser.parse_args()
         user_no = args['user_no']
+        new_id = args['new_id']
         new_pw = args['new_pw']
         email = args['email']
         name = args['name']
-        result = patch_user(user_no,new_pw,email,name)
+        result = patch_user(user_no,new_id,new_pw,email,name)
         if(result == UserChangeResult.DUPLICATED_EMAIL):
             return {"msg":"duplicated email"}, 403
+        elif(result == UserChangeResult.DUPLICATED_ID):
+            return {"msg":"duplicated id"}, 403
         elif(result == UserChangeResult.INVALID_USER):
             return {"msg": "Invalid User"}, 403
         else:

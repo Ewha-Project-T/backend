@@ -82,13 +82,13 @@ class AdminScript(Resource):
 
     @admin_required()
     def post(self):
+        cur_user = get_jwt_identity()
         parser = reqparse.RequestParser()
         parser.add_argument('type', type=str, required=True, help="Need Script Type")
-        parser.add_argument('proj_no', type=str, required=True, help="Need Project Number")
         parser.add_argument('file_name', type=werkzeug.datastructures.FileStorage, location='files', required=True, help="Not Valid File")
         args = parser.parse_args()
         type = args['type']
-        project_no = args['proj_no']
+        project_no = cur_user["project_no"]
         file_object = args['file_name']
         if(type not in TYPE):
             return {"msg": "Invalid Script Type"}, 400

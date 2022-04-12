@@ -135,7 +135,7 @@ def insert_db(upload_time,  path, safe, vuln, host_name, ip, types):
             an.analysis_count += 1
             an.timestamp = upload_time
         db.session.add(an)
-        host = HostInfo.query.filter_by(ip=ip).first()
+        host = HostInfo.query.filter_by(ip=ip, project_no=current_user["project_no"]).first()
         host_no = host.no
         an = Analysis(upload_time=upload_time, project_no=current_user["project_no"], user_no=acc.user_no, path=path[i], safe=safe[i], vuln=vuln[i], host_no=host_no)
         db.session.add(an)

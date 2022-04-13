@@ -7,7 +7,7 @@ from flask_jwt_extended import (
 import re
 from ..services.login_service import (
     login, register, delete, LoginResult, RegisterResult, create_tokens, 
-    DeleteResult, change, ChangeResult, admin_required
+    DeleteResult, change, ChangeResult, admin_required, pm_required
 )
 from ..services.admin_service import patch_user, UserChangeResult
 
@@ -143,20 +143,27 @@ class Admin(Resource):
         if(current_admin["user_perm"]==2):
             return {"msg":"admin authenticated"}, 200
         return {"msg": "you're not admin"}, 403
-    @admin_required()
+    @pm_required()
     def patch(self):
+        cur_user = get_jwt_identity()
         parser = reqparse.RequestParser()
         parser.add_argument('user_no', type=int, required=True)
-        parser.add_argument('new_id', type=str)
         parser.add_argument('new_pw', type=str)
-        parser.add_argument('email', type=str)
-        parser.add_argument('name', type=str)
+        if(cur_user["user_perm"] == 2):
+            parser.add_argument('new_id', type=str)
+            parser.add_argument('email', type=str)
+            parser.add_argument('name', type=str)
         args = parser.parse_args()
         user_no = args['user_no']
-        new_id = args['new_id']
         new_pw = args['new_pw']
-        email = args['email']
-        name = args['name']
+        if(cur_user["user_perm"] == 2):
+            new_id = args['new_id']
+            email = args['email']
+            name = args['name']
+        else:
+            new_id = None
+            email = None
+            name = None
         result = patch_user(user_no,new_id,new_pw,email,name)
         if(result == UserChangeResult.DUPLICATED_EMAIL):
             return {"msg":"duplicated email"}, 403

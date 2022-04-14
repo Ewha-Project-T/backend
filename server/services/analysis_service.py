@@ -41,6 +41,7 @@ class DownloadResult:
 class ExtensionsResult:
     SUCCESS = 0
     DENIED_EXTENSIONS = 1
+    INVALID_FILE = 2
 
 class VulnResult:
     SUCCESS = 0
@@ -75,11 +76,15 @@ def compression_extract(file_path, ext):
 
     f.extractall(UPLOAD_PATH + file_path.split('/')[0] + "/")
     os.remove(UPLOAD_PATH + file_path)
+    
     f.close()
     path = []
     file_list = os.listdir(UPLOAD_PATH + file_path.split('/')[0] + "/")
     for i in range(len(file_list)):
-        path.append(file_path.split('/')[0] + "/" + file_list[i])
+        if file_list[i][0] == ".":
+            os.remove(UPLOAD_PATH + file_path.split('/')[0] + "/" + file_list[i])
+        else:
+            path.append(file_path.split('/')[0] + "/" + file_list[i])
     return path
 
 def get_file_ext(filename):
@@ -88,7 +93,7 @@ def get_file_ext(filename):
             return ExtensionsResult.SUCCESS, filename.rsplit('.',1)[1]
         else:
             return ExtensionsResult.DENIED_EXTENSIONS, ''
-    return ''
+    return ExtensionsResult.INVALID_FILE, ''
 
 def delete_analysis_file(xml_no):
     acc = Analysis.query.filter_by(xml_no=xml_no).first()
@@ -128,14 +133,14 @@ def insert_db(upload_time,  path, safe, vuln, host_name, ip, types):
         an = Analysis.query.filter_by(path=path[i]).first()
         if(an != None):
             return UploadResult.INVALID_PATH
-        an = HostInfo.query.filter_by(ip=ip, project_no=current_user["project_no"]).first()
+        an = HostInfo.query.filter_by(ip=ip[i], project_no=current_user["project_no"]).first()
         if (an == None):
-            an = HostInfo(project_no=current_user["project_no"], host_name=host_name, analysis_count=1, timestamp=upload_time, types=types, ip=ip)
+            an = HostInfo(project_no=current_user["project_no"], host_name=host_name[i], analysis_count=1, timestamp=upload_time, types=types[i], ip=ip[i])
         else:
             an.analysis_count += 1
             an.timestamp = upload_time
         db.session.add(an)
-        host = HostInfo.query.filter_by(ip=ip, project_no=current_user["project_no"]).first()
+        host = HostInfo.query.filter_by(ip=ip[i], project_no=current_user["project_no"]).first()
         host_no = host.no
         an = Analysis(upload_time=upload_time, project_no=current_user["project_no"], user_no=acc.user_no, path=path[i], safe=safe[i], vuln=vuln[i], host_no=host_no)
         db.session.add(an)

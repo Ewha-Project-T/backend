@@ -4,7 +4,6 @@ from flasgger import swag_from
 from flask_jwt_extended import jwt_required
 from server import db
 from ..model import Code, Analysis, HostInfo
-from lxml import etree
 import os
 
 class ParseResult:
@@ -14,7 +13,6 @@ class ParseResult:
 
 def parse_xml(xml_no):
     path = "uploads/"
-    
     encoding = XMLParser(encoding="utf-8")
     xml_row = Analysis.query.filter_by(xml_no=xml_no).first()
     file_name = xml_row.path
@@ -59,19 +57,14 @@ def add_vuln(file_name):
     encoding = XMLParser(encoding="utf-8")
     safe = []
     vuln = []
-    '''
+    
+    replace_entity(file_name)
     try:
         tree = parse(path + file_name, parser=encoding)
     except:
-        try:
-            replace_entity(file_name)
-            tree = tree = parse(path + file_name, parser=encoding)
-        except:
-            return ParseResult.INVALID_FILE, 0, 0, 0, 0, 0
-    '''
-    replace_entity(file_name)
-    tree = tree = parse(path + file_name, parser=encoding)
+        return ParseResult.INVALID_FILE, 0, 0, 0, 0, 0
     root = tree.getroot()
+
     host_name = root.find("Hostname").text
     ip = root.find("Ipaddress").text
     types = root.find("OSversion").text

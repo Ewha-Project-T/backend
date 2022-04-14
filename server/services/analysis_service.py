@@ -7,7 +7,7 @@ from flask_jwt_extended import create_refresh_token, create_access_token, verify
 from werkzeug.utils import secure_filename
 from server import db
 from ..model import User, Analysis, HostInfo, Comment
-from ..services.xml_parser import parse_xml, ParseResult
+from ..services.xml_parser import parse_xml, ParseResult, replace_entity
 import pandas as pd
 import xlsxwriter
 from flask import send_file

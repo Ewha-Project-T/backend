@@ -35,7 +35,6 @@ class Analysis(Resource):
         args = parser.parse_args()
         
         fd = args['file']
-        
         filename = secure_filename(fd[0].filename)
         result ,file_ext = get_file_ext(filename)
         
@@ -48,8 +47,10 @@ class Analysis(Resource):
                 path = [uploaded_path]
             else:
                 return {"msg":"denied file extensions"}, 403
-        else:
+        elif (result == ExtensionsResult.DENIED_EXTENSIONS):
             return{"msg":"denied file extensions"}, 403
+        else:
+            return{"msg":"Invalid File Name"}, 403
 
         upload_time = time.strftime("%Y-%m-%d %H:%M:%S")
         safe = []
@@ -57,7 +58,6 @@ class Analysis(Resource):
         host_name = []
         ip = []
         types = []
-        #safe, vuln = add_vuln(path)
         for i in range(len(path)):
             result, tmp_safe, tmp_vuln, tmp_host, tmp_ip, tmp_os = add_vuln(path[i])
             if(result == ParseResult.INVALID_FILE):

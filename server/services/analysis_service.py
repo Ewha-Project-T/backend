@@ -194,6 +194,8 @@ def get_host_analysis(host_no):
         tmp["path"] = analysis.path
         tmp["safe"] = analysis.safe
         tmp["vuln"] = analysis.vuln
+        user_info = User.query.filter_by(user_no = analysis.user_no).first()
+        tmp["user_name"] = user_info.name
         analysis_list_result.append(tmp)
     return analysis_list_result
 
@@ -248,10 +250,8 @@ def commenting(xml_no, title_code, comment, vuln):
     if(comment == None):
         return CommentingResult.NOCOMMENT
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
-
     result, prev = patch_vuln(xml_no, title_code, vuln)
     comments = Comment.query.filter_by(xml_no=xml_no, title_code=title_code).order_by(Comment.comment_no.desc()).first()
-    
     if(comments == None):
         comments = Comment(xml_no=xml_no, title_code=title_code, old_vuln=prev, new_vuln=vuln, comment=comment, timestamp=timestamp, modifier=cur_user["user_id"])
     else:
@@ -280,11 +280,9 @@ def patch_vuln(xml_no, title_code, vuln):
         tree = parse(path + an.path, parser=encoding)
     except:
         return CommentingResult.INVALID_FILE
-    
     root = tree.getroot()
     row = root.findall("row")
     code = [x.findtext("Title_Code") for x in row]
-
     for i in range(len(code)):
         if(code[i] == title_code):
             prev = row[i][5].text

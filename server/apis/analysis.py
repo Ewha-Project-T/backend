@@ -175,7 +175,7 @@ class Comments(Resource):
             return {"msg":"success"}, 200
         elif(result == CommentingResult.INVALID_PROJECT_NO):
             return {"msg":"Invalid Project"}, 404
-        elif(result == ComementingResult.INVALID_FILE):
+        elif(result == CommentingResult.INVALID_FILE):
             return {"msg":"Invalid File"}, 404
         elif(result == CommentingResult.WRITE_FAIL):
             return {"msg":"XML Patch Fail"}, 404

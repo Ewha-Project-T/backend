@@ -64,7 +64,7 @@ def change_project(change_no, name, start, end):
     target_project = Project.query.filter_by(project_no=change_no).first()
     check = Project.query.filter_by(project_name=name).first()
     if(check!=None):
-        if(check.project_no != change_no):
+        if(check.project_no != int(change_no)):
             return ChangeResult.NAME_EXIST
     if(start>end):
         return ChangeResult.INVALID_DATE

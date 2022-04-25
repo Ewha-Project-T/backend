@@ -95,7 +95,8 @@ def change(old_pw, new_pw, new_name, new_email):
         raise Exception("Not Logged In")
     email_check = User.query.filter_by(email=new_email).first()
     if(email_check != None):
-        return ChangeResult.DUPLICATED_EMAIL
+        if(userinfo["user_id"] != email_check.id):
+            return ChangeResult.DUPLICATED_EMAIL
     acc = User.query.filter_by(id=userinfo["user_id"]).first()
     if(old_pw != None and new_pw != None):
         password = base64.b64decode(acc.password)

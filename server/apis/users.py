@@ -48,7 +48,7 @@ class MyUsers(Resource):
     def get(self):
         cur_user = get_jwt_identity()
         res = get_one_user_info(cur_user["user_id"])
-        if(res):
+        if(res==1):
             return {"msg":"Invalid user id"}, 404
         return jsonify(user_info=res)
 

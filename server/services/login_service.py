@@ -114,6 +114,7 @@ def change(old_pw, new_pw, new_name, new_email):
     return ChangeResult.SUCCESS
 
 def get_one_user_info(user_id):
+    print(user_id)
     acc = User.query.filter_by(id=user_id).first()
     if(acc == None):
         return 1

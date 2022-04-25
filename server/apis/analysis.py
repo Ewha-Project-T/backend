@@ -125,10 +125,7 @@ class Hosts(Resource):
 
 class HostAnalysis(Resource):
     @jwt_required()
-    def get(self,proj_no,host_no):
-        current_user = get_jwt_identity()
-        if(proj_no != str(current_user["project_no"])):
-            return {"msg":"Forbidden Project"}, 403
+    def get(self,host_no):
         analysises = get_host_analysis(host_no)
         return jsonify(analysises=analysises)
 

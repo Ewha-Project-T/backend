@@ -24,7 +24,7 @@ def load_api(api_module):
     api_module.add_resource(PMUsers,'/pm-users', endpoint='pm_users')
     api_module.add_resource(Users,'/users/<user_no>',endpoint='users_del')
     api_module.add_resource(Hosts,'/hosts/<proj_no>',endpoint='hosts_list')
-    api_module.add_resource(HostAnalysis,'/hosts/<proj_no>/<host_no>',endpoint='host_analysis')
+    api_module.add_resource(HostAnalysis,'/host/<host_no>',endpoint='host_analysis')
     api_module.add_resource(ProjectAnalysis,'/project_analysis',endpoint='project_analysis')
     api_module.add_resource(Comments,'/comments',endpoint='comments')
 

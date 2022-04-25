@@ -60,17 +60,18 @@ def delete_project(del_no):
     db.session.commit
     return DeleteResult.SUCCESS
 
-def change_project(change_no,name,start,end):
+def change_project(change_no, name, start, end):
     target_project = Project.query.filter_by(project_no=change_no).first()
     check = Project.query.filter_by(project_name=name).first()
     if(check!=None):
-        return ChangeResult.NAME_EXIST
+        if(check.project_no != change_no):
+            return ChangeResult.NAME_EXIST
     if(start>end):
         return ChangeResult.INVALID_DATE
 
 
     #USER변경
-    target_user =User.query.filter_by(id=target_project.project_name+"_USER1").first()
+    target_user = User.query.filter_by(id=target_project.project_name+"_USER1").first()
     if(target_user != None):
         target_user.id=name+"_USER1"
         target_user.name=name+"_USER1"

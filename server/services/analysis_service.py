@@ -11,7 +11,7 @@ from ..services.xml_parser import parse_xml, ParseResult
 import pandas as pd
 import xlsxwriter
 from flask import send_file
-from xml.etree.ElementTree import parse, XMLParser, dump
+from xml.etree.ElementTree import parse, XMLParser, dump, SubElement
 
 ALLOWED_EXTENSIONS = set(['zip', 'xml','tar'])
 ALLOWED_DECISION = set(['양호', '취약', '수동점검', 'N/A'])
@@ -290,8 +290,12 @@ def patch_vuln(xml_no, title_code, vuln):
     code = [x.findtext("Title_Code") for x in row]
     for i in range(len(code)):
         if(code[i] == title_code):
-            prev = row[i][5].text
-            row[i][5].text = vuln
+            if(row[i].findtext("Decision") == None):
+                SubElement(row[i], 'Decision').text = vuln
+                prev = None
+            else:
+                prev = row[i].findtext("Decision")
+                row[i].find('Decision').text = vuln
     try:
         tree.write(path + an.path, encoding='utf-8')
     except:
@@ -341,7 +345,7 @@ def delete_comment(comment_no):
 
         for i in range(len(code)):
             if(code[i] == co.title_code):
-                row[i][5].text = co.old_vuln
+                row[i].find('Decision').text = co.old_vuln
         try:
             tree.write(path + an.path, encoding='utf-8')
         except:

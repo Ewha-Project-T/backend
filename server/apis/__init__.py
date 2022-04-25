@@ -3,7 +3,7 @@ from .script import ScriptAPI, ScriptListingAPI, AdminScript
 from .analysis import Analysis, Hosts, HostAnalysis, ProjectAnalysis, Comments
 from .project import Project, ProjectList, ProjectScripts
 from .parser import XML_Parser
-from .users import Users, PMUsers
+from .users import Users, PMUsers, MyUsers
 
 def load_api(api_module):
     api_module.add_resource(Admin,'/admin',endpoint='admin')
@@ -27,5 +27,5 @@ def load_api(api_module):
     api_module.add_resource(HostAnalysis,'/host/<host_no>',endpoint='host_analysis')
     api_module.add_resource(ProjectAnalysis,'/project_analysis',endpoint='project_analysis')
     api_module.add_resource(Comments,'/comments',endpoint='comments')
-
+    api_module.add_resource(MyUsers,'/myinfo',endpoint='one_user_info')
 

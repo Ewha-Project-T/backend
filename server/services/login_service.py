@@ -113,6 +113,18 @@ def change(old_pw, new_pw, new_name, new_email):
     db.session.commit()
     return ChangeResult.SUCCESS
 
+def get_one_user_info(user_id):
+    acc = User.query.filter_by(id=user_id).first()
+    if(acc == None):
+        return 1
+    my_proj = Project.query.filter_by(project_no=acc.project_no).first()
+    tmp={}
+    tmp["user_id"] = acc.id
+    tmp["user_name"] = acc.name
+    tmp["user_email"] = acc.email
+    tmp["user_project"] = my_proj.project_name
+    return tmp
+
 def admin_required():
     def wrapper(fn):
         @wraps(fn)

@@ -1,8 +1,8 @@
 from flask import jsonify
-from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask_restful import reqparse, Resource
 from ..services.login_service import (
-    admin_required, DeleteResult, pm_required
+    admin_required, DeleteResult, get_one_user_info, pm_required
 )
 from ..services.admin_service import (
     get_users_info, delete_user, init_user_limit, InitResult
@@ -43,5 +43,13 @@ class PMUsers(Resource):
         res=get_users_info(cur_user["project_no"])
         return jsonify(users_info=res)
 
-        
+class MyUsers(Resource):
+    @jwt_required()
+    def get(self):
+        cur_user = get_jwt_identity()
+        res = get_one_user_info(cur_user["user_id"])
+        if(res):
+            return {"msg":"Invalid user id"}, 404
+        return jsonify(user_info=res)
+
 

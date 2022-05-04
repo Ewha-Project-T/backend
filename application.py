@@ -26,11 +26,14 @@ jwt=JWTManager(app)
 
 CORS(app,expose_headers='Location')
 myApi=Api(app, errors=Flask.errorhandler)
+
+'''
 swagger = Swagger(
     app, 
     template_file=r"docs/template.yml",
     parse=False
 )
+'''
 
 @jwt.token_in_blocklist_loader
 def check_if_token_is_revoked(jwt_header, jwt_payload):

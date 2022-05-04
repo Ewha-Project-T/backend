@@ -37,7 +37,7 @@ def upload_script(script_type, proj_no, file_name):
     db.session.commit
     return UploadResult.SUCCESS
 
-def download_auth_check(proj_no, file_name):
+def download_auth_check(file_name):
     file = Script.query.filter_by(script_name=file_name).first()
     if(file!=None):
         return DownloadAuthResult.SUCCESS

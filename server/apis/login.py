@@ -1,6 +1,5 @@
 from flask import jsonify
 from flask_restful import reqparse, Resource
-from flasgger import swag_from
 from flask_jwt_extended import (
     jwt_required, get_jwt_identity, create_access_token, get_jwt
 )
@@ -14,13 +13,11 @@ from ..services.admin_service import patch_user, UserChangeResult
 jwt_blocklist = set()
 
 class Login(Resource):
-    @swag_from("../../docs/login/get.yml")
     @jwt_required()
     def get(self):
         current_user = get_jwt_identity()
         return jsonify(user_account=current_user)
 
-    @swag_from("../../docs/login/post.yml")
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('id', type=str, required=True, help="ID is required")
@@ -48,7 +45,6 @@ class Login(Resource):
         else:
             return {"msg":"Bad username or password"}, 400
 
-    @swag_from("../../docs/login/put.yml")
     @jwt_required()
     def put(self):
         parser = reqparse.RequestParser()
@@ -119,7 +115,6 @@ class Login(Resource):
         return jsonify(msg="Access token revoked")
 
 class Account(Resource):
-    @swag_from("../../docs/Account/delete.yml")
     @jwt_required()
     def delete(self):
         current_user=get_jwt_identity()

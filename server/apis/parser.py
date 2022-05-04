@@ -1,10 +1,8 @@
 from flask_restful import reqparse, Resource
-from flasgger import swag_from
 from ..services.xml_parser import parse_xml
 
 
 class XML_Parser(Resource):
-    @swag_from("../../docs/parser/post.yml")
     #@jwt_required()
     def post(self):
         parser = reqparse.RequestParser()

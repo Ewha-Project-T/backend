@@ -1,6 +1,6 @@
 #!/bin/bash
-XML_DIR = "uploads"
-SCRIPT_DIR = "script_files"
+XML_DIR="uploads"
+SCRIPT_DIR="script_files"
 if [ ! -e $XML_DIR ]; then
         mkdir uploads
 fi

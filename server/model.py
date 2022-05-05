@@ -5,7 +5,7 @@ import hashlib
 import base64
 
 class User(db.Model):
-    __tablename__ = "user"
+    __tablename__ = "USER"
 
     user_no = db.Column(db.Integer,primary_key=True)
     id = db.Column(db.String(20), unique=True, nullable=False)
@@ -31,14 +31,14 @@ class User(db.Model):
     #    return self.password
     
 class Project(db.Model):
-    __tablename__ = "project"
+    __tablename__ = "PROJECT"
     project_no = db.Column(db.Integer, primary_key=True)
     project_name = db.Column(db.String(50), nullable=False)
     start_date = db.Column(db.DateTime,nullable=False)
     end_date = db.Column(db.DateTime,nullable=False)
 
 class Script(db.Model):
-    __tablename__ = "script"
+    __tablename__ = "SCRIPT"
 
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String(10), nullable=False)
@@ -46,7 +46,7 @@ class Script(db.Model):
     script_name = db.Column(db.String(50), unique=True, nullable=False)
 
 class Analysis(db.Model):
-    __tablename__ = "analysis"
+    __tablename__ = "ANALYSIS"
     
     xml_no = db.Column(db.Integer, primary_key=True)
     upload_time = db.Column(db.DateTime, nullable=False)
@@ -58,7 +58,7 @@ class Analysis(db.Model):
     host_no = db.Column(db.Integer, db.ForeignKey("host_info.no"), nullable=False)
 
 class HostInfo(db.Model):
-    __tablename__ = "host_info"
+    __tablename__ = "HOST_INFO"
 
     no = db.Column(db.Integer, primary_key=True)
     project_no = db.Column(db.Integer, db.ForeignKey("project.project_no"), nullable=False)
@@ -69,7 +69,7 @@ class HostInfo(db.Model):
     ip = db.Column(db.String(50), nullable=False)
 
 class Code(db.Model):
-    __tablename__="code"
+    __tablename__="CODE"
     
     code_no = db.Column(db.Integer,primary_key=True)
     os = db.Column(db.String(20), nullable=True)
@@ -78,7 +78,7 @@ class Code(db.Model):
 
 
 class Comment(db.Model):
-    __tablename__="comment"
+    __tablename__="COMMENT"
     comment_no = db.Column(db.Integer, primary_key=True)
     xml_no = db.Column(db.Integer, db.ForeignKey("analysis.xml_no"), nullable=False)
     title_code = db.Column(db.String(10), nullable=False)

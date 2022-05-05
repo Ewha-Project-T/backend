@@ -14,7 +14,7 @@ class User(db.Model):
     name = db.Column(db.String(100), unique=True, nullable=False)
     email = db.Column(db.String(50), unique=True, nullable=False)
     login_fail_limit = db.Column(db.Integer, default=0)
-    project_no = db.Column(db.Integer, db.ForeignKey("project.project_no"), nullable=False)
+    project_no = db.Column(db.Integer, db.ForeignKey("PROJECT.project_no"), nullable=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -42,7 +42,7 @@ class Script(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String(10), nullable=False)
-    project_no = db.Column(db.Integer, db.ForeignKey("project.project_no"), nullable=False)
+    project_no = db.Column(db.Integer, db.ForeignKey("PROJECT.project_no"), nullable=False)
     script_name = db.Column(db.String(50), unique=True, nullable=False)
 
 class Analysis(db.Model):
@@ -50,18 +50,18 @@ class Analysis(db.Model):
     
     xml_no = db.Column(db.Integer, primary_key=True)
     upload_time = db.Column(db.DateTime, nullable=False)
-    project_no = db.Column(db.Integer, db.ForeignKey("project.project_no"), nullable=False)
-    user_no = db.Column(db.Integer, db.ForeignKey("user.user_no"), nullable=False)
+    project_no = db.Column(db.Integer, db.ForeignKey("PROJECT.project_no"), nullable=False)
+    user_no = db.Column(db.Integer, db.ForeignKey("USER.user_no"), nullable=False)
     path = db.Column(db.String(100), nullable=False, unique=True)
     safe = db.Column(db.Integer, nullable=True)
     vuln = db.Column(db.Integer, nullable=True)
-    host_no = db.Column(db.Integer, db.ForeignKey("host_info.no"), nullable=False)
+    host_no = db.Column(db.Integer, db.ForeignKey("HOST_INFO.no"), nullable=False)
 
 class HostInfo(db.Model):
     __tablename__ = "HOST_INFO"
 
     no = db.Column(db.Integer, primary_key=True)
-    project_no = db.Column(db.Integer, db.ForeignKey("project.project_no"), nullable=False)
+    project_no = db.Column(db.Integer, db.ForeignKey("PROJECT.project_no"), nullable=False)
     host_name = db.Column(db.String(100), nullable=True)
     analysis_count = db.Column(db.Integer, default=0)
     timestamp = db.Column(db.DateTime, nullable=True)
@@ -80,7 +80,7 @@ class Code(db.Model):
 class Comment(db.Model):
     __tablename__="COMMENT"
     comment_no = db.Column(db.Integer, primary_key=True)
-    xml_no = db.Column(db.Integer, db.ForeignKey("analysis.xml_no"), nullable=False)
+    xml_no = db.Column(db.Integer, db.ForeignKey("ANALYSIS.xml_no"), nullable=False)
     title_code = db.Column(db.String(10), nullable=False)
     old_vuln = db.Column(db.String(20), nullable=True)
     new_vuln = db.Column(db.String(20), nullable=False)
@@ -91,7 +91,7 @@ class Comment(db.Model):
 class PROJECT_SCRIPT(db.Model):
     __tablename__ = "PROJECT_SCRIPTS_TB"
     no = db.Column(db.Integer,primary_key=True)
-    project_no = db.Column(db.Integer, db.ForeignKey("project.project_no"), nullable=False)
-    script_name = db.Column(db.String(100), db.ForeignKey("script.script_name"), nullable=False)
+    project_no = db.Column(db.Integer, db.ForeignKey("PROJECT.project_no"), nullable=False)
+    script_name = db.Column(db.String(100), db.ForeignKey("SCRIPT.script_name"), nullable=False)
     type = db.Column(db.String(10))
-    script_no = db.Column(db.Integer, db.ForeignKey("script.id"), nullable=False)
+    script_no = db.Column(db.Integer, db.ForeignKey("SCRIPT.id"), nullable=False)

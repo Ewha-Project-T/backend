@@ -9,6 +9,7 @@ from server.apis.login import jwt_blocklist
 from server import db
 import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
+from os import environ as env
 
 app=Flask(__name__)
 app.config['SWAGGER'] = {
@@ -30,7 +31,7 @@ sentry_sdk.init(
 app.config['SECRET_KEY'] = 'Shadow-Hunter-nerf-plz'#추후 랜덤문자열로 바꿀것 ㅎㅎ;
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
 app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=1)
-app.config['SQLALCHEMY_DATABASE_URI'] = ""#mysql+pymysql://id:pw@ip:port/dbname
+app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{env['SQL_USER']}:{env['SQL_PASSWORD']}@{env['SQL_HOST']}:{env['SQL_PORT']}/{env['SQL_DATABASE']}"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True 
 db.init_app(app)

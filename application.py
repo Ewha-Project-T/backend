@@ -15,10 +15,10 @@ app.config['SWAGGER'] = {
 }
 
 
-app.config['SECRET_KEY'] = 'CAT-Security-King-God'
+app.config['SECRET_KEY'] = 'Shadow-Hunter-nerf-plz'#추후 랜덤문자열로 바꿀것 ㅎㅎ;
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
 app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=1)
-app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://cert:cert@203.229.206.16:12344/cert"
+app.config['SQLALCHEMY_DATABASE_URI'] = ""#mysql+pymysql://id:pw@ip:port/dbname
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True 
 db.init_app(app)
@@ -43,7 +43,7 @@ def check_if_token_is_revoked(jwt_header, jwt_payload):
     
 @app.route("/", methods=['GET'])
 def hello():
-    return "CAT-Secuirty"
+    return "MoKoKo"#서버대기
 
 load_api(myApi)
 app.run(host='0.0.0.0', port = 5000)

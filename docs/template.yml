@@ -1,7 +1,7 @@
 swagger: "2.0"
 info:
   title: "API 문서"
-  description: "EastSunSecurity 백엔드 API 문서"
+  description: "ewha 백엔드 API 문서"
   version: "1.0"
 
 definitions:

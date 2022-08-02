@@ -25,6 +25,14 @@ class User(db.Model):
         salt = os.urandom(32)
         encrypt_passwd = base64.b64encode(salt + hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 100000, dklen=128))
         return encrypt_passwd
+
+
+class Project(db.Model):
+    __tablename__ = "PROJECT"
+    project_no = db.Column(db.Integer, primary_key=True)
+    project_name = db.Column(db.String(50), nullable=False)
+    start_date = db.Column(db.DateTime,nullable=False)
+    end_date = db.Column(db.DateTime,nullable=False)
     
 
 

@@ -7,13 +7,25 @@ from datetime import timedelta
 from server.apis import load_api
 from server.apis.login import jwt_blocklist
 from server import db
+import sentry_sdk
+from sentry_sdk.integrations.flask import FlaskIntegration
 
 app=Flask(__name__)
 app.config['SWAGGER'] = {
     'title': 'API Docs',
     'doc_dir': './docs/'
 }
+sentry_sdk.init(
+    dsn="https://c3e83b00ef6843adb8d442a9e438c34d@o1343525.ingest.sentry.io/6618334",#개인에게 할당된 sentry넣기
+    integrations=[
+        FlaskIntegration(),
+    ],
 
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for performance monitoring.
+    # We recommend adjusting this value in production.
+    traces_sample_rate=1.0
+)
 
 app.config['SECRET_KEY'] = 'Shadow-Hunter-nerf-plz'#추후 랜덤문자열로 바꿀것 ㅎㅎ;
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
@@ -27,13 +39,13 @@ jwt=JWTManager(app)
 CORS(app,expose_headers='Location')
 myApi=Api(app, errors=Flask.errorhandler)
 
-'''
+
 swagger = Swagger(
     app, 
     template_file=r"docs/template.yml",
     parse=False
 )
-'''
+
 
 @jwt.token_in_blocklist_loader
 def check_if_token_is_revoked(jwt_header, jwt_payload):
@@ -41,9 +53,10 @@ def check_if_token_is_revoked(jwt_header, jwt_payload):
     token_in_redis = jti in jwt_blocklist
     return token_in_redis
     
+
 @app.route("/", methods=['GET'])
 def hello():
-    return "MoKoKo"#서버대기
+    return "MokoKo"
 
 load_api(myApi)
 app.run(host='0.0.0.0', port = 5000)

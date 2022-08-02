@@ -2,7 +2,7 @@ from flask import jsonify
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask_restful import reqparse, Resource
 from ..services.login_service import (
-    admin_required, DeleteResult, get_one_user_info, pm_required
+    admin_required, DeleteResult, get_one_user_info,professor_required, assistant_required
 )
 from ..services.admin_service import (
     get_users_info, delete_user, init_user_limit, InitResult
@@ -16,8 +16,8 @@ class Users(Resource):
         res=get_users_info()
         return jsonify(users_info=res)
         
-    @pm_required()
-    def post(self):
+    @professor_required()
+    def post(self):#학생 비번틀림 5회 초기화
         parser = reqparse.RequestParser()
         parser.add_argument('user_no', type=str, required=True, help="user_no is required")
         args = parser.parse_args()
@@ -37,7 +37,7 @@ class Users(Resource):
             return {"msg": "INVALID User No"}, 400
 
 class PMUsers(Resource):
-    @pm_required()
+    @professor_required()
     def get(self):
         cur_user = get_jwt_identity()
         res=get_users_info(cur_user["project_no"])

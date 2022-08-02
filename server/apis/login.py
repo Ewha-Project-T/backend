@@ -6,13 +6,13 @@ from flask_jwt_extended import (
 import re
 from ..services.login_service import (
     login, register, delete, LoginResult, RegisterResult, create_tokens, 
-    DeleteResult, change, ChangeResult, admin_required, pm_required
+    DeleteResult, change, ChangeResult, admin_required, professor_required, assistant_required
 )
 from ..services.admin_service import patch_user, UserChangeResult
 
 jwt_blocklist = set()
 
-class Login(Resource):
+class Login(Resource): #로그인
     @jwt_required()
     def get(self):
         current_user = get_jwt_identity()
@@ -46,7 +46,7 @@ class Login(Resource):
             return {"msg":"Bad username or password"}, 400
 
     @jwt_required()
-    def put(self):
+    def put(self):#회원가입
         parser = reqparse.RequestParser()
         parser.add_argument('id', type=str, required=True, help="ID is required")
         parser.add_argument('pw', type=str, required=True, help="PW is required")
@@ -81,7 +81,7 @@ class Login(Resource):
             return {"msg": "Invalid Email"}, 400
 
     @jwt_required()
-    def patch(self):
+    def patch(self):#회원수정
         parser = reqparse.RequestParser()
         parser.add_argument('old_pw', type=str)
         parser.add_argument('new_pw', type=str)
@@ -109,14 +109,14 @@ class Login(Resource):
             return {'msg':'Internal Error'}, 400
 
     @jwt_required()
-    def delete(self):
+    def delete(self):#로그아웃
         jti = get_jwt()["jti"]
         jwt_blocklist.add(jti)
         return jsonify(msg="Access token revoked")
 
 class Account(Resource):
     @jwt_required()
-    def delete(self):
+    def delete(self):#계정삭제
         current_user=get_jwt_identity()
         result=delete(current_user["user_id"])
         if(result==DeleteResult.SUCCESS):
@@ -124,7 +124,7 @@ class Account(Resource):
         else:
             return{"msg": "invalid user id"},400
 
-class LoginRefresh(Resource):
+class LoginRefresh(Resource):#리프래쉬 토큰
     @jwt_required(refresh=True)
     def get(self):
         current_user = get_jwt_identity()
@@ -133,13 +133,13 @@ class LoginRefresh(Resource):
     
 class Admin(Resource):
     @admin_required()
-    def get(self):
+    def get(self):#관리자체크
         current_admin = get_jwt_identity()
         if(current_admin["user_perm"]==2):
             return {"msg":"admin authenticated"}, 200
         return {"msg": "you're not admin"}, 403
-    @pm_required()
-    def patch(self):
+    @admin_required()
+    def patch(self):#관리자가 계정생성
         cur_user = get_jwt_identity()
         parser = reqparse.RequestParser()
         parser.add_argument('user_no', type=int, required=True)

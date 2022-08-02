@@ -126,13 +126,13 @@ def get_one_user_info(user_id):
     tmp["user_project"] = my_proj.project_name
     return tmp
 
-def admin_required():
+def admin_required(): #관리자 권한
     def wrapper(fn):
         @wraps(fn)
         def decorator(*args, **kwargs):
             verify_jwt_in_request()
             claims = get_jwt()
-            if(claims["sub"]["user_perm"]==2):
+            if(claims["sub"]["user_perm"]==0):
                 return fn(*args, **kwargs)
             else:
                 return {"msg":"admin only"}, 403
@@ -141,16 +141,31 @@ def admin_required():
 
     return wrapper
 
-def pm_required():
+def professor_required():#교수권한
     def wrapper(fn):
         @wraps(fn)
         def decorator(*args, **kwargs):
             verify_jwt_in_request()
             claims = get_jwt()
-            if(claims["sub"]["user_perm"]>=1):
+            if(claims["sub"]["user_perm"]>=3 or claims["sub"]["user_perm"]==0):
                 return fn(*args, **kwargs)
             else:
-                return {"msg":"pm only"}, 403
+                return {"msg":"professor only"}, 403
+
+        return decorator
+
+    return wrapper
+
+def assistant_required():#조교권한
+    def wrapper(fn):
+        @wraps(fn)
+        def decorator(*args, **kwargs):
+            verify_jwt_in_request()
+            claims = get_jwt()
+            if(claims["sub"]["user_perm"]>=2 or claims["sub"]["user_perm"]==0):
+                return fn(*args, **kwargs)
+            else:
+                return {"msg":"assistant only"}, 403
 
         return decorator
 

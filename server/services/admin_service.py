@@ -1,5 +1,5 @@
 from .login_service import DeleteResult
-from ..model import User,Script, PROJECT_SCRIPT
+from ..model import User
 from server import db
 import hashlib
 import base64

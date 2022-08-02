@@ -28,6 +28,5 @@ root
 
 자세한 구현 방법은 코드 참조 및 [Flasgger](https://github.com/flasgger/flasgger)
 
-## 추가 문의
 
-이한 or 이승형으로 카톡
+

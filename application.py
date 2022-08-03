@@ -16,6 +16,7 @@ app.config['SWAGGER'] = {
     'title': 'API Docs',
     'doc_dir': './docs/'
 }
+"""
 sentry_sdk.init(
     dsn="https://c3e83b00ef6843adb8d442a9e438c34d@o1343525.ingest.sentry.io/6618334",#개인에게 할당된 sentry넣기
     integrations=[
@@ -27,6 +28,7 @@ sentry_sdk.init(
     # We recommend adjusting this value in production.
     traces_sample_rate=1.0
 )
+"""
 
 app.config['SECRET_KEY'] = 'Shadow-Hunter-nerf-plz'#추후 랜덤문자열로 바꿀것 ㅎㅎ;
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)

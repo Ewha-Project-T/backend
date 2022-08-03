@@ -1,4 +1,4 @@
-from ..model import User, Project
+from ..model import User, Lecture
 from server import db
 from functools import wraps
 from flask_jwt_extended import create_refresh_token, create_access_token, verify_jwt_in_request, get_jwt, get_jwt_identity
@@ -34,8 +34,8 @@ class ChangeResult:
     INVALID_NAME = 4
     DUPLICATED_EMAIL = 5
 
-def login(user_id, user_pw):
-    acc = User.query.filter_by(id=user_id).first()
+def login(user_email, user_pw):
+    acc = User.query.filter_by(email=user_email).first()
     if(acc == None):
         return LoginResult.ACC_IS_NOT_FOUND, acc
     passwd = base64.b64decode(acc.password)

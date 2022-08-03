@@ -8,13 +8,12 @@ class User(db.Model):
     __tablename__ = "USER"
 
     user_no = db.Column(db.Integer,primary_key=True)
-    id = db.Column(db.String(20), unique=True, nullable=False)
-    password = db.Column(db.String(250), unique=True, nullable=False)
-    permission = db.Column(db.Integer, default=0)
-    name = db.Column(db.String(100), unique=True, nullable=False)
     email = db.Column(db.String(50), unique=True, nullable=False)
+    password = db.Column(db.String(250), unique=True, nullable=False)
+    name = db.Column(db.String(100), unique=True, nullable=False)
+    permission = db.Column(db.Integer, default=0)
     login_fail_limit = db.Column(db.Integer, default=0)
-    project_no = db.Column(db.Integer, db.ForeignKey("PROJECT.project_no"), nullable=False)
+    lecture_no = db.Column(db.Integer, db.ForeignKey("Lecture.lecture_no"), nullable=True)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -27,12 +26,16 @@ class User(db.Model):
         return encrypt_passwd
 
 
-class Project(db.Model):
-    __tablename__ = "PROJECT"
-    project_no = db.Column(db.Integer, primary_key=True)
-    project_name = db.Column(db.String(50), nullable=False)
-    start_date = db.Column(db.DateTime,nullable=False)
-    end_date = db.Column(db.DateTime,nullable=False)
+class Lecture(db.Model):
+    __tablename__ = "LECTURE"
+    lecture_no = db.Column(db.Integer, primary_key=True)
+    lecture_name = db.Column(db.String(50), nullable=False)
+    year = db.Column(db.String(7), nullable=False)
+    semester = db.Column(db.String(10), nullable=False)
+    major = db.Column(db.String(50), nullable=False)
+    separated = db.Column(db.String(5), nullable=False)
+    boss = db.Column(db.String(50), nullable=False)
+    
     
 
 

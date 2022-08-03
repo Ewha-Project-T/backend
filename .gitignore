@@ -2,3 +2,4 @@
 serverENV
 serverENV/
 uploads/*
+.env

@@ -12,40 +12,42 @@ from ..services.admin_service import patch_user, UserChangeResult
 
 jwt_blocklist = set()
 
-class Login(Resource): #로그인
+class Login(Resource): 
     @jwt_required()
     def get(self):
         current_user = get_jwt_identity()
         return jsonify(user_account=current_user)
 
-    def post(self):
+    def post(self):#로그인
         parser = reqparse.RequestParser()
-        parser.add_argument('id', type=str, required=True, help="ID is required")
+        parser.add_argument('email', type=str, required=True, help="EMAIL is required")
         parser.add_argument('pw', type=str, required=True, help="PW is required")
         args = parser.parse_args()
-        user_id = args['id']
+        user_email = args['email']
         user_pw = args['pw']
-        result, account = login(user_id, user_pw)
-        if(result==LoginResult.ACC_IS_NOT_FOUND):
-            return {"msg":"User Not Found"}, 403
-        if(result==LoginResult.LOGIN_COUNT_EXCEEDED):
-            return {"msg":"login count exceeded"}, 403
-        if(result==LoginResult.SUCCESS):
-            access_token, refresh_token = create_tokens(account)
-            if(account.permission==2):
-                return {
-                    'access_token' : access_token,
-                    'refresh_token' : refresh_token
-                }, 201, {'location':'/adminpage'}
+        if re.match("^[A-Za-z0-9]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[A-Za-z0-9])*\.[A-Za-z]{2,3}$", user_email):
+            result, account = login(user_email, user_pw)
+            if(result==LoginResult.ACC_IS_NOT_FOUND):
+                return {"msg":"User Not Found"}, 403
+            if(result==LoginResult.LOGIN_COUNT_EXCEEDED):
+                return {"msg":"login count exceeded"}, 403
+            if(result==LoginResult.SUCCESS):
+                access_token, refresh_token = create_tokens(account)
+                if(account.permission==0):
+                    return {
+                        'access_token' : access_token,
+                        'refresh_token' : refresh_token
+                    }, 201, {'location':'/adminpage'}
+                else:
+                    return {
+                        'access_token' : access_token,
+                        'refresh_token': refresh_token
+                    }, 201, {'location':'/'}
             else:
-                return {
-                    'access_token' : access_token,
-                    'refresh_token': refresh_token
-                }, 201, {'location':'/'}
+                return {"msg":"Bad username or password"}, 400
         else:
-            return {"msg":"Bad username or password"}, 400
+            return {"msg": "Invalid Email"}, 400
 
-    @jwt_required()
     def put(self):#회원가입
         parser = reqparse.RequestParser()
         parser.add_argument('id', type=str, required=True, help="ID is required")

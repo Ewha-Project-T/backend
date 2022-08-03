@@ -4,7 +4,7 @@ tags:
   - Login APIs
 parameters:
   - in: body
-    name: user_id
+    name: user_email
     type: string
     required: True
   - in: body
@@ -14,5 +14,9 @@ parameters:
 responses:
   200:
     description: Login Success
+  400:
+    description: Invalid Email, Bad username or password
   401:
     description: User Not Found
+  403:
+    description: login count exceeded

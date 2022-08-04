@@ -16,6 +16,7 @@ app.config['SWAGGER'] = {
     'title': 'API Docs',
     'doc_dir': './docs/'
 }
+
 """
 sentry_sdk.init(
     dsn="https://c3e83b00ef6843adb8d442a9e438c34d@o1343525.ingest.sentry.io/6618334",#개인에게 할당된 sentry넣기

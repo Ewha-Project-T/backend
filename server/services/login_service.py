@@ -1,3 +1,4 @@
+import email
 from ..model import User, Lecture
 from server import db
 from functools import wraps
@@ -7,18 +8,16 @@ import base64
 
 class LoginResult:
     SUCCESS = 0
-    INVALID_IDPW = 1
+    INVALID_EMAILPW = 1
     LOGIN_COUNT_EXCEEDED=2
     ACC_IS_NOT_FOUND = 3
     INTERNAL_ERROR = 4
 
 class RegisterResult:
     SUCCESS = 0
-    INVALID_IDPW = 1
-    USERID_EXIST = 2
-    USEREMAIL_EXIST = 3
-    INVALID_PERM = 4
-    INVALID_PROJECT = 5
+    USEREMAIL_EXIST = 1
+    INVALID_PERM = 2
+
 
 class DeleteResult:
     SUCCESS = 0
@@ -49,33 +48,27 @@ def login(user_email, user_pw):
         return LoginResult.SUCCESS, acc
     acc.login_fail_limit+=1
     db.session.commit
-    return LoginResult.INVALID_IDPW, acc
+    return LoginResult.INVALID_EMAILPW, acc
 
 def create_tokens(user: User, **kwargs):
     identities = {
         "type": "login",
-        "user_id": user.id,
+        "user_email": user.email,
         "user_name": user.name,
+        "user_major": user.major,
         "user_perm": user.permission,
-        "project_no": user.project_no
     }
     return create_access_token(identities, **kwargs), create_refresh_token(identities, **kwargs)
 
-def register(user_id,user_pw,user_name,user_email, project_no, perm):
-    if(len(user_id)<4 or len(user_id)>20 or len(user_pw)<4 or len(user_pw)>20): #아이디 비번 글자수제한
-        return RegisterResult.INVALID_IDPW
-    acc = User.query.filter_by(id=user_id).first()
-    proj = Project.query.filter_by(project_no=project_no).first()
-    if(proj == None):
-        return RegisterResult.INVALID_PROJECT
-    if acc !=None:
-        return RegisterResult.USERID_EXIST
+def register(user_email,user_pw,user_name,user_major, user_perm): 
+    
+
     acc = User.query.filter_by(email=user_email).first()
     if acc !=None:
         return RegisterResult.USEREMAIL_EXIST
-    if(perm>2 or perm<0):
+    if(user_perm>3 or user_perm<0):
         return RegisterResult.INVALID_PERM
-    acc=User(id=user_id,password=user_pw,name=user_name,email=user_email,project_no=project_no,permission=perm)
+    acc=User(email=user_email,password=user_pw,name=user_name,major=user_major,permission=user_perm)
     db.session.add(acc)
     db.session.commit
     return RegisterResult.SUCCESS
@@ -118,7 +111,7 @@ def get_one_user_info(user_id):
     acc = User.query.filter_by(id=user_id).first()
     if(acc == None):
         return 1
-    my_proj = Project.query.filter_by(project_no=acc.project_no).first()
+    my_proj = Lecture.query.filter_by(project_no=acc.project_no).first()
     tmp={}
     tmp["user_id"] = acc.id
     tmp["user_name"] = acc.name

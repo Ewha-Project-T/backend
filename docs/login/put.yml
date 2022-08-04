@@ -4,19 +4,20 @@ tags:
   - Login APIs
 parameters:
   - in: body
-    name: user_id
-    type: string
-    required: true
-  - in: body
-    name: user_pw
-    type: string
-    required: true
-  - in: body
-    name: user_name
-    type: string
-    required: true
-  - in: email
     name: email
+    type: string
+    required: true
+  - in: body
+    name: pw
+    type: string
+    required: true
+  - in: body
+    name: pw2
+    type: string
+    required: true
+  - in: body
+    name: name
+    type: string
     required: true
 responses:
   200:

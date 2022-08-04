@@ -14,7 +14,7 @@ class User(db.Model):
     major = db.Column(db.String(50), unique=True, nullable=False)
     permission = db.Column(db.Integer, default=0)
     login_fail_limit = db.Column(db.Integer, default=0)
-    lecture_no = db.Column(db.Integer, db.ForeignKey("Lecture.lecture_no"), nullable=True)
+    lecture_no = db.Column(db.Integer, db.ForeignKey("LECTURE.lecture_no"), nullable=True)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

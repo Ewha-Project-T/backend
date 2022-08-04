@@ -1,3 +1,4 @@
+from server.model import Lecture
 from .login import Login, LoginRefresh, Account, Admin
 from .users import Users, PMUsers, MyUsers
 
@@ -10,4 +11,4 @@ def load_api(api_module):
     api_module.add_resource(PMUsers,'/pm-users', endpoint='pm_users')
     api_module.add_resource(Users,'/users/<user_no>',endpoint='users_del')
     api_module.add_resource(MyUsers,'/myinfo',endpoint='one_user_info')
-
+    api_module.add_resource(Lecture,'/lecture',endpoint='lecture')

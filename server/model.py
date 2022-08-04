@@ -14,7 +14,6 @@ class User(db.Model):
     major = db.Column(db.String(50), unique=True, nullable=False)
     permission = db.Column(db.Integer, default=0)
     login_fail_limit = db.Column(db.Integer, default=0)
-    lecture_no = db.Column(db.Integer, db.ForeignKey("Lecture.lecture_no"), nullable=True)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -36,6 +35,7 @@ class Lecture(db.Model):
     major = db.Column(db.String(50), nullable=False)
     separated = db.Column(db.String(5), nullable=False)
     boss = db.Column(db.String(50), nullable=False)
+    user_no = db.Column(db.Integer, db.ForeignKey("USER.user_no"), nullable=True)
     
     
 

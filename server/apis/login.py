@@ -50,40 +50,38 @@ class Login(Resource):
 
     def put(self):#회원가입
         parser = reqparse.RequestParser()
-        parser.add_argument('id', type=str, required=True, help="ID is required")
-        parser.add_argument('pw', type=str, required=True, help="PW is required")
-        parser.add_argument('name', type=str, required=True, help="name is required")
         parser.add_argument('email', type=str, required=True, help="Email is required")
-        parser.add_argument('pro_id', type=str, required=True, help="Project id is required")
+        parser.add_argument('pw', type=str, required=True, help="PW is required")
+        parser.add_argument('pw2', type=str, required=True, help="PW2 is required")
+        parser.add_argument('name', type=str, required=True, help="name is required")
+        parser.add_argument('major', type=str, required=True, help="major id is required")
         parser.add_argument('perm', type=int, required=True, help="Permission is required")
         args = parser.parse_args()
-        user_id = args['id']
-        user_pw = args['pw']
-        user_name=args['name']
         user_email = args['email']
-        user_project= args['pro_id']
+        user_pw = args['pw']
+        user_pw2 = args['pw2']
+        user_name=args['name']
+        user_major= args['major']
         user_perm = args['perm']
+        if(user_pw!=user_pw2):
+            return {"msg":"password mismatch"},400
+
         if re.match("^[A-Za-z0-9]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[A-Za-z0-9])*\.[A-Za-z]{2,3}$", user_email):
-            result=register(user_id,user_pw,user_name,user_email, user_project, user_perm)
+            result=register(user_email,user_pw,user_name,user_major, user_perm)
             if(result==RegisterResult.SUCCESS):
                 return{"msg" : "register success"},201
-            elif(result==RegisterResult.INVALID_IDPW):
-                return{"msg" : "invalid id or pw"},400
-            elif(result==RegisterResult.USERID_EXIST):
-                return{"msg" : "user id exist"},400
             elif(result==RegisterResult.USEREMAIL_EXIST):
                 return{"msg" : "user email exist"},400
             elif(result==RegisterResult.INVALID_PERM):
                 return {"msg" : "invalid permission"}, 400
-            elif(result==RegisterResult.INVALID_PROJECT):
-                return {"msg" : "invalid project"}, 400
             else:
                 return{"msg" : "bad parameters"},404
         else:
             return {"msg": "Invalid Email"}, 400
 
+
     @jwt_required()
-    def patch(self):#회원수정
+    def patch(self):#회원수정 쓸것같아서 일단킵
         parser = reqparse.RequestParser()
         parser.add_argument('old_pw', type=str)
         parser.add_argument('new_pw', type=str)
@@ -109,6 +107,7 @@ class Login(Resource):
             return {'msg':'Duplicated EMAIL'}, 400
         else:
             return {'msg':'Internal Error'}, 400
+
 
     @jwt_required()
     def delete(self):#로그아웃
@@ -137,7 +136,7 @@ class Admin(Resource):
     @admin_required()
     def get(self):#관리자체크
         current_admin = get_jwt_identity()
-        if(current_admin["user_perm"]==2):
+        if(current_admin["user_perm"]==0):
             return {"msg":"admin authenticated"}, 200
         return {"msg": "you're not admin"}, 403
     @admin_required()

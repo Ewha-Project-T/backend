@@ -15,6 +15,7 @@ class User(db.Model):
     permission = db.Column(db.Integer, default=0)
     login_fail_limit = db.Column(db.Integer, default=0)
 
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.password = self.encrypt_password(self.password) #DB생성시 pw 자동 암호화

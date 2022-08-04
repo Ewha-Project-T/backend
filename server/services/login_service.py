@@ -1,3 +1,4 @@
+import email
 from ..model import User, Lecture
 from server import db
 from functools import wraps

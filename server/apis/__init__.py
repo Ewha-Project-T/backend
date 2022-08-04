@@ -1,7 +1,7 @@
 from server.model import Lecture
 from .login import Login, LoginRefresh, Account, Admin
 from .users import Users, PMUsers, MyUsers
-
+from .lecture import Lecture
 def load_api(api_module):
     api_module.add_resource(Admin,'/admin',endpoint='admin')
     api_module.add_resource(Login,'/login',endpoint='login') # GET POST PUT PATCH DELETE

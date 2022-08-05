@@ -28,5 +28,8 @@ root
 
 자세한 구현 방법은 코드 참조 및 [Flasgger](https://github.com/flasgger/flasgger)
 
+swagger 보기:
+url/apidocs/#/경로로 이동
+
 
 

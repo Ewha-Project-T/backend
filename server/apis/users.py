@@ -28,28 +28,4 @@ class Users(Resource):
         else:
             return {"msg":"INVALID USER No"}, 400
 
-    @admin_required()
-    def delete(self,user_no):
-        result = delete_user(user_no)
-        if(result == DeleteResult.SUCCESS):
-            return {"msg": "Delete User SUCCESS"}, 200
-        else:
-            return {"msg": "INVALID User No"}, 400
-
-class PMUsers(Resource):
-    @professor_required()
-    def get(self):
-        cur_user = get_jwt_identity()
-        res=get_users_info(cur_user["project_no"])
-        return jsonify(users_info=res)
-
-class MyUsers(Resource):
-    @jwt_required()
-    def get(self):
-        cur_user = get_jwt_identity()
-        res = get_one_user_info(cur_user["user_id"])
-        if(res==1):
-            return {"msg":"Invalid user id"}, 404
-        return jsonify(user_info=res)
-
 

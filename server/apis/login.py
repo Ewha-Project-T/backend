@@ -81,35 +81,6 @@ class Login(Resource):
 
 
     @jwt_required()
-    def patch(self):#회원수정 쓸것같아서 일단킵
-        parser = reqparse.RequestParser()
-        parser.add_argument('old_pw', type=str)
-        parser.add_argument('new_pw', type=str)
-        parser.add_argument('email', type=str)
-        parser.add_argument('name', type=str)
-        args = parser.parse_args()
-        old_pw = args['old_pw']
-        new_pw = args['new_pw']
-        email = args['email']
-        name = args['name']
-        res = change(old_pw, new_pw, name, email)
-        if(res==ChangeResult.SUCCESS):
-            return {'msg':'success'},200
-        elif(res==ChangeResult.INCORRECT_PW):
-            return {'msg':'Incorrect old password'}, 400
-        elif(res==ChangeResult.INVALID_PW):
-            return {'msg':'Invalid password'}, 400
-        elif(res==ChangeResult.INVALID_EMAIL):
-            return {'msg':'Invalid email'}, 400
-        elif(res==ChangeResult.INVALID_NAME):
-            return {'msg':'Invalid name'}, 400
-        elif(res==ChangeResult.DUPLICATED_EMAIL):
-            return {'msg':'Duplicated EMAIL'}, 400
-        else:
-            return {'msg':'Internal Error'}, 400
-
-
-    @jwt_required()
     def delete(self):#로그아웃
         jti = get_jwt()["jti"]
         jwt_blocklist.add(jti)
@@ -139,39 +110,7 @@ class Admin(Resource):
         if(current_admin["user_perm"]==0):
             return {"msg":"admin authenticated"}, 200
         return {"msg": "you're not admin"}, 403
-    @admin_required()
-    def patch(self):#관리자가 계정생성
-        cur_user = get_jwt_identity()
-        parser = reqparse.RequestParser()
-        parser.add_argument('user_no', type=int, required=True)
-        parser.add_argument('new_pw', type=str)
-        if(cur_user["user_perm"] == 2):
-            parser.add_argument('new_id', type=str)
-            parser.add_argument('email', type=str)
-            parser.add_argument('name', type=str)
-        args = parser.parse_args()
-        user_no = args['user_no']
-        new_pw = args['new_pw']
-        if(cur_user["user_perm"] == 2):
-            new_id = args['new_id']
-            email = args['email']
-            name = args['name']
-        else:
-            new_id = None
-            email = None
-            name = None
-        result = patch_user(user_no,new_id,new_pw,email,name)
-        if(result == UserChangeResult.DUPLICATED_EMAIL):
-            return {"msg":"duplicated email"}, 403
-        elif(result == UserChangeResult.DUPLICATED_ID):
-            return {"msg":"duplicated id"}, 403
-        elif(result == UserChangeResult.INVALID_USER):
-            return {"msg": "Invalid User"}, 403
-        else:
-            return {"msg":"success"}, 200
-
-
-
+    
 
 
 

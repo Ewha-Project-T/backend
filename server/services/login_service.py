@@ -19,20 +19,6 @@ class RegisterResult:
     INVALID_PERM = 2
 
 
-class DeleteResult:
-    SUCCESS = 0
-    INVALID_ID = 1
-    PW_NOT_MATCHED = 2
-    INVALID_EMAIL = 3
-    
-class ChangeResult:
-    SUCCESS = 0
-    INVALID_PW = 1
-    INCORRECT_PW = 2
-    INVALID_EMAIL = 3
-    INVALID_NAME = 4
-    DUPLICATED_EMAIL = 5
-
 def login(user_email, user_pw):
     acc = User.query.filter_by(email=user_email).first()
     if(acc == None):
@@ -74,51 +60,6 @@ def register(user_email,user_pw,user_name,user_major, user_perm):
     db.session.commit
     return RegisterResult.SUCCESS
 
-
-def delete(user_id):
-    acc = User.query.filter_by(id=user_id).first()
-    if(acc==None):
-        return DeleteResult.INVALID_ID
-    db.session.delete(acc)
-    db.session.commit
-    return DeleteResult.SUCCESS
-
-def change(old_pw, new_pw, new_name, new_email):
-    userinfo = get_jwt_identity()
-    if(userinfo==None):
-        raise Exception("Not Logged In")
-    email_check = User.query.filter_by(email=new_email).first()
-    if(email_check != None):
-        if(userinfo["user_id"] != email_check.id):
-            return ChangeResult.DUPLICATED_EMAIL
-    acc = User.query.filter_by(id=userinfo["user_id"]).first()
-    if(old_pw != None and new_pw != None):
-        password = base64.b64decode(acc.password)
-        salt = password[:32]
-        old_pw = hashlib.pbkdf2_hmac('sha256', old_pw.encode('utf-8'), salt, 100000, dklen=128)
-        if(old_pw != password[32:]):
-            return ChangeResult.INCORRECT_PW
-        new_pw = base64.b64encode(salt + hashlib.pbkdf2_hmac('sha256', new_pw.encode('utf-8'), salt, 100000, dklen=128))
-        acc.password = new_pw
-    if(new_name != None):
-        acc.name = new_name
-    if(new_email != None):
-        acc.email = new_email
-    db.session.add(acc)
-    db.session.commit()
-    return ChangeResult.SUCCESS
-
-def get_one_user_info(user_id):
-    acc = User.query.filter_by(id=user_id).first()
-    if(acc == None):
-        return 1
-    my_proj = Lecture.query.filter_by(project_no=acc.project_no).first()
-    tmp={}
-    tmp["user_id"] = acc.id
-    tmp["user_name"] = acc.name
-    tmp["user_email"] = acc.email
-    tmp["user_project"] = my_proj.project_name
-    return tmp
 
 def admin_required(): #관리자 권한
     def wrapper(fn):

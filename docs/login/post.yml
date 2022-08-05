@@ -1,7 +1,7 @@
-Login with Account
+로그인
 ---
 tags:
-  - Login APIs
+  - 로그인관련
 parameters:
   - in: body
     name: user_email
@@ -19,4 +19,4 @@ responses:
   401:
     description: User Not Found
   403:
-    description: login count exceeded
+    description: login count exceeded, you need admin check

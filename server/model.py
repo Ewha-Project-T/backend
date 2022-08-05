@@ -12,9 +12,9 @@ class User(db.Model):
     password = db.Column(db.String(250), unique=True, nullable=False)
     name = db.Column(db.String(100), unique=True, nullable=False)
     major = db.Column(db.String(50), unique=True, nullable=False)
-    permission = db.Column(db.Integer, default=0)
+    permission = db.Column(db.Integer, default=1)
     login_fail_limit = db.Column(db.Integer, default=0)
-
+    access_check = db.Column(db.Integer, default=0)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -36,8 +36,24 @@ class Lecture(db.Model):
     major = db.Column(db.String(50), nullable=False)
     separated = db.Column(db.String(5), nullable=False)
     boss = db.Column(db.String(50), nullable=False)
+
+class Member(db.Model):
+    __tablename__="MEMBER"
+    member_no = db.Column(db.Integer, primary_key=True)
     user_no = db.Column(db.Integer, db.ForeignKey("USER.user_no"), nullable=True)
+    lecture_no = db.Column(db.Integer, db.ForeignKey("LECTURE.lecture_no"), nullable=True)
+    permission = db.Column(db.Integer, default=1)
+
+class Homework(db.Model):
+    __tablename__="HOMEWORK"
+    homework_no = db.Column(db.Integer, primary_key=True)
+    lecture_no = db.Column(db.Integer, db.ForeignKey("LECTURE.lecture_no"), nullable=True)
     
-    
+
+class Homework_check(db.Model):
+    check_no = db.Column(db.Integer, primary_key=True)
+    homework_no = db.Column(db.Integer, db.ForeignKey("HOMEWORK.homework_no"), nullable=True)
+    member_no = db.Column(db.Integer, db.ForeignKey("MEMBER.member_no"), nullable=True)
+    homework_check = db.Column(db.Integer, default=0)
 
 

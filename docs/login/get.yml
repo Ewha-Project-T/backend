@@ -1,7 +1,0 @@
-Login GET
----
-tags:
-  - Login APIs
-responses:
-  200:
-    description: Login Success

@@ -1,0 +1,7 @@
+로그아웃
+---
+tags:
+  - 로그인관련
+responses:
+  200:
+    description: DELETE Success

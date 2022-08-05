@@ -12,7 +12,7 @@ from ..services.login_service import (
 
 class Lecture(Resource):
     @jwt_required()
-    def get(self):#교수 목록조회
+    def get(self):#바뀐db구조로 바꿔야됨
         current_user = get_jwt_identity()
         lecture_list = lecture_listing(current_user["user_no"])
         return jsonify(lecture_list=lecture_list)

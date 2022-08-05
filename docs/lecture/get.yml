@@ -1,0 +1,7 @@
+강의조회
+---
+tags:
+  - 강의
+responses:
+  200:
+    description: lecture list

@@ -1,0 +1,9 @@
+관리자 승인이 필요한 유저조회
+---
+tags:
+  - 관리자기능
+responses:
+  200:
+    description: Success
+  404:
+    description: user not Found

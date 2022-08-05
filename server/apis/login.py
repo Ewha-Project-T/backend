@@ -5,10 +5,8 @@ from flask_jwt_extended import (
 )
 import re
 from ..services.login_service import (
-    login, register, delete, LoginResult, RegisterResult, create_tokens, 
-    DeleteResult, change, ChangeResult, admin_required, professor_required, assistant_required
+    login, register, LoginResult, RegisterResult, create_tokens, admin_required, professor_required, assistant_required
 )
-from ..services.admin_service import patch_user, UserChangeResult
 
 jwt_blocklist = set()
 
@@ -29,6 +27,8 @@ class Login(Resource):
             result, account = login(user_email, user_pw)
             if(result==LoginResult.ACC_IS_NOT_FOUND):
                 return {"msg":"User Not Found"}, 403
+            if(result==LoginResult.NEED_ADMIN_CHECK):
+                return {"msg":"you need Admin check"},403
             if(result==LoginResult.LOGIN_COUNT_EXCEEDED):
                 return {"msg":"login count exceeded"}, 403
             if(result==LoginResult.SUCCESS):
@@ -86,15 +86,6 @@ class Login(Resource):
         jwt_blocklist.add(jti)
         return jsonify(msg="Access token revoked")
 
-class Account(Resource):
-    @jwt_required()
-    def delete(self):#계정삭제
-        current_user=get_jwt_identity()
-        result=delete(current_user["user_id"])
-        if(result==DeleteResult.SUCCESS):
-            return{"msg":"success"},200
-        else:
-            return{"msg": "invalid user id"},400
 
 class LoginRefresh(Resource):#리프래쉬 토큰
     @jwt_required(refresh=True)
@@ -102,14 +93,6 @@ class LoginRefresh(Resource):#리프래쉬 토큰
         current_user = get_jwt_identity()
         new_access_token = create_access_token(identity=current_user, fresh=False)
         return {"access_token": new_access_token}, 200
-    
-class Admin(Resource):
-    @admin_required()
-    def get(self):#관리자체크
-        current_admin = get_jwt_identity()
-        if(current_admin["user_perm"]==0):
-            return {"msg":"admin authenticated"}, 200
-        return {"msg": "you're not admin"}, 403
     
 
 

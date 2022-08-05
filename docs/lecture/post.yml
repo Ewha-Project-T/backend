@@ -1,0 +1,32 @@
+강의만들기
+---
+tags:
+  - 강의
+parameters:
+  - in: body
+    name: name
+    type: string
+    required: True
+  - in: body
+    name: year
+    type: string
+    required: True
+  - in: body
+    name: semester
+    type: string
+    required: True
+  - in: body
+    name: major
+    type: string
+    required: True
+  - in: body
+    name: separated
+    type: string
+    required: True 
+  - in: body
+    name: boss
+    type: string
+    required: True   
+responses:
+  201:
+    description: lecture Success

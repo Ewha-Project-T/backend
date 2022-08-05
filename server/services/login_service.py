@@ -11,8 +11,9 @@ class LoginResult:
     INVALID_EMAILPW = 1
     LOGIN_COUNT_EXCEEDED=2
     ACC_IS_NOT_FOUND = 3
-    INTERNAL_ERROR = 4
-
+    NEED_ADMIN_CHECK = 4
+    INTERNAL_ERROR = 5
+    
 class RegisterResult:
     SUCCESS = 0
     USEREMAIL_EXIST = 1
@@ -23,6 +24,8 @@ def login(user_email, user_pw):
     acc = User.query.filter_by(email=user_email).first()
     if(acc == None):
         return LoginResult.ACC_IS_NOT_FOUND, acc
+    if(acc.access_check==0):
+        return LoginResult.NEED_ADMIN_CHECK, acc
     passwd = base64.b64decode(acc.password)
     salt = passwd[:32]
     encrypt_pw = hashlib.pbkdf2_hmac('sha256', user_pw.encode('utf-8'), salt, 100000, dklen=128)

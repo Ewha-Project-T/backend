@@ -31,7 +31,7 @@ class Stt(Resource):
             return { "msg": "user stt is not exists" },404
 
         return jsonify(
-            simultaneous_stt(f"{os.getenv['UPLOAD_PATH']}/{file}.wav")
+            simultaneous_stt(f"{os.environ['UPLOAD_PATH']}/{file}.wav")
         )
 
     @jwt_required

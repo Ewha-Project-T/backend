@@ -1,0 +1,31 @@
+번역하기
+---
+tags:
+  - stt
+parameters:
+  - in: body
+    name: homework
+    type: string
+    required: True
+  - in: body
+    name: file
+    type: uuid4
+    required: True 
+responses:
+  200:
+    description: stt output result
+    content:
+      application/json:
+        scheme:
+          type: object
+          properties:
+            textFile:
+              type: string
+              description: stt output text
+            annotations:
+              type: object
+              description: filler, backtracking, slience offset
+            timestamps:
+              type: object
+              description: speech part timestamps
+      

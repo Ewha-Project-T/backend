@@ -5,8 +5,8 @@ from flask_jwt_extended import create_refresh_token, create_access_token, verify
 
 
 
-def lecture_listing(user_no):
-    lecture_list=Lecture.query.filter_by(user_no=user_no).all()
+def lecture_listing():
+    lecture_list=Lecture.query.all()
     lecture_list_result=[]
     for lec in lecture_list:
         tmp={}
@@ -21,7 +21,22 @@ def lecture_listing(user_no):
     return lecture_list_result
 
 def make_lecture(name,year,semester,major,separated,professor):
-    userinfo = get_jwt_identity()
-    acc=Lecture(lecture_name=name,year=year,semester=semester,major=major,separated=separated,professor=professor,user_no=userinfo["user_no"])
+    acc=Lecture(lecture_name=name,year=year,semester=semester,major=major,separated=separated,professor=professor)
     db.session.add(acc)
+    db.session.commit
+
+def modify_lecture(no,name,year,semester,major,separated,professor):
+    acc=Lecture.query.filter_by(lecture_no=no).first()
+    acc.name=name
+    acc.year=year
+    acc.semester=semester
+    acc.major=major
+    acc.separated=separated
+    acc.professor=professor
+    db.session.add(acc)
+    db.session.commit()
+
+def delete_lecture(lecture_no):
+    acc = Lecture.query.filter_by(lecture_no=lecture_no).first()
+    db.session.delete(acc)
     db.session.commit

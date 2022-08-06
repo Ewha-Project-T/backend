@@ -5,6 +5,7 @@ import os
 from flask import jsonify
 from flask_restful import reqparse, Resource
 from flask_jwt_extended import jwt_required
+import werkzeug
 
 from ..services.stt_service import simultaneous_stt, get_userfile, is_stt_userfile, mapping_sst_user, remove_userfile
  
@@ -21,6 +22,7 @@ class Stt(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('assignment', type=int, required=True, help="assignment is required")
         parser.add_argument('file', type=uuid.UUID, required=True, help="file is required")
+
         args = parser.parse_args()
         assignment = args['assignment']
         file = args['file']
@@ -29,7 +31,7 @@ class Stt(Resource):
             return { "msg": "user stt is not exists" },404
 
         return jsonify(
-            simultaneous_stt(f"{os.getenv['UPLOAD_PATH']}/{file}.wav")
+            simultaneous_stt(f"{os.environ['UPLOAD_PATH']}/{file}.wav")
         )
 
     @jwt_required
@@ -38,19 +40,13 @@ class Stt(Resource):
         filename = f"{file}.wav"
         parser = reqparse.RequestParser()
         parser.add_argument('assignment', type=int, required=True, help="assignment is required")
-        parser.add_argument("wav", type=str, required=True, help="wav is required")
+        parser.add_argument("wav", type=werkzeug.datastructures.FileStorage, location="files", required=True, help="wav is required")
+        
         args = parser.parse_args()
         assignment = args['assignment']
         wav = args['wav']
-        wavbin = None
-        try:
-            wavbin = base64.b64decode(wav)
-        except:
-            return { "msg": "Invalid wav file" },400
-
-        with open(f"{os.getenv('UPLOAD_PATH')}/{filename}", "wb") as f:
-            f.write(wavbin)
-
+        
+        wav.save(f"{os.environ['UPLOAD_PATH']}/{filename}")
         mapping_sst_user(assignment, file)
         return jsonify(file=file)
 
@@ -59,6 +55,7 @@ class Stt(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('assignment', type=int, required=True, help="assignment is required")
         parser.add_argument('file', type=uuid.UUID, required=True, help="file is required")
+        
         args = parser.parse_args()
         assignment = args['assignment']
         file = args['file']

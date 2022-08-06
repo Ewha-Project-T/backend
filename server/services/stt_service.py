@@ -8,7 +8,7 @@ from nltk.tokenize import sent_tokenize
 from pydub import AudioSegment, silence
 
 from server import db
-from app.server.model import Stt
+from ..model import Stt
 
 def simultaneous_stt(filename):
     myaudio = AudioSegment.from_file(filename)  # 경로 변경 필요

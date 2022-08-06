@@ -51,8 +51,6 @@ def create_tokens(user: User, **kwargs):
     return create_access_token(identities, **kwargs), create_refresh_token(identities, **kwargs)
 
 def register(user_email,user_pw,user_name,user_major, user_perm): 
-    
-
     acc = User.query.filter_by(email=user_email).first()
     if acc !=None:
         return RegisterResult.USEREMAIL_EXIST

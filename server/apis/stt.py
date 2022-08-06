@@ -6,8 +6,7 @@ from flask import jsonify
 from flask_restful import reqparse, Resource
 from flask_jwt_extended import jwt_required
 
-from app.server.services.stt_service import get_userfile, is_stt_userfile, mapping_sst_user, remove_userfile
-from stt.stt import simultaneous_stt
+from ..services.stt_service import simultaneous_stt, get_userfile, is_stt_userfile, mapping_sst_user, remove_userfile
  
 class Stt(Resource):
     @jwt_required

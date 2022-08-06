@@ -11,3 +11,4 @@ xlsxwriter
 cryptography
 sentry-sdk
 sentry-sdk[flask]
+requests

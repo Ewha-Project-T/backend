@@ -19,13 +19,13 @@ class Stt(Resource):
     @jwt_required
     def post(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('homework', type=int, required=True, help="homework is required")
+        parser.add_argument('assignment', type=int, required=True, help="assignment is required")
         parser.add_argument('file', type=uuid.UUID, required=True, help="file is required")
         args = parser.parse_args()
-        homework = args['homework']
+        assignment = args['assignment']
         file = args['file']
 
-        if not is_stt_userfile(homework, file):
+        if not is_stt_userfile(assignment, file):
             return { "msg": "user stt is not exists" },404
 
         return jsonify(
@@ -37,10 +37,10 @@ class Stt(Resource):
         file = str(uuid.uuid4())
         filename = f"{file}.wav"
         parser = reqparse.RequestParser()
-        parser.add_argument('homework', type=int, required=True, help="homework is required")
+        parser.add_argument('assignment', type=int, required=True, help="assignment is required")
         parser.add_argument("wav", type=str, required=True, help="wav is required")
         args = parser.parse_args()
-        homework = args['homework']
+        assignment = args['assignment']
         wav = args['wav']
         wavbin = None
         try:
@@ -51,19 +51,19 @@ class Stt(Resource):
         with open(f"{os.getenv('UPLOAD_PATH')}/{filename}", "wb") as f:
             f.write(wavbin)
 
-        mapping_sst_user(homework, file)
+        mapping_sst_user(assignment, file)
         return jsonify(file=file)
 
     @jwt_required
     def delete(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('homework', type=int, required=True, help="homework is required")
+        parser.add_argument('assignment', type=int, required=True, help="assignment is required")
         parser.add_argument('file', type=uuid.UUID, required=True, help="file is required")
         args = parser.parse_args()
-        homework = args['homework']
+        assignment = args['assignment']
         file = args['file']
 
-        if remove_userfile(homework, file):
+        if remove_userfile(assignment, file):
             return jsonify(msg="success")
         else:
             return { "msg": "user stt is not exists" },404

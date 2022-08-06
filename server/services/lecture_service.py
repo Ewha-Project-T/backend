@@ -16,12 +16,12 @@ def lecture_listing(user_no):
         tmp["semester"]=vars(lec)["semester"]
         tmp["major"]=vars(lec)["major"]
         tmp["separated"]=vars(lec)["separated"]
-        tmp["boss"]=vars(lec)["boss"]
+        tmp["professor"]=vars(lec)["professor"]
         lecture_list_result.append(tmp)
     return lecture_list_result
 
-def make_lecture(name,year,semester,major,separated,boss):
+def make_lecture(name,year,semester,major,separated,professor):
     userinfo = get_jwt_identity()
-    acc=Lecture(lecture_name=name,year=year,semester=semester,major=major,separated=separated,boss=boss,user_no=userinfo["user_no"])
+    acc=Lecture(lecture_name=name,year=year,semester=semester,major=major,separated=separated,professor=professor,user_no=userinfo["user_no"])
     db.session.add(acc)
     db.session.commit

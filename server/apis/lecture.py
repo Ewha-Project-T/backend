@@ -25,7 +25,7 @@ class Lecture(Resource):
         parser.add_argument('semester', type=str, required=True, help="Semester is required")
         parser.add_argument('major', type=str, required=True, help="Major is required")
         parser.add_argument('separated', type=str, required=True, help="separated id is required")
-        parser.add_argument('boss', type=str, required=True, help="Boss is required")
+        parser.add_argument('profess', type=str, required=True, help="professor is required")
 
         args = parser.parse_args()
         lecture_name = args['name']
@@ -33,7 +33,7 @@ class Lecture(Resource):
         lecture_semester = args['semester']
         lecture_major=args['major']
         lecture_separated= args['separated']
-        lecture_boss = args['boss']
-        make_lecture(lecture_name,lecture_year,lecture_semester,lecture_major,lecture_separated,lecture_boss)
+        lecture_professor = args['professor']
+        make_lecture(lecture_name,lecture_year,lecture_semester,lecture_major,lecture_separated,lecture_professor)
         return{"msg" : "lecture make success"},201
         

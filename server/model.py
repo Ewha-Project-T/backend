@@ -35,31 +35,31 @@ class Lecture(db.Model):
     semester = db.Column(db.String(10), nullable=False)
     major = db.Column(db.String(50), nullable=False)
     separated = db.Column(db.String(5), nullable=False)
-    boss = db.Column(db.String(50), nullable=False)
+    professor = db.Column(db.String(50), nullable=False)
 
-class Member(db.Model):
-    __tablename__="MEMBER"
-    member_no = db.Column(db.Integer, primary_key=True)
+class Attendee(db.Model):
+    __tablename__="ATTENDEE"
+    Attendee_no = db.Column(db.Integer, primary_key=True)
     user_no = db.Column(db.Integer, db.ForeignKey("USER.user_no"), nullable=True)
     lecture_no = db.Column(db.Integer, db.ForeignKey("LECTURE.lecture_no"), nullable=True)
     permission = db.Column(db.Integer, default=1)
 
-class Homework(db.Model):
-    __tablename__="HOMEWORK"
-    homework_no = db.Column(db.Integer, primary_key=True)
+class Assignment(db.Model):
+    __tablename__="ASSIGNMENT"
+    assignment_no = db.Column(db.Integer, primary_key=True)
     lecture_no = db.Column(db.Integer, db.ForeignKey("LECTURE.lecture_no"), nullable=True)
     
 
-class Homework_check(db.Model):
+class Assignment_check(db.Model):
     check_no = db.Column(db.Integer, primary_key=True)
-    homework_no = db.Column(db.Integer, db.ForeignKey("HOMEWORK.homework_no"), nullable=True)
-    member_no = db.Column(db.Integer, db.ForeignKey("MEMBER.member_no"), nullable=True)
-    homework_check = db.Column(db.Integer, default=0)
+    assignment_no = db.Column(db.Integer, db.ForeignKey("ASSIGNMENT.assignment_no"), nullable=True)
+    attendee_no = db.Column(db.Integer, db.ForeignKey("ATTENDEE.attendee_no"), nullable=True)
+    assignment_check = db.Column(db.Integer, default=0)
 
 
 class Stt(db.Model):
     __tablename__ = "STT"
     stt_no = db.Column(db.Integer, primary_key=True)
     user_no = db.Column(db.Integer, db.ForeignKey("USER.user_no"), nullable=False)
-    homework_no = db.Column(db.Integer, db.ForeignKey("HOMEWORK.homework_no"), nullable=False)
+    assignment_no = db.Column(db.Integer, db.ForeignKey("ASSIGNMENT.assignment_no"), nullable=False)
     wav_file = db.Column(db.String(36), nullable=False)

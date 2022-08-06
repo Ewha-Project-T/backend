@@ -12,3 +12,6 @@ cryptography
 sentry-sdk
 sentry-sdk[flask]
 requests
+pydub
+nltk
+numpy

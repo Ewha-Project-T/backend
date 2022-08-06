@@ -57,3 +57,8 @@ class Homework_check(db.Model):
     homework_check = db.Column(db.Integer, default=0)
 
 
+class Stt(db.Model):
+    __tablename__ = "STT"
+    user_no = db.Column(db.Integer, db.ForeignKey("USER.user_no"), nullable=False)
+    homework_no = db.Column(db.Integer, db.ForeignKey("HOMEWORK.homework_no"), nullable=False)
+    wav_file = db.Column(db.String(36), nullable=False)

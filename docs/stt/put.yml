@@ -1,0 +1,26 @@
+녹음파일 업로드
+---
+tags:
+  - stt
+parameters:
+  - in: body
+    name: homework
+    type: string
+    required: true
+  - in: body
+    name: wav
+    type: string(base64,wav)
+    required: true
+responses:
+  200:
+    description: upload Success
+    content:
+      application/json:
+        scheme:
+          type: object
+          properties:
+            file:
+              type: uuid4
+              description: wav file uuid
+  400:
+    description: invalid parameter

@@ -1,0 +1,7 @@
+wav파일목록조회
+---
+tags:
+  - stt
+responses:
+  200:
+    description: wav file list

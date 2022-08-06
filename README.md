@@ -1,5 +1,4 @@
-# ess-server
-
+#Ewha Language Translation Platform
 ---
 
 ## 필요 모듈 설치

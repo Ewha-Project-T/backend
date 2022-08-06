@@ -9,7 +9,7 @@ parameters:
     required: True
   - in: body
     name: file
-    type: uuid4
+    type: string
     required: True 
 responses:
   200:

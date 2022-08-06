@@ -9,7 +9,7 @@ parameters:
     required: true
   - in: body
     name: wav
-    type: string(base64,wav)
+    type: string
     required: true
 responses:
   200:
@@ -20,7 +20,7 @@ responses:
           type: object
           properties:
             file:
-              type: uuid4
+              type: string
               description: wav file uuid
   400:
     description: invalid parameter

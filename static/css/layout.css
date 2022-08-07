@@ -1,0 +1,56 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: "Poppins", sans-serif; }
+.videoDiv { width: 100%; }
+#myVideo { position: fixed; right: 0; bottom: 0; width: 100%; min-height: 100%; margin-right: 12.5%; }
+::selection { color: #fff; background: #53f0e3; }
+.viewport-header { position: relative; height: 100vh; text-align: center; display: flex; align-items: center; justify-content: right; }
+.wrapper { position: absolute; right: 0px; width: 25%; min-width: 315px; padding: 40px 30px 50px 30px; background: #fff; border-radius: 5px; text-align: center; }
+.wrapper-bg { position:absolute; right: 0px; height: 100%; width: 25%; min-width: 315px; padding: 40px 30px 50px 30px; background: #fff; border-radius: 5px; text-align: center; }
+.wrapper h1 { font-size: 1.5rem; }
+.wrapper h1 span { font-size: 2.2rem; }
+.wrapper form { margin: 40px 0; }
+form .field { width: 100%; margin-bottom: 10px; }
+form .field.shake { animation: shake 0.3s ease-in-out; }
+@keyframes shake { 0%, 100% { margin-left: 0px; } 20%, 80% { margin-left: -12px; } 40%, 60% { margin-left: 12px; }
+}
+form .field .input-area { height: 50px; width: 100%; position: relative; }
+form input { width: 100%; height: 100%; outline: none; padding: 0 45px; font-size: 18px; background: none; caret-color: #5372F0; border-radius: 5px; border: 1px solid #bfbfbf; border-bottom-width: 2px; transition: all 0.2s ease; }
+form .field input:focus,
+form .field.valid input { border-color: #5372F0; }
+form .field.shake input,
+form .field.error input { border-color: #dc3545; }
+.field .input-area i { position: absolute; top: 50%; font-size: 18px; pointer-events: none; transform: translateY(-50%); }
+.input-area .icon { left: 15px; color: #bfbfbf; transition: color 0.2s ease; }
+.input-area .error-icon { right: 15px; color: #dc3545; }
+form input:focus~.icon,
+form .field.valid .icon { color: #5372F0; }
+form .field.shake input:focus~.icon,
+form .field.error input:focus~.icon { color: #bfbfbf; }
+form input::placeholder { color: #bfbfbf; font-size: 17px; }
+form .field .error-txt { color: #dc3545; text-align: left; margin-top: 5px; }
+form .field .error { display: none; }
+form .field.shake .error,
+form .field.error .error { display: block; }
+form .pass-txt { text-align: left; margin-top: -10px; }
+.wrapper a { color: #5372F0; text-decoration: none; }
+.wrapper a:hover { text-decoration: underline; }
+form input[type="submit"] { height: 50px; margin-top: 10px; color: #fff; padding: 0; border: none; background: #2e462f; cursor: pointer; border-bottom: 2px solid rgba(0, 0, 0, 0.1); transition: all 0.3s ease; }
+form input[type="submit"]:hover { background: #2e462f; }
+.logo img { width: 70%; }
+
+
+/**/
+.wrapper-join-bg { height: 100vh; align-items: center; display: flex; }
+.wrapper-join { width: 50%; margin: 0 auto; border-top: 10px solid #2a3f25; }
+.wrapper-join h1 { margin-top: 10px; font-size: 1.5rem; text-align: center; }
+.wrapper-join form .field { position: relative; }
+.wrapper-join form .field .input-area { width: 60%; margin: 0 auto; height: auto; }
+.wrapper-join form .field .input-area input { padding: 10px; }
+.wrapper-join form .field .comment { position: absolute; right: 0px; bottom: 0px; line-height: 50px; color:red; font-size: 0.9rem; display: none; }
+.wrapper-join form .field .input-area select { padding: 10px; }
+form select { width: 100%; height: 100%; outline: none; padding: 0 45px; font-size: 18px; background: none; caret-color: #5372F0; border-radius: 5px; border: 1px solid #bfbfbf; border-bottom-width: 2px; transition: all 0.2s ease; }
+.btn { height: 50px; margin-top: 10px; color: #fff; padding: 0; border: none; background: #2e462f; cursor: pointer; border-bottom: 2px solid rgba(0, 0, 0, 0.1); transition: all 0.3s ease; outline: none; caret-color: #5372f0; border-radius: 5px; text-align: center; }
+.btn:hover { background: #2e462f; }
+.btn-2 .btn { display: inline-block; width: 45%; font-size: 1.4rem; }
+.btn-2 .btn-cancel { float: left; background-color: #d8d8d8; color: #fff; line-height: 50px; }
+.btn-2 .btn-submit { float: right; color: #fff; }

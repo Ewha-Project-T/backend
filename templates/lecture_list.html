@@ -1,0 +1,133 @@
+{% extends 'layout_login.html' %}
+
+{% block stylesheet %}
+		<link rel="stylesheet" href="./css/slick.css">
+		<link rel="stylesheet" href="./css/slick-theme.css">
+{% endblock %}
+
+{% block script %}
+		<script type="text/javascript" src="./js/slick.min.js"></script>
+		<script type="text/javascript">
+		$(document).ready(function(){
+			$(".sliderDiv").slick({
+				slide: "Div",
+				infinite: true,
+				slidesToShow: 1,
+				slideToScroll: 1,
+				dots: true,
+				autoplay: true,
+				autoplaySpeed: 2000,
+			});
+		});
+		</script>
+{% endblock %}
+
+{% block content %}
+			<div class="bannerDiv">
+				<div class="sliderDiv slider">
+					<div><img src="{{ url_for('static', 'images/banner01.jpg') }}"></div>
+					<div><img src="{{ url_for('static', 'images/banner02.jpg') }}"></div>
+				</div>
+			</div>
+			
+			<div class="contentDiv">
+				<h1>강의 목록</h1>
+				<div class="topContentMenu">
+					<div class="semesterDiv">
+						<select class="semesterSelect inputStyle01" name="semesterSelect">
+						<option>2022-1학기</option>
+						<option>2022-2학기</option>
+						</select>
+					</div>
+					<div class="searchDiv">
+						<input type="text" name="searchInput" class="searchInput inputStyle01">
+					</div>
+				</div>
+				<div class="lectureListDiv">
+					<ul>
+						<li>
+							<div class="lectureInfoDiv">
+								<div class="lectureTitleDiv">
+									<span>SW 문제해결<br>Self Study Book!</span>
+									<img src="x">
+								</div>
+								<div class="lectureContentDiv">
+									<span>Programming ~~~~<br>SW 문제해결 뭐시기!!</span>
+								</div>
+								<div class="likeDiv">
+									<img src="x">
+									<span>222</span>
+								</div>
+							</div>
+						</li>
+						<li>
+							<div class="lectureInfoDiv">
+								<div class="lectureTitleDiv">
+									<span>SW 문제해결<br>Self Study Book!</span>
+									<img src="x">
+								</div>
+								<div class="lectureContentDiv">
+									<span>Programming ~~~~<br>SW 문제해결 뭐시기!!</span>
+								</div>
+								<div class="likeDiv">
+									<img src="x">
+									<span>222</span>
+								</div>
+							</div>
+						</li>
+						<li>
+							<div class="lectureInfoDiv">
+								<div class="lectureTitleDiv">
+									<span>SW 문제해결<br>Self Study Book!</span>
+									<img src="x">
+								</div>
+								<div class="lectureContentDiv">
+									<span>Programming ~~~~<br>SW 문제해결 뭐시기!!</span>
+								</div>
+								<div class="likeDiv">
+									<img src="x">
+									<span>222</span>
+								</div>
+							</div>
+						</li>
+						<li>
+							<div class="lectureInfoDiv">
+								<div class="lectureTitleDiv">
+									<span>SW 문제해결<br>Self Study Book!</span>
+									<img src="x">
+								</div>
+								<div class="lectureContentDiv">
+									<span>Programming ~~~~<br>SW 문제해결 뭐시기!!</span>
+								</div>
+								<div class="likeDiv">
+									<img src="x">
+									<span>222</span>
+								</div>
+							</div>
+						</li>
+						<li>
+							<div class="lectureInfoDiv">
+								<div class="lectureTitleDiv">
+									<span>SW 문제해결<br>Self Study Book!</span>
+									<img src="x">
+								</div>
+								<div class="lectureContentDiv">
+									<span>Programming ~~~~<br>SW 문제해결 뭐시기!!</span>
+								</div>
+								<div class="likeDiv">
+									<img src="x">
+									<span>222</span>
+								</div>
+							</div>
+						</li>
+						<li>
+							<div class="lectureInfoAddDiv">
+								<div class="lectureInfoAddBtnDiv">
+									<img src="x" alt="추가버튼">
+								</div>
+							</div>
+						</li>
+					</ul>
+				</div>
+			</div>
+{% endblock %}

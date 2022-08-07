@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>타이틀</title>
+		<link rel="stylesheet" href="{{ url_for('static', filename='css/auth_main.css') }}">
+{% block stylesheet %}{% endblock %}
+		<script type="text/javascript" src="{{ url_for('static', filename='js/jquery-3.6.0.min.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/auth_main.js') }}"></script>
+{% block script %}{% endblock %}
+	</head>
+	
+	<body>
+		<div class="">
+			<div class="menuBarDiv">
+				<div class="logoDiv">
+					<img src="{{ url_for('static', filename='images/ewha_logo.png') }}" />
+				</div>
+				<ul class="menuBarList">
+					<li>Menu1</li>
+					<li>Menu2</li>
+					<li>Menu3</li>
+					<li>Menu4</li>
+				</ul>
+				<div class="loginInfoDiv">
+					<img src="{{ url_for('static', filename='images/myphoto.png') }}" class="myphotoBtn">
+					<span>이화연 교수</span>
+					<img src="{{ url_for('static', filename='images/logout.png') }}" class="logoutBtn">
+				</div>
+			</div>
+{% block content %}{% endblock %}
+		</div>
+	</body>
+</html>

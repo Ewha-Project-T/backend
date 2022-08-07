@@ -1,0 +1,101 @@
+* { margin: 0px; padding: 0px; box-sizing: border-box; }
+li { display: block; }
+
+/* 공통 */
+.inputStyle01 { width: 100%; height: 100%; outline: none; padding: 5px 10px; font-size: 18px; background: none; caret-color: #5372F0; border-radius: 5px; border: 1px solid #bfbfbf; border-bottom-width: 2px; transition: all 0.2s ease; box-sizing: border-box; }
+.btnDiv { overflow: hidden; }
+.btn { height: 50px; margin-top: 10px; color: #fff; padding: 0; border: none; background: #2e462f; cursor: pointer; border-bottom: 2px solid rgba(0, 0, 0, 0.1); transition: all 0.3s ease; outline: none; caret-color: #5372f0; border-radius: 5px; text-align: center; }
+.btn:hover { background: #2e462f; }
+.btn-2 .btn { display: inline-block; width: 45%; font-size: 1.4rem; }
+.btn-2 .btn-cancel { float: left; background-color: #d8d8d8; color: #fff; line-height: 50px; }
+.btn-2 .btn-submit { float: right; color: #fff; }
+
+/* 강의목록 */
+.menuBarDiv { overflow: hidden; padding: 10px 40px; background-color: #3f7a4c; color: #ffffff; }
+.menuBarDiv .logoDiv { float: left; width: 20%; }
+.menuBarDiv .logoDiv img { height: 60px; }
+.menuBarDiv .menuBarList { float: left; }
+.menuBarDiv .menuBarList li { float: left; width: 100px; font-size: 1.5rem; font-weight: bold; line-height: 60px; margin-right: 40px; }
+.menuBarDiv .loginInfoDiv { float: right; }
+.menuBarDiv .loginInfoDiv * { line-height: 60px; height: 30px; vertical-align: middle; margin-left: 10px; }
+.menuBarDiv .loginInfoDiv span { font-size: 1.2rem; }
+.bannerDiv { width: 100%; }
+.bannerDiv .sliderDiv { width: 100%; height: 400px; }
+.bannerDiv .sliderDiv img { width: 100%; height: 400px; }
+.contentDiv { padding: 50px; width: 1600px; margin: 0px auto; }
+.contentDiv h1 { font-size: 2rem; text-align: center; }
+.contentDiv .topContentMenu { margin-top: 30px; overflow: hidden; }
+.contentDiv .topContentMenu .semesterDiv { float: left; }
+.contentDiv .topContentMenu .searchDiv { float: right; margin-right: 2%; }
+.contentDiv .lectureListDiv { margin-top: 30px; }
+.contentDiv .lectureListDiv ul { overflow: hidden; }
+.contentDiv .lectureListDiv ul li { float: left; width: 23%; margin-right: 2%; margin-bottom: 30px;}
+.contentDiv .lectureListDiv ul li .lectureInfoDiv { border: 1px solid #d8d8d8; overflow: hidden; }
+.contentDiv .lectureListDiv ul li .lectureInfoDiv .lectureTitleDiv { padding: 20px; height: 120px; }
+.contentDiv .lectureListDiv ul li .lectureInfoDiv .lectureTitleDiv img { line-height: 130px; float: right; }
+.contentDiv .lectureListDiv ul li .lectureInfoDiv .lectureContentDiv { border-top: 1px solid #d8d8d8; padding: 20px; height: 100px; }
+.contentDiv .lectureListDiv ul li .lectureInfoDiv .likeDiv { float: right; padding: 10px; height: 40px; }
+.contentDiv .lectureListDiv ul li .lectureInfoAddDiv { border: 1px solid #d8d8d8; overflow: hidden; height: 260px; position: relative; }
+.contentDiv .lectureListDiv ul li .lectureInfoAddDiv .lectureInfoAddBtnDiv { width: 50%; height: 50%; position: absolute; top: 25%; left: 25%; cursor: pointer; }
+.contentDiv .lectureListDiv ul li .lectureInfoAddDiv .lectureInfoAddBtnDiv img { width: 100%; }
+
+/* 강의만들기 */
+.lectureAddFormDiv { width: 30%; margin: 0 auto; border-top: 10px solid #2a3f25; margin-top: 50px; }
+.lectureAddFormDiv h1 { margin-top: 10px; font-size: 1.5rem; text-align: center; }
+.lectureAddFormDiv .inputFormDiv { margin-top: 10px; overflow: hidden; }
+.lectureAddFormDiv .inputFormDiv .lectureAddFormLebel { font-size: 1rem; font-weight: bold; }
+.lectureAddFormDiv .inputFormDiv .inputFormDiv-1 { float: left; width: 45%; }
+.lectureAddFormDiv .inputFormDiv .inputFormDiv-2 { float: right; width: 45%; }
+
+/* 과제목록 */
+.weekProbWrapper { margin-top: 30px; }
+.weekProbWrapper>li { margin-top: 20px; }
+.weekProbWrapper .weekProbDiv .weekProbTitleDiv { border: 1px solid #000000; background-color: #e6e6e6; overflow: hidden; padding: 5px 10px; }
+.weekProbWrapper .weekProbDiv .weekProbTitleDiv h2 { float: left; font-size: 1rem; height: 32px; line-height: 32px; }
+.weekProbWrapper .weekProbDiv .weekProbTitleDiv .weekProbAddBtn,
+.weekProbWrapper .weekProbDiv .weekProbTitleDiv .weekProbDetailViewBtn { float: right; margin-left: 10px; width: 32px; height: 32px; line-height: 32px; cursor: pointer; }
+.weekProbWrapper .weekProbDiv .weekProbDetailDiv { border: 1px solid #000000; background-color: #ffffff; overflow: hidden; display: none; }
+.weekProbWrapper .weekProbDiv .weekProbDetailDiv .weekProbDetailRowDiv { border-top: 1px solid #000000; padding: 5px 10px; overflow: hidden; }
+.weekProbWrapper .weekProbDiv .weekProbDetailDiv .weekProbDetailRowDiv:first { border-top: 0px; }
+.weekProbWrapper .weekProbDiv .weekProbDetailDiv span { float: left; font-size: 1rem; height: 32px; line-height: 32px; }
+.weekProbWrapper .weekProbDiv .weekProbDetailDiv .weekProbDetailDelBtn,
+.weekProbWrapper .weekProbDiv .weekProbDetailDiv .weekProbDetailEditBtn { float: right; margin-left: 10px; width: 32px; height: 32px; line-height: 32px; cursor: pointer; }
+
+/* 과제제출 */
+.probKeywordDiv { background-color: #d9d9d9; padding: 20px; border-radius: 10px; font-size: 1.5rem; font-weight: bold; margin-top: 30px; }
+.exampleAudioDiv { margin-top: 30px; }
+.exampleAudioDiv h2 {}
+.exampleAudioDiv #exampleAudioWaveSurfer { width: 100%; background-color: #ffffff; margin-top: 15px; }
+.submitAudioDiv { margin-top: 30px; }
+.submitAudioDiv h2 {}
+.submitAudioDiv #submitAudioWaveSurfer { width: 100%; background-color: #ffffff; margin-top: 15px; }
+.recordControllerDiv { margin-top: 30px; text-align: center; }
+.recordControllerDiv .btn { width: 50%; background-color: red; font-size: 1.7rem; height: 90px; border-radius: 25px; }
+.recordControllerDiv .btn.recoding { background-color: green; }
+.recordBtnDiv { margin-top: 30px; }
+.btn-align-right { width: 30%; margin: 20px 0px auto auto; }
+
+/* 과제 피드백 */
+.feedbackDiv .feedbackTitleDiv { overflow: hidden; }
+.feedbackDiv .feedbackTitleDiv h1 { text-align: left; float: left; }
+.feedbackDiv .feedbackTitleDiv .btn-2 { float: right; width: 300px; }
+.feedbackDiv #exampleAudioWaveSurfer,
+.feedbackDiv #assignmentAudioWaveSurfer { width: 100%; background-color: #ffffff; margin-top: 15px; height: 50px; }
+.feedbackDiv .probTextDiv { margin-top: 10px; }
+.feedbackDiv .probTextDiv .probTextContentDiv { float: left; width: 66%; border-right: 5px solid #000000; }
+.feedbackDiv .probTextDiv .probTextContentDiv .exampleTextDiv { float: left; width: 48%; margin-right: 2%; margin-bottom: 10px; }
+.feedbackDiv .probTextDiv .probTextContentDiv .exampleTextDiv h2 { font-size: 1.3rem; }
+.feedbackDiv .probTextDiv .probTextContentDiv .exampleTextDiv div { background-color: #d0d0d0; height: 600px; border-radius: 10px; margin-top: 10px; }
+.feedbackDiv .probTextDiv .probTextContentDiv .assignmentTextDiv { float: left; width: 48%; margin-right: 2%; margin-bottom: 10px; }
+.feedbackDiv .probTextDiv .probTextContentDiv .assignmentTextDiv h2 { font-size: 1.3rem; }
+.feedbackDiv .probTextDiv .probTextContentDiv .assignmentTextDiv div { background-color: #d0d0d0; height: 600px; border-radius: 10px; margin-top: 10px; }
+.feedbackDiv .probTextDiv .probTextContentDiv .commentTextDiv { clear: both; width: 98%; margin-right: 2%;}
+.feedbackDiv .probTextDiv .probTextContentDiv .commentTextDiv h2 { font-size: 1.3rem; }
+.feedbackDiv .probTextDiv .probTextContentDiv .commentTextDiv div { background-color: #d0d0d0; height: 300px; border-radius: 10px; margin-top: 10px; }
+.feedbackDiv .probTextDiv .feedbackContentDiv { float: right; width: 33%; }
+.feedbackDiv .probTextDiv .feedbackContentDiv .feedbackContentTitleDiv { overflow: hidden; }
+.feedbackDiv .probTextDiv .feedbackContentDiv .feedbackContentTitleDiv h2 { font-size: 1.3rem; float: left; }
+.feedbackDiv .probTextDiv .feedbackContentDiv .feedbackContentTitleDiv .btn { float: right; height: 30px; margin: 0px; width: 150px; }
+.feedbackDiv .probTextDiv .feedbackContentDiv .feedbackContentRowDiv { border-radius: 10px; overflow: hidden; margin-top: 10px; margin-bottom: 10px; }
+.feedbackDiv .probTextDiv .feedbackContentDiv .feedbackContentRowDiv .feedbackContentRowTitleDiv { height: 30px; background-color: #ff8d00; }
+.feedbackDiv .probTextDiv .feedbackContentDiv .feedbackContentRowDiv .feedbackContentRowContentDiv { height: 200px; background-color: #d0d0d0; }

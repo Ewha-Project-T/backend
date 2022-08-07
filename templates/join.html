@@ -1,0 +1,66 @@
+{% extends 'layout_nologin.html' %}
+
+{% block content %}
+		<div class="wrapper-join-bg">
+			<div class="wrapper-join">
+				<h1>회원가입</h1>
+				<form method="POST" action="{{ url_for('join') }}" class="joinForm" onsubmit="return joinFormCheck();">
+					<input type="hidden" name="msg" value="{{ msg }}">
+					<input type="hidden" name="emailFlag" value="F">
+					<input type="hidden" name="passwdFlag" value="F">
+					<div class="field email">
+						<div class="input-area">
+							<label for="join-email">이메일</label>
+							<input type="text" id="join-email" name="email">
+						</div>
+						<span class="comment">X 중복된 이메일</span>
+					</div>
+					<div class="field passwd">
+						<div class="input-area">
+							<label for="join-passwd">비밀번호</label>
+							<input type="password" id="join-passwd" name="pw">
+						</div>
+						<span class="comment"></span>
+					</div>
+					<div class="field passwdChk">
+						<div class="input-area">
+							<label for="join-passwdChk">비밀번호 재확인</label>
+							<input type="password" id="join-passwdChk" name="pw2">
+						</div>
+						<span class="comment">X 비밀번호 불일치</span>
+					</div>
+					<div class="field name">
+						<div class="input-area">
+							<label for="join-name">이름</label>
+							<input type="text" id="join-name" name="name">
+						</div>
+						<span class="comment"></span>
+					</div>
+					<div class="field dp">
+						<div class="input-area">
+							<label for="join-dp">학과</label>
+							<select id="join-dp" name="major">
+								<option>컴퓨터공학과</option>
+							</select>
+						</div>
+						<span class="comment"></span>
+					</div>
+					<div class="field type">
+						<div class="input-area">
+							<label for="join-type">분류</label>
+							<select id="join-type" name="perm">
+								<option>분류1</option>
+							</select>
+						</div>
+						<span class="comment"></span>
+					</div>
+					<div class="field">
+						<div class="input-area btn-2">
+							<div class="btn btn-cancel">취소</div>
+							<input type="submit" class="btn btn-submit" value="가입" />
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+{% endblock %}

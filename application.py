@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, redirect, send_from_directory
 from flask_restful import Api
 from flasgger import Swagger
 from flask_cors import CORS
@@ -11,7 +11,7 @@ import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
 from os import environ as env
 
-app=Flask(__name__)
+app=Flask(__name__, static_folder='./static')
 app.config['SWAGGER'] = {
     'title': 'API Docs',
     'doc_dir': './docs/'
@@ -56,11 +56,14 @@ def check_if_token_is_revoked(jwt_header, jwt_payload):
     jti = jwt_payload["jti"]
     token_in_redis = jti in jwt_blocklist
     return token_in_redis
-    
+
+@app.route("/uploads/<path:filename>")
+def uploads(filename):
+    return send_from_directory(env['UPLOAD_PATH'], filename)
 
 @app.route("/", methods=['GET'])
 def hello():
-    return "MokoKo"
+    return redirect('https://ewha.ltra.cc/login')
 
 load_api(myApi)
-app.run(host='0.0.0.0', port = 5000)
+app.run(host='0.0.0.0', port = 5000, debug=True)

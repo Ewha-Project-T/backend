@@ -1,0 +1,11 @@
+stt 결과
+---
+tags:
+  - stt
+parameters:
+  - in: path
+    name: jobid
+    type: string
+responses:
+  200:
+    description: stt result

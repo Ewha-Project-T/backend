@@ -28,21 +28,24 @@ def stt_getJobResult(jobid):
     endidx = JOBS[jobid]["endidx"]
     silenceidx = JOBS[jobid]["silenceidx"]
 
-    result = requests.get(
+    res = requests.get(
         url,
         headers={ "Ocp-Apim-Subscription-Key": os.environ['OCP_APIM_SUBSCRIPTION_KEY'] }
     ).json()
 
-    if len(result["values"]) == 0:
+    if len(res["values"]) == 0:
         return False
 
-    print(result)
+    result = {'textFile': '', 'timestamps': [], 'annotations': []}
+    for i in range(len(sound)):
+        result['timestamps'].append({'start': startidx[i], 'end': endidx[i]})
+
     flag = True
     text = ''
     delay_result = 0
     pause_result = 0
 
-    values = result["values"]
+    values = res["values"]
     for i in range(len(values)):
         kind = values[i]["kind"]
         if kind != "Transcription":
@@ -69,38 +72,34 @@ def stt_getJobResult(jobid):
                 text = text+'\n'
                 delay_result += silenceidx[i]
 
-    result = {'textFile': '', 'timestamps': [], 'annotations': []}
-    for i in range(len(sound)):
-        result['timestamps'].append({'start': startidx[i], 'end': endidx[i]})
+        p = re.compile('(\w\(filler\)|\w+\s\w+\(backtracking\))')
+        fidx = []
+        while (True):
+            f = p.search(stt)
+            if f == None:
+                break
+            fidx.append([f.start(), f.end()])
+            stt = re.sub("(\(filler\)|\(backtracking\))", "", stt, 1)
 
-    p = re.compile('(\w\(filler\)|\w+\s\w+\(backtracking\))')
-    fidx = []
-    while (True):
-        f = p.search(stt)
-        if f == None:
-            break
-        fidx.append([f.start(), f.end()])
-        stt = re.sub("(\(filler\)|\(backtracking\))", "", stt, 1)
+        for i in range(len(fidx)):
+            if stt[fidx[i][0]] == '음' or stt[fidx[i][0]] == '그' or stt[fidx[i][0]] == '어':
+                result['annotations'].append(
+                    {'start': fidx[i][0], 'end': fidx[i][0] + 1, 'type': 'FILLER'})
+            else:
+                result['annotations'].append(
+                    {'start': fidx[i][0], 'end': fidx[i][1] - 14, 'type': 'BACKTRACKING'})
 
-    for i in range(len(fidx)):
-        if stt[fidx[i][0]] == '음' or stt[fidx[i][0]] == '그' or stt[fidx[i][0]] == '어':
-            result['annotations'].append(
-                {'start': fidx[i][0], 'end': fidx[i][0] + 1, 'type': 'FILLER'})
-        else:
-            result['annotations'].append(
-                {'start': fidx[i][0], 'end': fidx[i][1] - 14, 'type': 'BACKTRACKING'})
+        pidx = []
+        indx = -1
+        while True:
+            indx = stt.find('\n', indx + 1)
+            if indx == -1:
+                break
+            pidx.append(indx)
+        for i in range(len(pidx)): # pause, delay 구분 없이 pause 로 통일
+            result['annotations'].append({'start': pidx[i], 'end': pidx[i] + 1, 'type': 'PAUSE', 'duration': silenceidx[i]})
 
-    pidx = []
-    indx = -1
-    while True:
-        indx = stt.find('\n', indx + 1)
-        if indx == -1:
-            break
-        pidx.append(indx)
-    for i in range(len(pidx)): # pause, delay 구분 없이 pause 로 통일
-        result['annotations'].append({'start': pidx[i], 'end': pidx[i] + 1, 'type': 'PAUSE', 'duration': silenceidx[i]})
-
-    result['textFile'] = stt
+        result['textFile'] += stt
 
     return result
 

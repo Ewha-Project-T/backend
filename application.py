@@ -30,7 +30,7 @@ sentry_sdk.init(
     traces_sample_rate=1.0
 )
 """
-
+#app.config['SERVER_NAME'] = 'https://ewha.ltra.cc'
 app.config['SECRET_KEY'] = 'Shadow-Hunter-nerf-plz'#추후 랜덤문자열로 바꿀것 ㅎㅎ;
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=4)
 app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=1)
@@ -38,6 +38,10 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{env['SQL_USER']}:{env
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True 
 db.init_app(app)
+
+with app.app_context():
+    db.create_all()
+
 jwt=JWTManager(app)
 
 CORS(app,expose_headers='Location')

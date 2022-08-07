@@ -15,7 +15,6 @@ JOBS = {}
 def simultaneous_stt(filename):
     myaudio = AudioSegment.from_file(filename)  # 경로 변경 필요
     sound, startidx, endidx, silenceidx = indexing(myaudio)
-    
     return do_stt(sound, myaudio, startidx, endidx, silenceidx)
 
 def stt_getJobResult(jobid):
@@ -27,6 +26,7 @@ def stt_getJobResult(jobid):
     startidx = JOBS[jobid]["startidx"]
     endidx = JOBS[jobid]["endidx"]
     silenceidx = JOBS[jobid]["silenceidx"]
+    local_files = JOBS[jobid]["files"]
 
     res = requests.get(
         url,
@@ -100,6 +100,9 @@ def stt_getJobResult(jobid):
             result['annotations'].append({'start': pidx[i], 'end': pidx[i] + 1, 'type': 'PAUSE', 'duration': silenceidx[i]})
 
         result['textFile'] += stt
+
+    for file in local_files:
+        os.unlink(file)
 
     return result
 
@@ -238,11 +241,13 @@ def do_stt(sound, myaudio, startidx, endidx, silenceidx):
     domain = os.getenv("DOMAIN", "https://ewha.ltra.cc")
 
     files = []
+    local_file = []
     for i in range(len(sound)):
         filetmp = uuid.uuid4()
         filepath = f"uploads/{filetmp}.wav"
         myaudio[startidx[i]:endidx[i]].export(filepath, format="wav")
         files += [ domain + "/" + filepath ]
+        local_file += [ filepath ]
 
     webhook_res = requests.post(
         "https://koreacentral.api.cognitive.microsoft.com/speechtotext/v3.0/transcriptions",
@@ -270,7 +275,8 @@ def do_stt(sound, myaudio, startidx, endidx, silenceidx):
         "sound": sound,
         "startidx": startidx,
         "endidx": endidx,
-        "silenceidx": silenceidx
+        "silenceidx": silenceidx,
+        "files": local_file
     }
     return jobid
 

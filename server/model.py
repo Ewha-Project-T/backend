@@ -39,7 +39,7 @@ class Lecture(db.Model):
 
 class Attendee(db.Model):
     __tablename__="ATTENDEE"
-    Attendee_no = db.Column(db.Integer, primary_key=True)
+    attendee_no = db.Column(db.Integer, primary_key=True)
     user_no = db.Column(db.Integer, db.ForeignKey("USER.user_no"), nullable=True)
     lecture_no = db.Column(db.Integer, db.ForeignKey("LECTURE.lecture_no"), nullable=True)
     permission = db.Column(db.Integer, default=1)
@@ -63,3 +63,5 @@ class Stt(db.Model):
     user_no = db.Column(db.Integer, db.ForeignKey("USER.user_no"), nullable=False)
     assignment_no = db.Column(db.Integer, db.ForeignKey("ASSIGNMENT.assignment_no"), nullable=False)
     wav_file = db.Column(db.String(36), nullable=False)
+
+

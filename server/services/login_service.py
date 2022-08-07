@@ -51,11 +51,11 @@ def create_tokens(user: User, **kwargs):
     return create_access_token(identities, **kwargs), create_refresh_token(identities, **kwargs)
 
 def register(user_email,user_pw,user_name,user_major, user_perm): 
-    acc = User.query.filter_by(email=user_email).first()
-    if acc !=None:
-        return RegisterResult.USEREMAIL_EXIST
-    if(user_perm>3 or user_perm<0):
-        return RegisterResult.INVALID_PERM
+    #acc = User.query.filter_by(email=user_email).first()
+    #if acc !=None:
+    #    return RegisterResult.USEREMAIL_EXIST
+    #if(user_perm>3 or user_perm<0):
+    #    return RegisterResult.INVALID_PERM
     acc=User(email=user_email,password=user_pw,name=user_name,major=user_major,permission=user_perm)
     db.session.add(acc)
     db.session.commit

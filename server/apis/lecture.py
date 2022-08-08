@@ -8,7 +8,8 @@ from ..services.lecture_service import lecture_listing, make_lecture,modify_lect
 from ..services.login_service import (
      admin_required, professor_required, assistant_required
 )
-
+from os import environ as env
+host_url=env["HOST"]
 
 class Lecture(Resource):
 

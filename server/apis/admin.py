@@ -5,7 +5,8 @@ from flask_jwt_extended import (
 )
 import re
 from ..services.admin_service import user_listing, activating_user,AdminResult
- 
+from os import environ as env
+host_url=env["HOST"]
 
 class admin(Resource):
     def get(self):#계정전체 명단

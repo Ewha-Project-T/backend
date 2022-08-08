@@ -60,6 +60,11 @@ def register(user_email,user_pw,user_name,user_major, user_perm):
     db.session.commit
     return RegisterResult.SUCCESS
 
+def real_time_email_check(user_email):
+    acc = User.query.filter_by(email=user_email).first()
+    if acc !=None:
+        return RegisterResult.USEREMAIL_EXIST
+    return 0
 
 def admin_required(): #관리자 권한
     def wrapper(fn):

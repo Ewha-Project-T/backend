@@ -30,7 +30,6 @@ sentry_sdk.init(
     traces_sample_rate=1.0
 )
 """
-#app.config['SERVER_NAME'] = 'https://ewha.ltra.cc'
 app.config['SECRET_KEY'] = 'Shadow-Hunter-nerf-plz'#추후 랜덤문자열로 바꿀것 ㅎㅎ;
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=4)
 app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=1)
@@ -67,7 +66,8 @@ def uploads(filename):
 
 @app.route("/", methods=['GET'])
 def hello():
-    return redirect('https://ewha.ltra.cc/login')#redirect('https://localhost/login')
+    #return redirect('/login')
+    return redirect('https://ewha.ltra.cc/login')
 
 load_api(myApi)
 app.run(host='0.0.0.0', port = 5000, debug=True)

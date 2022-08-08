@@ -1,13 +1,14 @@
-from flask import jsonify, make_response, render_template, request, redirect, url_for
+from flask import jsonify, make_response, render_template, request, redirect, url_for,abort
 from flask_restful import reqparse, Resource
 from flask_jwt_extended import (
     jwt_required, get_jwt_identity, create_access_token, get_jwt
 )
 import re
 from ..services.login_service import (
-    login, register, LoginResult, RegisterResult, create_tokens, admin_required, professor_required, assistant_required
+    login, register, LoginResult, RegisterResult, create_tokens, admin_required, professor_required, assistant_required,real_time_email_check
 )
-
+from os import environ as env
+host_url=env["HOST"]
 jwt_blocklist = set()
 
 class Login(Resource): 
@@ -51,6 +52,18 @@ msg=""
 perm_list={"학생":1,"조교":2,"교수":3}
 class Join(Resource):
     def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('mode', type=str)
+        parser.add_argument('email', type=str)
+        args=parser.parse_args()
+        mode=args['mode']
+        email=args['email']
+        if(mode == "emailChk"):
+            msg=""
+            result=real_time_email_check(email)
+            if(result==1):
+                msg="email_exist"
+
         return make_response(render_template('join.html',msg=msg))
 
     def post(self):
@@ -78,23 +91,23 @@ class Join(Resource):
             result=register(user_email,user_pw,user_name,user_major, user_perm)
             if(result==RegisterResult.SUCCESS):
                 msg="register success"
-                return redirect(url_for('login'))
+                return redirect(host_url+ url_for('login'))
 #                return{'location':'/login'},201
             elif(result==RegisterResult.USEREMAIL_EXIST):
                 msg="user email exist"
-                return redirect('https://ewha.ltra.cc' + url_for('join', msg=msg))
+                return redirect(host_url + url_for('join', msg=msg))
                 #return {'location':'/join'},400
             elif(result==RegisterResult.INVALID_PERM):
                 msg="invalid permission"
-                return redirect('https://ewha.ltra.cc' + url_for('join', msg=msg))
+                return redirect(host_url + url_for('join', msg=msg))
                 #return {'location':'/join'},400
             else:
                 msg="bad parameters"
-                return redirect('https://ewha.ltra.cc' + url_for('join', msg=msg))
+                return redirect(host_url + url_for('join', msg=msg))
 #                return {'location':'/join'},404
         else:
             msg="invalid email"
-            return redirect('https://ewha.ltra.cc' + url_for('join', msg=msg))
+            return redirect(host_url + url_for('join', msg=msg))
             #return {'location':'/join'},400
 
 

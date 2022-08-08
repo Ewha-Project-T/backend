@@ -48,22 +48,25 @@ class Login(Resource):
         jwt_blocklist.add(jti)
         return jsonify(msg="Access token revoked")
 
+global msg
 msg=""
 perm_list={"학생":1,"조교":2,"교수":3}
 class Join(Resource):
     def get(self):
+        global msg
         parser = reqparse.RequestParser()
         parser.add_argument('mode', type=str)
         parser.add_argument('email', type=str)
         args=parser.parse_args()
         mode=args['mode']
         email=args['email']
+        
         if(mode == "emailChk"):
             msg=""
             result=real_time_email_check(email)
             if(result==1):
                 msg="email_exist"
-
+        
         return make_response(render_template('join.html',msg=msg))
 
     def post(self):

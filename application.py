@@ -67,7 +67,7 @@ def uploads(filename):
 
 @app.route("/", methods=['GET'])
 def hello():
-    return redirect('https://ewha.ltra.cc/login')
+    return redirect('https://localhost/login') #return redirect('/login')
 
 load_api(myApi)
 app.run(host='0.0.0.0', port = 5000, debug=True)

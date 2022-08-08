@@ -48,56 +48,54 @@ class Login(Resource):
         return jsonify(msg="Access token revoked")
 
 msg=""
+perm_list={"학생":1,"조교":2,"교수":3}
 class Join(Resource):
     def get(self):
         return make_response(render_template('join.html',msg=msg))
 
     def post(self):
         msg=""
-        '''
         parser = reqparse.RequestParser()
-        parser.add_argument('email', type=str, required=True, help="Email is required")
-        parser.add_argument('pw', type=str, required=True, help="PW is required")
-        parser.add_argument('pw2', type=str, required=True, help="PW2 is required")
-        parser.add_argument('name', type=str, required=True, help="name is required")
-        parser.add_argument('major', type=str, required=True, help="major id is required")
-        parser.add_argument('perm', type=int, required=True, help="Permission is required")
+        parser.add_argument('email', type=str, help="Email is required")
+        parser.add_argument('pw', type=str, help="PW is required")
+        parser.add_argument('pw2', type=str, help="PW2 is required")
+        parser.add_argument('name', type=str, help="name is required")
+        parser.add_argument('major', type=str, help="major id is required")
+        parser.add_argument('perm', type=str, help="Permission is required")
+
         args = parser.parse_args()
-        return "AFAF"
         user_email = args['email']
         user_pw = args['pw']
-        user_pw2 = args['pw2']
+        user_pw2 = args['pw2'] 
         user_name=args['name']
         user_major= args['major']
-        user_perm = args['perm']
-        '''
-        user_email = request.form['email']
-        user_pw = request.form['pw']
-        user_pw2 = request.form['pw2']
-        user_name = request.form['name']
-        user_major = request.form['major']
-        user_perm = request.form['perm']
+        if args['perm'] not in perm_list:
+            user_perm=1
+        else:
+            user_perm=perm_list[args['perm']]
 
         if re.match("^[A-Za-z0-9]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[A-Za-z0-9])*\.[A-Za-z]{2,3}$", user_email):
             result=register(user_email,user_pw,user_name,user_major, user_perm)
-            #result = 'asdf'
             if(result==RegisterResult.SUCCESS):
                 msg="register success"
                 return redirect(url_for('login'))
 #                return{'location':'/login'},201
             elif(result==RegisterResult.USEREMAIL_EXIST):
                 msg="user email exist"
-                return {'location':'/join'},400
+                return redirect('https://ewha.ltra.cc' + url_for('join', msg=msg))
+                #return {'location':'/join'},400
             elif(result==RegisterResult.INVALID_PERM):
                 msg="invalid permission"
-                return {'location':'/join'},400
+                return redirect('https://ewha.ltra.cc' + url_for('join', msg=msg))
+                #return {'location':'/join'},400
             else:
                 msg="bad parameters"
                 return redirect('https://ewha.ltra.cc' + url_for('join', msg=msg))
 #                return {'location':'/join'},404
         else:
             msg="invalid email"
-            return {'location':'/join'},400
+            return redirect('https://ewha.ltra.cc' + url_for('join', msg=msg))
+            #return {'location':'/join'},400
 
 
 	

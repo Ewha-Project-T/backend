@@ -15,3 +15,5 @@ requests
 pydub
 nltk
 numpy
+azure.core
+azure.cognitiveservices.speech

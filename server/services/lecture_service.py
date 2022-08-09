@@ -40,3 +40,17 @@ def delete_lecture(lecture_no):
     acc = Lecture.query.filter_by(lecture_no=lecture_no).first()
     db.session.delete(acc)
     db.session.commit
+
+def search_student(name,major):
+    acc=User.query.filter_by(name=name,major=major).all()
+    student_list_result=[]
+    for user in acc:
+        tmp={}
+        tmp["user_no"]=vars(user)["user_no"]
+        tmp["email"]=vars(user)["email"]
+        tmp["name"]=vars(user)["name"]
+        tmp["major"]=vars(user)["major"]
+        tmp["permission"]=vars(user)["permission"]
+        student_list_result.append(tmp)
+    return student_list_result
+

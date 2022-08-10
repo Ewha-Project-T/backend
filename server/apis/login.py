@@ -60,12 +60,12 @@ class Join(Resource):
         args=parser.parse_args()
         mode=args['mode']
         email=args['email']
-        
         if(mode == "emailChk"):
             msg=""
             result=real_time_email_check(email)
             if(result==1):
-                msg="email_exist"
+                print("hi")
+                return {"msg":"email_exist"}
         
         return make_response(render_template('join.html',msg=msg))
 

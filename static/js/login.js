@@ -6,15 +6,21 @@ $(document).ready(function(){
 	// 회원가입 이메일 중복 체크
 	$(document).on("change", "input[name=email]", function(){
 		var email = $(this).val();
-		
-		if(email != '11@asdf.com'){
+		$.ajax({
+			url:"/join",
+			data:{mode:"emailChk",email:email},
+			method:"GET",
+            dataType:"json",
+		})
+		.done(function(data, textStatus, xhr) {
 			$(".email .comment").text("이메일 중복");
 			$(".email .comment").show();
 			$("input[name=emailFlag]").val("F");
-		}else{
+		})
+		.fail(function(data,textStatus,errorThrown){
 			$(".email .comment").hide();
 			$("input[name=emailFlag]").val("T");
-		}
+		})
 	});
 	
 	// 비밀번호 재확인

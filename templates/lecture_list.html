@@ -45,66 +45,24 @@
 				</div>
 				<div class="lectureListDiv">
 					<ul>
+					{% for  i in lecture_list %}
 						<li>
 							<div class="lectureInfoDiv">
 								<div class="lectureTitleDiv">
-									<span>SW 문제해결<br>Self Study Book!</span>
+									<span>{{i.lecture_name}}<br>{{i.professor}}</span>
 									<img src="x">
 								</div>
 								<div class="lectureContentDiv">
-									<span>Programming ~~~~<br>SW 문제해결 뭐시기!!</span>
+									<span>{{i.major}}<br>{{i.separated}}</span>
 								</div>
 								<div class="likeDiv">
 									<img src="x">
-									<span>222</span>
+									<span>{{i.year}}</span>
 								</div>
 							</div>
 						</li>
-						<li>
-							<div class="lectureInfoDiv">
-								<div class="lectureTitleDiv">
-									<span>SW 문제해결<br>Self Study Book!</span>
-									<img src="x">
-								</div>
-								<div class="lectureContentDiv">
-									<span>Programming ~~~~<br>SW 문제해결 뭐시기!!</span>
-								</div>
-								<div class="likeDiv">
-									<img src="x">
-									<span>222</span>
-								</div>
-							</div>
-						</li>
-						<li>
-							<div class="lectureInfoDiv">
-								<div class="lectureTitleDiv">
-									<span>SW 문제해결<br>Self Study Book!</span>
-									<img src="x">
-								</div>
-								<div class="lectureContentDiv">
-									<span>Programming ~~~~<br>SW 문제해결 뭐시기!!</span>
-								</div>
-								<div class="likeDiv">
-									<img src="x">
-									<span>222</span>
-								</div>
-							</div>
-						</li>
-						<li>
-							<div class="lectureInfoDiv">
-								<div class="lectureTitleDiv">
-									<span>SW 문제해결<br>Self Study Book!</span>
-									<img src="x">
-								</div>
-								<div class="lectureContentDiv">
-									<span>Programming ~~~~<br>SW 문제해결 뭐시기!!</span>
-								</div>
-								<div class="likeDiv">
-									<img src="x">
-									<span>222</span>
-								</div>
-							</div>
-						</li>
+					{% endfor %}
+						
 						<li>
 							<div class="lectureInfoDiv">
 								<div class="lectureTitleDiv">

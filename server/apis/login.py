@@ -1,7 +1,7 @@
 from flask import jsonify, make_response, render_template, request, redirect, url_for,abort
 from flask_restful import reqparse, Resource
 from flask_jwt_extended import (
-    jwt_required, get_jwt_identity, create_access_token, get_jwt
+    jwt_required, get_jwt_identity, create_access_token, get_jwt,set_access_cookies,set_refresh_cookies
 )
 import re
 from ..services.login_service import (
@@ -10,11 +10,17 @@ from ..services.login_service import (
 from os import environ as env
 host_url=env["HOST"]
 jwt_blocklist = set()
+global msg
+msg=""
+perm_list={"학생":1,"조교":2,"교수":3}
 
 class Login(Resource): 
     def get(self):
-        return make_response(render_template('login.html'))
+        global msg
+        return make_response(render_template('login.html',msg=msg))
     def post(self):#로그인
+        global msg
+        msg=""
         parser = reqparse.RequestParser()
         parser.add_argument('email', type=str, required=True, help="EMAIL is required")
         parser.add_argument('pw', type=str, required=True, help="PW is required")
@@ -24,33 +30,44 @@ class Login(Resource):
         if re.match("^[A-Za-z0-9]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[A-Za-z0-9])*\.[A-Za-z]{2,3}$", user_email):
             result, account = login(user_email, user_pw)
             if(result==LoginResult.ACC_IS_NOT_FOUND):
-                return {"msg":"User Not Found"}, 403
+                msg="User Not Found"
+                return redirect(host_url + url_for('login', msg=msg))
             if(result==LoginResult.NEED_ADMIN_CHECK):
-                return {"msg":"you need Admin check"},403
+                msg="you need Admin check"
+                return redirect(host_url + url_for('login', msg=msg))
             if(result==LoginResult.LOGIN_COUNT_EXCEEDED):
-                return {"msg":"login count exceeded"}, 403
+                msg="clogin count exceeded"
+                return redirect(host_url + url_for('login', msg=msg))
             if(result==LoginResult.SUCCESS):
+                msg=""
                 access_token, refresh_token = create_tokens(account)
                 if(account.permission==0):
                     return {
                         'access_token' : access_token,
                         'refresh_token' : refresh_token
-                    }, 201, {'location':'/adminpage'}
+                    }, 201, redirect(host_url+url_for('adminpage'))
                 else:
+                    res=redirect(host_url+url_for('lecture'))
+                    set_access_cookies(res,access_token)
+                    set_refresh_cookies(res,refresh_token)
+                    '''
                     return {
                         'access_token' : access_token,
                         'refresh_token': refresh_token
-                    }, 201, {'location':'/'}
-  
+                    },201,redirect(host_url+url_for('lecture'))
+                    '''
+
+                msg="invalid password"
+                return redirect(host_url + url_for('login', msg=msg))
+        else:
+            msg="check email"
+            return redirect(host_url + url_for('login', msg=msg))
     @jwt_required()
     def delete(self):#로그아웃
         jti = get_jwt()["jti"]
         jwt_blocklist.add(jti)
         return jsonify(msg="Access token revoked")
 
-global msg
-msg=""
-perm_list={"학생":1,"조교":2,"교수":3}
 class Join(Resource):
     def get(self):
         global msg
@@ -61,7 +78,6 @@ class Join(Resource):
         mode=args['mode']
         email=args['email']
         if(mode == "emailChk"):
-            msg=""
             result=real_time_email_check(email)
             if(result==1):
                 return {"msg":"email_exist"}
@@ -69,6 +85,7 @@ class Join(Resource):
         return make_response(render_template('join.html',msg=msg))
 
     def post(self):
+        global msg
         msg=""
         parser = reqparse.RequestParser()
         parser.add_argument('email', type=str, help="Email is required")

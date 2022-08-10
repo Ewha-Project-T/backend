@@ -1,4 +1,4 @@
-from flask import jsonify
+from flask import jsonify,render_template, request, redirect, url_for,abort,make_response
 from flask_restful import reqparse, Resource
 from flask_jwt_extended import (
     jwt_required, get_jwt_identity, create_access_token, get_jwt
@@ -15,7 +15,7 @@ class Lecture(Resource):
 
     def get(self):#강의목록
         lecture_list = lecture_listing()
-        return jsonify(lecture_list=lecture_list)
+        return make_response(render_template("lecture_list.html",lecture_list=lecture_list))
 
     def post(self):#강의생성/교수이상의권한
         parser = reqparse.RequestParser()

@@ -7,8 +7,8 @@ import re
 from ..services.admin_service import user_listing, activating_user,AdminResult
 from os import environ as env
 host_url=env["HOST"]
-
 class admin(Resource):
+    @jwt_required()
     def get(self):#계정전체 명단
         result,user_list = user_listing()
         if(result==AdminResult.NOT_FOUND):

@@ -64,7 +64,6 @@ class Join(Resource):
             msg=""
             result=real_time_email_check(email)
             if(result==1):
-                print("hi")
                 return {"msg":"email_exist"}
         
         return make_response(render_template('join.html',msg=msg))

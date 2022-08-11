@@ -51,6 +51,7 @@ class Assignment(db.Model):
     
 
 class Assignment_check(db.Model):
+    __tablename__="ASSIGNMENT_CHECK"
     check_no = db.Column(db.Integer, primary_key=True)
     assignment_no = db.Column(db.Integer, db.ForeignKey("ASSIGNMENT.assignment_no"), nullable=True)
     attendee_no = db.Column(db.Integer, db.ForeignKey("ATTENDEE.attendee_no"), nullable=True)

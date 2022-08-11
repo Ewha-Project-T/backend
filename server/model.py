@@ -9,9 +9,9 @@ class User(db.Model):
 
     user_no = db.Column(db.Integer,primary_key=True)
     email = db.Column(db.String(50), unique=True, nullable=False)
-    password = db.Column(db.String(250), unique=True, nullable=False)
-    name = db.Column(db.String(100), unique=True, nullable=False)
-    major = db.Column(db.String(50), unique=True, nullable=False)
+    password = db.Column(db.String(250), nullable=False)
+    name = db.Column(db.String(100), nullable=False)
+    major = db.Column(db.String(50), nullable=False)
     permission = db.Column(db.Integer, default=1)
     login_fail_limit = db.Column(db.Integer, default=0)
     access_check = db.Column(db.Integer, default=0)

@@ -47,9 +47,10 @@ class Login(Resource):
                         'refresh_token' : refresh_token
                     }, 201, redirect(host_url+url_for('adminpage'))
                 else:
-                    res=redirect(host_url+url_for('lecture'))
+                    res= redirect(host_url+url_for('lecture'))
                     set_access_cookies(res,access_token)
                     set_refresh_cookies(res,refresh_token)
+                    return res
                     '''
                     return {
                         'access_token' : access_token,

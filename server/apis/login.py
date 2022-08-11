@@ -51,6 +51,7 @@ class Login(Resource):
                     set_access_cookies(res,access_token)
                     set_refresh_cookies(res,refresh_token)
                     return res
+
                     '''
                     return {
                         'access_token' : access_token,
@@ -58,8 +59,8 @@ class Login(Resource):
                     },201,redirect(host_url+url_for('lecture'))
                     '''
 
-                msg="invalid password"
-                return redirect(host_url + url_for('login', msg=msg))
+            msg="invalid password"
+            return redirect(host_url + url_for('login', msg=msg))
         else:
             msg="check email"
             return redirect(host_url + url_for('login', msg=msg))

@@ -13,6 +13,7 @@ host_url=env["HOST"]
 
 class Lecture(Resource):
 
+    @jwt_required()
     def get(self):#강의목록
         lecture_list = lecture_listing()
         return make_response(render_template("lecture_list.html",lecture_list=lecture_list))

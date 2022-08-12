@@ -42,22 +42,14 @@ class Login(Resource):
                 msg=""
                 access_token, refresh_token = create_tokens(account)
                 if(account.permission==0):
-                    return {
-                        'access_token' : access_token,
-                        'refresh_token' : refresh_token
-                    }, 201, redirect(host_url+url_for('adminpage'))
-                else:
-                    res= redirect(host_url+url_for('lecture'))
+                    res=make_response(redirect(host_url+url_for('admin')))
                     set_access_cookies(res,access_token)
-                    set_refresh_cookies(res,refresh_token)
                     return res
-
-                    '''
-                    return {
-                        'access_token' : access_token,
-                        'refresh_token': refresh_token
-                    },201,redirect(host_url+url_for('lecture'))
-                    '''
+                else:
+                    res=make_response(redirect(host_url+url_for('lecture')))
+                    set_access_cookies(res,access_token)
+                    return res
+    
 
             msg="invalid password"
             return redirect(host_url + url_for('login', msg=msg))

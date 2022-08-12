@@ -1,19 +1,22 @@
-from flask import jsonify
+from flask import jsonify,render_template, request, redirect, url_for,abort,make_response
 from flask_restful import reqparse, Resource
 from flask_jwt_extended import (
     jwt_required, get_jwt_identity, create_access_token, get_jwt
 )
 import re
+
+from ..services.login_service import admin_required
 from ..services.admin_service import user_listing, activating_user,AdminResult
 from os import environ as env
 host_url=env["HOST"]
+
 class admin(Resource):
-    @jwt_required()
-    def get(self):#계정전체 명단
+    @admin_required()
+    def get(self):
         result,user_list = user_listing()
         if(result==AdminResult.NOT_FOUND):
             return {"msg":"none user"},404
-        return jsonify(uesr_list=user_list)
+        return make_response(render_template("admin_list.html",user_list=user_list))
     
     def post(self):
         parser = reqparse.RequestParser()

@@ -15,7 +15,7 @@ def user_listing(mode=None):#mode none일시 전체검색, 1일시 가입승인�
     user_list = []
     for user in acc_list:
         tmp_uesr = {}
-        tmp_uesr["uesr_no"] = user.user_no
+        tmp_uesr["user_no"] = user.user_no
         tmp_uesr["email"] = user.email
         tmp_uesr["name"] = user.name
         tmp_uesr["major"] = user.major

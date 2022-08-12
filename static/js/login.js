@@ -42,8 +42,35 @@ $(document).ready(function(){
 	$(document).on("click", ".btn-cancel", function(){
 		history.back();
 	});
-});
+/*
+	$("#login").click(function() {//로그인
+		var action = $("#form1").attr('action');
 
+		var form_data = {
+			email: $("#email").val(),
+			pw: $("#pw").val(),
+		};
+		$.ajax({
+			type: "POST",
+			url: action,
+			data: form_data,
+			dataType:"json"
+		})
+		.done(function(data, textStatus, xhr) {
+			console.log(data);
+			console.log(textStatus);
+			console.log(JSON.stringify(xhr));
+			alert(xhr);
+				if(data == 'success') {
+					alert("로그인 성공");
+				}
+				else {
+					alert("아이디 또는 비밀번호가 잘못되었습니다");	
+				}
+		})		
+	});
+});
+*/
 function loginFormCheck(){
 	var email = $("input[name=email]");
 	var passwd = $("input[name=pw]");

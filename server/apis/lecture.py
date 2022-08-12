@@ -1,16 +1,17 @@
+import json
 from flask import jsonify,render_template, request, redirect, url_for,abort,make_response
 from flask_restful import reqparse, Resource
 from flask_jwt_extended import (
     jwt_required, get_jwt_identity, create_access_token, get_jwt
 )
 import re
-from ..services.lecture_service import lecture_listing, make_lecture,modify_lecture,delete_lecture, search_student
+from ..services.lecture_service import lecture_listing, make_lecture,modify_lecture,delete_lecture, search_student,major_listing,attendee_add,attendee_listing
 from ..services.login_service import (
      admin_required, professor_required, assistant_required
 )
 from os import environ as env
 host_url=env["HOST"]
-
+perm_list={"학생":1,"조교":2,"교수":3}
 class Lecture(Resource):
 
     @jwt_required()
@@ -71,10 +72,44 @@ class Lecture_mod_del(Resource):
 class Student(Resource):
     def get(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('name', type=str, help="name is required")
-        parser.add_argument('major', type=str, help="major id is required")
+        parser.add_argument('name', type=str)
+        parser.add_argument('major', type=str)
         args = parser.parse_args()
         user_name=args['name']
         user_major= args['major']
         user_list = search_student(user_name,user_major)
         return jsonify(user_list=user_list)
+    
+class Major(Resource):
+    def get(self):
+        parser=reqparse.RequestParser()
+        parser.add_argument('major',type=str)
+        args=parser.parse_args()
+        user_major=args['major']
+        major_list= major_listing(user_major)
+        return jsonify(major_list=major_list)
+
+class Attend(Resource):
+    def get(self):
+        parser=reqparse.RequestParser()
+        parser.add_argument('lecture_no',type=int)
+        args=parser.parse_args()
+        lecture_no=args['lecture_no']
+        attendee_list=attendee_listing(lecture_no)
+        return jsonify(attendee_list=attendee_list)
+
+    def post(self):
+        parser=reqparse.RequestParser()
+        parser.add_argument('user_no',type=int)
+        parser.add_argument('lecture_no',type=int)
+        parser.add_argument('permission',type=str)
+        args=parser.parse_args()
+        user_no=args['user_no']
+        lecture_no=args['lecture_no']
+        permission=args['permission']
+        if args['permission'] not in perm_list:
+            permission=1
+        else:
+            permission=perm_list[args['permission']]
+        attendee_add(user_no,lecture_no,permission)
+        return {"good~":"hi"}

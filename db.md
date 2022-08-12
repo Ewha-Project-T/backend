@@ -11,3 +11,6 @@
 ```create table assignment(assignment_no int primary key auto_increment, lecture_no int,foreign key(lecture_no) references lecture(lecture_no) on delete cascade);```   
 
 ```create table assignment_check(check_no int primary key auto_increment, assignment_no int,attendee_no int,assignment_check int default 0,foreign key(assignment_no) references assignment(assignment_no) on delete cascade,foreign key(attendee_no) references attendee(attendee_no) on delete cascade);```   
+
+```create table STT(stt_no int primary key auto_increment,user_no int,assignment_no int,wav_file varchar(36),foreign key(user_no) references user(user_no) on delete cascade,foreign key(assignment_no) references assignment(assignment_no) on delete cascade);```
+

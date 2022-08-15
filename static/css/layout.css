@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Poppins", sans-serif; }
+#serverMsg { display: none; }
 .videoDiv { width: 100%; }
 #myVideo { position: fixed; right: 0; bottom: 0; width: 100%; min-height: 100%; margin-right: 12.5%; }
 ::selection { color: #fff; background: #53f0e3; }

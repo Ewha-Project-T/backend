@@ -12,5 +12,8 @@
 	
 	<body>
 {% block content %}{% endblock %}
+	{% if msg != '' %}
+	<div id="serverMsg">{{ msg }}</div>
+	{% endif %}
 	</body>
 </html>

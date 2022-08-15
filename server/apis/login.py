@@ -10,17 +10,15 @@ from ..services.login_service import (
 from os import environ as env
 host_url=env["HOST"]
 jwt_blocklist = set()
-global msg
-msg=""
 perm_list={"학생":1,"조교":2,"교수":3}
 
 class Login(Resource): 
     def get(self):
-        global msg
+        msg = ""
+        if request.args.get('msg') != "":
+            msg = request.args.get('msg')
         return make_response(render_template('login.html',msg=msg))
     def post(self):#로그인
-        global msg
-        msg=""
         parser = reqparse.RequestParser()
         parser.add_argument('email', type=str, required=True, help="EMAIL is required")
         parser.add_argument('pw', type=str, required=True, help="PW is required")
@@ -64,7 +62,9 @@ class Login(Resource):
 
 class Join(Resource):
     def get(self):
-        global msg
+        msg = ""
+        if request.args.get('msg') == "":
+            msg = request.args.get('msg')
         parser = reqparse.RequestParser()
         parser.add_argument('mode', type=str)
         parser.add_argument('email', type=str)
@@ -79,8 +79,6 @@ class Join(Resource):
         return make_response(render_template('join.html',msg=msg))
 
     def post(self):
-        global msg
-        msg=""
         parser = reqparse.RequestParser()
         parser.add_argument('email', type=str, help="Email is required")
         parser.add_argument('pw', type=str, help="PW is required")

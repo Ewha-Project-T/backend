@@ -1,0 +1,62 @@
+{% extends 'layout_login.html' %}
+
+{% block stylesheet %}
+{% endblock %}
+
+{% block script %}
+{% endblock %}
+
+{% block content %}
+			<div class="lectureAddFormDiv">
+				<form>
+					<h1>강의 만들기</h1>
+
+					<div class="inputFormDiv">
+						<label for="" class="lectureAddFormLebel">강의명</label>
+						<input type="text" class="inputStyle01">
+					</div>
+					<div class="inputFormDiv">
+						<div class="inputFormDiv-1">
+							<label for="" class="lectureAddFormLebel">연도</label>
+							<select class="inputStyle01">
+							<option>2022</option>
+							<option>2021</option>
+							</select>
+						</div>
+						<div class="inputFormDiv-2">
+							<label for="" class="lectureAddFormLebel">학기</label>
+							<select class="inputStyle01">
+							<option>1학기</option>
+							<option>2학기</option>
+							</select>
+						</div>
+					</div>
+					<div class="inputFormDiv">
+						<label for="" class="lectureAddFormLebel">개설학과</label>
+						<select class="inputStyle01">
+						<option>ㅁㅁㅁㅁ과</option>
+						<option>ㅂㅂㅂㅂ과</option>
+						</select>
+					</div>
+					<div class="inputFormDiv">
+						<label for="" class="lectureAddFormLebel">분반</label>
+						<select class="inputStyle01">
+						<option>1분반</option>
+						<option>2분반</option>
+						</select>
+					</div>
+					<div class="inputFormDiv">
+						<label for="" class="lectureAddFormLebel">담당교수</label>
+						<input type="text" class="inputStyle01">
+					</div>
+					<div class="inputFormDiv">
+						<label for="" class="lectureAddFormLebel">수강생명단</label>
+						<textarea class="inputStyle01"></textarea>
+					</div>
+					<div class="btnDiv btn-2">
+						<button class="btn btn-cancel">취소</button>
+						<input class="btn btn-submit" type="submit" value="생성">
+					</div>
+				</form>
+			</div>
+{% endblock %}

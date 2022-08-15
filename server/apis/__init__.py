@@ -1,6 +1,6 @@
 from server.model import Lecture
 from .login import Login, LoginRefresh,Join
-from .lecture import Attend, Lecture, Lecture_mod_del, Student,Major
+from .lecture import Attend, Lecture, Lecture_mod_del, Student,Major, Lecture_add, Prob, Prob_submit, Prob_feedback
 from .admin import admin
 from .stt import Stt, SttJob
 
@@ -16,3 +16,7 @@ def load_api(api_module):
     api_module.add_resource(Student,'/student',endpoint='student')
     api_module.add_resource(Major,'/major',endpoint='major')
     api_module.add_resource(Attend,'/attend',endpoint='attend')
+    api_module.add_resource(Lecture_add, '/lecture_add', endpoint='lecture_add')
+    api_module.add_resource(Prob, '/prob', endpoint='prob')
+    api_module.add_resource(Prob_submit, '/prob_submit', endpoint='prob_submit')
+    api_module.add_resource(Prob_feedback, '/prob_feedback', endpoint='prob_feedback')

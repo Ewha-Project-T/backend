@@ -113,3 +113,19 @@ class Attend(Resource):
             permission=perm_list[args['permission']]
         attendee_add(user_no,lecture_no,permission)
         return {"good~":"hi"}
+
+class Lecture_add(Resource):
+    def get(self):
+        return make_response(render_template("lecture_add.html"))
+
+class Prob(Resource):
+    def get(self):
+        return make_response(render_template("prob_list.html"))
+
+class Prob_submit(Resource):
+    def get(self):
+        return make_response(render_template("prob_submit.html"))
+
+class Prob_feedback(Resource):
+    def get(self):
+        return make_response(render_template("prob_feedback.html"))

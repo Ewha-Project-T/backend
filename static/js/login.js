@@ -1,7 +1,7 @@
 $(document).ready(function(){
 	// 오류 메시지 출력
-	if($("input[name=msg]").val() != "" && $("input[name=msg]").val() != undefined){
-		alert($("input[name=msg]").val()); //login이 error msg가 들어가고 register 버튼클릭시 errormsg노출
+	if($("#serverMsg").text() != "" && $("#serverMsg").text() != undefined){
+		alert($("#serverMsg").text()); //login이 error msg가 들어가고 register 버튼클릭시 errormsg노출
 	}
 	// 회원가입 이메일 중복 체크
 	$(document).on("change", "input[name=email]", function(){
@@ -69,8 +69,9 @@ $(document).ready(function(){
 				}
 		})		
 	});
-});
 */
+});
+
 function loginFormCheck(){
 	var email = $("input[name=email]");
 	var passwd = $("input[name=pw]");

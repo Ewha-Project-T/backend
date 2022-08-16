@@ -1,4 +1,6 @@
 import json
+from pickle import TRUE
+from typing_extensions import Required
 from flask import jsonify,render_template, request, redirect, url_for,abort,make_response
 from flask_restful import reqparse, Resource
 from flask_jwt_extended import (
@@ -19,24 +21,6 @@ class Lecture(Resource):
         lecture_list = lecture_listing()
         return make_response(render_template("lecture_list.html",lecture_list=lecture_list))
 
-    def post(self):#강의생성/교수이상의권한
-        parser = reqparse.RequestParser()
-        parser.add_argument('name', type=str, required=True, help="Nameis required")
-        parser.add_argument('year', type=str, required=True, help="Year is required")
-        parser.add_argument('semester', type=str, required=True, help="Semester is required")
-        parser.add_argument('major', type=str, required=True, help="Major is required")
-        parser.add_argument('separated', type=str, required=True, help="separated id is required")
-        parser.add_argument('professor', type=str, required=True, help="professor is required")
-
-        args = parser.parse_args()
-        lecture_name = args['name']
-        lecture_year = args['year']
-        lecture_semester = args['semester']
-        lecture_major=args['major']
-        lecture_separated= args['separated']
-        lecture_professor = args['professor']
-        make_lecture(lecture_name,lecture_year,lecture_semester,lecture_major,lecture_separated,lecture_professor)#추후 에러코드관리
-        return{"msg" : "lecture make success"},201
 
 
 class Lecture_mod_del(Resource):
@@ -70,7 +54,7 @@ class Lecture_mod_del(Resource):
         return{"msg" : "lecture modify success"},200
 
 class Student(Resource):
-    def get(self):
+    def get(self):#학생조회 이름과 전공으로 검색 후 리스팅
         parser = reqparse.RequestParser()
         parser.add_argument('name', type=str)
         parser.add_argument('major', type=str)
@@ -81,7 +65,7 @@ class Student(Resource):
         return jsonify(user_list=user_list)
     
 class Major(Resource):
-    def get(self):
+    def get(self):#해당전공 과목 리스팅
         parser=reqparse.RequestParser()
         parser.add_argument('major',type=str)
         args=parser.parse_args()
@@ -90,7 +74,7 @@ class Major(Resource):
         return jsonify(major_list=major_list)
 
 class Attend(Resource):
-    def get(self):
+    def get(self):# lecture no로 해당 강의의 수강생 명단 리스팅
         parser=reqparse.RequestParser()
         parser.add_argument('lecture_no',type=int)
         args=parser.parse_args()
@@ -98,7 +82,7 @@ class Attend(Resource):
         attendee_list=attendee_listing(lecture_no)
         return jsonify(attendee_list=attendee_list)
 
-    def post(self):
+    def post(self):#수강생 명단추가
         parser=reqparse.RequestParser()
         parser.add_argument('user_no',type=int)
         parser.add_argument('lecture_no',type=int)
@@ -117,6 +101,25 @@ class Attend(Resource):
 class Lecture_add(Resource):
     def get(self):
         return make_response(render_template("lecture_add.html"))
+    def post(self):#강의생성/교수이상의권한
+        parser = reqparse.RequestParser()
+        parser.add_argument('name', type=str, required=True, help="Nameis required")
+        parser.add_argument('year', type=str, required=True, help="Year is required")
+        parser.add_argument('semester', type=str, required=True, help="Semester is required")
+        parser.add_argument('major', type=str, required=True, help="Major is required")
+        parser.add_argument('separated', type=str, required=True, help="separated id is required")
+        parser.add_argument('professor', type=str, required=True, help="professor is required")
+        parser.add_argument('attendee', type=str, action='append', required=True)
+        args = parser.parse_args()
+        lecture_name = args['name']
+        lecture_year = args['year']
+        lecture_semester = args['semester']
+        lecture_major=args['major']
+        lecture_separated= args['separated']
+        lecture_professor = args['professor']
+        attendee=args['attendee']
+        make_lecture(lecture_name,lecture_year,lecture_semester,lecture_major,lecture_separated,lecture_professor,attendee)#추후 에러코드관리
+        return{"msg" : "lecture make success"},201
 
 class Prob(Resource):
     def get(self):

@@ -7,6 +7,7 @@ import re
 from ..services.login_service import (
     login, register, LoginResult, RegisterResult, create_tokens, admin_required, professor_required, assistant_required,real_time_email_check
 )
+
 from os import environ as env
 host_url=env["HOST"]
 jwt_blocklist = set()
@@ -25,14 +26,14 @@ class Login(Resource):
         args = parser.parse_args()
         user_email = args['email']
         user_pw = args['pw']
-        if re.match("^[A-Za-z0-9]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[A-Za-z0-9])*\.[A-Za-z]{2,3}$", user_email):
+        if re.match("^[A-Za-z0-9]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[A-Za-z0-9])*\.[A-Za-z]{2,3}$", user_email):#나중에 ewha.ac.kr같은 것만 되게 수정해야됨
             result, account = login(user_email, user_pw)
             if(result==LoginResult.ACC_IS_NOT_FOUND):
                 msg="User Not Found"
                 return redirect(host_url + url_for('login', msg=msg))
             if(result==LoginResult.NEED_ADMIN_CHECK):
-                msg="you need Admin check"
-                return redirect(host_url + url_for('login', msg=msg))
+                msg="you need email check"
+                return redirect(host_url + url_for('email_check', msg=msg))
             if(result==LoginResult.LOGIN_COUNT_EXCEEDED):
                 msg="clogin count exceeded"
                 return redirect(host_url + url_for('login', msg=msg))
@@ -121,17 +122,20 @@ class Join(Resource):
             return redirect(host_url + url_for('join', msg=msg))
             #return {'location':'/join'},400
 
+class Email_check(Resource):
+    def get(self):
+        return make_response(render_template('mail_check.html'))
 
 	
 
-
+'''
 class LoginRefresh(Resource):#리프래쉬 토큰
     @jwt_required(refresh=True)
     def get(self):
         current_user = get_jwt_identity()
         new_access_token = create_access_token(identity=current_user, fresh=False)
         return {"access_token": new_access_token}, 200
-    
+'''
 
 
 

@@ -121,14 +121,3 @@ class Lecture_add(Resource):
         make_lecture(lecture_name,lecture_year,lecture_semester,lecture_major,lecture_separated,lecture_professor,attendee)#추후 에러코드관리
         return{"msg" : "lecture make success"},201
 
-class Prob(Resource):
-    def get(self):
-        return make_response(render_template("prob_list.html"))
-
-class Prob_submit(Resource):
-    def get(self):
-        return make_response(render_template("prob_submit.html"))
-
-class Prob_feedback(Resource):
-    def get(self):
-        return make_response(render_template("prob_feedback.html"))

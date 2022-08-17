@@ -47,7 +47,7 @@
 					<ul>
 					{% for  i in lecture_list %}
 						<li>
-							<div class="lectureInfoDiv" link="{{ url_for('prob') }}">
+							<div class="lectureInfoDiv" link="{{ url_for('prob',lecture_no=i.lecture_no}}) }}">
 								<div class="lectureTitleDiv">
 									<span>{{i.lecture_name}}<br>{{i.professor}}</span>
 									<img src="x">

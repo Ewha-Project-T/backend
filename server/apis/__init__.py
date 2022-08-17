@@ -1,6 +1,7 @@
 from server.model import Lecture
 from .login import Login,Join,Email_check
-from .lecture import Attend, Lecture, Lecture_mod_del, Student,Major, Lecture_add, Prob, Prob_submit, Prob_feedback
+from .lecture import Attend, Lecture, Lecture_mod_del, Student,Major, Lecture_add
+from .assignment import Prob, Prob_submit, Prob_feedback,Prob_mod
 from .admin import admin
 from .stt import Stt, SttJob
 
@@ -21,3 +22,4 @@ def load_api(api_module):
     api_module.add_resource(Prob_submit, '/prob_submit', endpoint='prob_submit')
     api_module.add_resource(Prob_feedback, '/prob_feedback', endpoint='prob_feedback')
     api_module.add_resource(Email_check,'/mail_check',endpoint='Email_check')
+    api_module.add_resource(Prob_mod,'/prob_mod',endpoint='prob_mod')

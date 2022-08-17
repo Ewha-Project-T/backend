@@ -20,4 +20,4 @@ def load_api(api_module):
     api_module.add_resource(Prob, '/prob', endpoint='prob')
     api_module.add_resource(Prob_submit, '/prob_submit', endpoint='prob_submit')
     api_module.add_resource(Prob_feedback, '/prob_feedback', endpoint='prob_feedback')
-    api_module.add_resource(Email_check,'/email_check',endpoint='Email_check')
+    api_module.add_resource(Email_check,'/mail_check',endpoint='Email_check')

@@ -62,7 +62,8 @@ class Student(Resource):
         user_name=args['name']
         user_major= args['major']
         user_list = search_student(user_name,user_major)
-        return jsonify(user_list=user_list)
+        return make_response(render_template("user_list.html",user_list=user_list))
+        
     
 class Major(Resource):
     def get(self):#해당전공 과목 리스팅

@@ -4,6 +4,9 @@
 {% endblock %}
 
 {% block script %}
+<script>
+	function show_user_list() { window.open("{{ 'student' }}", "수강생명단","width=1000, height=1000"); }
+</script>
 {% endblock %}
 
 {% block content %}
@@ -28,14 +31,20 @@
 							<select class="inputStyle01">
 							<option>1학기</option>
 							<option>2학기</option>
+							<option>여름학기</option>
+							<option>겨울학기</option>
 							</select>
 						</div>
 					</div>
 					<div class="inputFormDiv">
 						<label for="" class="lectureAddFormLebel">개설학과</label>
 						<select class="inputStyle01">
-						<option>ㅁㅁㅁㅁ과</option>
-						<option>ㅂㅂㅂㅂ과</option>
+						<option>한일번역</option>
+						<option>한일통역</option>
+						<option>한중번역</option>
+						<option>한중통역</option>
+						<option>한영번역</option>
+						<option>한영통역</option>
 						</select>
 					</div>
 					<div class="inputFormDiv">
@@ -43,6 +52,14 @@
 						<select class="inputStyle01">
 						<option>1분반</option>
 						<option>2분반</option>
+						<option>3분반</option>
+						<option>4분반</option>
+						<option>5분반</option>
+						<option>6분반</option>
+						<option>7분반</option>
+						<option>8분반</option>
+						<option>9분반</option>
+						<option>10분반</option>
 						</select>
 					</div>
 					<div class="inputFormDiv">
@@ -51,7 +68,7 @@
 					</div>
 					<div class="inputFormDiv">
 						<label for="" class="lectureAddFormLebel">수강생명단</label>
-						<textarea class="inputStyle01"></textarea>
+						<textarea class="inputStyle01" onclick="show_user_list()"></textarea>
 					</div>
 					<div class="btnDiv btn-2">
 						<button class="btn btn-cancel">취소</button>

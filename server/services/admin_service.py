@@ -33,5 +33,10 @@ def activating_user(email):#일단기능만 에러처리는 나중에~
     db.session.add(acc)
     db.session.commit
 
+def del_user(email):
+    acc = User.query.filter_by(email=email).first()
+    db.session.delete(acc)
+    db.session.commit
+
 
 

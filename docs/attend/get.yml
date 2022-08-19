@@ -1,0 +1,12 @@
+해당강의 참석자조회
+---
+tags:
+  - 참석자
+parameters:
+  - in: body
+    name: lecture_no
+    type: int
+    required: True
+responses:
+  200:
+    description: attendee list

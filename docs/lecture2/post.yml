@@ -1,8 +1,13 @@
-강의만들기
+강의 수정
 ---
 tags:
   - 강의
 parameters:
+
+  - in: body
+    name: lecture_no
+    type: int
+    required: True   
   - in: body
     name: name
     type: string
@@ -24,9 +29,9 @@ parameters:
     type: string
     required: True 
   - in: body
-    name: boss
+    name: professor
     type: string
-    required: True   
+    required: True      
 responses:
   201:
-    description: lecture Success
+    description: lecture mod Success

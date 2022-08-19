@@ -1,4 +1,5 @@
 import json
+from operator import le
 from pickle import TRUE
 from typing_extensions import Required
 from flask import jsonify,render_template, request, redirect, url_for,abort,make_response
@@ -15,11 +16,15 @@ from os import environ as env
 host_url=env["HOST"]
 perm_list={"학생":1,"조교":2,"교수":3}
 class Lecture(Resource):
-
     @jwt_required()
-    def get(self):#강의목록
-        lecture_list = lecture_listing()
+    def get(self):
+        user_info=get_jwt_identity()
+        if(user_info["user_perm"]==0):
+            lecture_list=lecture_listing()
+        else:
+            lecture_list=lecture_listing(user_info)
         return make_response(render_template("lecture_list.html",lecture_list=lecture_list))
+
 
 
 
@@ -97,12 +102,15 @@ class Attend(Resource):
         else:
             permission=perm_list[args['permission']]
         attendee_add(user_no,lecture_no,permission)
-        return {"good~":"hi"}
+        return {"msg":"add success"}
 
 class Lecture_add(Resource):
+    @jwt_required()
     def get(self):
         return make_response(render_template("lecture_add.html"))
+    @jwt_required()
     def post(self):#강의생성/교수이상의권한
+        user_info=get_jwt_identity()
         parser = reqparse.RequestParser()
         parser.add_argument('name', type=str, required=True, help="Nameis required")
         parser.add_argument('year', type=str, required=True, help="Year is required")
@@ -119,6 +127,6 @@ class Lecture_add(Resource):
         lecture_separated= args['separated']
         lecture_professor = args['professor']
         attendee=args['attendee']
-        make_lecture(lecture_name,lecture_year,lecture_semester,lecture_major,lecture_separated,lecture_professor,attendee)#추후 에러코드관리
+        make_lecture(lecture_name,lecture_year,lecture_semester,lecture_major,lecture_separated,lecture_professor,attendee,user_info)#추후 에러코드관리
         return{"msg" : "lecture make success"},201
 

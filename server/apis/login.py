@@ -104,23 +104,22 @@ class Join(Resource):
             if(result==RegisterResult.SUCCESS):
                 msg="register success"
                 return redirect(host_url+ url_for('login'))
-#                return{'location':'/login'},201
+
             elif(result==RegisterResult.USEREMAIL_EXIST):
                 msg="user email exist"
                 return redirect(host_url + url_for('join', msg=msg))
-                #return {'location':'/join'},400
+
             elif(result==RegisterResult.INVALID_PERM):
                 msg="invalid permission"
                 return redirect(host_url + url_for('join', msg=msg))
-                #return {'location':'/join'},400
+
             else:
                 msg="bad parameters"
                 return redirect(host_url + url_for('join', msg=msg))
-#                return {'location':'/join'},404
+#
         else:
             msg="invalid email"
             return redirect(host_url + url_for('join', msg=msg))
-            #return {'location':'/join'},400
 
 class Email_check(Resource):
     def get(self):

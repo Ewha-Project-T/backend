@@ -4,4 +4,4 @@ tags:
   - 강의
 responses:
   200:
-    description: lecture list
+    description: perm=0->all_list, other perm->attend_lecture_list

@@ -7,6 +7,7 @@ import re
 
 from ..services.login_service import admin_required
 from ..services.admin_service import user_listing, activating_user,AdminResult
+from ..services.lecture_service import lecture_listing
 from os import environ as env
 host_url=env["HOST"]
 
@@ -31,3 +32,9 @@ class admin(Resource):
         if(result==AdminResult.NOT_FOUND):
             return {"msg":"none user"},404
         return jsonify(uesr_list=user_list)
+
+class Lecture_admin(Resource):
+    @jwt_required()
+    def get(self):#admin 강의목록
+        lecture_list = lecture_listing()
+        return make_response(render_template("lecture_list.html",lecture_list=lecture_list))

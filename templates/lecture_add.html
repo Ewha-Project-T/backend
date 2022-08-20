@@ -39,9 +39,9 @@
 			var attendeeEle = $(".userList li");
 			for(var i=0; i<attendeeEle.length; i++){
 				lecture_attendee.push({
-					"major": $(attendeeEle[0]).find("span")[0].innerText,
-					"email": $(attendeeEle[0]).find("span")[1].innerText,
-					"name": $(attendeeEle[0]).find("span")[2].innerText
+					"major": $(attendeeEle[i]).find("span")[0].innerText,
+					"email": $(attendeeEle[i]).find("span")[1].innerText,
+					"name": $(attendeeEle[i]).find("span")[2].innerText
 				});
 			}
 
@@ -61,7 +61,6 @@
 				headers: {'Content-Type': 'application/json'},
 				data: JSON.stringify(param),
 				success: function(d){
-					alert(d);
 					return location.href="/lecture";
 				}
 			});
@@ -148,15 +147,15 @@
 					<ul>
 						<li>
 							<input type="checkbox">
-							<span>이메일</span>
 							<span>학과</span>
+							<span>이메일</span>
 							<span>이름</span>
 						</li>
 						{% for i in user_list %}
 						<li>
 							<input type="checkbox">
-							<span>{{i.email}}</span>
 							<span>{{i.major}}</span>
+							<span>{{i.email}}</span>
 							<span>{{i.name}}</span>
 						</li>
 						{% endfor %}

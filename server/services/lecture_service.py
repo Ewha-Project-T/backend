@@ -48,13 +48,14 @@ def make_lecture(name,year,semester,major,separated,professor,attendee,user_info
     for attendee_user in attendee:
         attendee_user=attendee_user.replace("'",'"')
         user=json.loads(attendee_user)
-        user=user.popitem()
-        user_email=user[0]
-        user_name=user[1]
+        user_email=user["email"]
+        user_name=user["name"]
+        print(user_email)
+        print(user_name)
         user_acc=User.query.filter_by(email=user_email,name=user_name).first()
         if user_acc==None:
             continue
-        attend=Attendee(user_no=user_acc.user_no,lecture_no=this_lecture.lecture_no,permission=1)
+        attend=Attendee(user_no=user_acc.user_no,lecture_no=this_lecture.lecture_no,permission=user_acc.permission)
         db.session.add(attend)
         db.session.commit
 

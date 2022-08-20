@@ -8,7 +8,7 @@
 
 ```create table attendee(attendee_no int primary key auto_increment, user_no int,lecture_no int,permission int default 1,foreign key(user_no) references user(user_no) on delete cascade,foreign key(lecture_no) references lecture(lecture_no) on delete cascade);```   
 
-```create table assignment(assignment_no int primary key auto_increment, lecture_no int,foreign key(lecture_no) references lecture(lecture_no) on delete cascade);```   
+```create table assignment(assignment_no int primary key auto_increment, lecture_no int,week varchar(20) not null,limit_time DATETIME not null,as_name varchar(50) not null,as_type varchar(10),keyword TEXT,description TEXT,re_limit varchar(10) not null,speed float not null,disclosure int default 0,original_text TEXT,upload_url varchar(100),foreign key(lecture_no) references lecture(lecture_no) on delete cascade);```   
 
 ```create table assignment_check(check_no int primary key auto_increment, assignment_no int,attendee_no int,assignment_check int default 0,foreign key(assignment_no) references assignment(assignment_no) on delete cascade,foreign key(attendee_no) references attendee(attendee_no) on delete cascade);```   
 

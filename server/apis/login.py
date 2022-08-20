@@ -7,34 +7,33 @@ import re
 from ..services.login_service import (
     login, register, LoginResult, RegisterResult, create_tokens, admin_required, professor_required, assistant_required,real_time_email_check
 )
+
 from os import environ as env
 host_url=env["HOST"]
 jwt_blocklist = set()
-global msg
-msg=""
 perm_list={"학생":1,"조교":2,"교수":3}
 
 class Login(Resource): 
     def get(self):
-        global msg
+        msg = ""
+        if request.args.get('msg') != "":
+            msg = request.args.get('msg')
         return make_response(render_template('login.html',msg=msg))
     def post(self):#로그인
-        global msg
-        msg=""
         parser = reqparse.RequestParser()
         parser.add_argument('email', type=str, required=True, help="EMAIL is required")
         parser.add_argument('pw', type=str, required=True, help="PW is required")
         args = parser.parse_args()
         user_email = args['email']
         user_pw = args['pw']
-        if re.match("^[A-Za-z0-9]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[A-Za-z0-9])*\.[A-Za-z]{2,3}$", user_email):
+        if re.match("^[A-Za-z0-9]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[A-Za-z0-9])*\.[A-Za-z]{2,3}$", user_email):#나중에 ewha.ac.kr같은 것만 되게 수정해야됨
             result, account = login(user_email, user_pw)
             if(result==LoginResult.ACC_IS_NOT_FOUND):
                 msg="User Not Found"
                 return redirect(host_url + url_for('login', msg=msg))
             if(result==LoginResult.NEED_ADMIN_CHECK):
-                msg="you need Admin check"
-                return redirect(host_url + url_for('login', msg=msg))
+                msg="you need email check"
+                return redirect(host_url + url_for('email_check', msg=msg))
             if(result==LoginResult.LOGIN_COUNT_EXCEEDED):
                 msg="clogin count exceeded"
                 return redirect(host_url + url_for('login', msg=msg))
@@ -64,7 +63,9 @@ class Login(Resource):
 
 class Join(Resource):
     def get(self):
-        global msg
+        msg = ""
+        if request.args.get('msg') == "":
+            msg = request.args.get('msg')
         parser = reqparse.RequestParser()
         parser.add_argument('mode', type=str)
         parser.add_argument('email', type=str)
@@ -79,8 +80,6 @@ class Join(Resource):
         return make_response(render_template('join.html',msg=msg))
 
     def post(self):
-        global msg
-        msg=""
         parser = reqparse.RequestParser()
         parser.add_argument('email', type=str, help="Email is required")
         parser.add_argument('pw', type=str, help="PW is required")
@@ -105,35 +104,37 @@ class Join(Resource):
             if(result==RegisterResult.SUCCESS):
                 msg="register success"
                 return redirect(host_url+ url_for('login'))
-#                return{'location':'/login'},201
+
             elif(result==RegisterResult.USEREMAIL_EXIST):
                 msg="user email exist"
                 return redirect(host_url + url_for('join', msg=msg))
-                #return {'location':'/join'},400
+
             elif(result==RegisterResult.INVALID_PERM):
                 msg="invalid permission"
                 return redirect(host_url + url_for('join', msg=msg))
-                #return {'location':'/join'},400
+
             else:
                 msg="bad parameters"
                 return redirect(host_url + url_for('join', msg=msg))
-#                return {'location':'/join'},404
+#
         else:
             msg="invalid email"
             return redirect(host_url + url_for('join', msg=msg))
-            #return {'location':'/join'},400
 
+class Email_check(Resource):
+    def get(self):
+        return make_response(render_template('mail_check.html'))
 
 	
 
-
+'''
 class LoginRefresh(Resource):#리프래쉬 토큰
     @jwt_required(refresh=True)
     def get(self):
         current_user = get_jwt_identity()
         new_access_token = create_access_token(identity=current_user, fresh=False)
         return {"access_token": new_access_token}, 200
-    
+'''
 
 
 

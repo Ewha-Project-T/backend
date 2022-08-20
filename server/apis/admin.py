@@ -6,11 +6,12 @@ from flask_jwt_extended import (
 import re
 
 from ..services.login_service import admin_required
-from ..services.admin_service import user_listing, activating_user,AdminResult
+from ..services.admin_service import user_listing, activating_user,AdminResult,del_user
+from ..services.lecture_service import lecture_listing
 from os import environ as env
 host_url=env["HOST"]
 
-class admin(Resource):
+class Admin(Resource):
     @admin_required()
     def get(self):
         result,user_list = user_listing()
@@ -26,8 +27,19 @@ class admin(Resource):
         activating_user(email)
         return {"msg":"Activating account"},200
 
-    def put(self):#일단 put에 넣음 활성화 필요한 계정명단
+
+class Admin2(Resource):
+    @admin_required()
+    def get(self):#활성화 필요한 계정명단
         result,user_list = user_listing(1)
         if(result==AdminResult.NOT_FOUND):
             return {"msg":"none user"},404
-        return jsonify(uesr_list=user_list)
+        return make_response(render_template("admin_list.html",user_list=user_list))
+
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('email',type=str, required=True, help="email is required")
+        args= parser.parse_args()
+        email=args['email']
+        del_user(email)
+        return {"msg":"success"}

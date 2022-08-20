@@ -1,0 +1,17 @@
+유저조회
+---
+tags:
+  - 유저
+parameters:
+
+  - in: body
+    name: name
+    type: string
+    required: True   
+  - in: body
+    name: major
+    type: string
+    required: True   
+responses:
+  200:
+    description: user_list

@@ -4,4 +4,4 @@ tags:
   - 로그인관련
 responses:
   200:
-    description: DELETE Success
+    description: DELETE Success msg

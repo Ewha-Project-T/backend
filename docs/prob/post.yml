@@ -1,0 +1,69 @@
+과제 생성
+---
+tags:
+  - 과제
+parameters:
+
+  - in: body
+    name: lecture_no
+    type: int
+    required: True
+
+  - in: body
+    name: week
+    type: string
+    required: True   
+
+  - in: body
+    name: limit_time
+    type: string
+    required: True
+
+  - in: body
+    name: as_name
+    type: string
+    required: True
+    
+  - in: body
+    name: as_type
+    type: string
+    required: True
+  
+  - in: body
+    name: keyword
+    type: string
+    required: True
+
+  - in: body
+    name: description
+    type: string
+    required: True
+
+  - in: body
+    name: re_limit
+    type: string
+    required: True
+
+  - in: body
+    name: speed
+    type: float
+    required: True
+
+  - in: body
+    name: disclosure
+    type: int
+    required: True
+
+  - in: body
+    name: original_text
+    type: str
+    required: True
+
+  - in: body
+    name: upload_url
+    type: str
+    required: True
+
+responses:
+  201:
+    description: assignment make success

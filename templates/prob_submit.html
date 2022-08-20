@@ -1,0 +1,44 @@
+{% extends 'layout_login.html' %}
+
+{% block stylesheet %}
+		<link href="{{ url_for('static', filename='css/videojs/video-js.min.css') }}" rel="stylesheet">
+		<link href="{{ url_for('static', filename='css/videojs/videojs.wavesurfer.min.css') }}" rel="stylesheet">
+		<link href="{{ url_for('static', filename='css/videojs/videojs.record.min.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block script %}
+		<script type="text/javascript" src="{{ url_for('static', filename='js/videojs/video.min.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/videojs/adapter.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/videojs/recorder.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/videojs/wavesurfer.min.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/videojs/wavesurfer.microphone.min.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/videojs/videojs.wavesurfer.min.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/videojs/videojs.record.min.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/videojs/videojs.record.recorderjs.min.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/video_controller.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+			<div class="contentDiv">
+				<h1>동시 통역/순차 통역</h1>
+				<div class="probKeywordDiv">
+					<span>문제 키워드 : 테스트 키워드</span>
+				</div>
+				<div class="exampleAudioDiv">
+					<h2>원음</h2>
+					<audio id="exampleAudioWaveSurfer" class="video-js vjs-default-skin" audioLink="{{ url_for('static', filename='audio/audio_sample.wav') }}"></audio>
+				</div>
+				<div class="submitAudioDiv">
+					<h2>내음성</h2>
+					<audio id="submitAudioWaveSurfer" class="video-js vjs-default-skin"></audio>
+				</div>
+				<div class="recordControllerDiv">
+					<!--button class="btn sequentialBtn">통역 시작</button-->
+					<button class="btn simultaneousBtn">통역 시작</button>
+				</div>
+				<div class="recordBtnDiv btnDiv btn-2 btn-align-right">
+					<button class="btn btn-cancel">임시저장</button>
+					<button class="btn btn-submit submitRecordDataBtn">제출</button>
+				</div>
+			</div>
+{% endblock %}

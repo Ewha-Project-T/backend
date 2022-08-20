@@ -47,7 +47,7 @@
 					<ul>
 					{% for  i in lecture_list %}
 						<li>
-							<div class="lectureInfoDiv">
+							<div class="lectureInfoDiv" link="{{ url_for('prob',lecture_no=i.lecture_no) }}">
 								<div class="lectureTitleDiv">
 									<span>{{i.lecture_name}}<br>{{i.professor}}</span>
 									<img src="x">
@@ -64,9 +64,9 @@
 					{% endfor %}
 						
 						<li>
-							<div class="lectureInfoDiv">
+							<div class="lectureInfoDiv" link="{{ url_for('prob') }}">
 								<div class="lectureTitleDiv">
-									<span>SW 문제해결<br>Self Study Book!</span>
+									<span>SW 문제해결<br>클릭시 과제목록</span>
 									<img src="x">
 								</div>
 								<div class="lectureContentDiv">
@@ -80,8 +80,8 @@
 						</li>
 						<li>
 							<div class="lectureInfoAddDiv">
-								<div class="lectureInfoAddBtnDiv">
-									<img src="x" alt="추가버튼">
+								<div class="lectureInfoAddBtnDiv" link="{{ url_for('lecture_add') }}">
+									<img src="x" alt="클릭시 강의추가">
 								</div>
 							</div>
 						</li>

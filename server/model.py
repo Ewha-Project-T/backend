@@ -1,3 +1,5 @@
+from ast import keyword
+from calendar import week
 from server import db
 import os
 import sys
@@ -48,6 +50,17 @@ class Assignment(db.Model):
     __tablename__="ASSIGNMENT"
     assignment_no = db.Column(db.Integer, primary_key=True)
     lecture_no = db.Column(db.Integer, db.ForeignKey("LECTURE.lecture_no"), nullable=True)
+    week = db.Column(db.String(20), nullable=False)
+    limit_time = db.Column(db.DateTime, nullable=False)
+    as_name = db.Column(db.String(50), nullable=False)
+    as_type = db.Column(db.String(10), nullable=False)
+    keyword = db.Column(db.Text)
+    description = db.Column(db.Text)
+    re_limit = db.Column(db.String(10), nullable=False)
+    speed = db.Column(db.Float, nullable=False)
+    disclosure= db.Column(db.Integer,default=0)
+    original_text= db.Column(db.Text)
+    upload_url= db.Column(db.String(100))
     
 
 class Assignment_check(db.Model):

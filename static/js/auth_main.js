@@ -7,16 +7,17 @@ $(document).ready(function(){
 	// 취소버튼
 	$(document).on("click", ".btn-cancel", function(){
 		history.back();
+		return false;
 	});
 	
 	// 강의만들기 이동
 	$(document).on("click", ".lectureInfoAddBtnDiv", function(){
-		location.href = "./lecture_add.html";
+		location.href = $(this).attr("link");
 	});
 	
 	// 과제목록 이동
 	$(document).on("click", ".lectureInfoDiv", function(){
-		location.href = "./prob_list.html";
+		location.href = $(this).attr("link");
 	});
 	
 	// 과제목록 상세보기
@@ -26,8 +27,13 @@ $(document).ready(function(){
 		rowRoot.find(".weekProbDetailDiv").toggle();
 	});
 	
-	// 과제 피드백
+	// 과제 제출
 	$(document).on("click", ".weekProbDetailEditBtn", function(){
-		location.href = "./prob_feedback.html";
+		location.href = $(this).attr("link");
+	});
+
+	// 과제 피드백
+	$(document).on("click", ".weekProbFeedbackBtn", function(){
+		location.href = $(this).attr("link");
 	});
 });

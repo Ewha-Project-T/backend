@@ -1,0 +1,59 @@
+{% extends 'layout_login.html' %}
+
+{% block stylesheet %}
+{% endblock %}
+
+{% block script %}
+{% endblock %}
+
+{% block content %}
+			<div class="contentDiv">
+				<h1>과제 목록</h1>
+				<ul class="weekProbWrapper">
+					<li>
+						<div class="weekProbDiv">
+							<div class="weekProbTitleDiv">
+								<h2>1주차 아래 화살표 클릭</h2>
+								<img src="{{ url_for('static', filename='images/bottom-arrow.png') }}" class="weekProbDetailViewBtn" alt="아래화살표">
+								<img src="{{ url_for('static', filename='images/plus.png') }}" class="weekProbAddBtn" alt="+">
+							</div>
+							{% for  i in prob_list %}
+							<div class="weekProbDetailDiv">
+								<ul>
+									<li>
+										<div class="weekProbDetailRowDiv">
+											<span class="">{{i.as_name}}</span>
+											<img src="{{ url_for('static', filename='images/minus.png') }}" class="weekProbDetailDelBtn" alt="-">
+											<img src="{{ url_for('static', filename='images/pen.png') }}" class="weekProbDetailEditBtn" alt="펜" link="{{ url_for('prob_submit') }}">
+										</div>
+									</li>
+								</ul>
+							</div>
+							{% endfor %}
+							<div class="weekProbDetailDiv">
+								<ul>
+									<li>
+										<div class="weekProbDetailRowDiv">
+											<span class="">한→일 번역 과제(펜클릭시 과제 제출)</span>
+											<img src="{{ url_for('static', filename='images/minus.png') }}" class="weekProbDetailDelBtn" alt="-">
+											<img src="{{ url_for('static', filename='images/pen.png') }}" class="weekProbDetailEditBtn" alt="펜" link="{{ url_for('prob_submit') }}">
+										</div>
+									</li>
+								</ul>
+							</div>
+							<div class="weekProbDetailDiv">
+                                                                <ul>
+                                                                        <li>
+                                                                                <div class="weekProbDetailRowDiv">
+                                                                                        <span class="">한→일 번역 과제(펜클릭시 피드백)</span>
+                                                                                        <img src="{{ url_for('static', filename='images/minus.png') }}" class="weekProbDetailDelBtn" alt="-">
+                                                                                        <img src="{{ url_for('static', filename='images/pen.png') }}" class="weekProbFeedbackBtn" alt="펜" link="{{ url_for('prob_feedback') }}">
+                                                                                </div>
+                                                                        </li>
+                                                                </ul>
+                                                        </div>
+						</div>
+					</li>
+				</ul>
+			</div>
+{% endblock %}

@@ -22,7 +22,7 @@ class Lecture(Resource):
             lecture_list=lecture_listing()
         else:
             lecture_list=lecture_listing(user_info)
-        return make_response(render_template("lecture_list.html",lecture_list=lecture_list))
+        return make_response(render_template("lecture_list.html",lecture_list=lecture_list,user_perm=user_info["user_perm"]))
 
 
 

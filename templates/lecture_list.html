@@ -78,11 +78,13 @@
 							</div>
 						</li>
 						<li>
+							{% if user_perm == 0 or user_perm== 3 %}
 							<div class="lectureInfoAddDiv">
 								<div class="lectureInfoAddBtnDiv" link="{{ url_for('lecture_add') }}">
 									<img src="x" alt="클릭시 강의추가">
 								</div>
 							</div>
+							{% endif %}
 						</li>
 					</ul>
 				</div>

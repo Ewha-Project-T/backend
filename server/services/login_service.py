@@ -65,6 +65,17 @@ def real_time_email_check(user_email):
     if acc !=None:
         return RegisterResult.USEREMAIL_EXIST
     return 0
+def get_all_user():
+    acc_list = User.query.all()
+    info_list = []
+    for info in acc_list:
+        tmp_info = {}
+        tmp_info["email"] = info.email
+        tmp_info["name"] = info.name
+        tmp_info["major"] = info.major
+        info_list.append(tmp_info)
+    return info_list
+
 
 def admin_required(): #관리자 권한
     def wrapper(fn):

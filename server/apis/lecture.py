@@ -1,7 +1,6 @@
 import json
 from operator import le
 from pickle import TRUE
-from typing_extensions import Required
 from flask import jsonify,render_template, request, redirect, url_for,abort,make_response
 from flask_restful import reqparse, Resource
 from flask_jwt_extended import (
@@ -10,7 +9,7 @@ from flask_jwt_extended import (
 import re
 from ..services.lecture_service import lecture_listing, make_lecture,modify_lecture,delete_lecture, search_student,major_listing,attendee_add,attendee_listing
 from ..services.login_service import (
-     admin_required, professor_required, assistant_required
+     admin_required, professor_required, assistant_required,get_all_user
 )
 from os import environ as env
 host_url=env["HOST"]
@@ -107,26 +106,27 @@ class Attend(Resource):
 class Lecture_add(Resource):
     @jwt_required()
     def get(self):
-        return make_response(render_template("lecture_add.html"))
+        user_list=get_all_user()
+        return make_response(render_template("lecture_add.html",user_list=user_list))
     @jwt_required()
     def post(self):#강의생성/교수이상의권한
         user_info=get_jwt_identity()
         parser = reqparse.RequestParser()
-        parser.add_argument('name', type=str, required=True, help="Nameis required")
-        parser.add_argument('year', type=str, required=True, help="Year is required")
-        parser.add_argument('semester', type=str, required=True, help="Semester is required")
-        parser.add_argument('major', type=str, required=True, help="Major is required")
-        parser.add_argument('separated', type=str, required=True, help="separated id is required")
-        parser.add_argument('professor', type=str, required=True, help="professor is required")
-        parser.add_argument('attendee', type=str, action='append', required=True)
+        parser.add_argument('lecture_name', type=str, required=True, help="Nameis required")
+        parser.add_argument('lecture_year', type=str, required=True, help="Year is required")
+        parser.add_argument('lecture_semester', type=str, required=True, help="Semester is required")
+        parser.add_argument('lecture_major', type=str, required=True, help="Major is required")
+        parser.add_argument('lecture_separated', type=str, required=True, help="separated id is required")
+        parser.add_argument('lecture_professor', type=str, required=True, help="professor is required")
+        parser.add_argument('lecture_attendee', type=str, action='append', required=True)
         args = parser.parse_args()
-        lecture_name = args['name']
-        lecture_year = args['year']
-        lecture_semester = args['semester']
-        lecture_major=args['major']
-        lecture_separated= args['separated']
-        lecture_professor = args['professor']
-        attendee=args['attendee']
+        lecture_name = args['lecture_name']
+        lecture_year = args['lecture_year']
+        lecture_semester = args['lecture_semester']
+        lecture_major=args['lecture_major']
+        lecture_separated= args['lecture_separated']
+        lecture_professor = args['lecture_professor']
+        attendee=args['lecture_attendee']
         make_lecture(lecture_name,lecture_year,lecture_semester,lecture_major,lecture_separated,lecture_professor,attendee,user_info)#추후 에러코드관리
         return{"msg" : "lecture make success"},201
 

@@ -4,33 +4,94 @@
 {% endblock %}
 
 {% block script %}
-<script>
-	function show_user_list() { window.open("{{ 'student' }}", "수강생명단","width=1000, height=1000"); }
-</script>
+	<script type="text/javascript">
+		// 강의만들기 수강생 팝업
+		$(document).on("click", ".userList", function(){
+			$(".userListPopDiv").show();
+		});
+
+		// 강의만들기 수강생 팝업 줄 클릭
+		$(document).on("click", ".userListPopDiv li", function(){
+			var ele = $(this).find("input[type=checkbox]");
+			if(ele.is(':checked')){
+				ele.prop("checked", false);
+				$(this).removeClass("checked");
+			}else{
+				ele.prop("checked", true);
+				$(this).addClass("checked");
+			}
+		});
+
+		// 강의만들기 수강생 팝업 닫기
+		$(document).on("click", ".btn-popClose", function(){
+			$(".userListPopDiv").hide();
+		});
+
+		// 강의만들기 수강생 선택완료
+		$(document).on("click", ".btn-popSelect", function(){
+			var eleList = $(".userListPopDiv").find("li.checked").clone();
+			$(".userList").empty();
+			$(".userList").append(eleList);
+			$(".userListPopDiv").hide();
+		});
+		function lectureSubmit(){
+			var lecture_attendee = [];
+			var attendeeEle = $(".userList li");
+			for(var i=0; i<attendeeEle.length; i++){
+				lecture_attendee.push({
+					"major": $(attendeeEle[0]).find("span")[0].innerText,
+					"email": $(attendeeEle[0]).find("span")[1].innerText,
+					"name": $(attendeeEle[0]).find("span")[2].innerText
+				});
+			}
+
+			var param = {
+				"lecture_name": $(".lectureAddFormDiv input[name='lecture_name']").val(),
+				"lecture_year": $(".lectureAddFormDiv select[name='lecture_year']").val(),
+				"lecture_semester": $(".lectureAddFormDiv select[name='lecture_semester']").val(),
+				"lecture_major": $(".lectureAddFormDiv select[name='lecture_major']").val(),
+				"lecture_separated": $(".lectureAddFormDiv select[name='lecture_separated']").val(),
+				"lecture_professor": $(".lectureAddFormDiv input[name='lecture_professor']").val(),
+				"lecture_attendee": lecture_attendee,
+			};
+
+			$.ajax({
+				url: "{{ url_for('lecture_add') }}",
+				type: "POST",
+				headers: {'Content-Type': 'application/json'},
+				data: JSON.stringify(param),
+				success: function(d){
+					alert(d);
+					return false;
+				}
+			});
+			return false;
+		}
+	</script>
 {% endblock %}
 
 {% block content %}
 			<div class="lectureAddFormDiv">
-				<form>
+				<form method="POST" action="#" onsubmit="return lectureSubmit()">
 					<h1>강의 만들기</h1>
 
 					<div class="inputFormDiv">
 						<label for="" class="lectureAddFormLebel">강의명</label>
-						<input type="text" class="inputStyle01">
+						<input type="text" class="inputStyle01" name="lecture_name">
 					</div>
 					<div class="inputFormDiv">
 						<div class="inputFormDiv-1">
 							<label for="" class="lectureAddFormLebel">연도</label>
-							<select class="inputStyle01">
-							<option>2022</option>
-							<option>2021</option>
+							<select class="inputStyle01" name="lecture_year">
+							<option value="2022">2022</option>
+							<option value="2021">2021</option>
 							</select>
 						</div>
 						<div class="inputFormDiv-2">
 							<label for="" class="lectureAddFormLebel">학기</label>
-							<select class="inputStyle01">
-							<option>1학기</option>
-							<option>2학기</option>
+							<select class="inputStyle01" name="lecture_semester">
+							<option value="1학기">1학기</option>
+							<option value="2학기">2학기</option>
 							<option>여름학기</option>
 							<option>겨울학기</option>
 							</select>
@@ -38,8 +99,8 @@
 					</div>
 					<div class="inputFormDiv">
 						<label for="" class="lectureAddFormLebel">개설학과</label>
-						<select class="inputStyle01">
-						<option>한일번역</option>
+						<select class="inputStyle01" name="lecture_major">
+						<option value="한일번역">한일번역</option>
 						<option>한일통역</option>
 						<option>한중번역</option>
 						<option>한중통역</option>
@@ -49,8 +110,8 @@
 					</div>
 					<div class="inputFormDiv">
 						<label for="" class="lectureAddFormLebel">분반</label>
-						<select class="inputStyle01">
-						<option>1분반</option>
+						<select class="inputStyle01" name="lecture_separated">
+						<option value="1분반">1분반</option>
 						<option>2분반</option>
 						<option>3분반</option>
 						<option>4분반</option>
@@ -64,16 +125,46 @@
 					</div>
 					<div class="inputFormDiv">
 						<label for="" class="lectureAddFormLebel">담당교수</label>
-						<input type="text" class="inputStyle01">
+						<input type="text" class="inputStyle01" name="lecture_professor">
 					</div>
 					<div class="inputFormDiv">
 						<label for="" class="lectureAddFormLebel">수강생명단</label>
-						<textarea class="inputStyle01" onclick="show_user_list()"></textarea>
+						<ul class="inputStyle01 userList"></ul>
 					</div>
 					<div class="btnDiv btn-2">
 						<button class="btn btn-cancel">취소</button>
 						<input class="btn btn-submit" type="submit" value="생성">
 					</div>
 				</form>
+			</div>
+			<div class="userListPopDiv">
+				<div class="userSearchDiv">
+					<select class="inputStyle01">
+						<option>학과</option>
+					</select>
+					<input class="inputStyle01" type="text">
+				</div>
+				<div class="userListDiv">
+					<ul>
+						<li>
+							<input type="checkbox">
+							<span>이메일</span>
+							<span>학과</span>
+							<span>이름</span>
+						</li>
+						{% for i in user_list %}
+						<li>
+							<input type="checkbox">
+							<span>{{i.email}}</span>
+							<span>{{i.major}}</span>
+							<span>{{i.name}}</span>
+						</li>
+						{% endfor %}
+					</ul>
+				</div>
+				<div class="btnDiv btn-2">
+					<span class="btn btn-popClose">닫기</span>
+					<span class="btn btn-popSelect">선택완료</span>
+				</div>
 			</div>
 {% endblock %}

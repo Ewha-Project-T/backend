@@ -1,0 +1,107 @@
+{% extends 'layout_login.html' %}
+
+{% block stylesheet %}
+<link href="{{ url_for('static', filename='css/videojs/video-js.min.css') }}" rel="stylesheet">
+<link href="{{ url_for('static', filename='css/videojs/videojs.wavesurfer.min.css') }}" rel="stylesheet">
+<link href="{{ url_for('static', filename='css/videojs/videojs.record.min.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript" src="{{ url_for('static', filename='js/videojs/video.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/videojs/adapter.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/videojs/wavesurfer.min.js') }}"></script>
+<script type="text/javascript">
+var probAudioPlayer;
+$(document).ready(function(){
+	// 문제음
+	const probAudioOptions = {
+		controls: true,
+		autoplay: false,
+		fluid: false,
+		bigPlayButton: false,
+		plugins: {
+			wavesurfer: {
+				backend: 'MediaElement',
+				displayMillisecons: false,
+				debug: true,
+				waveColor: '#086280',
+				progressColor: 'black',
+				cursorColor: 'black',
+				hideScrollbar: true
+			}
+		}
+	};
+	probAudioPlayer = videojs('probAudioWaveSurfer', probAudioOptions, function(){
+		probAudioPlayer.src({ src: '{{ url_for('static', filename='audio/audio_sample.wav') }}', type: 'audio/wav' });
+	});
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="contentDiv">
+	<h1>과제 추가</h1>
+	<div class="probAddFormDiv">
+		<div class="probAddFormLeftDiv">
+			<div class="inputFormDiv">
+				<div class="inputFormDiv-1">
+					<label for class="probAddFormLabel">주차</label>
+					<select class="inputStyle01" name="prob_week">
+						<option value="1주차">1주차</option>
+					</select>
+				</div>
+				<div class="inputFormDiv-2">
+					<label for class="probAddFormLabel">기한</label>
+					<input type="date" class="inputStyle01" name="prob_timeEnd">
+				</div>
+			</div>
+			<div class="inputFormDiv">
+				<div class="inputFormDiv-1 w75">
+					<label for class="probAddFormLabel">과제명</label>
+					<input type="text" class="inputStyle01" name="prob_name">
+				</div>
+				<div class="inputFormDiv-2 w25">
+					<label for class="probAddFormLabel">과제 종류</label>
+					<select class="inputStyle01" name="prob_type">
+						<option value="순차통역">순차통역</option>
+					</select>
+				</div>
+			</div>
+			<div class="inputFormDiv">
+				<label for class="probAddFormLabel">키워드</label>
+				<input type="text" class="inputStyle01" name="prob_keyword">
+			</div>
+			<div class="inputFormDiv">
+				<label for class="probAddFormLabel">과제 설명</label>
+				<textarea class="inputStyle01" name="prob_exp"></textarea>
+			</div>
+			<div class="inputFormDiv">
+				<div class="inputFormDiv-1 w25">
+					<label for class="probAddFormLabel">다시 듣기 제한</label>
+					<select class="inputStyle01" name="prob_replay">
+						<option value="무제한">무제한</option>
+					</select>
+				</div>
+				<div class="inputFormDiv-1 w25">
+					<label for class="probAddFormLabel">재생 속도</label>
+					<input type="text" class="inputStyle01" name="prob_play_speed">
+				</div>
+			</div>
+			<div class="inputFormDiv">
+				<input type="checkbox" name="prob_open">
+				<label for class="probAddFormLabel">과제 제출물 공개 여부</label>
+			</div>
+		</div>
+		<div class="probAddFormRightDiv">
+			<div class="inputFormDiv">
+				<label for class="probAddFormLabel">드래그하여 구간을 설정하세요.</label><br>
+				<label for class="probAddFormLabel">원음 : 1분 0초</label>
+				<div class="probAudioDiv">
+					<audio id="probAudioWaveSurfer" class="video-js vjs-default-skin"></audio>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+{% endblock %}

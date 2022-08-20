@@ -3,7 +3,6 @@ var submitAudioPlayer;
 var fd;
 $(document).ready(function(){
 	// 원음
-if($("#exampleAudioWaveSurfer").length > 0){
 	const sampleAudioOptions = {
 		controls: true,
 		autoplay: false,
@@ -22,8 +21,7 @@ if($("#exampleAudioWaveSurfer").length > 0){
 		}
 	};
 	exampleAudioPlayer = videojs('exampleAudioWaveSurfer', sampleAudioOptions, function() {
-		var audioLink = $(this).attr("audioLink");
-		exampleAudioPlayer.src({src: audioLink, type: 'audio/wav'});
+		exampleAudioPlayer.src({src: 'audio/audio_sample.wav', type: 'audio/wav'});
 	});
 	
 	exampleAudioPlayer.on("ended", function(){
@@ -37,10 +35,8 @@ if($("#exampleAudioWaveSurfer").length > 0){
 			btnEle.text("통역시작");
 		}
 	});
-}
-
+	
 	// 과제음
-if($("#assignmentAudioWaveSurfer").length > 0){
 	const assignmentAudioOptions = {
 		controls: true,
 		autoplay: false,
@@ -59,15 +55,13 @@ if($("#assignmentAudioWaveSurfer").length > 0){
 		}
 	};
 	assignmentAudioPlayer = videojs('assignmentAudioWaveSurfer', assignmentAudioOptions, function() {
-		var audioLink = $(this).attr("audioLink");
-		assignmentAudioPlayer.src({src: audioLink, type: 'audio/wav'});
+		assignmentAudioPlayer.src({src: 'audio/audio_sample.wav', type: 'audio/wav'});
 	});
 	
 	assignmentAudioPlayer.on("ended", function(){
 	});
-}	
+	
 	// 녹음
-if($("#submitAudioWaveSurfer").length > 0){
 	var submitAudioOptions = {
 		controls: true,
 		bigPlayButton: false,
@@ -125,8 +119,7 @@ if($("#submitAudioWaveSurfer").length > 0){
 	submitAudioPlayer.on('finishRecord', function() {
 		console.log('finished recording: ', submitAudioPlayer.recordedData);
 	});
-}
-
+	
 	// 동시 통역
 	$(document).on("click", ".simultaneousBtn", function(){
 		var btnEle = $(this);

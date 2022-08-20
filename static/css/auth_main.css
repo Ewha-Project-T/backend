@@ -46,6 +46,18 @@ li { display: block; }
 .lectureAddFormDiv .inputFormDiv .lectureAddFormLebel { font-size: 1rem; font-weight: bold; }
 .lectureAddFormDiv .inputFormDiv .inputFormDiv-1 { float: left; width: 45%; }
 .lectureAddFormDiv .inputFormDiv .inputFormDiv-2 { float: right; width: 45%; }
+.lectureAddFormDiv .inputFormDiv .userList { height: 100px; overflow-y: auto; }
+.lectureAddFormDiv .inputFormDiv .userList input { display: none; }
+.userListPopDiv { position: absolute; top: 50%; left: 50%; width: 600px; height: 500px; background-color: #d8d8d8; margin-left: -300px; margin-top: -250px; padding: 10px; display: none; }
+.userListPopDiv .userSearchDiv { overflow: hidden; padding: 5px; }
+.userListPopDiv .userSearchDiv select { float: left; width: 45%; background-color: #ffffff; }
+.userListPopDiv .userSearchDiv input { float: right; width: 45%; background-color: #ffffff; }
+.userListPopDiv .userListDiv { padding: 5px; overflow: hidden; height: 360px; overflow-y: auto; background-color: #ffffff; }
+.userListPopDiv .userListDiv li { overflow: hidden; padding: 5px 0px; }
+.userListPopDiv .userListDiv li input { float: left; width: 20px; height: 20px; }
+.userListPopDiv .userListDiv li span { float: left; width: 170px; padding: 0px 5px; }
+.userListPopDiv .btn-popClose { background-color: #ffffff; color: #000000; float: left; line-height: 50px; }
+.userListPopDiv .btn-popSelect { color: #ffffff; float: right; line-height: 50px; }
 
 /* 과제목록 */
 .weekProbWrapper { margin-top: 30px; }
@@ -59,8 +71,7 @@ li { display: block; }
 .weekProbWrapper .weekProbDiv .weekProbDetailDiv .weekProbDetailRowDiv:first { border-top: 0px; }
 .weekProbWrapper .weekProbDiv .weekProbDetailDiv span { float: left; font-size: 1rem; height: 32px; line-height: 32px; }
 .weekProbWrapper .weekProbDiv .weekProbDetailDiv .weekProbDetailDelBtn,
-.weekProbWrapper .weekProbDiv .weekProbDetailDiv .weekProbDetailEditBtn,
-.weekProbWrapper .weekProbDiv .weekProbDetailDiv .weekProbFeedbackBtn { float: right; margin-left: 10px; width: 32px; height: 32px; line-height: 32px; cursor: pointer; }
+.weekProbWrapper .weekProbDiv .weekProbDetailDiv .weekProbDetailEditBtn { float: right; margin-left: 10px; width: 32px; height: 32px; line-height: 32px; cursor: pointer; }
 
 /* 과제제출 */
 .probKeywordDiv { background-color: #d9d9d9; padding: 20px; border-radius: 10px; font-size: 1.5rem; font-weight: bold; margin-top: 30px; }

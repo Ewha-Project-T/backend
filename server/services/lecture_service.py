@@ -126,3 +126,4 @@ def attendee_listing(lecture_no):
         tmp["permission"]=acc.permission 
         attendee_list_result.append(tmp)
     return attendee_list_result
+

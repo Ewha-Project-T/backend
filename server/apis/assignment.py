@@ -15,12 +15,17 @@ perm_list={"학생":1,"조교":2,"교수":3}
 
 class Prob(Resource):
     def get(self):#과제리스트
+        print("hi")
         parser = reqparse.RequestParser()
         parser.add_argument('lecture_no', type=int, required=True, help="lecture_no is required")
         args = parser.parse_args()
         lecture_no = args['lecture_no']
         prob_list=prob_listing(lecture_no)
         return make_response(render_template("prob_list.html",prob_list=prob_list))
+
+class Prob_add(Resource):
+    def get(self):
+        return make_response(render_template("prob_add.html"))
     def post(self):#과제만들기
         parser = reqparse.RequestParser()
         parser.add_argument('lecture_no', type=int, required=True, help="lecture_no is required")

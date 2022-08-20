@@ -45,8 +45,9 @@ $(document).ready(function(){
 	});
 	
 	// 과제목록 이동
+
 	$(document).on("click", ".lectureInfoDiv", function(){
-		location.href = "./prob_list.html";
+		location.href = $(".lectureInfoDiv").attr("link");
 	});
 	
 	// 과제목록 상세보기
@@ -58,6 +59,14 @@ $(document).ready(function(){
 	
 	// 과제 피드백
 	$(document).on("click", ".weekProbDetailEditBtn", function(){
-		location.href = "./prob_feedback.html";
+		location.href = "./prob_feedback";
+	});
+	//과제 추가
+	$(document).on("click", ".weekProbAddBtn", function(){
+		location.href = "./prob_add";
+	});
+	//과제 제출
+	$(document).on("click", ".weekProbDetailEditBtn", function(){
+		location.href = "./prob_submit";
 	});
 });

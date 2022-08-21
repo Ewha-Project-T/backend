@@ -1,8 +1,12 @@
-from ..model import Attendee, User, Lecture, Assignment
+from distutils.command.upload import upload
+
+from server.apis import assignment
+from ..model import Attendee, User, Lecture, Assignment,Prob_region
 from server import db
 from functools import wraps
 from flask_jwt_extended import create_refresh_token, create_access_token, verify_jwt_in_request, get_jwt, get_jwt_identity
 import json
+import os
 
 def prob_listing(lecture_no):
     as_list=Assignment.query.filter_by(lecture_no=lecture_no).all()
@@ -24,12 +28,23 @@ def prob_listing(lecture_no):
         as_list_result.append(tmp)
     return as_list_result
 
-def make_as(lecture_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,original_text,upload_url):
+def make_as(lecture_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,original_text="",upload_url="",region=""):
     acc=Assignment(lecture_no=lecture_no,week=week,limit_time=limit_time,as_name=as_name,as_type=as_type,keyword=keyword,description=description,re_limit=re_limit,speed=speed,disclosure=disclosure,original_text=original_text,upload_url=upload_url)
     db.session.add(acc)
     db.session.commit
+    this_assignment=Assignment.query.order_by(Assignment.assignment_no.desc()).first()
+    for reg in region:
+        reg=reg.replace("'",'"')
+        json_reg=json.loads(reg)
+        reg_index=json_reg["index"]
+        reg_start=json_reg["start"]
+        reg_end=json_reg["end"]
+        pr=Prob_region(assignment_no=this_assignment.assignment_no,region_index=reg_index,start=reg_start,end=reg_end)
+        db.session.add(pr)
+        db.session.commit
 
-def mod_as(as_no,lecture_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,original_text,upload_url):
+
+def mod_as(as_no,lecture_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,original_text="",upload_url=""):
     acc=Assignment.query.filter_by(assignment_no=as_no).first()
     acc.lecture_no=lecture_no
     acc.week=week
@@ -45,3 +60,6 @@ def mod_as(as_no,lecture_no,week,limit_time,as_name,as_type,keyword,description,
     acc.upload_url=upload_url
     db.session.add(acc)
     db.session.commit
+
+
+

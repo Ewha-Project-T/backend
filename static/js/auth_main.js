@@ -63,10 +63,11 @@ $(document).ready(function(){
 	});
 	//과제 추가
 	$(document).on("click", ".weekProbAddBtn", function(){
-		location.href = "./prob_add";
+		location.href = $(".weekProbAddBtn").attr("link");
 	});
 	//과제 제출
 	$(document).on("click", ".weekProbDetailEditBtn", function(){
 		location.href = "./prob_submit";
 	});
+
 });

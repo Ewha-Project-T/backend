@@ -78,6 +78,13 @@ class Stt(db.Model):
     assignment_no = db.Column(db.Integer, db.ForeignKey("ASSIGNMENT.assignment_no"), nullable=False)
     wav_file = db.Column(db.String(36), nullable=False)
 
+class Prob_region(db.Model):
+    __tablename__="PROB_REGION"
+    region_no= db.Column(db.Integer, primary_key=True)
+    assignment_no = db.Column(db.Integer, db.ForeignKey("ASSIGNMENT.assignment_no"), nullable=False)
+    region_index = db.Column(db.String(10))
+    start = db.Column(db.String(10))
+    end = db.Column(db.String(10))
 
 class SttJob(db.Model):
     __tablename__ = "STTJOB"

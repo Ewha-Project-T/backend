@@ -11,6 +11,25 @@
 <script type="text/javascript">
 var probAudioPlayer;
 $(document).ready(function(){
+	// 파일업로드
+	$(document).on("change", "input[name=prob_sound_file]", function(){
+		var formData = new FormData();
+		formData.append("prob_sound", $("input[name=prob_sound_file]")[0].files[0]);
+		$.ajax({
+			url: "{{ url_for('prob_upload') }}",
+			type: "POST",
+			processData: false,
+			contentType: false,
+			data: formData,
+			success: function(d){
+				$(".probSoundUpload").hide();
+				$(".probAddFormRightDiv>.inputFormDiv").show();
+				$("input[name=prob_sound_path]").val(d.file_path);
+				probAudioPlayer.load(d.file_path);
+			}
+		});
+	});
+
 	$(document).on("click", ".waveRegionDiv .btn", function(){
 		var regionIndex = $(this).attr("region");
 		var region = Object.values(probAudioPlayer.regions.list)[regionIndex];
@@ -39,7 +58,6 @@ $(document).ready(function(){
 			})
 		]
 	});
-	probAudioPlayer.load("{{ url_for('static', filename='audio/audio_sample.wav') }}");
 	function regionUpdate(region, e){
 		var region = Object.values(probAudioPlayer.regions.list);
 		$(".waveRegionDiv ul").empty();
@@ -47,6 +65,8 @@ $(document).ready(function(){
 			var liEle = $("<li />");
 			var spanEle = $("<span />");
 			spanEle.addClass("btn").attr("region", i).text("구간 " + i + " : " + region[i].start.toFixed() + " ~ " + region[i].end.toFixed());
+			spanEle.attr("start", region[i].start.toFixed());
+			spanEle.attr("end", region[i].end.toFixed());
 			var spanEle2 = $("<span />");
 			spanEle2.addClass("del").attr("region", i).text("X");
 			liEle.append(spanEle);
@@ -54,11 +74,52 @@ $(document).ready(function(){
 			$(".waveRegionDiv ul").append(liEle);
 		}
 	}
+	probAudioPlayer.on('loading', function(){
+		var audioSize = probAudioPlayer.getDuration();
+		$(".waveSoundSize").text("원음 : " + Math.floor(audioSize / 60).toFixed()  + "분 " + Math.floor(audioSize % 60).toFixed() + "초");
+	});
 	probAudioPlayer.on('region-update-end', function(region, e){
 		regionUpdate(region, e);
 	});
 	probAudioPlayer.on('region-removed', function(region, e){
 		regionUpdate(region, e);
+	});
+
+	$(document).on("click", ".btn-submit", function(){
+		var region = [];
+		var regionBtnEle = $(".waveRegionDiv span.btn");
+		for(var i=0; i<regionBtnEle.length; i++){
+			region.push({
+				"index": i,
+				"start": $(regionBtnEle[i]).attr("start"),
+				"end": $(regionBtnEle[i]).attr("end")
+			});
+		}
+		var params = {
+			"lecture_no":"{{lecture_no}}",
+			"prob_sound_path": $("input[name=prob_sound_path]").val(),
+			"prob_week": $("select[name=prob_week]").val(),
+			"prob_timeEnd": $("input[name=prob_timeEnd]").val(),
+			"prob_name": $("input[name=prob_name]").val(),
+			"prob_type": $("select[name=prob_type]").val(),
+			"prob_keyword": $("input[name=prob_keyword]").val(),
+			"prob_exp": $("textarea[name=prob_exp]").val(),
+			"prob_replay": $("select[name=prob_replay]").val(),
+			"prob_play_speed": $("input[name=prob_play_speed]").val(),
+			"prob_open": $("input[name=prob_open]").val(),
+			"prob_region": region
+		};
+		console.log(JSON.stringify(params));
+		$.ajax({
+			
+			url: "{{ url_for('prob_add') }}",
+			type: "POST",
+			headers: {'Content-Type': 'application/json'},
+			data: JSON.stringify(params),
+			success: function(d){
+				location.href="prob?lecture_no="+"{{ lecture_no }}"
+			}
+		});
 	});
 });
 </script>
@@ -78,7 +139,7 @@ $(document).ready(function(){
 				</div>
 				<div class="inputFormDiv-2">
 					<label for class="probAddFormLabel">기한</label>
-					<input type="date" class="inputStyle01" name="prob_timeEnd">
+					<input type="datetime-local" class="inputStyle01" name="prob_timeEnd">
 				</div>
 			</div>
 			<div class="inputFormDiv">
@@ -119,9 +180,14 @@ $(document).ready(function(){
 			</div>
 		</div>
 		<div class="probAddFormRightDiv">
+			<div class="probSoundUpload">
+				<label for class="probSoundUploadLabel">음원 업로드</label>
+				<input type="file" name="prob_sound_file">
+				<input type="hidden" name="prob_sound_path">
+			</div>
 			<div class="inputFormDiv">
 				<label for class="probAddFormLabel">드래그하여 구간을 설정하세요.</label><br>
-				<label for class="probAddFormLabel">원음 : ?분 ?초</label>
+				<label for class="probAddFormLabel waveSoundSize">원음 : ?분 ?초</label>
 				<div id="waveform"></div>
 				<div class="waveRegionDiv">
 					<ul></ul>
@@ -129,6 +195,9 @@ $(document).ready(function(){
 			</div>
 		</div>
 	</div>
-
+	<div class="btnDiv btn-2">
+		<span class="btn btn-cancel">뒤로가기</span>
+		<span class="btn btn-submit">과제 생성</span>
+	</div>
 </div>
 {% endblock %}

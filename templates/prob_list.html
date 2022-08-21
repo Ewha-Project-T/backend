@@ -15,19 +15,21 @@
 							<div class="weekProbTitleDiv">
 								<h2>1주차 아래 화살표 클릭 하면 과제리스트 보임/더하기 누르면 과제추가</h2>
 								<img src="{{ url_for('static', filename='images/bottom-arrow.png') }}" class="weekProbDetailViewBtn" alt="아래화살표">
-								<img src="{{ url_for('static', filename='images/plus.png') }}" class="weekProbAddBtn" alt="+" link="{{ url_for('prob_add') }}">
+								<img src="{{ url_for('static', filename='images/plus.png') }}" class="weekProbAddBtn" alt="+" link="{{ url_for('prob_add',lecture_no=lecture_no) }}">
 							</div>
+							{% for  i in prob_list %}
 							<div class="weekProbDetailDiv">
 								<ul>
 									<li>
 										<div class="weekProbDetailRowDiv">
-											<span class="">한→일 번역 과제(펜클릭시 과제 제출)</span>
+											<span class="">{{i.as_name}}</span>
 											<img src="{{ url_for('static', filename='images/minus.png') }}" class="weekProbDetailDelBtn" alt="-">
 											<img src="{{ url_for('static', filename='images/pen.png') }}" class="weekProbDetailEditBtn" alt="펜" link="{{ url_for('prob_submit') }}">
 										</div>
 									</li>
 								</ul>
 							</div>
+							{% endfor %}
 							<div class="weekProbDetailDiv">
                                                                 <ul>
                                                                         <li>

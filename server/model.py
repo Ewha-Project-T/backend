@@ -88,3 +88,4 @@ class SttJob(db.Model):
     endidx = db.Column(db.Text, nullable=False)
     silenceidx = db.Column(db.Text, nullable=False)
     stt_result = db.Column(db.Text, nullable=True)
+    is_seq = db.Column(db.Boolean, default=False, nullable=False)

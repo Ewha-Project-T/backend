@@ -9,7 +9,7 @@ from pydub import AudioSegment, silence
 
 from server import db
 from ..model import Stt, SttJob
-from worker import do_stt_work
+from worker import do_stt_work, do_sequential_stt_work
 
 def simultaneous_stt(filename):
     task = do_stt_work.delay(filename)
@@ -24,7 +24,7 @@ def stt_getJobResult(jobid):
     if not task.ready():
         return { 'state': task.state }
 
-    res, sound, startidx, endidx, silenceidx = task.get()
+    res, sound, startidx, endidx, silenceidx, stt_id = task.get()
 
     result = {'textFile': '', 'timestamps': [], 'annotations': []}
     for i in range(len(sound)):
@@ -91,8 +91,13 @@ def stt_getJobResult(jobid):
 
         result['textFile'] += stt
 
+    # stt = Stt.query.filter_by(wav_file=stt_id).first()
+    # if stt is None:
+    #     return False
+
     job = SttJob(
         job_id=task.id,
+        # stt_no=stt.stt_no,
         sound=repr(sound),
         startidx=repr(startidx),
         endidx=repr(endidx),
@@ -104,6 +109,91 @@ def stt_getJobResult(jobid):
 
     return result
 
+
+def sequential_stt(filename, index):
+    task = do_sequential_stt_work.delay(filename, index)
+    return task.id
+
+def seqstt_getJobResult(jobid):
+    task = do_sequential_stt_work.AsyncResult(jobid)
+    if not task.ready():
+        return False
+    
+    temp, sounds, startidxs, endidxs, silenceidxs, stt_id = task.get()
+    result = {'textFile': '', 'timestamps': [], 'annotations': []}
+    for i in range(len(sounds)):
+        for k in range(len(sounds[i])):
+            result['timestamps'].append({'start': startidxs[i][k], 'end': endidxs[i][k]})
+
+        res = temp[i]
+        values = res["values"]
+        for k in range(len(values)):
+            kind = values[i]["kind"]
+            if kind != "Transcription":
+                continue
+
+            recog = requests.get(values[i]["links"]["contentUrl"]).json()
+            stt = process_stt_result(recog["recognizedPhrases"][0]["nBest"][0]["lexical"])
+            text += stt
+            sentences = sent_tokenize(stt)
+            for sentence in sentences:
+                # print(sentence)
+                if sentence.endswith('.'):
+                    flag = True
+                else:
+                    flag = False
+            if i < len(sounds[i]) - 1:
+                if flag == False:
+                    print("(pause: " + str(silenceidxs[i][k])+"sec)")  # 침묵
+                    text = text+'\n'
+                    pause_result += silenceidxs[i][k]
+                else:
+                    # 통역 개시 지연구간
+                    print("(delay: " + str(silenceidxs[i][k]) + "sec)")
+                    text = text+'\n'
+                    delay_result += silenceidxs[i][k]
+
+            p = re.compile('(\w\(filler\)|\w+\s\w+\(backtracking\))')
+            fidx = []
+            while (True):
+                f = p.search(stt)
+                if f == None:
+                    break
+                fidx.append([f.start(), f.end()])
+                stt = re.sub("(\(filler\)|\(backtracking\))", "", stt, 1)
+
+            for i in range(len(fidx)):
+                if stt[fidx[i][0]] == '음' or stt[fidx[i][0]] == '그' or stt[fidx[i][0]] == '어':
+                    result['annotations'].append(
+                        {'start': fidx[i][0], 'end': fidx[i][0] + 1, 'type': 'FILLER'})
+                else:
+                    result['annotations'].append(
+                        {'start': fidx[i][0], 'end': fidx[i][1] - 14, 'type': 'BACKTRACKING'})
+
+            pidx = []
+            indx = -1
+            while True:
+                indx = stt.find('\n', indx + 1)
+                if indx == -1:
+                    break
+                pidx.append(indx)
+            for i in range(len(pidx)): # pause, delay 구분 없이 pause 로 통일
+                result['annotations'].append({'start': pidx[i], 'end': pidx[i] + 1, 'type': 'PAUSE', 'duration': silenceidx[i]})
+
+            result['textFile'] += stt
+    
+    job = SttJob(
+        job_id=task.id,
+        # stt_no=stt.stt_no,
+        sound=repr(sounds),
+        startidx=repr(startidxs),
+        endidx=repr(endidxs),
+        silenceidx=repr(silenceidxs),
+        is_seq=True
+    )
+
+    job.stt_result = repr(result)
+    db.session.commit()
 
 # def sequential_stt(filename, index):
 #     myaudio = AudioSegment.from_file(

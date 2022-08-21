@@ -24,7 +24,7 @@
 										<div class="weekProbDetailRowDiv">
 											<span class="">{{i.as_name}}</span>
 											<img src="{{ url_for('static', filename='images/minus.png') }}" class="weekProbDetailDelBtn" alt="-">
-											<img src="{{ url_for('static', filename='images/pen.png') }}" class="weekProbDetailEditBtn" alt="펜" link="{{ url_for('prob_submit') }}">
+											<img src="{{ url_for('static', filename='images/pen.png') }}" class="weekProbDetailEditBtn" alt="펜" link="{{ url_for('prob_submit',as_no=i.assignment_no) }}">
 										</div>
 									</li>
 								</ul>
@@ -36,7 +36,7 @@
                                                                                 <div class="weekProbDetailRowDiv">
                                                                                         <span class="">한→일 번역 과제(펜클릭시 피드백)</span>
                                                                                         <img src="{{ url_for('static', filename='images/minus.png') }}" class="weekProbDetailDelBtn" alt="-">
-																						<img src="{{ url_for('static', filename='images/pen.png') }}" class="weekProbFeedbackBtn" alt="펜" link="{{ url_for('prob_feedback') }}">
+																						<img src="{{ url_for('static', filename='images/pen.png') }}" class="weekProbFeedbackBtn" alt="펜" link="{{ url_for('prob_feedback',lecture_no=lecture_no) }}">
                                                                                 </div>
                                                                         </li>
                                                                 </ul>

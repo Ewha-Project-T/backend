@@ -61,5 +61,8 @@ def mod_as(as_no,lecture_no,week,limit_time,as_name,as_type,keyword,description,
     db.session.add(acc)
     db.session.commit
 
+def get_wav_url(as_no):
+    acc=Assignment.query.filter_by(assignment_no=as_no).first()
+    return acc.upload_url
 
 

@@ -14,4 +14,4 @@
 
 ```create table STT(stt_no int primary key auto_increment,user_no int,assignment_no int,wav_file varchar(36),foreign key(user_no) references user(user_no) on delete cascade,foreign key(assignment_no) references assignment(assignment_no) on delete cascade);```
 
-```create table prob_region(region_no int primary key auto_increment,assignment_no int,region_index varchar(10),start varchar(10),end varchar(10),foreign key(assignment_no) references assignment(assignment_no) on delete cascade)```
+```create table prob_region(region_no int primary key auto_increment,assignment_no int,region_index varchar(10),start varchar(10),end varchar(10),foreign key(assignment_no) references ASSIGNMENT(assignment_no) on delete cascade)```

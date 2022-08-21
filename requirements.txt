@@ -17,3 +17,5 @@ nltk
 numpy
 azure.core
 azure.cognitiveservices.speech
+celery
+redis

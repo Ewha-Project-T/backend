@@ -58,8 +58,8 @@ $(document).ready(function(){
 	});
 	
 	// 과제 피드백
-	$(document).on("click", ".weekProbDetailEditBtn", function(){
-		location.href = "./prob_feedback";
+	$(document).on("click", ".weekProbFeedbackBtn", function(){
+		location.href = $(".weekProbFeedbackBtn").attr("link");
 	});
 	//과제 추가
 	$(document).on("click", ".weekProbAddBtn", function(){
@@ -67,7 +67,7 @@ $(document).ready(function(){
 	});
 	//과제 제출
 	$(document).on("click", ".weekProbDetailEditBtn", function(){
-		location.href = "./prob_submit";
-	});
+		location.href = $(this).attr("link");
+	 });
 
 });

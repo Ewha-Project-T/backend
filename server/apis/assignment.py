@@ -7,7 +7,7 @@ from flask_jwt_extended import (
     jwt_required, get_jwt_identity, create_access_token, get_jwt
 )
 import re
-from ..services.assignment_service import prob_listing,make_as,mod_as
+from ..services.assignment_service import prob_listing,make_as,mod_as,get_wav_url
 from werkzeug.utils import secure_filename
 from os import environ as env
 from werkzeug.datastructures import FileStorage
@@ -107,7 +107,13 @@ class Prob_mod(Resource):
 
 class Prob_submit(Resource):
     def get(self):
-        return make_response(render_template("prob_submit.html"))
+        parser = reqparse.RequestParser()
+        parser.add_argument('as_no', type=int)
+        args = parser.parse_args()
+        as_no=args['as_no']
+        wav_url=get_wav_url(as_no)
+        wav_url=wav_url.split('/',2)[-1]
+        return make_response(render_template("prob_submit.html",wav_url=wav_url))
 
 class Prob_feedback(Resource):
     def get(self):

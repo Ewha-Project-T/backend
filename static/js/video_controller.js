@@ -21,7 +21,7 @@ $(document).ready(function(){
 		}
 	};
 	exampleAudioPlayer = videojs('exampleAudioWaveSurfer', sampleAudioOptions, function() {
-		exampleAudioPlayer.src({src: $(".video-js vjs-default-skin vjs-paused exampleAudioWaveSurfer-dimensions vjs-wavesurfer vjs-audio vjs-workinghover vjs-v7 vjs-user-active vjs-error vjs-controls-disabled").attr("audiolink"), type: 'audio/wav'});
+		exampleAudioPlayer.src({src: 'audio/audio_sample.wav', type: 'audio/wav'});
 	});
 	
 	exampleAudioPlayer.on("ended", function(){
@@ -55,7 +55,7 @@ $(document).ready(function(){
 		}
 	};
 	assignmentAudioPlayer = videojs('assignmentAudioWaveSurfer', assignmentAudioOptions, function() {
-		assignmentAudioPlayer.src({src: $(".video-js vjs-default-skin vjs-paused exampleAudioWaveSurfer-dimensions vjs-wavesurfer vjs-audio vjs-workinghover vjs-v7 vjs-user-active vjs-error vjs-controls-disabled").attr("audiolink"), type: 'audio/wav'});
+		assignmentAudioPlayer.src({src: 'audio/audio_sample.wav', type: 'audio/wav'});
 	});
 	
 	assignmentAudioPlayer.on("ended", function(){

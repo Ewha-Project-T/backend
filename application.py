@@ -63,14 +63,16 @@ def check_if_token_is_revoked(jwt_header, jwt_payload):
     token_in_redis = jti in jwt_blocklist
     return token_in_redis
 
-@app.route("/uploads/<path:filename>")
+@app.route("/upload/<path:filename>")
 def uploads(filename):
     return send_from_directory(env['UPLOAD_PATH'], filename)
 
 @app.route("/", methods=['GET'])
 def hello():
-    #return redirect('/login')
-    return redirect('https://ewha.ltra.cc/login')
+    return redirect('http://203.255.176.34:8080/login')
+    #return redirect('https://translation-platform.site:8443/login')
+    #return redirect('https://ewha.ltra.cc/login')
 
 load_api(myApi)
+
 app.run(host='0.0.0.0', port = 5000, debug=True) 

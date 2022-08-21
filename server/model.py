@@ -79,3 +79,12 @@ class Stt(db.Model):
     wav_file = db.Column(db.String(36), nullable=False)
 
 
+class SttJob(db.Model):
+    __tablename__ = "STTJOB"
+    job_id = db.Column(db.String(36), primary_key=True)
+    # stt_no = db.Column(db.Integer, db.ForeignKey("STT.stt_no"), nullable=False)
+    sound = db.Column(db.Text, nullable=False)
+    startidx = db.Column(db.Text, nullable=False)
+    endidx = db.Column(db.Text, nullable=False)
+    silenceidx = db.Column(db.Text, nullable=False)
+    stt_result = db.Column(db.Text, nullable=True)

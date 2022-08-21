@@ -31,7 +31,7 @@ class Stt(Resource):
         # if not is_stt_userfile(assignment, file):
         #     return { "msg": "user stt is not exists" },404
 
-        jobid = simultaneous_stt(f"{os.environ['UPLOAD_PATH']}/{file}.wav")
+        jobid = simultaneous_stt(file)
 
         return jsonify(job=jobid)
 

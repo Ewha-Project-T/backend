@@ -8,33 +8,23 @@ from nltk.tokenize import sent_tokenize
 from pydub import AudioSegment, silence
 
 from server import db
-from ..model import Stt
-
-JOBS = {}
+from ..model import Stt, SttJob
+from worker import do_stt_work
 
 def simultaneous_stt(filename):
-    myaudio = AudioSegment.from_file(filename)  # 경로 변경 필요
-    sound, startidx, endidx, silenceidx = indexing(myaudio)
-    return do_stt(sound, myaudio, startidx, endidx, silenceidx)
+    task = do_stt_work.delay(filename)
+    return task.id
 
 def stt_getJobResult(jobid):
-    if jobid not in JOBS:
-        return False
+    job = SttJob.query.filter_by(job_id=jobid).first()
+    if job != None:
+        return eval(job.stt_result)
 
-    url = JOBS[jobid]["url"]
-    sound = JOBS[jobid]["sound"]
-    startidx = JOBS[jobid]["startidx"]
-    endidx = JOBS[jobid]["endidx"]
-    silenceidx = JOBS[jobid]["silenceidx"]
-    local_files = JOBS[jobid]["files"]
+    task = do_stt_work.AsyncResult(jobid)
+    if not task.ready():
+        return { 'state': task.state }
 
-    res = requests.get(
-        url,
-        headers={ "Ocp-Apim-Subscription-Key": os.environ['OCP_APIM_SUBSCRIPTION_KEY'] }
-    ).json()
-
-    if len(res["values"]) == 0:
-        return False
+    res, sound, startidx, endidx, silenceidx = task.get()
 
     result = {'textFile': '', 'timestamps': [], 'annotations': []}
     for i in range(len(sound)):
@@ -101,57 +91,65 @@ def stt_getJobResult(jobid):
 
         result['textFile'] += stt
 
-    for file in local_files:
-        os.unlink(file)
+    job = SttJob(
+        job_id=task.id,
+        sound=repr(sound),
+        startidx=repr(startidx),
+        endidx=repr(endidx),
+        silenceidx=repr(silenceidx),
+    )
+
+    job.stt_result = repr(result)
+    db.session.commit()
 
     return result
 
 
-def sequential_stt(filename, index):
-    myaudio = AudioSegment.from_file(
-        f'tmp/{filename}')  # 경로 변경 필요
-    result = {'textFile': '', 'timestamps': [], 'annotations': []}
-    silenceidxs = []
-    temp = []
-    for i in range(len(index)):
-        audio_part = myaudio[index[i][0]:index[i][1]]
-        sound, startidx, endidx, silenceidx = indexing(audio_part)
-        silenceidxs.append(silenceidx)
-        stt, pause_result, delay_result = do_stt(
-            sound, audio_part, startidx, endidx, silenceidx)
+# def sequential_stt(filename, index):
+#     myaudio = AudioSegment.from_file(
+#         f'tmp/{filename}')  # 경로 변경 필요
+#     result = {'textFile': '', 'timestamps': [], 'annotations': []}
+#     silenceidxs = []
+#     temp = []
+#     for i in range(len(index)):
+#         audio_part = myaudio[index[i][0]:index[i][1]]
+#         sound, startidx, endidx, silenceidx = indexing(audio_part)
+#         silenceidxs.append(silenceidx)
+#         stt, pause_result, delay_result = do_stt(
+#             sound, audio_part, startidx, endidx, silenceidx)
 
-        for j in range(len(sound)):
-            result['timestamps'].append(
-                {'start': startidx[j]+index[i][0], 'end': endidx[j]+index[i][0]})
+#         for j in range(len(sound)):
+#             result['timestamps'].append(
+#                 {'start': startidx[j]+index[i][0], 'end': endidx[j]+index[i][0]})
 
-        temp.append(stt)
+#         temp.append(stt)
 
-    text = '\n\n'.join(temp)
-    p = re.compile('(\w\(filler\)|\w+\s\w+\(backtracking\))')
-    fidx = []
-    while (True):
-        f = p.search(text)
-        if f == None:
-            break
-        fidx.append([f.start(), f.end()])
-        text = re.sub("(\(filler\)|\(backtracking\))", "", text, 1)
+#     text = '\n\n'.join(temp)
+#     p = re.compile('(\w\(filler\)|\w+\s\w+\(backtracking\))')
+#     fidx = []
+#     while (True):
+#         f = p.search(text)
+#         if f == None:
+#             break
+#         fidx.append([f.start(), f.end()])
+#         text = re.sub("(\(filler\)|\(backtracking\))", "", text, 1)
 
-    for i in range(len(fidx)):
-        if text[fidx[i][0]] == '음' or text[fidx[i][0]] == '그' or text[fidx[i][0]] == '어':
-            result['annotations'].append(
-                {'start': fidx[i][0], 'end': fidx[i][0] + 1, 'type': 'FILLER'})
-        else:
-            result['annotations'].append(
-                {'start': fidx[i][0], 'end': fidx[i][1] - 14, 'type': 'BACKTRACKING'})
+#     for i in range(len(fidx)):
+#         if text[fidx[i][0]] == '음' or text[fidx[i][0]] == '그' or text[fidx[i][0]] == '어':
+#             result['annotations'].append(
+#                 {'start': fidx[i][0], 'end': fidx[i][0] + 1, 'type': 'FILLER'})
+#         else:
+#             result['annotations'].append(
+#                 {'start': fidx[i][0], 'end': fidx[i][1] - 14, 'type': 'BACKTRACKING'})
 
-    idx = [m.start(0) + 1 for m in re.finditer('[^\\n]\\n[^\\n]', text)]
-    for i in range(len(idx)):  # pause, delay 구분 없이 pause 로 통일
-        result['annotations'].append(
-            {'start': idx[i], 'end': idx[i]+1, 'type': 'Pause', 'duration': silenceidxs[i]})
+#     idx = [m.start(0) + 1 for m in re.finditer('[^\\n]\\n[^\\n]', text)]
+#     for i in range(len(idx)):  # pause, delay 구분 없이 pause 로 통일
+#         result['annotations'].append(
+#             {'start': idx[i], 'end': idx[i]+1, 'type': 'Pause', 'duration': silenceidxs[i]})
 
-    result['textFile'] = text
+#     result['textFile'] = text
 
-    return result
+#     return result
 
 
 def indexing(myaudio):
@@ -188,72 +186,23 @@ def process_stt_result(stt):
     result = ' '.join(result)
     return result
 
-
-# def do_stt(sound, myaudio, startidx, endidx, silenceidx):
-#     url = os.getenv("STT_API_URL")
-
-#     headers = {
-#         'Content-type': 'audio/wav;codec="audio/pcm";',
-#         'Ocp-Apim-Subscription-Key': os.getenv("OCP_APIM_SUBSCRIPTION_KEY"),
-#     }
-
-#     flag = True
-#     text = ''
-#     delay_result = 0
-#     pause_result = 0
-#     filetmp = uuid.uuid4()
-#     for i in range(len(sound)):
-#         myaudio[startidx[i]:endidx[i]].export(f"{os.environ['UPLOAD_PATH']}/{filetmp}.wav", format="wav")
-#         # To recognize speech from an audio file, use `filename` instead of `use_default_microphone`:
-#         with open(f"{filetmp}.wav", 'rb') as payload:
-#             response = requests.request(
-#                 "POST", url, headers=headers, data=payload)
-#             if response.status_code != 200:
-#                 raise RuntimeError("API server does not response correctly")
-#             dic = json.loads(response.text)
-#             if dic.get("RecognitionStatus") == "Success":
-#                 tmp = dic.get("NBest")
-#                 stt = process_stt_result(tmp[0].get("Lexical"))
-#                 text = text + stt
-#                 sentences = sent_tokenize(stt)
-                # for sentence in sentences:
-                #     # print(sentence)
-                #     if sentence.endswith('.'):
-                #         flag = True
-                #     else:
-                #         flag = False
-                # if i < len(sound) - 1:
-                #     if flag == False:
-                #         # print("(pause: " + str(silenceidx[i])+"sec)")  # 침묵
-                #         text = text+'\n'
-                #         pause_result += silenceidx[i]
-                #     else:
-                #         # 통역 개시 지연구간
-                #         # print("(delay: " + str(silenceidx[i]) + "sec)")
-                #         text = text+'\n'
-                #         delay_result += silenceidx[i]
-#             else:
-#                 continue
-#         os.remove(f"{os.environ['UPLOAD_PATH']}/{filetmp}.wav")
-#     return text, pause_result, delay_result
-
-def do_stt(sound, myaudio, startidx, endidx, silenceidx):
+def do_stt(stt_id, sound, myaudio, startidx, endidx, silenceidx):
     domain = os.getenv("DOMAIN", "https://ewha.ltra.cc")
 
     files = []
     local_file = []
     for i in range(len(sound)):
         filetmp = uuid.uuid4()
-        filepath = f"uploads/{filetmp}.wav"
+        filepath = f"{os.environ['UPLOAD_PATH']}/{filetmp}.wav"
         myaudio[startidx[i]:endidx[i]].export(filepath, format="wav")
         files += [ domain + "/" + filepath ]
         local_file += [ filepath ]
-
+    
     webhook_res = requests.post(
-        "https://koreacentral.api.cognitive.microsoft.com/speechtotext/v3.0/transcriptions",
+        os.environ["STT_URL"],
         headers={
             "Content-Type": "application/json",
-            "Ocp-Apim-Subscription-Key": "18c20da6bd3447238718e3a5738a5ea1"
+            "Ocp-Apim-Subscription-Key": os.environ["STT_KEY"]
         },
         json={
             "contentUrls": files,
@@ -270,32 +219,42 @@ def do_stt(sound, myaudio, startidx, endidx, silenceidx):
 
     result_link = webhook_res["links"]["files"]
     jobid = str(uuid.uuid4())
-    JOBS[jobid] = {
-        "url": result_link,
-        "sound": sound,
-        "startidx": startidx,
-        "endidx": endidx,
-        "silenceidx": silenceidx,
-        "files": local_file
-    }
+    # print(stt_id)
+    # stt = Stt.query.filter_by(wav_file=stt_id).first()
+    # if stt is None:
+    #     return False
+
+    job = SttJob(
+        job_no=jobid,
+        # stt_no=stt.stt_no,
+        url=result_link,
+        sound=repr(sound),
+        startidx=repr(startidx),
+        endidx=repr(endidx),
+        silenceidx=repr(silenceidx),
+        files=repr(local_file)
+    )
+    db.session.add(job)
+    db.session.commit()
+    
     return jobid
 
-def mapping_sst_user(homework, file):
+def mapping_sst_user(assignment, file):
     userinfo = get_jwt_identity()
-    stt = Stt(user_no=userinfo["user_no"], homework_no=homework, wav_file=file)
+    stt = Stt(user_no=userinfo["user_no"], assignment_no=assignment, wav_file=file)
     db.session.add(stt)
-    db.session.commit
+    db.session.commit()
 
-def is_stt_userfile(homework, file) -> bool:
+def is_stt_userfile(assignment, file) -> bool:
     userinfo = get_jwt_identity()
-    stt = Stt.query.filter_by(user_no=userinfo["user_no"], homework_no=homework, wav_file=file).first()
+    stt = Stt.query.filter_by(user_no=userinfo["user_no"], assignment_no=assignment, wav_file=file).first()
     if stt is None:
         return False
     return True
 
-def remove_userfile(homework, file) -> bool:
+def remove_userfile(assignment, file) -> bool:
     userinfo = get_jwt_identity()
-    stt = Stt.query.filter_by(user_no=userinfo["user_no"], homework_no=homework, wav_file=file)
+    stt = Stt.query.filter_by(user_no=userinfo["user_no"], assignment_no=assignment, wav_file=file)
     if stt is None:
         return False
     try:
@@ -303,12 +262,28 @@ def remove_userfile(homework, file) -> bool:
     except:
         pass
     stt.delete()
-    db.session.commit
+    db.session.commit()
     return True
 
 def get_userfile():
     userinfo = get_jwt_identity()
     stt = Stt.query.filter_by(user_no=userinfo["user_no"]).all()
+    if stt is None:
+        return False
+    return stt
+
+def get_sttjob(jobid):
+    job = SttJob.query.filter_by(job_no=jobid).first()
+    if job is None:
+        return False
+    return job
+
+def get_stt_from_jobid(jobid):
+    job = SttJob.query.filter_by(job_no=jobid).first()
+    if job is None:
+        return False
+    
+    stt = Stt.query.filter_by(stt_no=job.stt_no).first()
     if stt is None:
         return False
     return stt

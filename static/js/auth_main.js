@@ -8,12 +8,10 @@ $(document).ready(function(){
 	$(document).on("click", ".btn-cancel", function(){
 		history.back();
 	});
-	
 	// 강의만들기 이동
 	$(document).on("click", ".lectureInfoAddBtnDiv", function(){
 		location.href = $(this).attr("link");
 	});
-
 	// 강의만들기 수강생 팝업
 	$(document).on("click", ".userList", function(){
 		$(".userListPopDiv").show();

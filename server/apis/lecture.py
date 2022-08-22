@@ -31,7 +31,7 @@ class Lecture_mod_del(Resource):
 
     def get(self):#강의삭제/권한관리 만든사람, 관리자
         parser = reqparse.RequestParser()
-        parser.add_argument('lecture_no', type=int, required=True, help="lecture_no is required")
+        parser.add_argument('lecture_no', type=int)
         args = parser.parse_args()
         lecture_no = args['lecture_no']
         delete_lecture(lecture_no)

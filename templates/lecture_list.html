@@ -19,7 +19,22 @@
 				autoplaySpeed: 2000,
 			});
 		});
+		
 		</script>
+		<script type="text/javascript">
+			//강의삭제
+		$(document).on("click",".lectureDelDiv", function(){
+			var del_link = $(".lectureDelDiv").attr("link");
+			console.log(del_link);
+			$.ajax({
+				url: del_link,
+				type: "GET",
+				success: function(d){
+					location.href="/lecture"
+				}
+			});
+		});
+			</script>
 {% endblock %}
 
 {% block content %}
@@ -47,6 +62,10 @@
 					<ul>
 						{% for  i in lecture_list %}
 						<li>
+							<div class="lectureDelDiv" link="{{ url_for('lecture2',lecture_no=i.lecture_no) }}">
+								<img src="x">
+								<span>삭제</span>
+							</div>
 							<div class="lectureInfoDiv" link="{{ url_for('prob',lecture_no=i.lecture_no) }}">
 								<div class="lectureTitleDiv">
 									<span>{{i.lecture_name}}<br>{{i.professor}}</span>

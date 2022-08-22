@@ -68,7 +68,9 @@ def real_time_email_check(user_email):
 def get_all_user():
     acc_list = User.query.all()
     info_list = []
-    for info in acc_list:
+    for info in acc_list:#교수와 관리자계정은 제외했음
+        if vars(info)["permission"]==3 or vars(info)["permission"]==0:
+            continue
         tmp_info = {}
         tmp_info["email"] = info.email
         tmp_info["name"] = info.name

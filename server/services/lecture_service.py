@@ -42,7 +42,7 @@ def make_lecture(name,year,semester,major,separated,professor,attendee,user_info
     db.session.commit
     this_lecture=Lecture.query.order_by(Lecture.lecture_no.desc()).first()
     professor_no=user_info["user_no"]
-    professor=Attendee(user_no=professor_no,lecture_no=this_lecture.lecture_no,permission=2)
+    professor=Attendee(user_no=professor_no,lecture_no=this_lecture.lecture_no,permission=3)
     db.session.add(professor)
     db.session.commit
     for attendee_user in attendee:

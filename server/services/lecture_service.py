@@ -50,8 +50,6 @@ def make_lecture(name,year,semester,major,separated,professor,attendee,user_info
         user=json.loads(attendee_user)
         user_email=user["email"]
         user_name=user["name"]
-        print(user_email)
-        print(user_name)
         user_acc=User.query.filter_by(email=user_email,name=user_name).first()
         if user_acc==None:
             continue
@@ -128,3 +126,8 @@ def attendee_listing(lecture_no):
         attendee_list_result.append(tmp)
     return attendee_list_result
 
+def lecture_access_check(user_no,lecture_no):
+    acc=Attendee.query.filter_by(lecture_no=lecture_no,user_no=user_no,permission=3).first()
+    if(acc==None):
+        return 0
+    return 1

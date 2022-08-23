@@ -43,10 +43,12 @@ class Login(Resource):
                 if(account.permission==0):
                     res=make_response(redirect(host_url+url_for('admin')))
                     set_access_cookies(res,access_token)
+                    set_refresh_cookies(res,refresh_token)
                     return res
                 else:
                     res=make_response(redirect(host_url+url_for('lecture')))
                     set_access_cookies(res,access_token)
+                    set_refresh_cookies(res,refresh_token)
                     return res
     
 
@@ -126,16 +128,17 @@ class Email_check(Resource):
         return make_response(render_template('mail_check.html'))
 
 	
-
-'''
 class LoginRefresh(Resource):#리프래쉬 토큰
     @jwt_required(refresh=True)
     def get(self):
         current_user = get_jwt_identity()
+        if(current_user==None):
+            res=make_response(redirect(host_url+url_for('login')))
+            return res
         new_access_token = create_access_token(identity=current_user, fresh=False)
-        return {"access_token": new_access_token}, 200
-'''
-
+        res=make_response(redirect(host_url+url_for('lecture')))
+        set_access_cookies(res,new_access_token)
+        return res
 
 
       

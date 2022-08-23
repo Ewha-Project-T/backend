@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, redirect, send_from_directory
+from flask import Flask, jsonify, redirect, send_from_directory,url_for
 from flask_restful import Api
 from flasgger import Swagger
 from flask_cors import CORS
@@ -61,6 +61,19 @@ def check_if_token_is_revoked(jwt_header, jwt_payload):
     jti = jwt_payload["jti"]
     token_in_redis = jti in jwt_blocklist
     return token_in_redis
+@jwt.expired_token_loader
+def my_expired_token_callback(jwt_header, jwt_payload):
+    return unauth_res()
+
+@jwt.unauthorized_loader
+def handle_auth_error(e):
+    if(e=='Missing cookie "refresh_token_cookie"'):
+        return redirect(host_url+ url_for('login'))
+    return redirect(host_url + url_for('login_refresh'))
+
+host_url=env["HOST"]
+def unauth_res():
+    return redirect(host_url + url_for('login_refresh'))
 
 @app.route("/upload/<path:filename>")
 def uploads(filename):

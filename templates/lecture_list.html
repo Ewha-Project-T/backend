@@ -24,7 +24,7 @@
 		<script type="text/javascript">
 			//강의삭제
 		$(document).on("click",".lectureDelDiv", function(){
-			var del_link = $(".lectureDelDiv").attr("link");
+			var del_link = $(this).attr("link");
 			console.log(del_link);
 			$.ajax({
 				url: del_link,

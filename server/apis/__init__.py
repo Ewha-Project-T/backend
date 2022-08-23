@@ -1,5 +1,5 @@
 from server.model import Lecture
-from .login import Login,Join,Email_check
+from .login import Login,Join,Email_check, LoginRefresh
 from .lecture import Attend, Lecture, Lecture_mod_del, Student,Major, Lecture_add
 from .assignment import Prob, Prob_submit, Prob_feedback,Prob_mod,Prob_add, prob_upload
 from .admin import Admin,Admin2
@@ -7,7 +7,7 @@ from .stt import Stt, SttJob
 
 def load_api(api_module):
     api_module.add_resource(Login,'/login',endpoint='login') # GET POST PUT PATCH DELETE
-    #api_module.add_resource(LoginRefresh,'/login-refresh',endpoint='login_refresh') 
+    api_module.add_resource(LoginRefresh,'/login-refresh',endpoint='login_refresh') 
     api_module.add_resource(Lecture,'/lecture',endpoint='lecture')
     api_module.add_resource(Admin,'/admin',endpoint='admin')
     api_module.add_resource(Stt, '/stt',endpoint='stt')

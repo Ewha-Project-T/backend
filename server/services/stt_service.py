@@ -182,6 +182,10 @@ def seqstt_getJobResult(jobid):
 
             result['textFile'] += stt
     
+    # stt = Stt.query.filter_by(wav_file=stt_id).first()
+    # if stt is None:
+    #     return False
+
     job = SttJob(
         job_id=task.id,
         # stt_no=stt.stt_no,
@@ -194,53 +198,6 @@ def seqstt_getJobResult(jobid):
 
     job.stt_result = repr(result)
     db.session.commit()
-
-# def sequential_stt(filename, index):
-#     myaudio = AudioSegment.from_file(
-#         f'tmp/{filename}')  # 경로 변경 필요
-#     result = {'textFile': '', 'timestamps': [], 'annotations': []}
-#     silenceidxs = []
-#     temp = []
-#     for i in range(len(index)):
-#         audio_part = myaudio[index[i][0]:index[i][1]]
-#         sound, startidx, endidx, silenceidx = indexing(audio_part)
-#         silenceidxs.append(silenceidx)
-#         stt, pause_result, delay_result = do_stt(
-#             sound, audio_part, startidx, endidx, silenceidx)
-
-#         for j in range(len(sound)):
-#             result['timestamps'].append(
-#                 {'start': startidx[j]+index[i][0], 'end': endidx[j]+index[i][0]})
-
-#         temp.append(stt)
-
-#     text = '\n\n'.join(temp)
-#     p = re.compile('(\w\(filler\)|\w+\s\w+\(backtracking\))')
-#     fidx = []
-#     while (True):
-#         f = p.search(text)
-#         if f == None:
-#             break
-#         fidx.append([f.start(), f.end()])
-#         text = re.sub("(\(filler\)|\(backtracking\))", "", text, 1)
-
-#     for i in range(len(fidx)):
-#         if text[fidx[i][0]] == '음' or text[fidx[i][0]] == '그' or text[fidx[i][0]] == '어':
-#             result['annotations'].append(
-#                 {'start': fidx[i][0], 'end': fidx[i][0] + 1, 'type': 'FILLER'})
-#         else:
-#             result['annotations'].append(
-#                 {'start': fidx[i][0], 'end': fidx[i][1] - 14, 'type': 'BACKTRACKING'})
-
-#     idx = [m.start(0) + 1 for m in re.finditer('[^\\n]\\n[^\\n]', text)]
-#     for i in range(len(idx)):  # pause, delay 구분 없이 pause 로 통일
-#         result['annotations'].append(
-#             {'start': idx[i], 'end': idx[i]+1, 'type': 'Pause', 'duration': silenceidxs[i]})
-
-#     result['textFile'] = text
-
-#     return result
-
 
 def indexing(myaudio):
     print("detecting silence")
@@ -258,7 +215,6 @@ def indexing(myaudio):
         if i < len(sound) - 1:
             silenceidx.append(sound[i + 1][0] - sound[i][1])
     return sound, startidx, endidx, silenceidx
-
 
 def process_stt_result(stt):
     result = stt
@@ -309,7 +265,7 @@ def do_stt(stt_id, sound, myaudio, startidx, endidx, silenceidx):
 
     result_link = webhook_res["links"]["files"]
     jobid = str(uuid.uuid4())
-    # print(stt_id)
+
     # stt = Stt.query.filter_by(wav_file=stt_id).first()
     # if stt is None:
     #     return False

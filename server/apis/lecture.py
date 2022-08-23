@@ -7,7 +7,7 @@ from flask_jwt_extended import (
     jwt_required, get_jwt_identity, create_access_token, get_jwt
 )
 import re
-from ..services.lecture_service import lecture_listing, make_lecture,modify_lecture,delete_lecture, search_student,major_listing,attendee_add,attendee_listing
+from ..services.lecture_service import lecture_listing, make_lecture,modify_lecture,delete_lecture, search_student,major_listing,attendee_add,attendee_listing,lecture_access_check
 from ..services.login_service import (
      admin_required, professor_required, assistant_required,get_all_user
 )
@@ -28,14 +28,20 @@ class Lecture(Resource):
 
 
 class Lecture_mod_del(Resource):
-
+    
+    @jwt_required()
     def get(self):#강의삭제/권한관리 만든사람, 관리자
         parser = reqparse.RequestParser()
-        parser.add_argument('lecture_no', type=int, required=True, help="lecture_no is required")
+        parser.add_argument('lecture_no', type=int)
         args = parser.parse_args()
         lecture_no = args['lecture_no']
-        delete_lecture(lecture_no)
-        return{"msg" : "lecture delete success"},200
+        user_info=get_jwt_identity()
+        if(lecture_access_check(user_info["user_no"],lecture_no) or user_info["user_perm"]==0):
+            delete_lecture(lecture_no)
+            return{"msg" : "lecture delete success"},200
+        else:
+            return{"msg": "access denied"}
+
     def post(self):#강의수정권한관리 만든사람, 관리자
         parser = reqparse.RequestParser()
         parser.add_argument('lecture_no', type=int, required=True, help="lecture_no is required")

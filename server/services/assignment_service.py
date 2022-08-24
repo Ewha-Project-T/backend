@@ -72,6 +72,8 @@ def mod_as(lecture_no,as_no,week,limit_time,as_name,as_type,keyword,description,
         acc.upload_url=upload_url
     db.session.add(acc)
     db.session.commit
+    if region==None:
+        return
     Prob_region.query.filter_by(assignment_no=as_no).delete()
     db.session.commit
 

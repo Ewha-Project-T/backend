@@ -4,6 +4,19 @@
 {% endblock %}
 
 {% block script %}
+<script type="text/javascript">
+	//과제삭제
+$(document).on("click",".probDelDiv", function(){
+	var del_link = $(this).attr("link");
+	$.ajax({
+		url: del_link,
+		type: "GET",
+		success: function(d){
+			location.href="/prob?lecture_no="+"{{lecture_no}}"
+		}
+	});
+});
+	</script>
 {% endblock %}
 
 {% block content %}
@@ -15,7 +28,9 @@
 							<div class="weekProbTitleDiv">
 								<h2>1주차 아래 화살표 클릭 하면 과제리스트 보임/더하기 누르면 과제추가</h2>
 								<img src="{{ url_for('static', filename='images/bottom-arrow.png') }}" class="weekProbDetailViewBtn" alt="아래화살표">
+								{% if user_perm == 0 or user_perm== 3 %}
 								<img src="{{ url_for('static', filename='images/plus.png') }}" class="weekProbAddBtn" alt="+" link="{{ url_for('prob_add',lecture_no=lecture_no) }}">
+								{% endif %}
 							</div>
 							{% for  i in prob_list %}
 							<div class="weekProbDetailDiv">
@@ -23,6 +38,16 @@
 									<li>
 										<div class="weekProbDetailRowDiv">
 											<span class="">{{i.as_name}}</span>
+											{% if user_perm == 0 or user_perm== 3 %}
+											<div class="probDelDiv" link="{{ url_for('prob_del',lecture_no=lecture_no,as_no=i.assignment_no) }}">
+												<img src="{{ url_for('static', filename='images/minus.png') }}">
+												<span>삭제버튼</span>
+											</div>
+											<div class="lectureInfoDiv" link="{{ url_for('prob_mod',lecture_no=lecture_no,as_no=i.assignment_no) }}">
+												<img src="{{ url_for('static', filename='images/pen.png') }}">
+												<span>수정</span>
+											</div>
+											{% endif %}
 											<img src="{{ url_for('static', filename='images/minus.png') }}" class="weekProbDetailDelBtn" alt="-">
 											<img src="{{ url_for('static', filename='images/pen.png') }}" class="weekProbDetailEditBtn" alt="펜" link="{{ url_for('prob_submit',as_no=i.assignment_no) }}">
 										</div>

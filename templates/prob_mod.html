@@ -1,0 +1,204 @@
+{% extends 'layout_login.html' %}
+
+{% block stylesheet %}
+{% endblock %}
+
+{% block script %}
+<script src="{{ url_for('static', filename='js/wavesurfer/wavesurfer.js') }}"></script>
+<script src="{{ url_for('static', filename='js/wavesurfer/wavesurfer.timeline.js') }}"></script>
+<script src="{{ url_for('static', filename='js/wavesurfer/wavesurfer.regions.js') }}"></script>
+<script src="{{ url_for('static', filename='js/wavesurfer/wavesurfer.minimap.js') }}"></script>
+<script type="text/javascript">
+var probAudioPlayer;
+$(document).ready(function(){
+	// 파일업로드
+	$(document).on("change", "input[name=prob_sound_file]", function(){
+		var formData = new FormData();
+		formData.append("prob_sound", $("input[name=prob_sound_file]")[0].files[0]);
+		$.ajax({
+			url: "{{ url_for('prob_upload') }}",
+			type: "POST",
+			processData: false,
+			contentType: false,
+			data: formData,
+			success: function(d){
+				$(".probSoundUpload").hide();
+				$(".probAddFormRightDiv>.inputFormDiv").show();
+				$("input[name=prob_sound_path]").val(d.file_path);
+				probAudioPlayer.load(d.file_path);
+			}
+		});
+	});
+
+	$(document).on("click", ".waveRegionDiv .btn", function(){
+		var regionIndex = $(this).attr("region");
+		var region = Object.values(probAudioPlayer.regions.list)[regionIndex];
+		region.play();
+	});
+	
+	$(document).on("click", ".waveRegionDiv .del", function(){
+		var regionIndex = $(this).attr("region");
+		var region = Object.values(probAudioPlayer.regions.list)[regionIndex];
+		region.remove();
+	});
+
+	probAudioPlayer = WaveSurfer.create({
+		container: document.querySelector('#waveform'),
+		waveColor: '#A8DBA8',
+		progressColor: '#3B8686',
+		backend: 'MediaElement',
+		plugins: [
+			WaveSurfer.regions.create({
+				regionsMinLength: 2,
+				regions: [
+				],
+				dragSelection: {
+					slop: 5
+				}
+			})
+		]
+	});
+	function regionUpdate(region, e){
+		var region = Object.values(probAudioPlayer.regions.list);
+		$(".waveRegionDiv ul").empty();
+		for(var i=0; i<region.length; i++){
+			var liEle = $("<li />");
+			var spanEle = $("<span />");
+			spanEle.addClass("btn").attr("region", i).text("구간 " + i + " : " + region[i].start.toFixed() + " ~ " + region[i].end.toFixed());
+			spanEle.attr("start", region[i].start.toFixed());
+			spanEle.attr("end", region[i].end.toFixed());
+			var spanEle2 = $("<span />");
+			spanEle2.addClass("del").attr("region", i).text("X");
+			liEle.append(spanEle);
+			liEle.append(spanEle2);
+			$(".waveRegionDiv ul").append(liEle);
+		}
+	}
+	probAudioPlayer.on('loading', function(){
+		var audioSize = probAudioPlayer.getDuration();
+		$(".waveSoundSize").text("원음 : " + Math.floor(audioSize / 60).toFixed()  + "분 " + Math.floor(audioSize % 60).toFixed() + "초");
+	});
+	probAudioPlayer.on('region-update-end', function(region, e){
+		regionUpdate(region, e);
+	});
+	probAudioPlayer.on('region-removed', function(region, e){
+		regionUpdate(region, e);
+	});
+
+	$(document).on("click", ".btn-submit", function(){
+		var region = [];
+		var regionBtnEle = $(".waveRegionDiv span.btn");
+		for(var i=0; i<regionBtnEle.length; i++){
+			region.push({
+				"index": i,
+				"start": $(regionBtnEle[i]).attr("start"),
+				"end": $(regionBtnEle[i]).attr("end")
+			});
+		}
+		var params = {
+			"lecture_no":"{{lecture_no}}",
+			"as_no":"{{as_no}}",
+			"prob_sound_path": $("input[name=prob_sound_path]").val(),
+			"prob_week": $("select[name=prob_week]").val(),
+			"prob_timeEnd": $("input[name=prob_timeEnd]").val(),
+			"prob_name": $("input[name=prob_name]").val(),
+			"prob_type": $("select[name=prob_type]").val(),
+			"prob_keyword": $("input[name=prob_keyword]").val(),
+			"prob_exp": $("textarea[name=prob_exp]").val(),
+			"prob_replay": $("select[name=prob_replay]").val(),
+			"prob_play_speed": $("input[name=prob_play_speed]").val(),
+			"prob_open": $("input[name=prob_open]").val(),
+			"prob_region": region
+		};
+		console.log(JSON.stringify(params));
+		$.ajax({
+			
+			url: "{{ url_for('prob_mod') }}",
+			type: "POST",
+			headers: {'Content-Type': 'application/json'},
+			data: JSON.stringify(params),
+			success: function(d){
+				location.href="prob?lecture_no="+"{{ lecture_no }}"
+			}
+		});
+	});
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="contentDiv">
+	<h1>과제 수정</h1>
+	<div class="probAddFormDiv">
+		<div class="probAddFormLeftDiv">
+			<div class="inputFormDiv">
+				<div class="inputFormDiv-1">
+					<label for class="probAddFormLabel">주차</label>
+					<select class="inputStyle01" name="prob_week">
+						<option value="1주차">1주차</option>
+					</select>
+				</div>
+				<div class="inputFormDiv-2">
+					<label for class="probAddFormLabel">기한</label>
+					<input type="datetime-local" class="inputStyle01" name="prob_timeEnd">
+				</div>
+			</div>
+			<div class="inputFormDiv">
+				<div class="inputFormDiv-1 w75">
+					<label for class="probAddFormLabel">과제명</label>
+					<input type="text" class="inputStyle01" name="prob_name">
+				</div>
+				<div class="inputFormDiv-2 w25">
+					<label for class="probAddFormLabel">과제 종류</label>
+					<select class="inputStyle01" name="prob_type">
+						<option value="순차통역">순차통역</option>
+					</select>
+				</div>
+			</div>
+			<div class="inputFormDiv">
+				<label for class="probAddFormLabel">키워드</label>
+				<input type="text" class="inputStyle01" name="prob_keyword">
+			</div>
+			<div class="inputFormDiv">
+				<label for class="probAddFormLabel">과제 설명</label>
+				<textarea class="inputStyle01" name="prob_exp"></textarea>
+			</div>
+			<div class="inputFormDiv">
+				<div class="inputFormDiv-1 w25">
+					<label for class="probAddFormLabel">다시 듣기 제한</label>
+					<select class="inputStyle01" name="prob_replay">
+						<option value="무제한">무제한</option>
+					</select>
+				</div>
+				<div class="inputFormDiv-1 w25">
+					<label for class="probAddFormLabel">재생 속도</label>
+					<input type="text" class="inputStyle01" name="prob_play_speed">
+				</div>
+			</div>
+			<div class="inputFormDiv">
+				<input type="checkbox" name="prob_open">
+				<label for class="probAddFormLabel">과제 제출물 공개 여부</label>
+			</div>
+		</div>
+		<div class="probAddFormRightDiv">
+			<div class="probSoundUpload">
+				<label for class="probSoundUploadLabel">음원 업로드</label>
+				<input type="file" name="prob_sound_file">
+				<input type="hidden" name="prob_sound_path">
+			</div>
+			<div class="inputFormDiv">
+				<label for class="probAddFormLabel">드래그하여 구간을 설정하세요.</label><br>
+				<label for class="probAddFormLabel waveSoundSize">원음 : ?분 ?초</label>
+				<div id="waveform"></div>
+				<div class="waveRegionDiv">
+					<ul></ul>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="btnDiv btn-2">
+		<span class="btn btn-cancel">뒤로가기</span>
+		<span class="btn btn-submit">과제 생성</span>
+	</div>
+</div>
+{% endblock %}

@@ -25,7 +25,6 @@
 			//강의삭제
 		$(document).on("click",".lectureDelDiv", function(){
 			var del_link = $(this).attr("link");
-			console.log(del_link);
 			$.ajax({
 				url: del_link,
 				type: "GET",
@@ -66,6 +65,10 @@
 							<div class="lectureDelDiv" link="{{ url_for('lecture2',lecture_no=i.lecture_no) }}">
 								<img src="x">
 								<span>삭제</span>
+							</div>
+							<div class="lectureInfoDiv" link="{{ url_for('lecture_mod',lecture_no=i.lecture_no) }}">
+								<img src="x">
+								<span>수정</span>
 							</div>
 							{% endif %}
 							<div class="lectureInfoDiv" link="{{ url_for('prob',lecture_no=i.lecture_no) }}">

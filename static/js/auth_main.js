@@ -45,7 +45,7 @@ $(document).ready(function(){
 	// 과제목록 이동
 
 	$(document).on("click", ".lectureInfoDiv", function(){
-		location.href = $(".lectureInfoDiv").attr("link");
+		location.href = $(this).attr("link");
 	});
 	
 	// 과제목록 상세보기

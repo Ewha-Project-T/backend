@@ -58,16 +58,48 @@ def make_lecture(name,year,semester,major,separated,professor,attendee,user_info
         db.session.commit
 
 
-def modify_lecture(no,name,year,semester,major,separated,professor):
+def modify_lecture(no,name,year,semester,major,separated,professor,attendee,user_info):
     acc=Lecture.query.filter_by(lecture_no=no).first()
-    acc.name=name
-    acc.year=year
-    acc.semester=semester
-    acc.major=major
-    acc.separated=separated
-    acc.professor=professor
+    if name !="":
+        acc.lecture_name=name
+    if name !="":
+        acc.year=year
+    if name !="":
+        acc.semester=semester
+    if name !="":
+        acc.major=major
+    if name !="":
+        acc.separated=separated
+    if name !="":
+        acc.professor=professor
     db.session.add(acc)
-    db.session.commit()
+    db.session.commit()#글수정
+    attend_list=[]
+    professor_acc=Attendee.query.filter_by(user_no=user_info["user_no"],lecture_no=no,permission=3).first()
+    attend_list.append(professor_acc.attendee_no)
+    for attendee_user in attendee:#참석자 수정 시작
+        attendee_user=attendee_user.replace("'",'"')
+        user=json.loads(attendee_user)
+        user_email=user["email"]
+        user_name=user["name"]
+        user_acc=User.query.filter_by(email=user_email,name=user_name).first()
+        if user_acc==None:
+            continue
+        attend_acc=Attendee.query.filter_by(user_no=user_acc.user_no,lecture_no=no).first()
+        if attend_acc==None:
+            attend=Attendee(user_no=user_acc.user_no,lecture_no=no,permission=user_acc.permission)
+            db.session.add(attend)
+            db.session.commit
+            this_attendee=Attendee.query.order_by(Attendee.attendee_no.desc()).first()
+            attend_list.append(this_attendee.attendee_no)
+        else:
+            attend_list.append(attend_acc.attendee_no)
+    attend=Attendee.query.filter_by(lecture_no=no).all()#기존에서 사라진사람 삭제
+    for att in attend:
+        if att.attendee_no not in attend_list:
+            db.session.delete(att)
+            db.session.commit
+
 
 def delete_lecture(lecture_no):
     acc = Lecture.query.filter_by(lecture_no=lecture_no).first()

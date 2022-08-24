@@ -43,6 +43,10 @@ $(document).on("click",".probDelDiv", function(){
 												<img src="{{ url_for('static', filename='images/minus.png') }}">
 												<span>삭제버튼</span>
 											</div>
+											<div class="lectureInfoDiv" link="{{ url_for('prob_mod',lecture_no=lecture_no,as_no=i.assignment_no) }}">
+												<img src="{{ url_for('static', filename='images/pen.png') }}">
+												<span>수정</span>
+											</div>
 											{% endif %}
 											<img src="{{ url_for('static', filename='images/minus.png') }}" class="weekProbDetailDelBtn" alt="-">
 											<img src="{{ url_for('static', filename='images/pen.png') }}" class="weekProbDetailEditBtn" alt="펜" link="{{ url_for('prob_submit',as_no=i.assignment_no) }}">

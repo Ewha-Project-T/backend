@@ -62,15 +62,15 @@ def modify_lecture(no,name,year,semester,major,separated,professor,attendee,user
     acc=Lecture.query.filter_by(lecture_no=no).first()
     if name !="":
         acc.lecture_name=name
-    if name !="":
+    if year !="":
         acc.year=year
-    if name !="":
+    if semester !="":
         acc.semester=semester
-    if name !="":
+    if major !="":
         acc.major=major
-    if name !="":
+    if separated !="":
         acc.separated=separated
-    if name !="":
+    if professor !="":
         acc.professor=professor
     db.session.add(acc)
     db.session.commit()#글수정

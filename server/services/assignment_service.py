@@ -44,22 +44,47 @@ def make_as(lecture_no,week,limit_time,as_name,as_type,keyword,description,re_li
         db.session.commit
 
 
-def mod_as(as_no,lecture_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,original_text="",upload_url=""):
+def mod_as(lecture_no,as_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,original_text="",upload_url="",region=""):
     acc=Assignment.query.filter_by(assignment_no=as_no).first()
-    acc.lecture_no=lecture_no
-    acc.week=week
-    acc.limit_time=limit_time
-    acc.as_name=as_name
-    acc.as_type=as_type
-    acc.keyword=keyword
-    acc.description=description
-    acc.relimit=re_limit
-    acc.speed=speed
-    acc.disclosure=disclosure
-    acc.original_text=original_text
-    acc.upload_url=upload_url
+    if(lecture_no!=""):
+        acc.lecture_no=lecture_no
+    if(week!=""):
+        acc.week=week
+    if(limit_time!=""):
+        acc.limit_time=limit_time
+    if(as_name!=""):
+        acc.as_name=as_name
+    if(as_type!=""):
+        acc.as_type=as_type
+    if(keyword!=""):
+        acc.keyword=keyword
+    if(description!=""):
+        acc.description=description
+    if(re_limit!=""):
+        acc.relimit=re_limit
+    if(speed!=""):
+        acc.speed=speed
+    if(disclosure!=""):
+        acc.disclosure=disclosure
+    if(original_text!=""):
+        acc.original_text=original_text
+    if(upload_url!=""):
+        acc.upload_url=upload_url
     db.session.add(acc)
     db.session.commit
+    Prob_region.query.filter_by(assignment_no=as_no).delete()
+    db.session.commit
+
+    for reg in region:
+        reg=reg.replace("'",'"')
+        json_reg=json.loads(reg)
+        reg_index=json_reg["index"]
+        reg_start=json_reg["start"]
+        reg_end=json_reg["end"]
+        pr=Prob_region(assignment_no=as_no,region_index=reg_index,start=reg_start,end=reg_end)
+        db.session.add(pr)
+        db.session.commit
+
 
 def get_wav_url(as_no):
     acc=Assignment.query.filter_by(assignment_no=as_no).first()

@@ -65,4 +65,7 @@ def get_wav_url(as_no):
     acc=Assignment.query.filter_by(assignment_no=as_no).first()
     return acc.upload_url
 
-
+def delete_assignment(assignment_no):
+    acc = Assignment.query.filter_by(assignment_no=assignment_no).first()
+    db.session.delete(acc)
+    db.session.commit

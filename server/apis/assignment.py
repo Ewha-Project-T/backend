@@ -7,7 +7,8 @@ from flask_jwt_extended import (
     jwt_required, get_jwt_identity, create_access_token, get_jwt
 )
 import re
-from ..services.assignment_service import prob_listing,make_as,mod_as,get_wav_url
+from ..services.assignment_service import prob_listing,make_as,mod_as,get_wav_url,delete_assignment
+from ..services.lecture_service import lecture_access_check
 from werkzeug.utils import secure_filename
 from os import environ as env
 from werkzeug.datastructures import FileStorage
@@ -17,13 +18,15 @@ host_url=env["HOST"]
 perm_list={"학생":1,"조교":2,"교수":3}
 
 class Prob(Resource):
+    @jwt_required()
     def get(self):#과제리스트
+        user_info=get_jwt_identity()
         parser = reqparse.RequestParser()
         parser.add_argument('lecture_no', type=int, required=True, help="lecture_no is required")
         args = parser.parse_args()
         lecture_no = args['lecture_no']
         prob_list=prob_listing(lecture_no)
-        return make_response(render_template("prob_list.html",prob_list=prob_list,lecture_no=lecture_no))
+        return make_response(render_template("prob_list.html",prob_list=prob_list,lecture_no=lecture_no,user_perm=user_info["user_perm"]))
 
 class Prob_add(Resource):
     def get(self):
@@ -114,7 +117,21 @@ class Prob_submit(Resource):
         wav_url=get_wav_url(as_no)
         wav_url=wav_url.split('/',2)[-1]
         return make_response(render_template("prob_submit.html",wav_url=wav_url))
-
+class Prob_del(Resource):
+    @jwt_required()
+    def get(self):#과제 삭제
+        parser = reqparse.RequestParser()
+        parser.add_argument('lecture_no', type=int)
+        parser.add_argument('as_no', type=int)
+        args = parser.parse_args()
+        lecture_no = args['lecture_no']
+        as_no = args['as_no']
+        user_info=get_jwt_identity()
+        if(lecture_access_check(user_info["user_no"],lecture_no) or user_info["user_perm"]==0):
+            delete_assignment(as_no)
+            return{"msg" : "assignment delete success"},200
+        else:
+            return{"msg": "access denied"}
 class Prob_feedback(Resource):
     def get(self):
         return make_response(render_template("prob_feedback.html"))

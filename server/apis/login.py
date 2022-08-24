@@ -1,7 +1,7 @@
 from flask import jsonify, make_response, render_template, request, redirect, url_for,abort
 from flask_restful import reqparse, Resource
 from flask_jwt_extended import (
-    jwt_required, get_jwt_identity, create_access_token, get_jwt,set_access_cookies,set_refresh_cookies
+    jwt_required, get_jwt_identity, create_access_token, get_jwt,set_access_cookies,set_refresh_cookies,unset_jwt_cookies
 )
 import re
 from ..services.login_service import (
@@ -57,11 +57,15 @@ class Login(Resource):
         else:
             msg="check email"
             return redirect(host_url + url_for('login', msg=msg))
-    @jwt_required()
-    def delete(self):#로그아웃
+class Logout(Resource):
+
+    @jwt_required(refresh=True)
+    def get(self):#로그아웃
         jti = get_jwt()["jti"]
         jwt_blocklist.add(jti)
-        return jsonify(msg="Access token revoked")
+        res=make_response(redirect(host_url+url_for('login')))
+        unset_jwt_cookies(res)
+        return res
 
 class Join(Resource):
     def get(self):

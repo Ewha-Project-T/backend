@@ -26,7 +26,9 @@
 				<div class="loginInfoDiv">
 					<img src="{{ url_for('static', filename='images/myphoto.png') }}" class="myphotoBtn">
 					<span>이화연 교수</span>
+					<a href="{{ url_for('logout') }}">
 					<img src="{{ url_for('static', filename='images/logout.png') }}" class="logoutBtn">
+					</a>
 				</div>
 			</div>
 {% block content %}{% endblock %}

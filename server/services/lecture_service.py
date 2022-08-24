@@ -74,6 +74,8 @@ def modify_lecture(no,name,year,semester,major,separated,professor,attendee,user
         acc.professor=professor
     db.session.add(acc)
     db.session.commit()#글수정
+    if(attendee==None):
+        return
     attend_list=[]
     professor_acc=Attendee.query.filter_by(user_no=user_info["user_no"],lecture_no=no,permission=3).first()
     attend_list.append(professor_acc.attendee_no)

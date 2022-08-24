@@ -1,5 +1,5 @@
 from server.model import Lecture
-from .login import Login,Join,Email_check, LoginRefresh
+from .login import Login,Join,Email_check, LoginRefresh, Logout
 from .lecture import Attend, Lecture, Lecture_mod, Lecture_mod_del, Student,Major, Lecture_add
 from .assignment import Prob, Prob_submit, Prob_feedback,Prob_mod,Prob_add, prob_upload
 from .admin import Admin,Admin2
@@ -27,3 +27,4 @@ def load_api(api_module):
     api_module.add_resource(Email_check,'/mail_check',endpoint='Email_check')
     api_module.add_resource(Prob_mod,'/prob_mod',endpoint='prob_mod')
     api_module.add_resource(Admin2,'/admin2',endpoint='admin2')
+    api_module.add_resource(Logout,'/logout',endpoint='logout')

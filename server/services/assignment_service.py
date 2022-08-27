@@ -1,6 +1,6 @@
 from distutils.command.upload import upload
-
 from server.apis import assignment
+from server.services.stt_service import mapping_sst_user
 from ..model import Attendee, User, Lecture, Assignment,Prob_region
 from server import db
 from functools import wraps
@@ -37,22 +37,26 @@ def make_as(lecture_no,week,limit_time,as_name,as_type,keyword,description,re_li
     acc=Assignment(lecture_no=lecture_no,week=week,limit_time=limit_time,as_name=as_name,as_type=as_type,keyword=keyword,description=description,re_limit=re_limit,speed=speed,disclosure=disclosure,original_text=original_text,upload_url=upload_url)
     db.session.add(acc)
     db.session.commit
-    this_assignment=Assignment.query.order_by(Assignment.assignment_no.desc()).first()
+    # this_assignment=Assignment.query.order_by(Assignment.assignment_no.desc()).first()
+    
     for reg in region:
         reg=reg.replace("'",'"')
         json_reg=json.loads(reg)
         reg_index=json_reg["index"]
         reg_start=json_reg["start"]
         reg_end=json_reg["end"]
+
         split_url=split_wav_save(upload_url,int(reg_start),int(reg_end))
+        mapping_sst_user(acc.assignment_no, split_url)
+
         task = do_stt_work.delay(split_url)
-        pr = Prob_region(assignment_no=this_assignment.assignment_no,region_index=reg_index,start=reg_start,end=reg_end,upload_url=split_url, job_id=task.id)
+        pr = Prob_region(assignment_no=acc.assignment_no,region_index=reg_index,start=reg_start,end=reg_end,upload_url=split_url, job_id=task.id)
         db.session.add(pr)
         db.session.commit
         
 def split_wav_save(upload_url,start,end):
     uuid_str=str(uuid.uuid4())
-    audio = AudioSegment.from_file(upload_url)
+    audio: AudioSegment = AudioSegment.from_file(upload_url)
     audio[start * 1000:end * 1000].export(f"{os.environ['UPLOAD_PATH']}/{uuid_str}.wav", format="wav")
     return uuid_str
     
@@ -96,9 +100,18 @@ def mod_as(lecture_no,as_no,week,limit_time,as_name,as_type,keyword,description,
         reg_index=json_reg["index"]
         reg_start=json_reg["start"]
         reg_end=json_reg["end"]
-        pr=Prob_region(assignment_no=as_no,region_index=reg_index,start=reg_start,end=reg_end)
+
+        split_url=split_wav_save(upload_url,int(reg_start),int(reg_end))
+        mapping_sst_user(acc.assignment_no, split_url)
+
+        task = do_stt_work.delay(split_url)
+        pr = Prob_region(assignment_no=acc.assignment_no,region_index=reg_index,start=reg_start,end=reg_end,upload_url=split_url, job_id=task.id)
         db.session.add(pr)
         db.session.commit
+
+        # pr=Prob_region(assignment_no=as_no,region_index=reg_index,start=reg_start,end=reg_end)
+        # db.session.add(pr)
+        # db.session.commit
 
 
 def get_wav_url(as_no):

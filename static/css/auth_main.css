@@ -8,6 +8,7 @@ li { display: block; }
 .btn:hover { background: #2e462f; }
 .btn-2 .btn { display: inline-block; width: 45%; font-size: 1.4rem; }
 .btn-2 .btn-cancel { float: left; background-color: #d8d8d8; color: #fff; line-height: 50px; }
+.btn-2 .btn-temp { float: left; background-color: #d8d8d8; color: #fff; line-height: 50px; }
 .btn-2 .btn-submit { float: right; color: #fff; }
 
 /* 강의목록 */
@@ -19,10 +20,10 @@ li { display: block; }
 .menuBarDiv .loginInfoDiv { float: right; }
 .menuBarDiv .loginInfoDiv * { line-height: 60px; height: 30px; vertical-align: middle; margin-left: 10px; }
 .menuBarDiv .loginInfoDiv span { font-size: 1.2rem; }
-.bannerDiv { width: 100%; }
+.bannerDiv { width: 1200px; margin: 0px auto; }
 .bannerDiv .sliderDiv { width: 100%; height: 400px; }
 .bannerDiv .sliderDiv img { width: 100%; height: 400px; }
-.contentDiv { padding: 50px; width: 1600px; margin: 0px auto; }
+.contentDiv { padding: 50px; width: 1200px; margin: 0px auto; }
 .contentDiv h1 { font-size: 2rem; text-align: center; }
 .contentDiv .topContentMenu { margin-top: 30px; overflow: hidden; }
 .contentDiv .topContentMenu .semesterDiv { float: left; }
@@ -32,9 +33,10 @@ li { display: block; }
 .contentDiv .lectureListDiv ul li { float: left; width: 23%; margin-right: 2%; margin-bottom: 30px;}
 .contentDiv .lectureListDiv ul li .lectureInfoDiv { border: 1px solid #d8d8d8; overflow: hidden; }
 .contentDiv .lectureListDiv ul li .lectureInfoDiv .lectureTitleDiv { padding: 20px; height: 120px; }
-.contentDiv .lectureListDiv ul li .lectureInfoDiv .lectureTitleDiv img { line-height: 130px; float: right; }
+.contentDiv .lectureListDiv ul li .lectureInfoDiv .lectureTitleDiv img { width: 50px; line-height: 130px; float: right; }
 .contentDiv .lectureListDiv ul li .lectureInfoDiv .lectureContentDiv { border-top: 1px solid #d8d8d8; padding: 20px; height: 100px; }
 .contentDiv .lectureListDiv ul li .lectureInfoDiv .likeDiv { float: right; padding: 10px; height: 40px; }
+.contentDiv .lectureListDiv ul li .lectureInfoDiv .likeDiv img { width: 30px; }
 .contentDiv .lectureListDiv ul li .lectureInfoAddDiv { border: 1px solid #d8d8d8; overflow: hidden; height: 260px; position: relative; }
 .contentDiv .lectureListDiv ul li .lectureInfoAddDiv .lectureInfoAddBtnDiv { width: 50%; height: 50%; position: absolute; top: 25%; left: 25%; cursor: pointer; }
 .contentDiv .lectureListDiv ul li .lectureInfoAddDiv .lectureInfoAddBtnDiv img { width: 100%; }
@@ -60,7 +62,7 @@ li { display: block; }
 .userListPopDiv .btn-popSelect { color: #ffffff; float: right; line-height: 50px; }
 
 /* 과제목록 */
-.weekProbWrapper { margin-top: 30px; }
+.weekProbWrapper { margin: 30px auto 0px; width: 800px; }
 .weekProbWrapper>li { margin-top: 20px; }
 .weekProbWrapper .weekProbDiv .weekProbTitleDiv { border: 1px solid #000000; background-color: #e6e6e6; overflow: hidden; padding: 5px 10px; }
 .weekProbWrapper .weekProbDiv .weekProbTitleDiv h2 { float: left; font-size: 1rem; height: 32px; line-height: 32px; }
@@ -72,7 +74,8 @@ li { display: block; }
 .weekProbWrapper .weekProbDiv .weekProbDetailDiv span { float: left; font-size: 1rem; height: 32px; line-height: 32px; }
 .weekProbWrapper .weekProbDiv .weekProbDetailDiv .weekProbDetailDelBtn,
 .weekProbWrapper .weekProbDiv .weekProbDetailDiv .weekProbDetailEditBtn,
-.weekProbWrapper .weekProbDiv .weekProbDetailDiv .weekProbFeedbackBtn { float: right; margin-left: 10px; width: 32px; height: 32px; line-height: 32px; cursor: pointer; }
+.weekProbWrapper .weekProbDiv .weekProbDetailDiv .weekProbFeedbackBtn,
+.weekProbWrapper .weekProbDiv .weekProbDetailDiv .weekProbSubmitBtn { float: right; margin-left: 10px; width: 32px; height: 32px; line-height: 32px; cursor: pointer; }
 
 /* 과제제출 */
 .probKeywordDiv { background-color: #d9d9d9; padding: 20px; border-radius: 10px; font-size: 1.5rem; font-weight: bold; margin-top: 30px; }
@@ -125,3 +128,50 @@ li { display: block; }
 .probAddFormDiv .probAddFormRightDiv>.inputFormDiv { display: none; }
 .probAddFormDiv .probAddFormRightDiv li { padding: 5px; }
 .probAddFormDiv .probAddFormRightDiv .btn { padding: 5px; }
+.probAddFormDiv .probAddFormRightDiv .waveRegionDiv .del { width: 32px; vertical-align: middle; }
+
+.loader-bg {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    background-color: rgba(239, 239, 239, 0.7);
+    z-index: 1000;
+}
+
+.loader {
+    margin: auto;
+    border: 20px solid #EAF0F6;
+    border-radius: 50%;
+    border-top: 20px solid #FF7A59;
+    width: 200px;
+    height: 200px;
+    animation: spinner 4s linear infinite;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+.loader-msg {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 230px;
+    bottom: 0;
+    margin: auto;
+    width: 300px;
+    height: 30px;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+}
+
+@keyframes spinner {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.hidden {
+    display: none;
+}

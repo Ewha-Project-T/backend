@@ -8,10 +8,12 @@ $(document).ready(function(){
 	$(document).on("click", ".btn-cancel", function(){
 		history.back();
 	});
-	// 강의만들기 이동
-	$(document).on("click", ".lectureInfoAddBtnDiv", function(){
+
+	// 링크이동
+	$(document).on("click", ".link", function(){
 		location.href = $(this).attr("link");
 	});
+
 	// 강의만들기 수강생 팝업
 	$(document).on("click", ".userList", function(){
 		$(".userListPopDiv").show();
@@ -42,12 +44,6 @@ $(document).ready(function(){
 		$(".userListPopDiv").hide();
 	});
 	
-	// 과제목록 이동
-
-	$(document).on("click", ".lectureInfoDiv", function(){
-		location.href = $(this).attr("link");
-	});
-	
 	// 과제목록 상세보기
 	$(document).on("click", ".weekProbDetailViewBtn", function(){
 		var rowRoot = $(this).parents(".weekProbDiv");
@@ -58,10 +54,6 @@ $(document).ready(function(){
 	// 과제 피드백
 	$(document).on("click", ".weekProbFeedbackBtn", function(){
 		location.href = $(".weekProbFeedbackBtn").attr("link");
-	});
-	//과제 추가
-	$(document).on("click", ".weekProbAddBtn", function(){
-		location.href = $(".weekProbAddBtn").attr("link");
 	});
 	//과제 제출
 	$(document).on("click", ".weekProbDetailEditBtn", function(){

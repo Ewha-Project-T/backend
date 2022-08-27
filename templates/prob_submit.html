@@ -16,9 +16,18 @@
 		<script type="text/javascript" src="{{ url_for('static', filename='js/videojs/videojs.record.min.js') }}"></script>
 		<script type="text/javascript" src="{{ url_for('static', filename='js/videojs/videojs.record.recorderjs.min.js') }}"></script>
 		<script type="text/javascript">
+// 문제 파일
+var probFileList = [];
+probFileList.push("/static/audio/audio_sample.wav");
+probFileList.push("/static/audio/hal.wav");
+// 녹음 파일
+var submitDataList = [];
+
+// 플레이어
 var exampleAudioPlayer;
 var submitAudioPlayer;
 var fd;
+var submitSeq = "";
 $(document).ready(function(){
         // 원음
         const sampleAudioOptions = {
@@ -39,11 +48,13 @@ $(document).ready(function(){
                 }
         };
         exampleAudioPlayer = videojs('exampleAudioWaveSurfer', sampleAudioOptions, function() {
-		exampleAudioPlayer.src({src: "{{ url_for('static', filename=wav_url) }}", type: 'audio/wav'});
+		// 1번문제 세팅
+		exampleAudioPlayer.src({src: probFileList[0], type: 'audio/wav'});
+//		exampleAudioPlayer.src({src: "{{ url_for('static', filename=wav_url) }}", type: 'audio/wav'});
         });
 
         exampleAudioPlayer.on("ended", function(){
-                // 동시통역
+                // 녹음 끝났을떄
                 if($(".simultaneousBtn").length > 0){
                         var btnEle = $(".sequentialBtn");
                         exampleAudioPlayer.pause();
@@ -98,6 +109,7 @@ $(document).ready(function(){
         });
 
         submitAudioPlayer.on('deviceError', function() {
+		alert('지원하지 않는 장비입니다.');
                 console.log('device error:', submitAudioPlayer.deviceErrorCode);
         });
 
@@ -134,21 +146,72 @@ $(document).ready(function(){
         });
 
         // 녹음본 제출
-        $(document).on("click", ".submitRecordDataBtn", function(){
+        $(document).on("click", ".recordTempSaveBtn", function(){
                 // 녹음 데이터 보내기
+		console.log("녹음 임시저장중");
                 fd = new FormData();
-                fd.append('assignment', '123');
                 fd.append('wav', submitAudioPlayer.recordedData);
                 $.ajax({
-                        url: "https://ewha.ltra.cc/stt",
+                        url: "/stt",
                         type: "PUT",
                         data: fd,
                         processData: false,
                         contentType: false
                 }).done(function(data){
-					
+			submitDataList.push(data.file);
+			// 다음문제 세팅
+			if(probFileList.length == submitDataList.length){
+				// 문제 모두 녹음됬을때
+				alert("녹음이 완료되었습니다.\n제출버튼을 눌러주세요");
+			}else{
+				exampleAudioPlayer.src({src: probFileList[submitDataList.length], type: 'audio/wav'});
+				alert(submitDataList.length + "번 녹음 완료");
+			}
                 });
         });
+
+	$(document).on("click", ".submitRecordDataBtn", function(){
+		if(probFileList.length != submitDataList.length){
+			alert("모든 문제를 녹음해주세요");
+		}else{
+			var submitUUID = [];
+			for(var i=0; i<submitDataList.length; i++){
+				submitUUID.push(submitDataList[i]);
+			}
+			var param = {
+				"submitUUID": submitUUID,
+				"as_no": ""
+			};
+
+			$.ajax({
+				url: "/",
+				type: "POST",
+				headers: {'Content-Type': 'application/json'},
+				data: JSON.stringify(param),
+				success: function(d){
+					// pass
+				}
+			});
+/*
+			$.ajax({
+				url: "/stt",
+				type: "POST",
+				data: "file=" + submitSeq,
+				success: function(d){
+					console.log(d);
+					setTimeout(function(){
+						$.ajax({
+							url: "/stt/" + d.job,
+							type: "GET",
+							success: function(e){
+								alert(decodeURIComponent(e.textFile));
+							}
+						});
+					}, 5000);
+				}
+			});*/
+		}
+	});
 });
 		</script>
 {% endblock %}
@@ -172,7 +235,7 @@ $(document).ready(function(){
 					<button class="btn simultaneousBtn">통역 시작</button>
 				</div>
 				<div class="recordBtnDiv btnDiv btn-2 btn-align-right">
-					<button class="btn btn-cancel">임시저장</button>
+					<button class="btn btn-temp recordTempSaveBtn">임시저장</button>
 					<button class="btn btn-submit submitRecordDataBtn">제출</button>
 				</div>
 			</div>

@@ -85,11 +85,13 @@ class Prob_region(db.Model):
     region_index = db.Column(db.String(10))
     start = db.Column(db.String(10))
     end = db.Column(db.String(10))
+    upload_url = db.Column(db.Text, nullable=False)
+    job_id = db.Column(db.String(36), nullable=False)
 
 class SttJob(db.Model):
     __tablename__ = "STTJOB"
     job_id = db.Column(db.String(36), primary_key=True)
-    # stt_no = db.Column(db.Integer, db.ForeignKey("STT.stt_no"), nullable=False)
+    stt_no = db.Column(db.Integer, db.ForeignKey("STT.stt_no"), nullable=False)
     sound = db.Column(db.Text, nullable=False)
     startidx = db.Column(db.Text, nullable=False)
     endidx = db.Column(db.Text, nullable=False)

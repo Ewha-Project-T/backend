@@ -5,8 +5,13 @@ from ..model import Attendee, User, Lecture, Assignment,Prob_region
 from server import db
 from functools import wraps
 from flask_jwt_extended import create_refresh_token, create_access_token, verify_jwt_in_request, get_jwt, get_jwt_identity
+from pydub import AudioSegment, silence
+from worker import do_stt_work
+
 import json
 import os
+# import librosa
+import uuid
 
 def prob_listing(lecture_no):
     as_list=Assignment.query.filter_by(lecture_no=lecture_no).all()
@@ -39,10 +44,18 @@ def make_as(lecture_no,week,limit_time,as_name,as_type,keyword,description,re_li
         reg_index=json_reg["index"]
         reg_start=json_reg["start"]
         reg_end=json_reg["end"]
-        pr=Prob_region(assignment_no=this_assignment.assignment_no,region_index=reg_index,start=reg_start,end=reg_end)
+        split_url=split_wav_save(upload_url,int(reg_start),int(reg_end))
+        task = do_stt_work.delay(split_url)
+        pr = Prob_region(assignment_no=this_assignment.assignment_no,region_index=reg_index,start=reg_start,end=reg_end,upload_url=split_url, job_id=task.id)
         db.session.add(pr)
         db.session.commit
-
+        
+def split_wav_save(upload_url,start,end):
+    uuid_str=str(uuid.uuid4())
+    audio = AudioSegment.from_file(upload_url)
+    audio[start * 1000:end * 1000].export(f"{os.environ['UPLOAD_PATH']}/{uuid_str}.wav", format="wav")
+    return uuid_str
+    
 
 def mod_as(lecture_no,as_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,original_text="",upload_url="",region=""):
     acc=Assignment.query.filter_by(assignment_no=as_no).first()

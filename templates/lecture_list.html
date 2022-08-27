@@ -24,14 +24,17 @@
 		<script type="text/javascript">
 			//강의삭제
 		$(document).on("click",".lectureDelDiv", function(){
-			var del_link = $(this).attr("link");
-			$.ajax({
-				url: del_link,
-				type: "GET",
-				success: function(d){
-					location.href="/lecture"
-				}
-			});
+			if(confirm("삭제하시겠습니까?")){
+				var del_link = $(this).attr("link");
+				$.ajax({
+					url: del_link,
+					type: "GET",
+					success: function(d){
+						location.href="/lecture"
+					}
+				});
+			}
+			return false;
 		});
 			</script>
 {% endblock %}
@@ -61,51 +64,28 @@
 					<ul>
 						{% for  i in lecture_list %}
 						<li>
-							{% if user_perm == 0 or user_perm== 3 %}
-							<div class="lectureDelDiv" link="{{ url_for('lecture2',lecture_no=i.lecture_no) }}">
-								<img src="x">
-								<span>삭제</span>
-							</div>
-							<div class="lectureInfoDiv" link="{{ url_for('lecture_mod',lecture_no=i.lecture_no) }}">
-								<img src="x">
-								<span>수정</span>
-							</div>
-							{% endif %}
-							<div class="lectureInfoDiv" link="{{ url_for('prob',lecture_no=i.lecture_no) }}">
-								<div class="lectureTitleDiv">
+							<div class="lectureInfoDiv">
+								<div class="lectureTitleDiv link" link="{{ url_for('prob',lecture_no=i.lecture_no) }}">
 									<span>{{i.lecture_name}}<br>{{i.professor}}</span>
-									<img src="x">
+									<img src="{{ url_for('static', filename='images/homework.png') }}">
 								</div>
-								<div class="lectureContentDiv">
+								<div class="lectureContentDiv link" link="{{ url_for('prob',lecture_no=i.lecture_no) }}">
 									<span>{{i.major}}<br>{{i.separated}}</span>
 								</div>
+							{% if user_perm == 0 or user_perm== 3 %}
 								<div class="likeDiv">
-									<img src="x">
-									<span>{{i.year}}</span>
+									<img src="{{ url_for('static', filename='images/del_icon.png') }}" class="lectureDelDiv" link="{{ url_for('lecture2',lecture_no=i.lecture_no) }}">
+									<img src="{{ url_for('static', filename='images/edit_icon.png') }}" class="lectureEditDiv link" link="{{ url_for('lecture_mod',lecture_no=i.lecture_no) }}">
 								</div>
+							{% endif %}
 							</div>
 						</li>
 						{% endfor %}
 						<li>
-							<div class="lectureInfoDiv" link="{{ url_for('prob') }}">
-								<div class="lectureTitleDiv">
-									<span>SW 문제해결<br>클릭시 과제목록</span>
-									<img src="x">
-								</div>
-								<div class="lectureContentDiv">
-									<span>Programming ~~~~<br>SW 문제해결 뭐시기!!</span>
-								</div>
-								<div class="likeDiv">
-									<img src="x">
-									<span>222</span>
-								</div>
-							</div>
-						</li>
-						<li>
 							{% if user_perm == 0 or user_perm== 3 %}
 							<div class="lectureInfoAddDiv">
-								<div class="lectureInfoAddBtnDiv" link="{{ url_for('lecture_add') }}">
-									<img src="x" alt="클릭시 강의추가">
+								<div class="lectureInfoAddBtnDiv link" link="{{ url_for('lecture_add') }}">
+									<img src="{{ url_for('static', filename='images/add_icon.png') }}" alt="클릭시 강의추가">
 								</div>
 							</div>
 							{% endif %}

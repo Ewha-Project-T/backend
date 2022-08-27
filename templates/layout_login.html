@@ -13,15 +13,18 @@
 	
 	<body>
 		<div class="">
+			<div class="loader-bg hidden">
+				<div class="loader-ctx">
+					<div class="loader"></div>
+					<div class="loader-msg"></div>
+				</div>
+			</div>
 			<div class="menuBarDiv">
 				<div class="logoDiv">
 					<img src="{{ url_for('static', filename='images/ewha_logo.png') }}" />
 				</div>
 				<ul class="menuBarList">
-					<li>Menu1</li>
-					<li>Menu2</li>
-					<li>Menu3</li>
-					<li>Menu4</li>
+					<li class="link" link="{{ url_for('lecture') }}">Home</li>
 				</ul>
 				<div class="loginInfoDiv">
 					<img src="{{ url_for('static', filename='images/myphoto.png') }}" class="myphotoBtn">

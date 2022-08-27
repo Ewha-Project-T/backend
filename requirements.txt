@@ -19,3 +19,4 @@ azure.core
 azure.cognitiveservices.speech
 celery
 redis
+librosa

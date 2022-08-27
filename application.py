@@ -38,6 +38,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True 
 app.config['JWT_TOKEN_LOCATION'] = ['cookies']
 app.config['JWT_COOKIE_CSRF_PROTECT'] = False
+app.config['BUNDLE_ERRORS'] = True
+
 db.init_app(app)
 
 with app.app_context():
@@ -81,8 +83,8 @@ def uploads(filename):
 
 @app.route("/", methods=['GET'])
 def hello():
-    return redirect('http://203.255.176.34:8080/login')
-    #return redirect('https://translation-platform.site:8443/login')
+    #return redirect('http://203.255.176.34:8080/login')
+    return redirect('https://translation-platform.site:8443/login')
     #return redirect('https://ewha.ltra.cc/login')
 
 load_api(myApi)

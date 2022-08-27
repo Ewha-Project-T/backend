@@ -3,6 +3,7 @@ import json
 from pickle import TRUE
 from flask import jsonify,render_template, request, redirect, url_for,abort,make_response
 from flask_restful import reqparse, Resource
+from worker import do_stt_work
 from flask_jwt_extended import (
     jwt_required, get_jwt_identity, create_access_token, get_jwt
 )
@@ -13,6 +14,7 @@ from werkzeug.utils import secure_filename
 from os import environ as env
 from werkzeug.datastructures import FileStorage
 import os
+import uuid
 
 host_url=env["HOST"]
 perm_list={"학생":1,"조교":2,"교수":3}
@@ -166,9 +168,19 @@ class prob_upload(Resource):
         parser.add_argument('prob_sound', type=FileStorage, location='files')        
         args = parser.parse_args()        
         file= args['prob_sound']
+
+        uuid_str=str(uuid.uuid4())
+        filename = uuid_str
+        path = f'{os.environ["UPLOAD_PATH"]}/{filename}.wav'
         if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save('./static/audio/{0}'.format(secure_filename(file.filename)))
-        res = {"file_path": f"/static/audio/{filename}"}#추후 파일명에대한 해쉬처리 필요
+            #filename = secure_filename(file.filename)
+            # file.save('./static/audio/{0}'.format(filename))
+            file.save(path)
+        
+        # task = do_stt_work.delay(filename)
+        res = {
+            "file_path": path, #추후 파일명에대한 해쉬처리 필요
+            # "job": task.id
+        }
         return jsonify(res)
 

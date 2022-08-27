@@ -11,6 +11,24 @@
 <script type="text/javascript">
 var probAudioPlayer;
 $(document).ready(function(){
+	var polling_id = null
+
+	function translation_polling(jobid) {
+		/*
+		$.ajax({
+			url: `/stt/${jobid}`,
+			success: function(d) {
+				if(d.state == undefined) {
+					clearInterval(polling_id)
+					$(".loader-bg").addClass("hidden")
+				} else {
+					$(".loader-msg").text(d.state + " 작업 진행중입니다.")
+				}
+			}
+		})
+		*/
+	}
+
 	// 파일업로드
 	$(document).on("change", "input[name=prob_sound_file]", function(){
 		var formData = new FormData();
@@ -25,6 +43,8 @@ $(document).ready(function(){
 				$(".probSoundUpload").hide();
 				$(".probAddFormRightDiv>.inputFormDiv").show();
 				$("input[name=prob_sound_path]").val(d.file_path);
+				//polling_id = setInterval(() => { translation_polling(d.job) }, 1000)
+				//$(".loader-bg").removeClass("hidden")
 				probAudioPlayer.load(d.file_path);
 			}
 		});
@@ -67,16 +87,26 @@ $(document).ready(function(){
 			spanEle.addClass("btn").attr("region", i).text("구간 " + i + " : " + region[i].start.toFixed() + " ~ " + region[i].end.toFixed());
 			spanEle.attr("start", region[i].start.toFixed());
 			spanEle.attr("end", region[i].end.toFixed());
-			var spanEle2 = $("<span />");
-			spanEle2.addClass("del").attr("region", i).text("X");
+			var imgEle = $("<img />");
+			imgEle.addClass("del").attr({
+				"region": i,
+				"src": "{{ url_for('static', filename='images/X_icon.png') }}"
+			});
 			liEle.append(spanEle);
-			liEle.append(spanEle2);
+			liEle.append(imgEle);
 			$(".waveRegionDiv ul").append(liEle);
 		}
 	}
-	probAudioPlayer.on('loading', function(){
+	function audioSizeUpdate(){
 		var audioSize = probAudioPlayer.getDuration();
-		$(".waveSoundSize").text("원음 : " + Math.floor(audioSize / 60).toFixed()  + "분 " + Math.floor(audioSize % 60).toFixed() + "초");
+		if(isNaN(audioSize)){
+			setTimeout(audioSizeUpdate(), 1000);
+		}else{
+			$(".waveSoundSize").text("원음 : " + Math.floor(audioSize / 60).toFixed()  + "분 " + Math.floor(audioSize % 60).toFixed() + "초");
+		}
+	}
+	probAudioPlayer.on('loading', function(){
+		audioSizeUpdate();
 	});
 	probAudioPlayer.on('region-update-end', function(region, e){
 		regionUpdate(region, e);
@@ -111,7 +141,6 @@ $(document).ready(function(){
 		};
 		console.log(JSON.stringify(params));
 		$.ajax({
-			
 			url: "{{ url_for('prob_add') }}",
 			type: "POST",
 			headers: {'Content-Type': 'application/json'},

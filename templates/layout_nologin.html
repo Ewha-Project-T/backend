@@ -12,7 +12,7 @@
 	
 	<body>
 {% block content %}{% endblock %}
-	{% if msg != '' %}
+	{% if msg != '' and msg != None %}
 	<div id="serverMsg">{{ msg }}</div>
 	{% endif %}
 	</body>

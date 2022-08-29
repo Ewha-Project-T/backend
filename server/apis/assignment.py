@@ -137,7 +137,6 @@ class Prob_submit(Resource):
         as_no=args['as_no']
         lecture_no = args['lecture_no']
         wav_url=get_wav_url(as_no)
-        print(wav_url)
         return make_response(render_template("prob_submit.html",wav_url=wav_url,as_no=as_no,lecture_no=lecture_no))
     @jwt_required()
     def post(self):
@@ -167,9 +166,10 @@ class Prob_del(Resource):
         else:
             return{"msg": "access denied"}
 
-
+@jwt_required()
 class Prob_feedback(Resource):
     def get(self):
+        user_info=get_jwt_identity()
         return make_response(render_template("prob_feedback.html"))
 
 ALLOWED_EXTENSIONS = {'wav','mp4'}

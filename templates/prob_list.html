@@ -42,7 +42,7 @@ $(document).on("click",".probDelDiv", function(){
 										<div class="weekProbDetailRowDiv">
 											<span class="">{{i.as_name}}</span>
 											<img src="{{ url_for('static', filename='images/submit_icon.png') }}" class="weekProbSubmitBtn link" link="{{ url_for('prob_submit',as_no=i.assignment_no,lecture_no=lecture_no) }}">
-											<img src="{{ url_for('static', filename='images/feedback_icon.png') }}" class="weekProbFeedbackBtn" alt="펜" link="{{ url_for('prob_feedback',lecture_no=lecture_no) }}">
+											<img src="{{ url_for('static', filename='images/feedback_icon.png') }}" class="weekProbFeedbackBtn" alt="펜" link="{{ url_for('prob_feedback',as_no=i.assignment_no,lecture_no=lecture_no) }}">
 											{% if user_perm == 0 or user_perm== 3 %}
 											<img src="{{ url_for('static', filename='images/del_icon.png') }}" class="weekProbDetailDelBtn probDelDiv" link="{{ url_for('prob_del',lecture_no=lecture_no,as_no=i.assignment_no) }}" alt="-">
 											<img src="{{ url_for('static', filename='images/edit_icon.png') }}" class="lectureInfoDiv weekProbDetailEditBtn" link="{{ url_for('prob_mod',lecture_no=lecture_no,as_no=i.assignment_no) }}">

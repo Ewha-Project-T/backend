@@ -17,9 +17,6 @@ nltk.download('punkt')
 
 env = os.environ
 base = declarative_base()
-engine = create_engine(f"mysql+pymysql://{env['SQL_USER']}:{env['SQL_PASSWORD']}@{env['SQL_HOST']}:{env['SQL_PORT']}/{env['SQL_DATABASE']}")
-base.metadata.bind = engine
-session = orm.scoped_session(orm.sessionmaker())(bind=engine)
 
 BROKER = os.environ['REDIS_BACKEND']
 CELERY_RESULT_BACKEND = os.environ['REDIS_BACKEND']
@@ -78,6 +75,10 @@ def process_stt_result(stt):
 
 @celery.task(bind=True)
 def do_stt_work(self, filename):
+    engine = create_engine(f"mysql+pymysql://{env['SQL_USER']}:{env['SQL_PASSWORD']}@{env['SQL_HOST']}:{env['SQL_PORT']}/{env['SQL_DATABASE']}")
+    base.metadata.bind = engine
+    session = orm.scoped_session(orm.sessionmaker())(bind=engine)
+
     self.update_state(state='INDEXING')
 
     filepath = f"{os.environ['UPLOAD_PATH']}/{filename}.wav"
@@ -229,6 +230,10 @@ def do_stt_work(self, filename):
 
 @celery.task(bind=True)
 def do_sequential_stt_work(self, filename, index):
+    engine = create_engine(f"mysql+pymysql://{env['SQL_USER']}:{env['SQL_PASSWORD']}@{env['SQL_HOST']}:{env['SQL_PORT']}/{env['SQL_DATABASE']}")
+    base.metadata.bind = engine
+    session = orm.scoped_session(orm.sessionmaker())(bind=engine)
+
     filepath = f"{os.environ['UPLOAD_PATH']}/{filename}.wav"
     myaudio = AudioSegment.from_file(filepath)
 

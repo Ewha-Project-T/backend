@@ -8,7 +8,7 @@ from flask_jwt_extended import (
     jwt_required, get_jwt_identity, create_access_token, get_jwt
 )
 import re
-from ..services.assignment_service import prob_listing,make_as,mod_as,get_wav_url,delete_assignment,check_assignment
+from ..services.assignment_service import prob_listing,make_as,mod_as,get_wav_url,delete_assignment,check_assignment,get_as_name
 from ..services.lecture_service import lecture_access_check
 from werkzeug.utils import secure_filename
 from os import environ as env
@@ -166,11 +166,18 @@ class Prob_del(Resource):
         else:
             return{"msg": "access denied"}
 
-@jwt_required()
 class Prob_feedback(Resource):
+    @jwt_required()
     def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('lecture_no', type=int)
+        parser.add_argument('as_no', type=int)
+        args = parser.parse_args()
+        as_no=args['as_no']
+        lecture_no = args['lecture_no']
         user_info=get_jwt_identity()
-        return make_response(render_template("prob_feedback.html"))
+        as_name=get_as_name(as_no)
+        return make_response(render_template("prob_feedback.html",user_info=user_info,as_name=as_name))
 
 ALLOWED_EXTENSIONS = {'wav','mp4'}
 def allowed_file(filename):

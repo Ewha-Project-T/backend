@@ -33,11 +33,10 @@ def prob_listing(lecture_no):
         as_list_result.append(tmp)
     return as_list_result
 
-def make_as(lecture_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,original_text="",upload_url="",region=""):
+def make_as(lecture_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,original_text="",upload_url="",region="",user_info=None):
     acc=Assignment(lecture_no=lecture_no,week=week,limit_time=limit_time,as_name=as_name,as_type=as_type,keyword=keyword,description=description,re_limit=re_limit,speed=speed,disclosure=disclosure,original_text=original_text,upload_url=upload_url)
     db.session.add(acc)
     db.session.commit()
-    # this_assignment=Assignment.query.order_by(Assignment.assignment_no.desc()).first()
     
     for reg in region:
         reg=reg.replace("'",'"')
@@ -47,7 +46,7 @@ def make_as(lecture_no,week,limit_time,as_name,as_type,keyword,description,re_li
         reg_end=json_reg["end"]
 
         split_url=split_wav_save(upload_url,int(reg_start),int(reg_end))
-        mapping_sst_user(acc.assignment_no, split_url)
+        mapping_sst_user(acc.assignment_no, split_url,user_info)
 
         task = do_stt_work.delay(split_url)
         pr = Prob_region(assignment_no=acc.assignment_no,region_index=reg_index,start=reg_start,end=reg_end,upload_url=split_url, job_id=task.id)

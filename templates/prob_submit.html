@@ -52,7 +52,6 @@ $(document).ready(function(){
         exampleAudioPlayer = videojs('exampleAudioWaveSurfer', sampleAudioOptions, function() {
 		// 1번문제 세팅
 		exampleAudioPlayer.src({src: probFileList[0], type: 'audio/wav'});
-//		exampleAudioPlayer.src({src: "{{ url_for('static', filename=wav_url) }}", type: 'audio/wav'});
         });
 
         exampleAudioPlayer.on("ended", function(){

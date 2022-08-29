@@ -37,6 +37,7 @@ class Prob_add(Resource):
         args = parser.parse_args()
         lecture_no = args['lecture_no']
         return make_response(render_template("prob_add.html",lecture_no=lecture_no))
+    @jwt_required()
     def post(self):#과제만들기
         parser = reqparse.RequestParser()
         parser.add_argument('lecture_no', type=int)
@@ -69,9 +70,9 @@ class Prob_add(Resource):
         else:
             disclosure=1
         prob_region=args['prob_region']
-
+        user_info=get_jwt_identity()
         #original_text = args['original_text']
-        make_as(lecture_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,"",upload_path,prob_region)#original_text,upload_url
+        make_as(lecture_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,"",upload_path,prob_region,user_info)#original_text,upload_url
         return{"msg" : "success"},200
 
 class Prob_mod(Resource):
@@ -122,7 +123,7 @@ class Prob_mod(Resource):
         #original_text = args['original_text']
         user_info=get_jwt_identity()
         if(lecture_access_check(user_info["user_no"],lecture_no) or user_info["user_perm"]==0):
-            mod_as(lecture_no,as_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,"",upload_path,prob_region)#original_text,upload_url
+            mod_as(lecture_no,as_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,"",upload_path,prob_region,user_info)#original_text,upload_url
             return{"msg" : "assignment delete success"},200
         else:
             return{"msg": "access denied"}

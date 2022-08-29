@@ -140,3 +140,7 @@ def check_assignment(as_no,lecture_no,uuid,user_info):
         acc2=Assignment_check_list(check_no=acc.check_no,acl_uuid=uu)
         db.session.add(acc2)
         db.session.commit()
+
+def get_as_name(as_no):
+    acc=Assignment.query.filter_by(assignment_no=as_no).first()
+    return acc.as_name

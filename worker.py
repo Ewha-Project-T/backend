@@ -209,7 +209,7 @@ def do_stt_work(self, filename):
         result['textFile'] += stt
 
     stt = session.query(Stt).filter_by(wav_file=filename).first()
-    if stt is None:
+    if not stt:
         return False
 
     job = SttJob(

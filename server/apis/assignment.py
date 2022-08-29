@@ -8,7 +8,7 @@ from flask_jwt_extended import (
     jwt_required, get_jwt_identity, create_access_token, get_jwt
 )
 import re
-from ..services.assignment_service import prob_listing,make_as,mod_as,get_wav_url,delete_assignment
+from ..services.assignment_service import prob_listing,make_as,mod_as,get_wav_url,delete_assignment,check_assignment
 from ..services.lecture_service import lecture_access_check
 from werkzeug.utils import secure_filename
 from os import environ as env
@@ -130,12 +130,26 @@ class Prob_mod(Resource):
 class Prob_submit(Resource):
     def get(self):
         parser = reqparse.RequestParser()
+        parser.add_argument('lecture_no', type=int)
         parser.add_argument('as_no', type=int)
         args = parser.parse_args()
         as_no=args['as_no']
+        lecture_no = args['lecture_no']
         wav_url=get_wav_url(as_no)
-        wav_url=wav_url.split('/',2)[-1]
-        return make_response(render_template("prob_submit.html",wav_url=wav_url))
+        print(wav_url)
+        return make_response(render_template("prob_submit.html",wav_url=wav_url,as_no=as_no,lecture_no=lecture_no))
+    @jwt_required()
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('lecture_no', type=int)
+        parser.add_argument('as_no', type=int)
+        parser.add_argument('submitUUID',type=str,action='append')
+        args = parser.parse_args()
+        as_no=args['as_no']
+        lecture_no = args['lecture_no']
+        uuid=args['submitUUID']
+        user_info=get_jwt_identity()
+        check_assignment(as_no,lecture_no,uuid,user_info)
 class Prob_del(Resource):
     @jwt_required()
     def get(self):#과제 삭제

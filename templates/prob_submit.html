@@ -18,8 +18,10 @@
 		<script type="text/javascript">
 // 문제 파일
 var probFileList = [];
-probFileList.push("/static/audio/audio_sample.wav");
-probFileList.push("/static/audio/hal.wav");
+{% for i in wav_url %}
+    probFileList.push("{{i.upload_url}}")
+{% endfor %}
+
 // 녹음 파일
 var submitDataList = [];
 
@@ -150,6 +152,7 @@ $(document).ready(function(){
                 // 녹음 데이터 보내기
 		console.log("녹음 임시저장중");
                 fd = new FormData();
+                fd.append('assignment',{{as_no}})
                 fd.append('wav', submitAudioPlayer.recordedData);
                 $.ajax({
                         url: "/stt",
@@ -180,16 +183,17 @@ $(document).ready(function(){
 			}
 			var param = {
 				"submitUUID": submitUUID,
-				"as_no": ""
+				"as_no": {{as_no}},
+        "lecture_no":{{lecture_no}}
 			};
 
 			$.ajax({
-				url: "/",
+				url: "/prob_submit",
 				type: "POST",
 				headers: {'Content-Type': 'application/json'},
 				data: JSON.stringify(param),
 				success: function(d){
-					// pass
+					location.href="/prob?lecture_no={{lecture_no}}"
 				}
 			});
 /*

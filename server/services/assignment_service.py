@@ -1,7 +1,7 @@
 from distutils.command.upload import upload
 from server.apis import assignment
 from server.services.stt_service import mapping_sst_user
-from ..model import Attendee, User, Lecture, Assignment,Prob_region
+from ..model import Attendee, User, Lecture, Assignment,Prob_region,Assignment_check,Assignment_check_list
 from server import db
 from functools import wraps
 from flask_jwt_extended import create_refresh_token, create_access_token, verify_jwt_in_request, get_jwt, get_jwt_identity
@@ -36,7 +36,7 @@ def prob_listing(lecture_no):
 def make_as(lecture_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,original_text="",upload_url="",region=""):
     acc=Assignment(lecture_no=lecture_no,week=week,limit_time=limit_time,as_name=as_name,as_type=as_type,keyword=keyword,description=description,re_limit=re_limit,speed=speed,disclosure=disclosure,original_text=original_text,upload_url=upload_url)
     db.session.add(acc)
-    db.session.commit
+    db.session.commit()
     # this_assignment=Assignment.query.order_by(Assignment.assignment_no.desc()).first()
     
     for reg in region:
@@ -115,10 +115,29 @@ def mod_as(lecture_no,as_no,week,limit_time,as_name,as_type,keyword,description,
 
 
 def get_wav_url(as_no):
-    acc=Assignment.query.filter_by(assignment_no=as_no).first()
-    return acc.upload_url
+    acc=Prob_region.query.filter_by(assignment_no=as_no).all()
+    prob_result=[]
+    for lec in acc:
+        tmp={}
+        tmp["region_index"]=vars(lec)["region_index"]
+        tmp["start"]=vars(lec)["start"]
+        tmp["end"]=vars(lec)["end"]
+        tmp["upload_url"]=f"{os.environ['UPLOAD_PATH']}/{vars(lec)['upload_url']}.wav"
+        tmp["job_id"]=vars(lec)["job_id"]
+        prob_result.append(tmp)
+    return prob_result
 
 def delete_assignment(assignment_no):
     acc = Assignment.query.filter_by(assignment_no=assignment_no).first()
     db.session.delete(acc)
     db.session.commit
+    
+def check_assignment(as_no,lecture_no,uuid,user_info):
+    attend=Attendee.query.filter_by(user_no=user_info["user_no"],lecture_no=lecture_no).first()
+    acc=Assignment_check(assignment_no=as_no,attendee_no=attend.attendee_no,assignment_check=1)
+    db.session.add(acc)
+    db.session.commit()
+    for uu in uuid:
+        acc2=Assignment_check_list(check_no=acc.check_no,acl_uuid=uu)
+        db.session.add(acc2)
+        db.session.commit()

@@ -111,7 +111,7 @@ def do_stt(stt_id, sound, myaudio, startidx, endidx, silenceidx):
     jobid = str(uuid.uuid4())
 
     stt = Stt.query.filter_by(wav_file=stt_id).first()
-    if stt is None:
+    if not stt:
         return False
 
     job = SttJob(
@@ -128,24 +128,24 @@ def do_stt(stt_id, sound, myaudio, startidx, endidx, silenceidx):
     
     return jobid
 
-def mapping_sst_user(assignment, file):
+def mapping_sst_user(assignment, file,userinfo):
     # userinfo = get_jwt_identity()
-    userinfo = {"user_no":1}
+    #userinfo = {"user_no":1}
     stt = Stt(user_no=userinfo["user_no"], assignment_no=assignment, wav_file=file)
     db.session.add(stt)
     db.session.commit()
 
-def is_stt_userfile(assignment, file) -> bool:
+def is_stt_userfile(assignment, file,userinfo) -> bool:
     # userinfo = get_jwt_identity()
-    userinfo = {"user_no":1}
+    #userinfo = {"user_no":1}
     stt = Stt.query.filter_by(user_no=userinfo["user_no"], assignment_no=assignment, wav_file=file).first()
     if stt is None:
         return False
     return True
 
-def remove_userfile(assignment, file) -> bool:
+def remove_userfile(assignment, file,userinfo) -> bool:
     # userinfo = get_jwt_identity()
-    userinfo = {"user_no":1}
+    #userinfo = {"user_no":1}
     stt = Stt.query.filter_by(user_no=userinfo["user_no"], assignment_no=assignment, wav_file=file)
     if stt is None:
         return False
@@ -157,9 +157,9 @@ def remove_userfile(assignment, file) -> bool:
     db.session.commit()
     return True
 
-def get_userfile():
+def get_userfile(userinfo):
     #userinfo = get_jwt_identity()
-    userinfo = {"user_no":1}
+    #userinfo = {"user_no":1}
     stt = Stt.query.filter_by(user_no=userinfo["user_no"]).first()
     if stt is None:
         return False

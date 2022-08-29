@@ -5,7 +5,7 @@ import os
 from flask import jsonify, Response, abort
 from flask_restful import reqparse, Resource
 from flask_restful.reqparse import Argument
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required,get_jwt_identity
 from sqlalchemy.ext.declarative import DeclarativeMeta
 
 import werkzeug
@@ -46,14 +46,15 @@ class AlchemyEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 class Stt(Resource):
-    # @jwt_required
+    @jwt_required()
     def get(self):
-        files = get_userfile()
+        user_info=get_jwt_identity()
+        files = get_userfile(user_info)
         if not files:
             return { "msg": "user stt is not exists" },404
         return jsonify(files=AlchemyEncoder().default(files))
     
-    # @jwt_required
+    @jwt_required()
     def post(self):
         parser = reqparse.RequestParser(argument_class=APIArgument, bundle_errors=True)
         parser.add_argument('assignment', type=int, required=True, help="assignment is required")
@@ -62,15 +63,15 @@ class Stt(Resource):
         args = parser.parse_args()
         assignment = args['assignment']
         file = args['file']
-
-        if not is_stt_userfile(assignment, file):
+        user_info=get_jwt_identity()
+        if not is_stt_userfile(assignment, file,user_info):
             return { "msg": "user stt is not exists" },404
 
         jobid = simultaneous_stt(file)
 
         return jsonify(job=jobid)
 
-    # @jwt_required
+    @jwt_required()
     def put(self):
         file = str(uuid.uuid4())
         filename = f"{file}.wav"
@@ -83,10 +84,11 @@ class Stt(Resource):
         wav = args['wav']
         
         wav.save(f"{os.environ['UPLOAD_PATH']}/{filename}")
-        mapping_sst_user(assignment, file)
+        user_info=get_jwt_identity()
+        mapping_sst_user(assignment, file,user_info)
         return jsonify(file=file)
 
-    @jwt_required
+    @jwt_required()
     def delete(self):
         parser = reqparse.RequestParser(argument_class=APIArgument, bundle_errors=True)
         parser.add_argument('assignment', type=int, required=True, help="assignment is required")
@@ -95,8 +97,8 @@ class Stt(Resource):
         args = parser.parse_args()
         assignment = args['assignment']
         file = args['file']
-
-        if remove_userfile(assignment, file):
+        user_info=get_jwt_identity()
+        if remove_userfile(assignment, file,user_info):
             return jsonify(msg="success")
         else:
             return { "msg": "user stt is not exists" },404
@@ -106,7 +108,7 @@ class SttJob(Resource):
         return jsonify(stt_getJobResult(jobid))
 
 class SttSeq(Resource):
-    # @jwt_required
+    @jwt_required()
     def post(self):
         parser = reqparse.RequestParser(argument_class=APIArgument, bundle_errors=True)
         parser.add_argument('assignment', type=int, required=True, help="assignment is required")
@@ -115,7 +117,7 @@ class SttSeq(Resource):
 
         args = parser.parse_args()
         
-        # assignment = args['assignment']
+        assignment = args['assignment']
         region = args['region']
         file = args['file']
 

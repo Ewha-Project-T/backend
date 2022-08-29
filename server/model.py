@@ -70,7 +70,11 @@ class Assignment_check(db.Model):
     attendee_no = db.Column(db.Integer, db.ForeignKey("ATTENDEE.attendee_no"), nullable=True)
     assignment_check = db.Column(db.Integer, default=0)
 
-
+class Assignment_check_list(db.Model):
+    __tablename__="ASSIGNMENT_CHECK_LIST"
+    acl_no=db.Column(db.Integer, primary_key=True)
+    check_no = db.Column(db.Integer, db.ForeignKey("ASSIGNMENT_CHECK.check_no"), nullable=True)
+    acl_uuid= db.Column(db.String(36), nullable=False)
 class Stt(db.Model):
     __tablename__ = "STT"
     stt_no = db.Column(db.Integer, primary_key=True)

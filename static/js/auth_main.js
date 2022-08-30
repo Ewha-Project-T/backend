@@ -53,7 +53,7 @@ $(document).ready(function(){
 	
 	// 과제 피드백
 	$(document).on("click", ".weekProbFeedbackBtn", function(){
-		location.href = $(".weekProbFeedbackBtn").attr("link");
+		location.href = $(this).attr("link");
 	});
 	//과제 제출
 	$(document).on("click", ".weekProbDetailEditBtn", function(){

@@ -1,7 +1,7 @@
 from distutils.command.upload import upload
 from server.apis import assignment
 from server.services.stt_service import mapping_sst_user
-from ..model import Attendee, User, Lecture, Assignment,Prob_region,Assignment_check,Assignment_check_list
+from ..model import Attendee, User, Lecture, Assignment,Prob_region,Assignment_check,Assignment_check_list,Stt
 from server import db
 from functools import wraps
 from flask_jwt_extended import create_refresh_token, create_access_token, verify_jwt_in_request, get_jwt, get_jwt_identity
@@ -125,6 +125,15 @@ def get_wav_url(as_no):
         tmp["job_id"]=vars(lec)["job_id"]
         prob_result.append(tmp)
     return prob_result
+
+def get_prob_wav_url(as_no,user_info):
+    acc=Stt.query.filter_by(assignment_no=as_no,user_no=user_info["user_no"]).all()
+    stt_result=[]
+    for lec in acc:
+        tmp={}
+        tmp["wav_url"]=f"{os.environ['UPLOAD_PATH']}/{vars(lec)['wav_file']}.wav"
+        stt_result.append(tmp)
+    return stt_result
 
 def delete_assignment(assignment_no):
     acc = Assignment.query.filter_by(assignment_no=assignment_no).first()

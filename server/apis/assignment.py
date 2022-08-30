@@ -8,7 +8,7 @@ from flask_jwt_extended import (
     jwt_required, get_jwt_identity, create_access_token, get_jwt
 )
 import re
-from ..services.assignment_service import prob_listing,make_as,mod_as,get_wav_url,delete_assignment,check_assignment,get_as_name
+from ..services.assignment_service import prob_listing,make_as,mod_as,get_wav_url,delete_assignment,check_assignment,get_as_name,get_prob_wav_url
 from ..services.lecture_service import lecture_access_check
 from werkzeug.utils import secure_filename
 from os import environ as env
@@ -177,7 +177,9 @@ class Prob_feedback(Resource):
         lecture_no = args['lecture_no']
         user_info=get_jwt_identity()
         as_name=get_as_name(as_no)
-        return make_response(render_template("prob_feedback.html",user_info=user_info,as_name=as_name))
+        wav_url=get_prob_wav_url(as_no,user_info)
+        print(wav_url)
+        return make_response(render_template("prob_feedback.html",user_info=user_info,as_name=as_name,wav_url=wav_url))
 
 ALLOWED_EXTENSIONS = {'wav','mp4'}
 def allowed_file(filename):

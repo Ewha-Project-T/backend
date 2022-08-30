@@ -131,11 +131,15 @@ def get_prob_wav_url(as_no,user_info,lecture_no):
     check=Assignment_check.query.filter_by(assignment_no=as_no,attendee_no=attend.attendee_no,assignment_check=1).first()
     acc=Assignment_check_list.query.filter_by(check_no=check.check_no).all()
     stt_result=[]
+    stt_uuid=[]
     for lec in acc:
         tmp={}
+        tmp2={}
         tmp["wav_url"]=f"{os.environ['UPLOAD_PATH']}/{vars(lec)['acl_uuid']}.wav"
+        tmp2["uuid"]=vars(lec)['acl_uuid']
         stt_result.append(tmp)
-    return stt_result
+        stt_uuid.append(tmp2)
+    return stt_result,stt_uuid
 
 def delete_assignment(assignment_no):
     acc = Assignment.query.filter_by(assignment_no=assignment_no).first()
@@ -151,6 +155,7 @@ def check_assignment(as_no,lecture_no,uuid,user_info):
         acc2=Assignment_check_list(check_no=acc.check_no,acl_uuid=uu)
         db.session.add(acc2)
         db.session.commit()
+        do_stt_work.delay(uu)
 
 def get_as_name(as_no):
     acc=Assignment.query.filter_by(assignment_no=as_no).first()
@@ -160,13 +165,16 @@ def get_stt_result(uuid):
     stt_result_list=[]
     for i in uuid:
         tmp={}
-        stt_acc=Stt.query.filter_by(wav_file=i).first()
+        stt_acc=Stt.query.filter_by(wav_file=i["uuid"]).first()
         acc=SttJob.query.filter_by(stt_no=stt_acc.stt_no).first()
-        tmp["sound"]=vars(acc)['sound']
-        tmp["startidx"]=vars(acc)['startidx']
-        tmp["endidx"]=vars(acc)['endidx']
-        tmp["silenceidx"]=vars(acc)['silenceidx']
-        tmp["stt_result"]=vars(acc)['stt_result']
-        tmp["is_seq"]=vars(acc)['is_seq']
+        if acc==None:
+            return None
+        print(acc)
+        tmp["sound"]=acc.sound
+        tmp["startidx"]=acc.startidx
+        tmp["endidx"]=acc.endidx
+        tmp["silenceidx"]=acc.silenceidx
+        tmp["stt_result"]=acc.stt_result
+        tmp["is_seq"]=acc.is_seq
         stt_result_list.append(tmp)
     return stt_result_list

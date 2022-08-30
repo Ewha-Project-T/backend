@@ -38,9 +38,8 @@
 					<audio id="assignmentAudioWaveSurfer" class="video-js vjs-default-skin" audioLink="{{i.wav_url}}"></audio>
 				</div>
 				{% endfor %}
-
-
-				{% for i in stt_result}
+{% if stt_result!=None %}
+        {% for i in stt_result %}
 				<div class="probTextDiv">
 					<div class="probTextContentDiv">
 						<div class="exampleTextDiv">
@@ -63,6 +62,7 @@
 							<!--button class="btn">불러오기</button-->
 						</div>
 						{% endfor %}
+{% endif %}
 						<ul>
 							<li>
 								<div class="feedbackContentRowDiv">

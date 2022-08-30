@@ -177,9 +177,9 @@ class Prob_feedback(Resource):
         lecture_no = args['lecture_no']
         user_info=get_jwt_identity()
         as_name=get_as_name(as_no)
-        wav_url=get_prob_wav_url(as_no,user_info,lecture_no)
+        wav_url,uuid=get_prob_wav_url(as_no,user_info,lecture_no)
         wav_url_example=get_wav_url(as_no)
-        stt_result=get_stt_result(wav_url)
+        stt_result=get_stt_result(uuid)
         return make_response(render_template("prob_feedback.html",user_info=user_info,as_name=as_name,wav_url=wav_url,wav_url_example=wav_url_example,stt_result=stt_result))
 
 ALLOWED_EXTENSIONS = {'wav','mp4'}

@@ -27,13 +27,16 @@
 						<button class="btn">저장</button>
 					</div>
 				</div>
+
+				
 				<div class="exampleAudioDiv">
 					<audio id="exampleAudioWaveSurfer" class="video-js vjs-default-skin" audioLink="{{ url_for('static', filename='audio/audio_sample.wav') }}"></audio>
 				</div>
+				{% for  i in wav_url %}
 				<div class="assignmentAudioDiv">
-					<audio id="assignmentAudioWaveSurfer" class="video-js vjs-default-skin" audioLink="{{ url_for('static', filename='audio/audio_sample.wav') }}"></audio>
+					<audio id="assignmentAudioWaveSurfer" class="video-js vjs-default-skin" audioLink="{{i.wav_url}}"></audio>
 				</div>
-				
+				{% endfor %}
 				<div class="probTextDiv">
 					<div class="probTextContentDiv">
 						<div class="exampleTextDiv">

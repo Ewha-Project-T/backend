@@ -128,7 +128,7 @@ def get_wav_url(as_no):
 
 def get_prob_wav_url(as_no,user_info,lecture_no):
     attend=Attendee.query.filter_by(user_no=user_info["user_no"],lecture_no=lecture_no).first()
-    check=Assignment_check.query.filter_by(assignmnet_no=as_no,attendee_no=attend.attendee_no,assignment_check=1).first()
+    check=Assignment_check.query.filter_by(assignment_no=as_no,attendee_no=attend.attendee_no,assignment_check=1).first()
     acc=Assignment_check_list.query.filter_by(check_no=check.check_no).all()
     stt_result=[]
     for lec in acc:

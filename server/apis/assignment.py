@@ -178,8 +178,8 @@ class Prob_feedback(Resource):
         user_info=get_jwt_identity()
         as_name=get_as_name(as_no)
         wav_url=get_prob_wav_url(as_no,user_info,lecture_no)
-        print(wav_url)
-        return make_response(render_template("prob_feedback.html",user_info=user_info,as_name=as_name,wav_url=wav_url))
+        wav_url_example=get_wav_url(as_no)
+        return make_response(render_template("prob_feedback.html",user_info=user_info,as_name=as_name,wav_url=wav_url,wav_url_example=wav_url_example))
 
 ALLOWED_EXTENSIONS = {'wav','mp4'}
 def allowed_file(filename):

@@ -28,10 +28,11 @@
 					</div>
 				</div>
 
-				
+				{% for i in wav_url_example %}
 				<div class="exampleAudioDiv">
-					<audio id="exampleAudioWaveSurfer" class="video-js vjs-default-skin" audioLink="{{ url_for('static', filename='audio/audio_sample.wav') }}"></audio>
+					<audio id="exampleAudioWaveSurfer" class="video-js vjs-default-skin" audioLink="{{ i.upload_url}}"></audio>
 				</div>
+				{% endfor %}
 				{% for  i in wav_url %}
 				<div class="assignmentAudioDiv">
 					<audio id="assignmentAudioWaveSurfer" class="video-js vjs-default-skin" audioLink="{{i.wav_url}}"></audio>

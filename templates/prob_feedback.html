@@ -38,15 +38,18 @@
 					<audio id="assignmentAudioWaveSurfer" class="video-js vjs-default-skin" audioLink="{{i.wav_url}}"></audio>
 				</div>
 				{% endfor %}
+
+
+				{% for i in stt_result}
 				<div class="probTextDiv">
 					<div class="probTextContentDiv">
 						<div class="exampleTextDiv">
 							<h2>원문</h2>
-							<div></div>
+							<div>i.sound</div>
 						</div>
 						<div class="assignmentTextDiv">
 							<h2>통역 전사문</h2>
-							<div></div>
+							<div>i.silenceidx</div>
 						</div>
 						<div class="commentTextDiv">
 							<h2>총평</h2>
@@ -56,9 +59,10 @@
 					<div class="feedbackContentDiv">
 						<div class="feedbackContentTitleDiv">
 							<h2>피드백</h2>
+							i.stt_result
 							<!--button class="btn">불러오기</button-->
 						</div>
-						
+						{% endfor %}
 						<ul>
 							<li>
 								<div class="feedbackContentRowDiv">

@@ -39,26 +39,35 @@
 				</div>
 				{% endfor %}
 {% if stt_result!=None %}
-        {% for i in stt_result %}
+        {% for i in len(stt_result) %}
 				<div class="probTextDiv">
 					<div class="probTextContentDiv">
 						<div class="exampleTextDiv">
 							<h2>원문</h2>
-							<div>{{i.sound}}</div>
+							<div>{{original_stt_result[i].stt_result}}</div>
+							{{original_stt_result[i].sound}}
+							{{original_stt_result[i].startidx}}
+							{{original_stt_result[i].endidx}}
+							{{original_stt_result[i].silenceidx}}
+							{{original_stt_result[i].is_seq}}
 						</div>
 						<div class="assignmentTextDiv">
 							<h2>통역 전사문</h2>
-							<div>{{i.silenceidx}}</div>
+							<div>{{stt_result[i].stt_result}}</div> <!-- i.stt_result dict타입인줄 알았으나 str타입이네요 -->
 						</div>
 						<div class="commentTextDiv">
 							<h2>총평</h2>
-							<div></div>
+							<div>입력하는곳 </div>
 						</div>
 					</div>
 					<div class="feedbackContentDiv">
 						<div class="feedbackContentTitleDiv">
 							<h2>피드백</h2>
-							{{i.stt_result}}
+							{{stt_result[i].sound}}
+							{{stt_result[i].startidx}}
+							{{stt_result[i].endidx}}
+							{{stt_result[i].silenceidx}}
+							{{stt_result[i].is_seq}}
 							<!--button class="btn">불러오기</button-->
 						</div>
 						{% endfor %}

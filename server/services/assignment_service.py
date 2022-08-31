@@ -125,6 +125,19 @@ def get_wav_url(as_no):
         tmp["job_id"]=vars(lec)["job_id"]
         prob_result.append(tmp)
     return prob_result
+def get_original_stt_result(prob_result):
+    original_result=[]
+    for i in prob_result:
+        acc=SttJob.query.filter_by(job_id=i["job_id"]).order_by(SttJob.stt_no.desc()).first()
+        tmp={}
+        tmp["sound"]=acc.sound
+        tmp["startidx"]=acc.startidx
+        tmp["endidx"]=acc.endidx
+        tmp["silenceidx"]=acc.silenceidx
+        tmp["stt_result"]=acc.stt_result
+        tmp["is_seq"]=acc.is_seq
+        original_result.append(tmp)
+    return original_result
 
 def get_prob_wav_url(as_no,user_info,lecture_no):
     attend=Attendee.query.filter_by(user_no=user_info["user_no"],lecture_no=lecture_no).first()

@@ -77,59 +77,68 @@
 
 					<div class="inputFormDiv">
 						<label for="" class="lectureAddFormLebel">강의명</label>
-						<input type="text" class="inputStyle01" name="lecture_name">
+						<input type="text" class="inputStyle01" name="lecture_name" value="{{mod_list['lecture_name']}}">
 					</div>
 					<div class="inputFormDiv">
 						<div class="inputFormDiv-1">
 							<label for="" class="lectureAddFormLebel">연도</label>
 							<select class="inputStyle01" name="lecture_year">
-							<option value="2022">2022</option>
-							<option value="2021">2021</option>
+							<option value="2022"{% if mod_list['year']=="2022" %} selected {% endif %}>2022</option>
+							<option value="2021"{% if mod_list['year']=="2021" %} selected {% endif %}>2021</option>
 							</select>
 						</div>
 						<div class="inputFormDiv-2">
 							<label for="" class="lectureAddFormLebel">학기</label>
 							<select class="inputStyle01" name="lecture_semester">
-							<option value="1학기">1학기</option>
-							<option value="2학기">2학기</option>
-							<option>여름학기</option>
-							<option>겨울학기</option>
+							<option value="1학기"{% if mod_list['semester']=="1학기" %} selected {% endif %}>1학기</option>
+							<option value="2학기"{% if mod_list['semester']=="2학기" %} selected {% endif %}>2학기</option>
+							<option value="여름학기"{% if mod_list['semester']=="여름학기" %} selected {% endif %}>여름학기</option>
+							<option value="겨울학기"{% if mod_list['semester']=="겨울학기" %} selected {% endif %}>겨울학기</option>
 							</select>
 						</div>
 					</div>
 					<div class="inputFormDiv">
 						<label for="" class="lectureAddFormLebel">개설학과</label>
 						<select class="inputStyle01" name="lecture_major">
-						<option value="한일번역">한일번역</option>
-						<option>한일통역</option>
-						<option>한중번역</option>
-						<option>한중통역</option>
-						<option>한영번역</option>
-						<option>한영통역</option>
+						<option value="한일번역"{% if mod_list['major']=="한일번역" %} selected {% endif %}>한일번역</option>
+						<option value="한일통역"{% if mod_list['major']=="한일통역" %} selected {% endif %}>한일통역</option>
+						<option value="한중번역"{% if mod_list['major']=="한중번역" %} selected {% endif %}>한중번역</option>
+						<option value="한중통역"{% if mod_list['major']=="한중통역" %} selected {% endif %}>한중통역</option>
+						<option value="한영번역"{% if mod_list['major']=="한영번역" %} selected {% endif %}>한영번역</option>
+						<option value="한영통역"{% if mod_list['major']=="한영통역" %} selected {% endif %}>한영통역</option>
 						</select>
 					</div>
 					<div class="inputFormDiv">
 						<label for="" class="lectureAddFormLebel">분반</label>
 						<select class="inputStyle01" name="lecture_separated">
-						<option value="1분반">1분반</option>
-						<option>2분반</option>
-						<option>3분반</option>
-						<option>4분반</option>
-						<option>5분반</option>
-						<option>6분반</option>
-						<option>7분반</option>
-						<option>8분반</option>
-						<option>9분반</option>
-						<option>10분반</option>
+						<option value="1분반"{% if mod_list['separated']=="1분반" %} selected {% endif %}>1분반</option>
+						<option value="2분반"{% if mod_list['separated']=="2분반" %} selected {% endif %}>2분반</option>
+						<option value="3분반"{% if mod_list['separated']=="3분반" %} selected {% endif %}>3분반</option>
+						<option value="4분반"{% if mod_list['separated']=="4분반" %} selected {% endif %}>4분반</option>
+						<option value="5분반"{% if mod_list['separated']=="5분반" %} selected {% endif %}>5분반</option>
+						<option value="6분반"{% if mod_list['separated']=="6분반" %} selected {% endif %}>6분반</option>
+						<option value="7분반"{% if mod_list['separated']=="7분반" %} selected {% endif %}>7분반</option>
+						<option value="8분반"{% if mod_list['separated']=="8분반" %} selected {% endif %}>8분반</option>
+						<option value="9분반"{% if mod_list['separated']=="9분반" %} selected {% endif %}>9분반</option>
+						<option value="10분반"{% if mod_list['separated']=="10분반" %} selected {% endif %}>10분반</option>
 						</select>
 					</div>
 					<div class="inputFormDiv">
 						<label for="" class="lectureAddFormLebel">담당교수</label>
-						<input type="text" class="inputStyle01" name="lecture_professor">
+						<input type="text" class="inputStyle01" name="lecture_professor" value="{{mod_list['professor']}}">
 					</div>
 					<div class="inputFormDiv">
 						<label for="" class="lectureAddFormLebel">수강생명단</label>
-						<ul class="inputStyle01 userList"></ul>
+						<ul class="inputStyle01 userList">
+							{% for i in attend_list %}
+						<li class="checked">
+							<input type="checkbox">
+							<span>{{i["major"]}}</span>
+							<span>{{i["email"]}}</span>
+							<span>{{i["name"]}}</span>
+						</li>
+						{% endfor %}
+						</ul>
 					</div>
 					<div class="btnDiv btn-2">
 						<button class="btn btn-cancel">취소</button>

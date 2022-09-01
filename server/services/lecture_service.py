@@ -165,3 +165,28 @@ def lecture_access_check(user_no,lecture_no):
     if(acc==None):
         return 0
     return 1
+
+def mod_lecutre_listing(lecture_no):
+    lecture_list_result={}
+    acc=Lecture.query.filter_by(lecture_no=lecture_no).first()
+    lecture_list_result["lecture_no"]=vars(acc)["lecture_no"]
+    lecture_list_result["lecture_name"]=vars(acc)["lecture_name"]
+    lecture_list_result["year"]=vars(acc)["year"]
+    lecture_list_result["semester"]=vars(acc)["semester"]
+    lecture_list_result["major"]=vars(acc)["major"]
+    lecture_list_result["separated"]=vars(acc)["separated"]
+    lecture_list_result["professor"]=vars(acc)["professor"]
+
+    attend_list_result=[]
+    attend_list=Attendee.query.filter_by(lecture_no=lecture_no).all()
+    for att in attend_list:
+        if att.permission==3 or att.permission==0:
+            continue
+        tmp={}
+        acc=User.query.filter_by(user_no=att.user_no).first()
+        tmp["email"]=vars(acc)["email"]
+        tmp["name"]=vars(acc)["name"]
+        tmp["major"]=vars(acc)["major"]
+        attend_list_result.append(tmp)
+
+    return lecture_list_result,attend_list_result

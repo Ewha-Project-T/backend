@@ -7,7 +7,7 @@ from flask_jwt_extended import (
     jwt_required, get_jwt_identity, create_access_token, get_jwt
 )
 import re
-from ..services.lecture_service import lecture_listing, make_lecture,modify_lecture,delete_lecture, search_student,major_listing,attendee_add,attendee_listing,lecture_access_check
+from ..services.lecture_service import lecture_listing, make_lecture,modify_lecture,delete_lecture, search_student,major_listing,attendee_add,attendee_listing,lecture_access_check,mod_lecutre_listing
 from ..services.login_service import (
      admin_required, professor_required, assistant_required,get_all_user
 )
@@ -123,7 +123,8 @@ class Lecture_mod(Resource):
         parser.add_argument('lecture_no', type=int )
         args = parser.parse_args()
         lecture_no = args['lecture_no']
-        return make_response(render_template("lecture_mod.html",user_list=user_list,lecture_no=lecture_no))
+        mod_list,attend_list=mod_lecutre_listing(lecture_no)
+        return make_response(render_template("lecture_mod.html",user_list=user_list,lecture_no=lecture_no,mod_list=mod_list,attend_list=attend_list))
     @jwt_required()
     def post(self):#강의수정권한관리 만든사람, 관리자
         user_info=get_jwt_identity()

@@ -163,7 +163,11 @@ def delete_assignment(assignment_no):
     db.session.commit
     
 def check_assignment(as_no,lecture_no,uuid,user_info):
+    acc=Prob_region.query.filter_by(assignment_no=as_no).all()
+    if(len(acc)!=len(uuid)):
+        return
     attend=Attendee.query.filter_by(user_no=user_info["user_no"],lecture_no=lecture_no).first()
+    Assignment_check.query.filter_by(assignment_no=as_no,attendee_no=attend.attendee_no,assignment_check=1).delete()#check_list도 cascade되는지 확인
     acc=Assignment_check(assignment_no=as_no,attendee_no=attend.attendee_no,assignment_check=1)
     db.session.add(acc)
     db.session.commit()

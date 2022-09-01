@@ -28,8 +28,8 @@ var probTextList = []; // 문제텍스트
 {% for i in range(stt_result|length) %}
 probTextList.push("{{original_stt_result[i].textFile}}"); 
 //임시로 넣음
-probFileList.push("original_stt_result[i].timestamps")
-probFileList.push("original_stt_result[i].annotations")
+probTextList.push("original_stt_result[i].timestamps")
+probTextList.push("original_stt_result[i].annotations")
 {% endfor %}
 var submitTextList = []; //녹음텍스트
 {% for i in range(stt_result|length) %}

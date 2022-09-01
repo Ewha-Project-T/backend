@@ -178,6 +178,8 @@ class Prob_feedback(Resource):
         user_info=get_jwt_identity()
         as_name=get_as_name(as_no)
         wav_url,uuid=get_prob_wav_url(as_no,user_info,lecture_no)
+        if(wav_url==None):
+            return redirect(host_url + url_for('prob', lecture_no=lecture_no))
         wav_url_example=get_wav_url(as_no)
         stt_result=get_stt_result(uuid)
         original_stt_result=get_original_stt_result()

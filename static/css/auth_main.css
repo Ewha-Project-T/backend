@@ -95,6 +95,8 @@ li { display: block; }
 .feedbackDiv .feedbackTitleDiv { overflow: hidden; }
 .feedbackDiv .feedbackTitleDiv h1 { text-align: left; float: left; }
 .feedbackDiv .feedbackTitleDiv .btn-2 { float: right; width: 300px; }
+.feedbackDiv .feedbackProbTab { margin-top: 10px; overflow:hidden; }
+.feedbackDiv .feedbackProbTab li { float: left; background-color: #354531; color: #fff; padding: 5px 10px; border-radius: 5px; margin-right: 10px; }
 .feedbackDiv #exampleAudioWaveSurfer,
 .feedbackDiv #assignmentAudioWaveSurfer { width: 100%; background-color: #ffffff; margin-top: 15px; height: 50px; }
 .feedbackDiv .probTextDiv { margin-top: 10px; }

@@ -15,7 +15,65 @@
 		<script type="text/javascript" src="{{ url_for('static', filename='js/videojs/videojs.wavesurfer.min.js') }}"></script>
 		<script type="text/javascript" src="{{ url_for('static', filename='js/videojs/videojs.record.min.js') }}"></script>
 		<script type="text/javascript" src="{{ url_for('static', filename='js/videojs/videojs.record.recorderjs.min.js') }}"></script>
-		<script type="text/javascript" src="{{ url_for('static', filename='js/video_controller.js') }}"></script>
+<script type="text/javascript">
+var probFileList = []; // 문제파일
+{% for i in wav_url_example %}
+probFileList.push("{{ i.upload_url}}");
+{% endfor %}
+var submitFileList = []; // 녹음파일
+{% for  i in wav_url %}
+submitFileList.push("{{i.wav_url}}");
+{% endfor %}
+var probTextList = []; // 문제텍스트
+{% for i in range(stt_result|length) %}
+probTextList.push("{{original_stt_result[i].stt_result}}"); // json 말고 텍스트형태로 나오도록 수정 필요
+{% endfor %}
+var submitTextList = []; //녹음텍스트
+{% for i in range(stt_result|length) %}
+submitTextList.push("{{stt_result[i].stt_result}}"); // json 말고 텍스트로
+{% endfor %}
+var audioOptions = {
+	controls: true,
+	autoplay: false,
+	fluid: false,
+	bigPlayButton: false,
+	plugins: {
+		wavesurfer: {
+			backend: 'MediaElement',
+			displayMilliseconds: false,
+			debug: true,
+			waveColor: '#086280',
+			progressColor: 'black',
+			cursorColor: 'black',
+			hideScrollbar: true
+		}
+	}
+};
+
+function loadData(index){
+	index = parseInt(index);
+	examplePlayer.src({ src: probFileList[index], type: 'audio/wav'});
+	submitPlayer.src({ src: submitFileList[index], type: 'audio/wav'});
+	$(".exampleTextDiv div").empty().text(probTextList[index]);
+	$(".assignmentTextDiv div").empty().text(submitTextList[index]);
+}
+
+var examplePlayer;
+var submitPlayer;
+$(document).ready(function(){
+	// 플레이어 로딩
+	examplePlayer = videojs("exampleAudioWaveSurfer", audioOptions, function(){ });
+	submitPlayer = videojs("assignmentAudioWaveSurfer", audioOptions, function(){ });
+
+	// 1번문제 로딩
+	loadData(0);
+
+	// 탭 클릭
+	$(document).on("click", ".feedbackProbTab li", function(){
+		loadData($(this).attr("idx"));
+	});
+});
+</script>
 {% endblock %}
 
 {% block content %}
@@ -28,32 +86,28 @@
 					</div>
 				</div>
 
-				{% for i in wav_url_example %}
+				<ul class="feedbackProbTab">
+					{% for i in wav_url_example %}
+					<li idx="{{ loop.index - 1 }}">구간 {{ loop.index }}</li>
+					{% endfor %}
+				</ul>
+
 				<div class="exampleAudioDiv">
-					<audio id="exampleAudioWaveSurfer" class="video-js vjs-default-skin" audioLink="{{ i.upload_url}}"></audio>
+					<audio id="exampleAudioWaveSurfer" class="video-js vjs-default-skin"></audio>
 				</div>
-				{% endfor %}
-				{% for  i in wav_url %}
 				<div class="assignmentAudioDiv">
-					<audio id="assignmentAudioWaveSurfer" class="video-js vjs-default-skin" audioLink="{{i.wav_url}}"></audio>
+					<audio id="assignmentAudioWaveSurfer" class="video-js vjs-default-skin"></audio>
 				</div>
-				{% endfor %}
-{% if stt_result!=None %}
-        {% for i in range(stt_result|length) %}
+
 				<div class="probTextDiv">
 					<div class="probTextContentDiv">
 						<div class="exampleTextDiv">
 							<h2>원문</h2>
-							<div>{{original_stt_result[i].stt_result}}</div>
-							{{original_stt_result[i].sound}}
-							{{original_stt_result[i].startidx}}
-							{{original_stt_result[i].endidx}}
-							{{original_stt_result[i].silenceidx}}
-							{{original_stt_result[i].is_seq}}
+							<div></div>
 						</div>
 						<div class="assignmentTextDiv">
 							<h2>통역 전사문</h2>
-							<div>{{stt_result[i].stt_result}}</div> <!-- i.stt_result dict타입인줄 알았으나 str타입이네요 -->
+							<div></div>
 						</div>
 						<div class="commentTextDiv">
 							<h2>총평</h2>
@@ -63,15 +117,8 @@
 					<div class="feedbackContentDiv">
 						<div class="feedbackContentTitleDiv">
 							<h2>피드백</h2>
-							{{stt_result[i].sound}}
-							{{stt_result[i].startidx}}
-							{{stt_result[i].endidx}}
-							{{stt_result[i].silenceidx}}
-							{{stt_result[i].is_seq}}
 							<!--button class="btn">불러오기</button-->
 						</div>
-						{% endfor %}
-{% endif %}
 						<ul>
 							<li>
 								<div class="feedbackContentRowDiv">

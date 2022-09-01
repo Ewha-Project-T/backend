@@ -39,7 +39,7 @@
 				</div>
 				{% endfor %}
 {% if stt_result!=None %}
-        {% for i in len(stt_result) %}
+        {% for i in range(stt_result|length) %}
 				<div class="probTextDiv">
 					<div class="probTextContentDiv">
 						<div class="exampleTextDiv">

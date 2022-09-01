@@ -26,11 +26,14 @@ submitFileList.push("{{i.wav_url}}");
 {% endfor %}
 var probTextList = []; // 문제텍스트
 {% for i in range(stt_result|length) %}
-probTextList.push("{{original_stt_result[i].stt_result}}"); // json 말고 텍스트형태로 나오도록 수정 필요
+probTextList.push("{{original_stt_result[i].textFile}}"); 
+//임시로 넣음
+probFileList.push("original_stt_result[i].timestamps")
+probFileList.push("original_stt_result[i].annotations")
 {% endfor %}
 var submitTextList = []; //녹음텍스트
 {% for i in range(stt_result|length) %}
-submitTextList.push("{{stt_result[i].stt_result}}"); // json 말고 텍스트로
+submitTextList.push("{{stt_result[i].textFile}}");
 {% endfor %}
 var audioOptions = {
 	controls: true,

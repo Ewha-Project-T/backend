@@ -130,7 +130,12 @@ def get_original_stt_result(prob_result):
         tmp["startidx"]=acc.startidx
         tmp["endidx"]=acc.endidx
         tmp["silenceidx"]=acc.silenceidx
-        tmp["stt_result"]=acc.stt_result
+        stt_result=acc.stt_result
+        stt_result=stt_result.replace("'",'"')
+        json_result=json.loads(stt_result)
+        tmp["textFile"]=json_result["textFile"]
+        tmp["timestamps"]=json_result["timestamps"]
+        tmp["annotations"]=json_result["annotations"]
         tmp["is_seq"]=acc.is_seq
         original_result.append(tmp)
     return original_result
@@ -185,7 +190,12 @@ def get_stt_result(uuid):
         tmp["startidx"]=acc.startidx
         tmp["endidx"]=acc.endidx
         tmp["silenceidx"]=acc.silenceidx
-        tmp["stt_result"]=acc.stt_result
+        stt_result=acc.stt_result
+        stt_result=stt_result.replace("'",'"')
+        json_result=json.loads(stt_result)
+        tmp["textFile"]=json_result["textFile"]
+        tmp["timestamps"]=json_result["timestamps"]
+        tmp["annotations"]=json_result["annotations"]
         tmp["is_seq"]=acc.is_seq
         stt_result_list.append(tmp)
     return stt_result_list

@@ -60,7 +60,7 @@ def split_wav_save(upload_url,start,end):
     return uuid_str
     
 
-def mod_as(lecture_no,as_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,original_text="",upload_url="",region=""):
+def mod_as(lecture_no,as_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,original_text="",upload_url="",region="",user_info=None):
     acc=Assignment.query.filter_by(assignment_no=as_no).first()
     if(lecture_no!=""):
         acc.lecture_no=lecture_no
@@ -101,16 +101,12 @@ def mod_as(lecture_no,as_no,week,limit_time,as_name,as_type,keyword,description,
         reg_end=json_reg["end"]
 
         split_url=split_wav_save(upload_url,int(reg_start),int(reg_end))
-        mapping_sst_user(acc.assignment_no, split_url)
+        mapping_sst_user(acc.assignment_no, split_url,user_info)
 
         task = do_stt_work.delay(split_url)
         pr = Prob_region(assignment_no=acc.assignment_no,region_index=reg_index,start=reg_start,end=reg_end,upload_url=split_url, job_id=task.id)
         db.session.add(pr)
-        db.session.commit
-
-        # pr=Prob_region(assignment_no=as_no,region_index=reg_index,start=reg_start,end=reg_end)
-        # db.session.add(pr)
-        # db.session.commit
+        db.session.commit()
 
 
 def get_wav_url(as_no):

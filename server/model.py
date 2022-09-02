@@ -18,6 +18,8 @@ class User(db.Model):
     login_fail_limit = db.Column(db.Integer, default=0)
     access_check = db.Column(db.Integer, default=0)
 
+    attendee= db.relationship("Attendee",back_populates="user",cascade="all, delete",passive_deletes=True,)
+    stt= db.relationship("Stt",back_populates="user",cascade="all, delete",passive_deletes=True,)
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.password = self.encrypt_password(self.password) #DB생성시 pw 자동 암호화
@@ -39,17 +41,23 @@ class Lecture(db.Model):
     separated = db.Column(db.String(5), nullable=False)
     professor = db.Column(db.String(50), nullable=False)
 
+    attendee= db.relationship("Attendee",back_populates="lecture",cascade="all, delete",passive_deletes=True,)
+    assignment= db.relationship("Assignment",back_populates="lecture",cascade="all, delete",passive_deletes=True,)
 class Attendee(db.Model):
     __tablename__="ATTENDEE"
     attendee_no = db.Column(db.Integer, primary_key=True)
-    user_no = db.Column(db.Integer, db.ForeignKey("USER.user_no"), nullable=True)
-    lecture_no = db.Column(db.Integer, db.ForeignKey("LECTURE.lecture_no"), nullable=True)
+    user_no = db.Column(db.Integer, db.ForeignKey("USER.user_no", ondelete="CASCADE"), nullable=True)
+    lecture_no = db.Column(db.Integer, db.ForeignKey("LECTURE.lecture_no",ondelete="CASCADE"), nullable=True)
     permission = db.Column(db.Integer, default=1)
 
+    user = db.relationship("User", back_populates="attendee")
+    lecture = db.relationship("Lecture",back_populates="attendee")
+
+    assignment_check= db.relationship("Assignment_check",back_populates="attendee",cascade="all, delete",passive_deletes=True,)
 class Assignment(db.Model):
     __tablename__="ASSIGNMENT"
     assignment_no = db.Column(db.Integer, primary_key=True)
-    lecture_no = db.Column(db.Integer, db.ForeignKey("LECTURE.lecture_no"), nullable=True)
+    lecture_no = db.Column(db.Integer, db.ForeignKey("LECTURE.lecture_no", ondelete="CASCADE"), nullable=True)
     week = db.Column(db.String(20), nullable=False)
     limit_time = db.Column(db.DateTime, nullable=False)
     as_name = db.Column(db.String(50), nullable=False)
@@ -62,43 +70,74 @@ class Assignment(db.Model):
     original_text= db.Column(db.Text)
     upload_url= db.Column(db.String(100))
     
+    lecture = db.relationship("Lecture",back_populates="assignment")
+
+    assignment_check= db.relationship("Assignment_check",back_populates="assignment",cascade="all, delete",passive_deletes=True,)
+    stt= db.relationship("Stt",back_populates="assignment",cascade="all, delete",passive_deletes=True,)
+    prob_region=db.relationship("Prob_region",back_populates="assignment",cascade="all, delete",passive_deletes=True,)
 
 class Assignment_check(db.Model):
     __tablename__="ASSIGNMENT_CHECK"
     check_no = db.Column(db.Integer, primary_key=True)
-    assignment_no = db.Column(db.Integer, db.ForeignKey("ASSIGNMENT.assignment_no"), nullable=True)
-    attendee_no = db.Column(db.Integer, db.ForeignKey("ATTENDEE.attendee_no"), nullable=True)
+    assignment_no = db.Column(db.Integer, db.ForeignKey("ASSIGNMENT.assignment_no", ondelete="CASCADE"), nullable=True)
+    attendee_no = db.Column(db.Integer, db.ForeignKey("ATTENDEE.attendee_no", ondelete="CASCADE"), nullable=True)
     assignment_check = db.Column(db.Integer, default=0)
+    professor_review= db.Column(db.Text)
+   
+    attendee = db.relationship("Attendee", back_populates="assignment_check")
+    assignment = db.relationship("Assignment", back_populates="assignment_check")
+
+    feedback= db.relationship("Assignment_feedback",back_populates="check",cascade="all, delete",passive_deletes=True,)
+    check_list= db.relationship("Assignment_check_list", back_populates="check", cascade="all, delete", passive_deletes=True,)
+class Assignment_feedback(db.Model):
+    __tablename__="ASSIGNMENT_FEEDBACK"
+    feedback_no= db.Column(db.Integer, primary_key=True)
+    check_no = db.Column(db.Integer, db.ForeignKey("ASSIGNMENT_CHECK.check_no", ondelete="CASCADE"))
+    target_text = db.Column(db.Text, nullable=False)
+    text_type = db.Column(db.Text)
+    comment = db.Column(db.Text, nullable=False)
+
+    check = db.relationship("Assignment_check", back_populates="feedback")
 
 class Assignment_check_list(db.Model):
     __tablename__="ASSIGNMENT_CHECK_LIST"
     acl_no=db.Column(db.Integer, primary_key=True)
-    check_no = db.Column(db.Integer, db.ForeignKey("ASSIGNMENT_CHECK.check_no"), nullable=True)
+    check_no = db.Column(db.Integer, db.ForeignKey("ASSIGNMENT_CHECK.check_no", ondelete="CASCADE"), nullable=True)
     acl_uuid= db.Column(db.String(36), nullable=False)
+
+    check = db.relationship("Assignment_check", back_populates="check_list")
 class Stt(db.Model):
     __tablename__ = "STT"
     stt_no = db.Column(db.Integer, primary_key=True)
-    user_no = db.Column(db.Integer, db.ForeignKey("USER.user_no"), nullable=False)
-    assignment_no = db.Column(db.Integer, db.ForeignKey("ASSIGNMENT.assignment_no"), nullable=False)
+    user_no = db.Column(db.Integer, db.ForeignKey("USER.user_no", ondelete="CASCADE"), nullable=False)
+    assignment_no = db.Column(db.Integer, db.ForeignKey("ASSIGNMENT.assignment_no", ondelete="CASCADE"), nullable=False)
     wav_file = db.Column(db.String(36), nullable=False)
 
+    user=db.relationship("User", back_populates="stt")
+    assignment = db.relationship("Assignment", back_populates="stt")
+
+    sttjob= db.relationship("SttJob",back_populates="stt",cascade="all, delete",passive_deletes=True,)
 class Prob_region(db.Model):
     __tablename__="PROB_REGION"
     region_no= db.Column(db.Integer, primary_key=True)
-    assignment_no = db.Column(db.Integer, db.ForeignKey("ASSIGNMENT.assignment_no"), nullable=False)
+    assignment_no = db.Column(db.Integer, db.ForeignKey("ASSIGNMENT.assignment_no", ondelete="CASCADE"), nullable=False)
     region_index = db.Column(db.String(10))
     start = db.Column(db.String(10))
     end = db.Column(db.String(10))
     upload_url = db.Column(db.Text, nullable=False)
     job_id = db.Column(db.String(36), nullable=False)
 
+    assignment = db.relationship("Assignment", back_populates="prob_region")
+
 class SttJob(db.Model):
     __tablename__ = "STTJOB"
     job_id = db.Column(db.String(36), primary_key=True)
-    stt_no = db.Column(db.Integer, db.ForeignKey("STT.stt_no"), nullable=False)
+    stt_no = db.Column(db.Integer, db.ForeignKey("STT.stt_no", ondelete="CASCADE"),nullable=False)
     sound = db.Column(db.Text, nullable=False)
     startidx = db.Column(db.Text, nullable=False)
     endidx = db.Column(db.Text, nullable=False)
     silenceidx = db.Column(db.Text, nullable=False)
     stt_result = db.Column(db.Text, nullable=True)
     is_seq = db.Column(db.Boolean, default=False, nullable=False)
+
+    stt = db.relationship("Stt", back_populates="sttjob")

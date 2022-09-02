@@ -25,16 +25,18 @@ var submitFileList = []; // 녹음파일
 submitFileList.push("{{i.wav_url}}");
 {% endfor %}
 var probTextList = []; // 문제텍스트
-{% for i in range(stt_result|length) %}
+{% for i in range(original_stt_result|length) %}
 probTextList.push("{{original_stt_result[i].textFile}}"); 
 //임시로 넣음
 //probTextList.push("{{original_stt_result[i].timestamps}}")
 //probTextList.push("{{original_stt_result[i].annotations}}")
 {% endfor %}
 var submitTextList = []; //녹음텍스트
+{% if stt_result != None %}
 {% for i in range(stt_result|length) %}
 submitTextList.push("{{stt_result[i].textFile}}");
 {% endfor %}
+{% endif %}
 var audioOptions = {
 	controls: true,
 	autoplay: false,

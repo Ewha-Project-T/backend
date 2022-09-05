@@ -51,7 +51,7 @@ class Prob_add(Resource):
         parser.add_argument('prob_play_speed', type=str, required=True, help="speed is required")
         parser.add_argument('prob_open', type=str)
         parser.add_argument('prob_region', type=str, action='append', required=True)
-        #parser.add_argument('original_text', type=str)
+        parser.add_argument('original_text', type=str)
         parser.add_argument('prob_sound_path', type=str)
         args=parser.parse_args()
         lecture_no = args['lecture_no']
@@ -71,8 +71,8 @@ class Prob_add(Resource):
             disclosure=1
         prob_region=args['prob_region']
         user_info=get_jwt_identity()
-        #original_text = args['original_text']
-        make_as(lecture_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,"",upload_path,prob_region,user_info)#original_text,upload_url
+        original_text = args['original_text']
+        make_as(lecture_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,original_text,upload_path,prob_region,user_info)
         return{"msg" : "success"},200
 
 class Prob_mod(Resource):
@@ -101,7 +101,7 @@ class Prob_mod(Resource):
         parser.add_argument('prob_play_speed')
         parser.add_argument('prob_open', type=str)
         parser.add_argument('prob_region', type=str, action='append')
-        #parser.add_argument('original_text', type=str)
+        parser.add_argument('original_text', type=str)
         parser.add_argument('prob_sound_path', type=str)
         args=parser.parse_args()
         lecture_no = args['lecture_no']
@@ -121,10 +121,10 @@ class Prob_mod(Resource):
         else:
             disclosure=1
         prob_region=args['prob_region']
-        #original_text = args['original_text']
+        original_text = args['original_text']
         user_info=get_jwt_identity()
         if(lecture_access_check(user_info["user_no"],lecture_no) or user_info["user_perm"]==0):
-            mod_as(lecture_no,as_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,"",upload_path,prob_region,user_info)#original_text,upload_url
+            mod_as(lecture_no,as_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,original_text,upload_path,prob_region,user_info)
             return{"msg" : "assignment delete success"},200
         else:
             return{"msg": "access denied"}

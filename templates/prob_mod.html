@@ -130,6 +130,7 @@ $(document).ready(function(){
 			"prob_replay": $("select[name=prob_replay]").val(),
 			"prob_play_speed": $("input[name=prob_play_speed]").val(),
 			"prob_open": $("input[name=prob_open]:checked").length > 0 ? $("input[name=prob_open]:checked").val() : "off",
+			"original_text": $("textarea[name=prob_sound_text]").val(),
 			"prob_region": region
 		};
 		console.log(JSON.stringify(params));
@@ -152,7 +153,7 @@ $(document).ready(function(){
 	$(".probSoundUpload").hide();
 	$(".probAddFormRightDiv>.inputFormDiv").show();
 	$("input[name=prob_sound_path]").val('{{as_list["upload_url"]}}');
-	probAudioPlayer.load("{{as_list["upload_url"]}}");
+	probAudioPlayer.load('{{as_list["upload_url"]}}');
 });
 </script>
 {% endblock %}

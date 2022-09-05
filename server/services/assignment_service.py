@@ -33,7 +33,7 @@ def prob_listing(lecture_no):
         as_list_result.append(tmp)
     return as_list_result
 
-major_convert={"한일통역":"ja-JP","한일번역":"ja_JP","한중통역":"zh-CN","한중번역":"zh-CN","한영통역":"en-US","한영번역":"en-US","한불통역":"fr-FR","한불번역":"fr-FR"}#임시용
+major_convert={"한일통역":"ja-JP","한일번역":"ja-JP","한중통역":"zh-CN","한중번역":"zh-CN","한영통역":"en-US","한영번역":"en-US","한불통역":"fr-FR","한불번역":"fr-FR"}#임시용
 def make_as(lecture_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,original_text="",upload_url="",region="",user_info=None):
     acc=Assignment(lecture_no=lecture_no,week=week,limit_time=limit_time,as_name=as_name,as_type=as_type,keyword=keyword,description=description,re_limit=re_limit,speed=speed,disclosure=disclosure,original_text=original_text,upload_url=upload_url)
     db.session.add(acc)
@@ -44,7 +44,7 @@ def make_as(lecture_no,week,limit_time,as_name,as_type,keyword,description,re_li
         lecture_major=major_convert[lecture_major]
     else:
         lecture_major="ko-KR"
-
+    print(lecture_major)
     for reg in region:
         reg=reg.replace("'",'"')
         json_reg=json.loads(reg)
@@ -55,7 +55,7 @@ def make_as(lecture_no,week,limit_time,as_name,as_type,keyword,description,re_li
         split_url=split_wav_save(upload_url,int(reg_start),int(reg_end))
         mapping_sst_user(acc.assignment_no, split_url,user_info)
 
-        task = do_stt_work.delay(split_url,lecture_major)
+        task = do_stt_work.delay(filename=split_url,locale=lecture_major)
         pr = Prob_region(assignment_no=acc.assignment_no,region_index=reg_index,start=reg_start,end=reg_end,upload_url=split_url, job_id=task.id)
         db.session.add(pr)
         db.session.commit

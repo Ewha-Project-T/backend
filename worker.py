@@ -74,7 +74,7 @@ def process_stt_result(stt):
     return result
 
 @celery.task(bind=True)
-def do_stt_work(self, filename):
+def do_stt_work(self, filename, locale="ko-KR"):
     engine = create_engine(f"mysql+pymysql://{env['SQL_USER']}:{env['SQL_PASSWORD']}@{env['SQL_HOST']}:{env['SQL_PORT']}/{env['SQL_DATABASE']}")
     base.metadata.bind = engine
     session = orm.scoped_session(orm.sessionmaker())(bind=engine)
@@ -124,7 +124,7 @@ def do_stt_work(self, filename):
                 "punctuationMode": "DictatedAndAutomatic",
                 "profanityFilterMode": "Masked"
             },
-            "locale": "ko-KR",
+            "locale": locale,
             "displayName": "Transcription of file using default model for en-US"
         }
     ).json()
@@ -229,7 +229,7 @@ def do_stt_work(self, filename):
     return result
 
 @celery.task(bind=True)
-def do_sequential_stt_work(self, filename, index):
+def do_sequential_stt_work(self, filename, index, locale="ko-KR"):
     engine = create_engine(f"mysql+pymysql://{env['SQL_USER']}:{env['SQL_PASSWORD']}@{env['SQL_HOST']}:{env['SQL_PORT']}/{env['SQL_DATABASE']}")
     base.metadata.bind = engine
     session = orm.scoped_session(orm.sessionmaker())(bind=engine)
@@ -288,7 +288,7 @@ def do_sequential_stt_work(self, filename, index):
                     "punctuationMode": "DictatedAndAutomatic",
                     "profanityFilterMode": "Masked"
                 },
-                "locale": "ko-KR",
+                "locale": locale,
                 "displayName": "Transcription of file using default model for en-US"
             }
         ).json()

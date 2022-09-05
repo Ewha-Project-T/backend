@@ -25,11 +25,28 @@ $(document).ready(function(){
 				$(".probSoundUpload").hide();
 				$(".probAddFormRightDiv>.inputFormDiv").show();
 				$("input[name=prob_sound_path]").val(d.file_path);
+				//polling_id = setInterval(() => { translation_polling(d.job) }, 1000)
+				//$(".loader-bg").removeClass("hidden")
 				probAudioPlayer.load(d.file_path);
 			}
 		});
 	});
-
+ 
+	$(document).on("change", "select[name='prob_type']", function(){
+		var d = $(this).val();
+		if(d == "번역"){
+			$(".probSoundUpload").hide();
+      $("div[name=prob_replay2]").hide()
+      $("div[name=prob_play_speed2]").hide()
+			$(".probAddFormRightDiv .inputFormDiv").hide();
+		}else{
+			$(".probSoundUpload").show();
+			$(".probAddFormRightDiv .inputFormDiv").hide();
+      $("div[name=prob_replay2]").show()
+      $("div[name=prob_play_speed2]").show()
+		}
+	});
+ 
 	$(document).on("click", ".waveRegionDiv .btn", function(){
 		var regionIndex = $(this).attr("region");
 		var region = Object.values(probAudioPlayer.regions.list)[regionIndex];
@@ -74,9 +91,14 @@ $(document).ready(function(){
 			$(".waveRegionDiv ul").append(liEle);
 		}
 	}
-	probAudioPlayer.on('loading', function(){
+	probAudioPlayer.on('waveform-ready', function(){
 		var audioSize = probAudioPlayer.getDuration();
 		$(".waveSoundSize").text("원음 : " + Math.floor(audioSize / 60).toFixed()  + "분 " + Math.floor(audioSize % 60).toFixed() + "초");
+		//probAudioPlayer.addRegion({start : 0, end: 10});
+   {% for i in audio_list %}
+     probAudioPlayer.addRegion({start : {{i["start"]}}, end: {{i.end}}});
+   {% endfor %}
+		regionUpdate("", "");
 	});
 	probAudioPlayer.on('region-update-end', function(region, e){
 		regionUpdate(region, e);
@@ -107,7 +129,7 @@ $(document).ready(function(){
 			"prob_exp": $("textarea[name=prob_exp]").val(),
 			"prob_replay": $("select[name=prob_replay]").val(),
 			"prob_play_speed": $("input[name=prob_play_speed]").val(),
-			"prob_open": $("input[name=prob_open]").val(),
+			"prob_open": $("input[name=prob_open]:checked").length > 0 ? $("input[name=prob_open]:checked").val() : "off",
 			"prob_region": region
 		};
 		console.log(JSON.stringify(params));
@@ -118,69 +140,99 @@ $(document).ready(function(){
 			headers: {'Content-Type': 'application/json'},
 			data: JSON.stringify(params),
 			success: function(d){
+        alert("수정 완료");
 				location.href="prob?lecture_no="+"{{ lecture_no }}"
-			}
+			},
+      error: function(error){
+        alert("입력값을 확인해주세요");
+      }
 		});
 	});
+	// 기존파일 로딩
+	$(".probSoundUpload").hide();
+	$(".probAddFormRightDiv>.inputFormDiv").show();
+	$("input[name=prob_sound_path]").val('{{as_list["upload_url"]}}');
+	probAudioPlayer.load("{{as_list["upload_url"]}}");
 });
 </script>
 {% endblock %}
 
 {% block content %}
 <div class="contentDiv">
-	<h1>과제 수정</h1>
+	<h1>과제 수</h1>
 	<div class="probAddFormDiv">
 		<div class="probAddFormLeftDiv">
-			<div class="inputFormDiv">
+			<div class="inputFormDiv">정
 				<div class="inputFormDiv-1">
 					<label for class="probAddFormLabel">주차</label>
 					<select class="inputStyle01" name="prob_week">
-						<option value="1주차">1주차</option>
+            <option value="1주차"{% if as_list['week']=="1주차" %} selected {% endif %}>1주차</option>      
+            <option value="2주차"{% if as_list['week']=="2주차" %} selected {% endif %}>2주차</option>   
+            <option value="3주차"{% if as_list['week']=="3주차" %} selected {% endif %}>3주차</option>   
+            <option value="4주차"{% if as_list['week']=="4주차" %} selected {% endif %}>4주차</option>   
+            <option value="5주차"{% if as_list['week']=="5주차" %} selected {% endif %}>5주차</option>   
+            <option value="6주차"{% if as_list['week']=="6주차" %} selected {% endif %}>6주차</option>   
+            <option value="7주차"{% if as_list['week']=="7주차" %} selected {% endif %}>7주차</option>   
+            <option value="8주차"{% if as_list['week']=="8주차" %} selected {% endif %}>8주차</option>     
+            <option value="9주차"{% if as_list['week']=="9주차" %} selected {% endif %}>9주차</option>   
+            <option value="10주차"{% if as_list['week']=="10주차" %} selected {% endif %}>10주차</option>   
+            <option value="11주차"{% if as_list['week']=="11주차" %} selected {% endif %}>11주차</option>   
+            <option value="12주차"{% if as_list['week']=="12주차" %} selected {% endif %}>12주차</option>   
+            <option value="13주차"{% if as_list['week']=="13주차" %} selected {% endif %}>13주차</option>   
+            <option value="14주차"{% if as_list['week']=="14주차" %} selected {% endif %}>14주차</option>   
+            <option value="15주차"{% if as_list['week']=="15주차" %} selected {% endif %}>15주차</option>     
+            <option value="16주차"{% if as_list['week']=="16주차" %} selected {% endif %}>16주차</option>                       
 					</select>
 				</div>
 				<div class="inputFormDiv-2">
 					<label for class="probAddFormLabel">기한</label>
-					<input type="datetime-local" class="inputStyle01" name="prob_timeEnd">
+					<input type="datetime-local" class="inputStyle01" name="prob_timeEnd" value='{{as_list["limit_time"]}}'>
 				</div>
 			</div>
 			<div class="inputFormDiv">
 				<div class="inputFormDiv-1 w75">
 					<label for class="probAddFormLabel">과제명</label>
-					<input type="text" class="inputStyle01" name="prob_name">
+					<input type="text" class="inputStyle01" name="prob_name" value='{{as_list["as_name"]}}'>
 				</div>
 				<div class="inputFormDiv-2 w25">
 					<label for class="probAddFormLabel">과제 종류</label>
 					<select class="inputStyle01" name="prob_type">
-						<option value="순차통역">순차통역</option>
+            <option value="번역"{% if as_list['as_type']=="번역" %} selected {% endif %}>번역</option>      
+            <option value="동시통역"{% if as_list['as_type']=="동시통역" %} selected {% endif %}>동시통역</option>  
+            <option value="일반통역"{% if as_list['as_type']=="일반통역" %} selected {% endif %}>일반통역</option>                              
 					</select>
 				</div>
 			</div>
 			<div class="inputFormDiv">
 				<label for class="probAddFormLabel">키워드</label>
-				<input type="text" class="inputStyle01" name="prob_keyword">
+				<input type="text" class="inputStyle01" name="prob_keyword" value='{{as_list["keyword"]}}'>
 			</div>
 			<div class="inputFormDiv">
 				<label for class="probAddFormLabel">과제 설명</label>
-				<textarea class="inputStyle01" name="prob_exp"></textarea>
+				<textarea class="inputStyle01" name="prob_exp">{{as_list["description"]}}</textarea>
 			</div>
 			<div class="inputFormDiv">
-				<div class="inputFormDiv-1 w25">
+				<div class="inputFormDiv-1 w25" name="prob_replay2">
 					<label for class="probAddFormLabel">다시 듣기 제한</label>
 					<select class="inputStyle01" name="prob_replay">
-						<option value="무제한">무제한</option>
+            <option value="무제한"{% if as_list['re_limit']=="무제한" %} selected {% endif %}>무제한</option>
 					</select>
 				</div>
-				<div class="inputFormDiv-1 w25">
+				<div class="inputFormDiv-1 w25" name="prob_play_speed2">
 					<label for class="probAddFormLabel">재생 속도</label>
-					<input type="text" class="inputStyle01" name="prob_play_speed">
+					<input type="text" class="inputStyle01" name="prob_play_speed" value='{{as_list["speed"]}}'>
 				</div>
 			</div>
 			<div class="inputFormDiv">
-				<input type="checkbox" name="prob_open">
-				<label for class="probAddFormLabel">과제 제출물 공개 여부</label>
+				<input type="checkbox" name="prob_open" {% if as_list['disclosure']==0 %} checked {% endif %}>
+				<label for class="probAddFormLabel">자습용 과제</label>
 			</div>
 		</div>
 		<div class="probAddFormRightDiv">
+			<div class="probTextDiv">
+				<label class="probTextLabel">원문</label>
+				<textarea name="prob_sound_text" class="inputStyle01">{{as_list["original_text"]}}</textarea>
+			</div>
 			<div class="probSoundUpload">
 				<label for class="probSoundUploadLabel">음원 업로드</label>
 				<input type="file" name="prob_sound_file">
@@ -198,7 +250,7 @@ $(document).ready(function(){
 	</div>
 	<div class="btnDiv btn-2">
 		<span class="btn btn-cancel">뒤로가기</span>
-		<span class="btn btn-submit">과제 수정</span>
+		<span class="btn btn-submit">과제 생성</span>
 	</div>
 </div>
 {% endblock %}

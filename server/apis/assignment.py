@@ -8,7 +8,7 @@ from flask_jwt_extended import (
     jwt_required, get_jwt_identity, create_access_token, get_jwt
 )
 import re
-from ..services.assignment_service import prob_listing,make_as,mod_as,get_wav_url,delete_assignment,check_assignment,get_as_name,get_prob_wav_url,get_stt_result,get_original_stt_result
+from ..services.assignment_service import prob_listing,make_as,mod_as,get_wav_url,delete_assignment,check_assignment,get_as_name,get_prob_wav_url,get_stt_result,get_original_stt_result,mod_assignment_listing,get_as_info
 from ..services.lecture_service import lecture_access_check
 from werkzeug.utils import secure_filename
 from os import environ as env
@@ -84,7 +84,8 @@ class Prob_mod(Resource):
         args = parser.parse_args()
         lecture_no = args['lecture_no']
         as_no = args['as_no']
-        return make_response(render_template("prob_mod.html",lecture_no=lecture_no,as_no=as_no))
+        as_list,audio_list=mod_assignment_listing(lecture_no,as_no)
+        return make_response(render_template("prob_mod.html",lecture_no=lecture_no,as_no=as_no,as_list=as_list,audio_list=audio_list))
     @jwt_required()
     def post(self):#강의수정권한관리 만든사람, 관리자
         parser = reqparse.RequestParser()
@@ -137,7 +138,8 @@ class Prob_submit(Resource):
         as_no=args['as_no']
         lecture_no = args['lecture_no']
         wav_url=get_wav_url(as_no)
-        return make_response(render_template("prob_submit.html",wav_url=wav_url,as_no=as_no,lecture_no=lecture_no))
+        as_info=get_as_info(lecture_no,as_no)
+        return make_response(render_template("prob_submit.html",wav_url=wav_url,as_no=as_no,lecture_no=lecture_no,as_info=as_info))
     @jwt_required()
     def post(self):
         parser = reqparse.RequestParser()
@@ -182,10 +184,14 @@ class Prob_feedback(Resource):
             return redirect(host_url + url_for('prob', lecture_no=lecture_no))
         wav_url_example=get_wav_url(as_no)
         stt_result=get_stt_result(uuid)
+        print(wav_url_example)
         original_stt_result=get_original_stt_result(wav_url_example)
-        return make_response(render_template("prob_feedback.html",user_info=user_info,as_name=as_name,wav_url=wav_url,wav_url_example=wav_url_example,stt_result=stt_result,original_stt_result=original_stt_result))
+        print(original_stt_result)
+        print(stt_result)
+        as_info=get_as_info(lecture_no,as_no)
+        return make_response(render_template("prob_feedback.html",user_info=user_info,as_name=as_name,wav_url=wav_url,wav_url_example=wav_url_example,stt_result=stt_result,original_stt_result=original_stt_result,as_info=as_info))
 
-ALLOWED_EXTENSIONS = {'wav','mp4'}
+ALLOWED_EXTENSIONS = {'wav','mp3','mp4'}
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS

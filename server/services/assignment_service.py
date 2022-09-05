@@ -125,6 +125,8 @@ def get_original_stt_result(prob_result):
     original_result=[]
     for i in prob_result:
         acc=SttJob.query.filter_by(job_id=i["job_id"]).order_by(SttJob.stt_no.desc()).first()
+        if acc==None:
+            return None
         tmp={}
         tmp["sound"]=acc.sound
         tmp["startidx"]=acc.startidx
@@ -189,7 +191,6 @@ def get_stt_result(uuid):
         acc=SttJob.query.filter_by(stt_no=stt_acc.stt_no).first()
         if acc==None:
             return None
-        print(acc)
         tmp["sound"]=acc.sound
         tmp["startidx"]=acc.startidx
         tmp["endidx"]=acc.endidx
@@ -203,3 +204,50 @@ def get_stt_result(uuid):
         tmp["is_seq"]=acc.is_seq
         stt_result_list.append(tmp)
     return stt_result_list
+    
+def mod_assignment_listing(lecture_no,assignment_no):
+    as_list_result={}
+    acc= Assignment.query.filter_by(lecture_no=lecture_no,assignment_no=assignment_no).first()
+    as_list_result["lecture_no"]=vars(acc)["lecture_no"]
+    as_list_result["week"]=vars(acc)["week"]
+    as_list_result["limit_time"]=vars(acc)["limit_time"]
+    as_list_result["as_name"]=vars(acc)["as_name"]
+    as_list_result["as_type"]=vars(acc)["as_type"]
+    as_list_result["keyword"]=vars(acc)["keyword"]
+    as_list_result["description"]=vars(acc)["description"]
+    as_list_result["re_limit"]=vars(acc)["re_limit"]
+    as_list_result["speed"]=vars(acc)["speed"]
+    as_list_result["disclosure"]=vars(acc)["disclosure"]
+    as_list_result["original_text"]=vars(acc)["original_text"]
+    as_list_result["upload_url"]=vars(acc)["upload_url"]
+    
+    audio_list_result=[]
+    audio_list=Prob_region.query.filter_by(assignment_no=assignment_no).all()
+    for att in audio_list:
+        tmp={}
+        tmp["region_index"]=att.region_index
+        tmp["start"]=att.start
+        tmp["end"]=att.end
+        tmp["upload_url"]=att.upload_url
+        audio_list_result.append(tmp)
+
+    return as_list_result,audio_list_result
+
+def get_as_info(lecture_no,assignment_no):
+    as_list_result={}
+    acc= Assignment.query.filter_by(lecture_no=lecture_no,assignment_no=assignment_no).first()
+    if acc==None:
+        return None
+    as_list_result["lecture_no"]=vars(acc)["lecture_no"]
+    as_list_result["week"]=vars(acc)["week"]
+    as_list_result["limit_time"]=vars(acc)["limit_time"]
+    as_list_result["as_name"]=vars(acc)["as_name"]
+    as_list_result["as_type"]=vars(acc)["as_type"]
+    as_list_result["keyword"]=vars(acc)["keyword"]
+    as_list_result["description"]=vars(acc)["description"]
+    as_list_result["re_limit"]=vars(acc)["re_limit"]
+    as_list_result["speed"]=vars(acc)["speed"]
+    as_list_result["disclosure"]=vars(acc)["disclosure"]
+    as_list_result["original_text"]=vars(acc)["original_text"]
+    as_list_result["upload_url"]=vars(acc)["upload_url"]
+    return as_list_result

@@ -11,8 +11,8 @@ from server import db
 from ..model import Stt, SttJob
 from worker import do_stt_work, do_sequential_stt_work
 
-def simultaneous_stt(filename):
-    task = do_stt_work.delay(filename)
+def simultaneous_stt(filename, locale):
+    task = do_stt_work.delay(filename, locale)
     return task.id
 
 def stt_getJobResult(jobid):
@@ -27,8 +27,8 @@ def stt_getJobResult(jobid):
     result = task.get()
     return result
 
-def sequential_stt(filename, index):
-    task = do_sequential_stt_work.delay(filename, index)
+def sequential_stt(filename, index, locale):
+    task = do_sequential_stt_work.delay(filename, index, locale)
     return task.id
 
 def seqstt_getJobResult(jobid):

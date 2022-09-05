@@ -62,8 +62,12 @@
 				headers: {'Content-Type': 'application/json'},
 				data: JSON.stringify(param),
 				success: function(d){
+          alert("수정 완료");
 					return location.href="/lecture";
-				}
+				},
+      error: function(error){
+        alert("입력값을 확인해주세요");
+      }
 			});
 			return false;
 		}

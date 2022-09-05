@@ -59,15 +59,18 @@ class Stt(Resource):
         parser = reqparse.RequestParser(argument_class=APIArgument, bundle_errors=True)
         parser.add_argument('assignment', type=int, required=True, help="assignment is required")
         parser.add_argument('file', type=uuid.UUID, required=True, help="file is required")
+        parser.add_argument("locale", type=str, default="ko-KR", help="locale is required(default=ko-KR)")
 
         args = parser.parse_args()
         assignment = args['assignment']
         file = args['file']
+        locale = args['locale']
+        
         user_info=get_jwt_identity()
         if not is_stt_userfile(assignment, file,user_info):
             return { "msg": "user stt is not exists" },404
 
-        jobid = simultaneous_stt(file)
+        jobid = simultaneous_stt(file, locale)
 
         return jsonify(job=jobid)
 

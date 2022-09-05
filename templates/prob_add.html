@@ -50,6 +50,21 @@ $(document).ready(function(){
 		});
 	});
 
+	$(document).on("change", "select[name='prob_type']", function(){
+		var d = $(this).val();
+		if(d == "번역"){
+			$(".probSoundUpload").hide();
+      $("div[name=prob_replay2]").hide()
+      $("div[name=prob_play_speed2]").hide()
+			$(".probAddFormRightDiv .inputFormDiv").hide();
+		}else{
+			$(".probSoundUpload").show();
+			$(".probAddFormRightDiv .inputFormDiv").hide();
+      $("div[name=prob_replay2]").show()
+      $("div[name=prob_play_speed2]").show()
+		}
+	});
+
 	$(document).on("click", ".waveRegionDiv .btn", function(){
 		var regionIndex = $(this).attr("region");
 		var region = Object.values(probAudioPlayer.regions.list)[regionIndex];
@@ -105,7 +120,7 @@ $(document).ready(function(){
 			$(".waveSoundSize").text("원음 : " + Math.floor(audioSize / 60).toFixed()  + "분 " + Math.floor(audioSize % 60).toFixed() + "초");
 		}
 	}
-	probAudioPlayer.on('loading', function(){
+	probAudioPlayer.on('waveform-ready', function(){
 		audioSizeUpdate();
 	});
 	probAudioPlayer.on('region-update-end', function(region, e){
@@ -136,7 +151,7 @@ $(document).ready(function(){
 			"prob_exp": $("textarea[name=prob_exp]").val(),
 			"prob_replay": $("select[name=prob_replay]").val(),
 			"prob_play_speed": $("input[name=prob_play_speed]").val(),
-			"prob_open": $("input[name=prob_open]").val(),
+			"prob_open": $("input[name=prob_open]:checked").length > 0 ? $("input[name=prob_open]:checked").val() : "off",
 			"prob_region": region
 		};
 		console.log(JSON.stringify(params));
@@ -146,8 +161,12 @@ $(document).ready(function(){
 			headers: {'Content-Type': 'application/json'},
 			data: JSON.stringify(params),
 			success: function(d){
+        alert("생성완료")
 				location.href="prob?lecture_no="+"{{ lecture_no }}"
-			}
+			},
+      error: function(error){
+        alert("입력값을 확인해주세요")
+      }
 		});
 	});
 });
@@ -180,6 +199,8 @@ $(document).ready(function(){
 					<label for class="probAddFormLabel">과제 종류</label>
 					<select class="inputStyle01" name="prob_type">
 						<option value="순차통역">순차통역</option>
+						<option value="동시통역">동시통역</option>
+						<option value="번역">번역</option>
 					</select>
 				</div>
 			</div>
@@ -192,23 +213,27 @@ $(document).ready(function(){
 				<textarea class="inputStyle01" name="prob_exp"></textarea>
 			</div>
 			<div class="inputFormDiv">
-				<div class="inputFormDiv-1 w25">
+				<div class="inputFormDiv-1 w25" name="prob_replay2">
 					<label for class="probAddFormLabel">다시 듣기 제한</label>
 					<select class="inputStyle01" name="prob_replay">
 						<option value="무제한">무제한</option>
 					</select>
 				</div>
-				<div class="inputFormDiv-1 w25">
+				<div class="inputFormDiv-1 w25" name="prob_play_speed2">
 					<label for class="probAddFormLabel">재생 속도</label>
 					<input type="text" class="inputStyle01" name="prob_play_speed">
 				</div>
 			</div>
 			<div class="inputFormDiv">
 				<input type="checkbox" name="prob_open">
-				<label for class="probAddFormLabel">과제 제출물 공개 여부</label>
+				<label for class="probAddFormLabel">자습용 과제</label>
 			</div>
 		</div>
 		<div class="probAddFormRightDiv">
+			<div class="probTextDiv">
+				<label class="probTextLabel">원문</label>
+				<textarea name="prob_sound_text" class="inputStyle01"></textarea>
+			</div>
 			<div class="probSoundUpload">
 				<label for class="probSoundUploadLabel">음원 업로드</label>
 				<input type="file" name="prob_sound_file">

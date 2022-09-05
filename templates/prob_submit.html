@@ -19,17 +19,37 @@
 // 문제 파일
 var probFileList = [];
 {% for i in wav_url %}
-    probFileList.push("{{i.upload_url}}")
+    probFileList.push("{{i.upload_url}}");
 {% endfor %}
 
 // 녹음 파일
 var submitDataList = [];
+{% for i in wav_url %}
+submitDataList.push("");
+{% endfor %}
 
 // 플레이어
 var exampleAudioPlayer;
 var submitAudioPlayer;
 var fd;
 var submitSeq = "";
+
+// 과제타입
+var submitType = "{{ as_info['as_type'] }}";
+
+// 문제세팅
+var probIndex;
+function loadProb(index){
+	$(".submitProbTab li").removeClass("focus");
+	$(".submitProbTab li[probIndex=" + index + "]").addClass("focus");
+	index = parseInt(index);
+	probIndex = index;
+	exampleAudioPlayer.src({src: probFileList[index], type: 'audio/wav'});
+	if(submitAudioPlayer.record().isRecording()){
+		submitAudioPlayer.record().stop();
+	}
+}
+
 $(document).ready(function(){
         // 원음
         const sampleAudioOptions = {
@@ -51,19 +71,24 @@ $(document).ready(function(){
         };
         exampleAudioPlayer = videojs('exampleAudioWaveSurfer', sampleAudioOptions, function() {
 		// 1번문제 세팅
-		exampleAudioPlayer.src({src: probFileList[0], type: 'audio/wav'});
+		loadProb(0);
         });
 
         exampleAudioPlayer.on("ended", function(){
-                // 녹음 끝났을떄
-                if($(".simultaneousBtn").length > 0){
-                        var btnEle = $(".sequentialBtn");
-                        exampleAudioPlayer.pause();
-                        exampleAudioPlayer.currentTime(0)
-                        submitAudioPlayer.record().stop();
-                        btnEle.removeClass("recoding");
-                        btnEle.text("통역시작");
-                }
+                // 재생 끝났을때
+		if(submitType == "순차통역"){
+			var btnEle = $(".simultaneousBtn");
+			exampleAudioPlayer.pause();
+			exampleAudioPlayer.currentTime(0);
+			submitAudioPlayer.record().start();
+		}else if(submitType == "동시통역"){
+			var btnEle = $(".simultaneousBtn");
+			exampleAudioPlayer.pause();
+			exampleAudioPlayer.currentTime(0);
+			submitAudioPlayer.record().stop();
+			btnEle.removeClass("recoding");
+			btnEle.text("통역시작");
+		}
         });
 
         // 녹음
@@ -126,30 +151,44 @@ $(document).ready(function(){
                 console.log('finished recording: ', submitAudioPlayer.recordedData);
         });
 
-        // 동시 통역
+        // 통역시작
         $(document).on("click", ".simultaneousBtn", function(){
                 var btnEle = $(this);
 
-                if(!btnEle.hasClass("recoding")){
-                        // 녹음시작
-                        exampleAudioPlayer.play();
-                        submitAudioPlayer.record().start();
-                        btnEle.addClass("recoding");
-                        btnEle.text("녹음중/취소");
-                }else{
-                        // 녹음아님
-                        exampleAudioPlayer.pause();
-                        exampleAudioPlayer.currentTime(0)
-                        submitAudioPlayer.record().stop();
-                        btnEle.removeClass("recoding");
-                        btnEle.text("통역시작");
-                }
+		if(submitType == "순차통역"){
+			if(!btnEle.hasClass("recoding")){
+				// 녹음시작 (원음 재생만)
+				exampleAudioPlayer.play();
+				btnEle.addClass("recoding");
+				btnEle.text("녹음중/취소");
+			}else{
+				exampleAudioPlayer.pause();
+				exampleAudioPlayer.currentTime(0)
+				submitAudioPlayer.record().stop();
+				btnEle.removeClass("recoding");
+				btnEle.text("통역시작");
+			}
+		}else if(submitType == "동시통역"){
+	                if(!btnEle.hasClass("recoding")){
+	                        // 녹음시작
+	                        exampleAudioPlayer.play();
+	                        submitAudioPlayer.record().start();
+	                        btnEle.addClass("recoding");
+	                        btnEle.text("녹음중/취소");
+	                }else{
+	                        // 녹음아님
+	                        exampleAudioPlayer.pause();
+	                        exampleAudioPlayer.currentTime(0)
+	                        submitAudioPlayer.record().stop();
+	                        btnEle.removeClass("recoding");
+	                        btnEle.text("통역시작");
+	                }
+		}
         });
 
         // 녹음본 제출
         $(document).on("click", ".recordTempSaveBtn", function(){
                 // 녹음 데이터 보내기
-		console.log("녹음 임시저장중");
                 fd = new FormData();
                 fd.append('assignment',{{as_no}})
                 fd.append('wav', submitAudioPlayer.recordedData);
@@ -160,60 +199,46 @@ $(document).ready(function(){
                         processData: false,
                         contentType: false
                 }).done(function(data){
-			submitDataList.push(data.file);
+			submitDataList[probIndex] = data.file;
+			$(".submitProbTab li[probIndex=" + probIndex + "]").addClass('tmpSave');
 			// 다음문제 세팅
-			if(probFileList.length == submitDataList.length){
-				// 문제 모두 녹음됬을때
-				alert("녹음이 완료되었습니다.\n제출버튼을 눌러주세요");
+			if($(".submitProbTab li").not(".tmpSave").length > 0){
+				var nextProbIndex = $($(".submitProbTab li").not(".tmpSave")[0]).attr("probindex");
+				loadProb(nextProbIndex);
 			}else{
-				exampleAudioPlayer.src({src: probFileList[submitDataList.length], type: 'audio/wav'});
-				alert(submitDataList.length + "번 녹음 완료");
+				alert("모든 문제가 녹음되었습니다.\n제출버튼을 눌러 완료해주세요");
 			}
                 });
         });
 
 	$(document).on("click", ".submitRecordDataBtn", function(){
-		if(probFileList.length != submitDataList.length){
-			alert("모든 문제를 녹음해주세요");
-		}else{
-			var submitUUID = [];
-			for(var i=0; i<submitDataList.length; i++){
-				submitUUID.push(submitDataList[i]);
+		var submitUUID = [];
+		for(var i=0; i<submitDataList.length; i++){
+			if(submitDataList[i] == ""){
+				alert("모든 문제를 녹음해주세요.");
+				return false;
 			}
-			var param = {
-				"submitUUID": submitUUID,
-				"as_no": {{as_no}},
-        "lecture_no":{{lecture_no}}
-			};
-
-			$.ajax({
-				url: "/prob_submit",
-				type: "POST",
-				headers: {'Content-Type': 'application/json'},
-				data: JSON.stringify(param),
-				success: function(d){
-					location.href="/prob?lecture_no={{lecture_no}}"
-				}
-			});
-/*
-			$.ajax({
-				url: "/stt",
-				type: "POST",
-				data: "file=" + submitSeq,
-				success: function(d){
-					console.log(d);
-					setTimeout(function(){
-						$.ajax({
-							url: "/stt/" + d.job,
-							type: "GET",
-							success: function(e){
-								alert(decodeURIComponent(e.textFile));
-							}
-						});
-					}, 5000);
-				}
-			});*/
+			submitUUID.push(submitDataList[i]);
 		}
+		var param = {
+			"submitUUID": submitUUID,
+			"as_no": {{as_no}},
+			"lecture_no":{{lecture_no}}
+		};
+
+		$.ajax({
+			url: "/prob_submit",
+			type: "POST",
+			headers: {'Content-Type': 'application/json'},
+			data: JSON.stringify(param),
+			success: function(d){
+				location.href="/prob?lecture_no={{lecture_no}}"
+			}
+		});
+	});
+
+	$(document).on("click", ".submitProbTab li", function(){
+		loadProb($(this).attr("probIndex"));
 	});
 });
 		</script>
@@ -221,10 +246,15 @@ $(document).ready(function(){
 
 {% block content %}
 			<div class="contentDiv">
-				<h1>동시 통역/순차 통역</h1>
+				<h1>{{as_info['as_type']}}</h1>
 				<div class="probKeywordDiv">
 					<span>문제 키워드 : 테스트 키워드</span>
 				</div>
+				<ul class="submitProbTab">
+					{% for i in wav_url %}
+					<li probIndex="{{ loop.index - 1 }}">문제{{ loop.index }}</li>
+					{% endfor %}
+				</ul>
 				<div class="exampleAudioDiv">
 					<h2>원음</h2>
 					<audio id="exampleAudioWaveSurfer" class="video-js vjs-default-skin"></audio>

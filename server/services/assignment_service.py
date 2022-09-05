@@ -44,7 +44,6 @@ def make_as(lecture_no,week,limit_time,as_name,as_type,keyword,description,re_li
         lecture_major=major_convert[lecture_major]
     else:
         lecture_major="ko-KR"
-    print(lecture_major)
     for reg in region:
         reg=reg.replace("'",'"')
         json_reg=json.loads(reg)
@@ -100,6 +99,12 @@ def mod_as(lecture_no,as_no,week,limit_time,as_name,as_type,keyword,description,
     Prob_region.query.filter_by(assignment_no=as_no).delete()
     db.session.commit
 
+    lec=Lecture.query.filter_by(lecture_no=lecture_no).first()
+    lecture_major=lec.major
+    if(lecture_major in major_convert):
+        lecture_major=major_convert[lecture_major]
+    else:
+        lecture_major="ko-KR"
     for reg in region:
         reg=reg.replace("'",'"')
         json_reg=json.loads(reg)
@@ -110,7 +115,7 @@ def mod_as(lecture_no,as_no,week,limit_time,as_name,as_type,keyword,description,
         split_url=split_wav_save(upload_url,int(reg_start),int(reg_end))
         mapping_sst_user(acc.assignment_no, split_url,user_info)
 
-        task = do_stt_work.delay(split_url)
+        task = do_stt_work.delay(split_url,lecture_major)
         pr = Prob_region(assignment_no=acc.assignment_no,region_index=reg_index,start=reg_start,end=reg_end,upload_url=split_url, job_id=task.id)
         db.session.add(pr)
         db.session.commit()

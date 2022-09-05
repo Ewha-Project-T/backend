@@ -1,5 +1,6 @@
 import json
 from operator import le
+from datetime import datetime
 from pickle import TRUE
 from flask import jsonify,render_template, request, redirect, url_for,abort,make_response
 from flask_restful import reqparse, Resource
@@ -93,7 +94,8 @@ class Lecture_add(Resource):
     def get(self):
         user_list=get_all_user()
         user_info=get_jwt_identity()
-        return make_response(render_template("lecture_add.html",user_list=user_list,user_info=user_info))
+        now = datetime.now()
+        return make_response(render_template("lecture_add.html",user_list=user_list,user_info=user_info,year=str(now.year)))
     @jwt_required()
     def post(self):#강의생성/교수이상의권한
         user_info=get_jwt_identity()

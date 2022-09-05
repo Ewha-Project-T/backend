@@ -31,6 +31,7 @@ class Prob(Resource):
         return make_response(render_template("prob_list.html",prob_list=prob_list,lecture_no=lecture_no,user_perm=user_info["user_perm"],user_info=user_info))
 
 class Prob_add(Resource):
+    @jwt_required()
     def get(self):
         parser = reqparse.RequestParser()
         parser.add_argument('lecture_no', type=int, required=True, help="lecture_no is required")

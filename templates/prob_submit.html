@@ -203,6 +203,7 @@ $(document).ready(function(){
 			$(".submitProbTab li[probIndex=" + probIndex + "]").addClass('tmpSave');
 			// 다음문제 세팅
 			if($(".submitProbTab li").not(".tmpSave").length > 0){
+				alert("임시저장 되었습니다.");
 				var nextProbIndex = $($(".submitProbTab li").not(".tmpSave")[0]).attr("probindex");
 				loadProb(nextProbIndex);
 			}else{

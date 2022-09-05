@@ -28,7 +28,7 @@ class Prob(Resource):
         args = parser.parse_args()
         lecture_no = args['lecture_no']
         prob_list=prob_listing(lecture_no)
-        return make_response(render_template("prob_list.html",prob_list=prob_list,lecture_no=lecture_no,user_perm=user_info["user_perm"]))
+        return make_response(render_template("prob_list.html",prob_list=prob_list,lecture_no=lecture_no,user_perm=user_info["user_perm"],user_info=user_info))
 
 class Prob_add(Resource):
     def get(self):
@@ -36,7 +36,8 @@ class Prob_add(Resource):
         parser.add_argument('lecture_no', type=int, required=True, help="lecture_no is required")
         args = parser.parse_args()
         lecture_no = args['lecture_no']
-        return make_response(render_template("prob_add.html",lecture_no=lecture_no))
+        user_info=get_jwt_identity()
+        return make_response(render_template("prob_add.html",lecture_no=lecture_no,user_info=user_info))
     @jwt_required()
     def post(self):#과제만들기
         parser = reqparse.RequestParser()
@@ -85,7 +86,8 @@ class Prob_mod(Resource):
         lecture_no = args['lecture_no']
         as_no = args['as_no']
         as_list,audio_list=mod_assignment_listing(lecture_no,as_no)
-        return make_response(render_template("prob_mod.html",lecture_no=lecture_no,as_no=as_no,as_list=as_list,audio_list=audio_list))
+        user_info=get_jwt_identity()
+        return make_response(render_template("prob_mod.html",lecture_no=lecture_no,as_no=as_no,as_list=as_list,audio_list=audio_list,user_info=user_info))
     @jwt_required()
     def post(self):#강의수정권한관리 만든사람, 관리자
         parser = reqparse.RequestParser()
@@ -139,7 +141,8 @@ class Prob_submit(Resource):
         lecture_no = args['lecture_no']
         wav_url=get_wav_url(as_no)
         as_info=get_as_info(lecture_no,as_no)
-        return make_response(render_template("prob_submit.html",wav_url=wav_url,as_no=as_no,lecture_no=lecture_no,as_info=as_info))
+        user_info=get_jwt_identity()
+        return make_response(render_template("prob_submit.html",wav_url=wav_url,as_no=as_no,lecture_no=lecture_no,as_info=as_info,user_info=user_info))
     @jwt_required()
     def post(self):
         parser = reqparse.RequestParser()

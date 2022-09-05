@@ -22,7 +22,7 @@ class Lecture(Resource):
             lecture_list=lecture_listing()
         else:
             lecture_list=lecture_listing(user_info)
-        return make_response(render_template("lecture_list.html",lecture_list=lecture_list,user_perm=user_info["user_perm"]))
+        return make_response(render_template("lecture_list.html",lecture_list=lecture_list,user_perm=user_info["user_perm"],user_info=user_info))
 
 
 
@@ -92,7 +92,8 @@ class Lecture_add(Resource):
     @jwt_required()
     def get(self):
         user_list=get_all_user()
-        return make_response(render_template("lecture_add.html",user_list=user_list))
+        user_info=get_jwt_identity()
+        return make_response(render_template("lecture_add.html",user_list=user_list,user_info=user_info))
     @jwt_required()
     def post(self):#강의생성/교수이상의권한
         user_info=get_jwt_identity()
@@ -124,7 +125,8 @@ class Lecture_mod(Resource):
         args = parser.parse_args()
         lecture_no = args['lecture_no']
         mod_list,attend_list=mod_lecutre_listing(lecture_no)
-        return make_response(render_template("lecture_mod.html",user_list=user_list,lecture_no=lecture_no,mod_list=mod_list,attend_list=attend_list))
+        user_info=get_jwt_identity()
+        return make_response(render_template("lecture_mod.html",user_list=user_list,lecture_no=lecture_no,mod_list=mod_list,attend_list=attend_list,user_info=user_info))
     @jwt_required()
     def post(self):#강의수정권한관리 만든사람, 관리자
         user_info=get_jwt_identity()

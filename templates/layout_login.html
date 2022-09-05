@@ -28,7 +28,10 @@
 				</ul>
 				<div class="loginInfoDiv">
 					<img src="{{ url_for('static', filename='images/myphoto.png') }}" class="myphotoBtn">
-					<span>이화연 교수</span>
+					{% if user_info['user_perm']==0 %}<span>{{user_info['user_name']}} 관리자</span> {% endif %}
+					{% if user_info['user_perm']==1 %}<span>{{user_info['user_name']}} 학생</span> {% endif %}
+					{% if user_info['user_perm']==2 %}<span>{{user_info['user_name']}} 조교</span> {% endif %}
+					{% if user_info['user_perm']==3 %}<span>{{user_info['user_name']}} 교수</span> {% endif %}
 					<a href="{{ url_for('logout') }}">
 					<img src="{{ url_for('static', filename='images/logout.png') }}" class="logoutBtn">
 					</a>

@@ -63,6 +63,7 @@ class Assignment(db.Model):
     as_name = db.Column(db.String(50), nullable=False)
     as_type = db.Column(db.String(10), nullable=False)
     keyword = db.Column(db.Text)
+    translang= db.Column(db.String(20))
     description = db.Column(db.Text)
     re_limit = db.Column(db.String(10), nullable=False)
     speed = db.Column(db.Float, nullable=False)

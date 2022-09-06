@@ -10,6 +10,7 @@ li { display: block; }
 .btn-2 .btn-cancel { float: left; background-color: #d8d8d8; color: #fff; line-height: 50px; }
 .btn-2 .btn-temp { float: left; background-color: #d8d8d8; color: #fff; line-height: 50px; }
 .btn-2 .btn-submit { float: right; color: #fff; }
+.btn-h2-small { font-size: 0.6em; padding: 4px; float: right; height: 25px; line-height: 17px; margin-top: 3px; margin-left: 3px; }
 
 /* 강의목록 */
 .menuBarDiv { overflow: hidden; padding: 10px 40px; background-color: #3f7a4c; color: #ffffff; }

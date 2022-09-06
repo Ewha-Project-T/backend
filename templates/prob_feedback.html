@@ -16,6 +16,7 @@
 		<script type="text/javascript" src="{{ url_for('static', filename='js/videojs/videojs.record.min.js') }}"></script>
 		<script type="text/javascript" src="{{ url_for('static', filename='js/videojs/videojs.record.recorderjs.min.js') }}"></script>
 <script type="text/javascript">
+var probIndex;
 var probFileList = []; // 문제파일
 {% for i in wav_url_example %}
 probFileList.push("{{ i.upload_url}}");
@@ -40,6 +41,7 @@ var submitTextList = []; //녹음텍스트
 submitTextList.push("{{stt_result[i].textFile}}");
 {% endfor %}
 {% endif %}
+var oriInputText = "{{ as_info['original_text'] }}";
 var audioOptions = {
 	controls: true,
 	autoplay: false,
@@ -60,6 +62,7 @@ var audioOptions = {
 
 function loadData(index){
 	index = parseInt(index);
+	probIndex = index;
 	examplePlayer.src({ src: probFileList[index], type: 'audio/wav'});
 	submitPlayer.src({ src: submitFileList[index], type: 'audio/wav'});
 	$(".exampleTextDiv div").empty().text(probTextList[index]);
@@ -109,6 +112,14 @@ $(document).ready(function(){
 		var txt = selectText();
 		createFeedback(txt);
 	});
+
+	// 원음 버튼
+	$(document).on("click", ".oriTextBtn", function(){
+		$(".exampleTextDiv div").empty().text(oriInputText);
+	});
+	$(document).on("click", ".sttTextBtn", function(){
+		$(".exampleTextDiv div").empty().text(probTextList[probIndex]);
+	});
 });
 </script>
 {% endblock %}
@@ -139,7 +150,10 @@ $(document).ready(function(){
 				<div class="probTextDiv">
 					<div class="probTextContentDiv">
 						<div class="exampleTextDiv">
-							<h2>원문</h2>
+							<h2>원문
+								<span class="btn btn-h2-small oriTextBtn">원문</span>
+								<span class="btn btn-h2-small sttTextBtn">STT</span>
+							</h2>
 							<div></div>
 						</div>
 						<div class="assignmentTextDiv">

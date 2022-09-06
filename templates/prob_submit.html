@@ -33,6 +33,7 @@ var exampleAudioPlayer;
 var submitAudioPlayer;
 var fd;
 var submitSeq = "";
+var exampleAudioPlayFlag = false;
 
 // 과제타입
 var submitType = "{{ as_info['as_type'] }}";
@@ -74,7 +75,16 @@ $(document).ready(function(){
 		loadProb(0);
         });
 
+	exampleAudioPlayer.on('playing', function(){ 
+		exampleAudioPlayFlag = true; 
+	});
+
+	exampleAudioPlayer.on(['waiting', 'pause'], function(){ 
+		exampleAudioPlayFlag = false; 
+	});
+
         exampleAudioPlayer.on("ended", function(){
+		exampleAudioPlayFlag = false;
                 // 재생 끝났을때
 		if(submitType == "순차통역"){
 			var btnEle = $(".simultaneousBtn");
@@ -153,28 +163,32 @@ $(document).ready(function(){
 
         // 통역시작
         $(document).on("click", ".simultaneousBtn", function(){
-                var btnEle = $(this);
+		if(submitType == "순차통역" && !exampleAudioPlayFlag){
 
+                var btnEle = $(this);
 		if(submitType == "순차통역"){
 			if(!btnEle.hasClass("recoding")){
+				alert("문제" + (parseInt(probIndex) + 1) + " 통역시작");
 				// 녹음시작 (원음 재생만)
 				exampleAudioPlayer.play();
 				btnEle.addClass("recoding");
-				btnEle.text("녹음중/취소");
+				btnEle.text("통역완료");
 			}else{
 				exampleAudioPlayer.pause();
 				exampleAudioPlayer.currentTime(0)
 				submitAudioPlayer.record().stop();
 				btnEle.removeClass("recoding");
 				btnEle.text("통역시작");
+				recordEndBtnEvent();
 			}
 		}else if(submitType == "동시통역"){
 	                if(!btnEle.hasClass("recoding")){
+				alert("문제" + (parseInt(probIndex) + 1) + " 통역시작");
 	                        // 녹음시작
 	                        exampleAudioPlayer.play();
 	                        submitAudioPlayer.record().start();
 	                        btnEle.addClass("recoding");
-	                        btnEle.text("녹음중/취소");
+	                        btnEle.text("통역완료");
 	                }else{
 	                        // 녹음아님
 	                        exampleAudioPlayer.pause();
@@ -182,12 +196,16 @@ $(document).ready(function(){
 	                        submitAudioPlayer.record().stop();
 	                        btnEle.removeClass("recoding");
 	                        btnEle.text("통역시작");
+				recordEndBtnEvent();
 	                }
+		}
+
 		}
         });
 
         // 녹음본 제출
-        $(document).on("click", ".recordTempSaveBtn", function(){
+//        $(document).on("click", ".recordTempSaveBtn", function(){
+	function recordEndBtnEvent(){
                 // 녹음 데이터 보내기
                 fd = new FormData();
                 fd.append('assignment',{{as_no}})
@@ -210,7 +228,8 @@ $(document).ready(function(){
 				alert("모든 문제가 녹음되었습니다.\n제출버튼을 눌러 완료해주세요");
 			}
                 });
-        });
+	}
+//        });
 
 	$(document).on("click", ".submitRecordDataBtn", function(){
 		var submitUUID = [];

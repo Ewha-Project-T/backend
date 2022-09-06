@@ -118,6 +118,10 @@ $(document).ready(function(){
 			setTimeout(audioSizeUpdate(), 1000);
 		}else{
 			$(".waveSoundSize").text("원음 : " + Math.floor(audioSize / 60).toFixed()  + "분 " + Math.floor(audioSize % 60).toFixed() + "초");
+			if($("select[name=prob_type]").val() == "동시통역"){
+				probAudioPlayer.addRegion({start : 0, end: audioSize});
+				regionUpdate("", "");
+			}
 		}
 	}
 	probAudioPlayer.on('waveform-ready', function(){
@@ -148,6 +152,7 @@ $(document).ready(function(){
 			"prob_name": $("input[name=prob_name]").val(),
 			"prob_type": $("select[name=prob_type]").val(),
 			"prob_keyword": $("input[name=prob_keyword]").val(),
+			"prob_translang": $("input[name=prob_translang]").val(),
 			"prob_exp": $("textarea[name=prob_exp]").val(),
 			"prob_replay": $("select[name=prob_replay]").val(),
 			"prob_play_speed": $("input[name=prob_play_speed]").val(),
@@ -206,8 +211,18 @@ $(document).ready(function(){
 				</div>
 			</div>
 			<div class="inputFormDiv">
-				<label for class="probAddFormLabel">키워드</label>
-				<input type="text" class="inputStyle01" name="prob_keyword">
+				<div class="inputFormDiv-1 w75">
+					<label for class="probAddFormLabel">키워드</label>
+					<input type="text" class="inputStyle01" name="prob_keyword">
+				</div>
+				<div class="inputFormDiv-2 w25">
+					<label for class="probAddFormLabel">번역언어</label>
+					<select class="inputStyle01" name="prob_translang">
+						<option value="jp-ko">일본어-한국어</option>
+						<option value="en-ko">영어-한국어</option>
+						<option value="cn-ko">중국어-한국어</option>
+					</select>
+				</div>
 			</div>
 			<div class="inputFormDiv">
 				<label for class="probAddFormLabel">과제 설명</label>

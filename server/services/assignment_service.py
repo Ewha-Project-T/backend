@@ -146,7 +146,16 @@ def get_original_stt_result(prob_result):
         tmp["endidx"]=acc.endidx
         tmp["silenceidx"]=acc.silenceidx
         stt_result=acc.stt_result
-        stt_result=stt_result.replace("'",'"')
+        check_text=0
+        stt_result=list(stt_result)
+        for idx in range(len(stt_result)):
+            if stt_result[idx]=='"' and check_text==0:
+                check_text=1
+            elif stt_result[idx]=='"' and check_text==1:
+                check_text=0
+            if check_text==0 and stt_result[idx]=="'":
+                stt_result[idx]='"'       
+        stt_result=''.join(stt_result)
         json_result=json.loads(stt_result)
         tmp["textFile"]=json_result["textFile"]
         tmp["timestamps"]=json_result["timestamps"]

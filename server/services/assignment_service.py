@@ -33,13 +33,13 @@ def prob_listing(lecture_no):
         as_list_result.append(tmp)
     return as_list_result
 
-major_convert={"한일통역":"ja-JP","한일번역":"ja-JP","한중통역":"zh-CN","한중번역":"zh-CN","한영통역":"en-US","한영번역":"en-US","한불통역":"fr-FR","한불번역":"fr-FR"}#임시용
-def make_as(lecture_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,original_text="",upload_url="",region="",user_info=None):
+#major_convert={"한일통역":"ja-JP","한일번역":"ja-JP","한중통역":"zh-CN","한중번역":"zh-CN","한영통역":"en-US","한영번역":"en-US","한불통역":"fr-FR","한불번역":"fr-FR"}#임시용
+major_convert={"일본어-한국어":"ja-JP","영어-한국어":"en-US","중국어-한국어":"zh-CN"}
+def make_as(lecture_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,original_text="",upload_url="",region="",user_info=None,prob_translang="ko-KR"):
     acc=Assignment(lecture_no=lecture_no,week=week,limit_time=limit_time,as_name=as_name,as_type=as_type,keyword=keyword,description=description,re_limit=re_limit,speed=speed,disclosure=disclosure,original_text=original_text,upload_url=upload_url)
     db.session.add(acc)
     db.session.commit()
-    lec=Lecture.query.filter_by(lecture_no=lecture_no).first()
-    lecture_major=lec.major
+    lecture_major=prob_translang
     if(lecture_major in major_convert):
         lecture_major=major_convert[lecture_major]
     else:
@@ -66,7 +66,7 @@ def split_wav_save(upload_url,start,end):
     return uuid_str
     
 
-def mod_as(lecture_no,as_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,original_text="",upload_url="",region="",user_info=None):
+def mod_as(lecture_no,as_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,original_text="",upload_url="",region="",user_info=None,prob_translang="ko-KR"):
     acc=Assignment.query.filter_by(assignment_no=as_no).first()
     if(lecture_no!=""):
         acc.lecture_no=lecture_no
@@ -99,8 +99,7 @@ def mod_as(lecture_no,as_no,week,limit_time,as_name,as_type,keyword,description,
     Prob_region.query.filter_by(assignment_no=as_no).delete()
     db.session.commit
 
-    lec=Lecture.query.filter_by(lecture_no=lecture_no).first()
-    lecture_major=lec.major
+    lecture_major=prob_translang
     if(lecture_major in major_convert):
         lecture_major=major_convert[lecture_major]
     else:

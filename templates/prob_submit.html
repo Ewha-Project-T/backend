@@ -49,6 +49,10 @@ function loadProb(index){
 	if(submitAudioPlayer.record().isRecording()){
 		submitAudioPlayer.record().stop();
 	}
+
+	var btnEle = $(".simultaneousBtn");
+	btnEle.removeClass("recoding");
+	btnEle.text("통역시작");
 }
 
 $(document).ready(function(){
@@ -87,17 +91,13 @@ $(document).ready(function(){
 		exampleAudioPlayFlag = false;
                 // 재생 끝났을때
 		if(submitType == "순차통역"){
-			var btnEle = $(".simultaneousBtn");
 			exampleAudioPlayer.pause();
 			exampleAudioPlayer.currentTime(0);
 			submitAudioPlayer.record().start();
 		}else if(submitType == "동시통역"){
-			var btnEle = $(".simultaneousBtn");
 			exampleAudioPlayer.pause();
 			exampleAudioPlayer.currentTime(0);
 			submitAudioPlayer.record().stop();
-			btnEle.removeClass("recoding");
-			btnEle.text("통역시작");
 		}
         });
 
@@ -159,27 +159,27 @@ $(document).ready(function(){
 
         submitAudioPlayer.on('finishRecord', function() {
                 console.log('finished recording: ', submitAudioPlayer.recordedData);
+		recordEndBtnEvent();
         });
 
         // 통역시작
         $(document).on("click", ".simultaneousBtn", function(){
-		if(submitType == "순차통역" && !exampleAudioPlayFlag){
-
                 var btnEle = $(this);
-		if(submitType == "순차통역"){
-			if(!btnEle.hasClass("recoding")){
-				alert("문제" + (parseInt(probIndex) + 1) + " 통역시작");
-				// 녹음시작 (원음 재생만)
-				exampleAudioPlayer.play();
-				btnEle.addClass("recoding");
-				btnEle.text("통역완료");
-			}else{
-				exampleAudioPlayer.pause();
-				exampleAudioPlayer.currentTime(0)
-				submitAudioPlayer.record().stop();
-				btnEle.removeClass("recoding");
-				btnEle.text("통역시작");
-				recordEndBtnEvent();
+		if(submitType == "순차통역" && !exampleAudioPlayFlag){
+			if(submitType == "순차통역"){
+				if(!btnEle.hasClass("recoding")){
+					alert("문제" + (parseInt(probIndex) + 1) + " 통역시작");
+					// 녹음시작 (원음 재생만)
+					exampleAudioPlayer.play();
+					btnEle.addClass("recoding");
+					btnEle.text("통역완료");
+				}else{
+					exampleAudioPlayer.pause();
+					exampleAudioPlayer.currentTime(0)
+					submitAudioPlayer.record().stop();
+					btnEle.removeClass("recoding");
+					btnEle.text("통역시작");
+				}
 			}
 		}else if(submitType == "동시통역"){
 	                if(!btnEle.hasClass("recoding")){
@@ -196,10 +196,7 @@ $(document).ready(function(){
 	                        submitAudioPlayer.record().stop();
 	                        btnEle.removeClass("recoding");
 	                        btnEle.text("통역시작");
-				recordEndBtnEvent();
 	                }
-		}
-
 		}
         });
 

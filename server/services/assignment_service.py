@@ -39,6 +39,7 @@ def make_as(lecture_no,week,limit_time,as_name,as_type,keyword,description,re_li
     acc=Assignment(lecture_no=lecture_no,week=week,limit_time=limit_time,as_name=as_name,as_type=as_type,keyword=keyword,description=description,re_limit=re_limit,speed=speed,disclosure=disclosure,original_text=original_text,upload_url=upload_url,translang=prob_translang)
     db.session.add(acc)
     db.session.commit()
+    print(prob_translang)
     lecture_major=prob_translang
     if(lecture_major in major_convert):
         lecture_major=major_convert[lecture_major]

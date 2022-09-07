@@ -76,6 +76,8 @@ class Prob_add(Resource):
         prob_region=args['prob_region']
         user_info=get_jwt_identity()
         original_text = args['original_text']
+        #original_text=original_text.replace("<","&lt")
+        #original_text=original_text.replace(">","gt")
         make_as(lecture_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,original_text,upload_path,prob_region,user_info,prob_translang)
         return{"msg" : "success"},200
 
@@ -129,6 +131,8 @@ class Prob_mod(Resource):
             disclosure=1
         prob_region=args['prob_region']
         original_text = args['original_text']
+        #original_text=original_text.replace("<","&lt")
+        #original_text=original_text.replace(">","gt")
         user_info=get_jwt_identity()
         if(lecture_access_check(user_info["user_no"],lecture_no) or user_info["user_perm"]==0):
             mod_as(lecture_no,as_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,original_text,upload_path,prob_region,user_info,prob_translang)

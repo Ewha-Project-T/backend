@@ -53,7 +53,7 @@ class Prob_add(Resource):
         parser.add_argument('prob_replay', type=str)
         parser.add_argument('prob_play_speed', type=str)
         parser.add_argument('prob_open', type=str)
-        parser.add_argument('prob_region', type=str, action='append', required=True)
+        parser.add_argument('prob_region', type=str, action='append')
         parser.add_argument('original_text', type=str)
         parser.add_argument('prob_sound_path', type=str)
         args=parser.parse_args()
@@ -67,6 +67,9 @@ class Prob_add(Resource):
         description = args['prob_exp']
         re_limit = args['prob_replay']
         speed = args['prob_play_speed']
+        print(speed)
+        if(speed==None):
+            speed=1
         disclosure = args['prob_open']
         upload_path= args['prob_sound_path']
         if(disclosure=="on"):

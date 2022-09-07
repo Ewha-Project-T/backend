@@ -158,7 +158,9 @@ def get_original_stt_result(prob_result):
                 stt_result[idx]='"'       
         stt_result=''.join(stt_result)
         json_result=json.loads(stt_result)
-        tmp["textFile"]=json_result["textFile"]
+        original_text=json_result["textFile"]
+        original_text=original_text.replace("<","&lt")
+        tmp["textFile"]=original_text.replace(">","&gt")
         tmp["timestamps"]=json_result["timestamps"]
         tmp["annotations"]=json_result["annotations"]
         tmp["is_seq"]=acc.is_seq
@@ -221,7 +223,9 @@ def get_stt_result(uuid):
         stt_result=acc.stt_result
         stt_result=stt_result.replace("'",'"')
         json_result=json.loads(stt_result)
-        tmp["textFile"]=json_result["textFile"]
+        original_text=json_result["textFile"]
+        original_text=original_text.replace("<","&lt")
+        tmp["textFile"]=original_text.replace(">","&gt")
         tmp["timestamps"]=json_result["timestamps"]
         tmp["annotations"]=json_result["annotations"]
         tmp["is_seq"]=acc.is_seq
@@ -272,6 +276,8 @@ def get_as_info(lecture_no,assignment_no):
     as_list_result["re_limit"]=vars(acc)["re_limit"]
     as_list_result["speed"]=vars(acc)["speed"]
     as_list_result["disclosure"]=vars(acc)["disclosure"]
-    as_list_result["original_text"]=vars(acc)["original_text"]
+    original_text=vars(acc)["original_text"]
+    original_text=original_text.replace("<","&lt")
+    as_list_result["original_text"]=original_text.replace(">","&gt")
     as_list_result["upload_url"]=vars(acc)["upload_url"]
     return as_list_result

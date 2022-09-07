@@ -133,7 +133,9 @@ $(document).ready(function(){
 				<div class="feedbackTitleDiv">
 					<h1>{{as_name}} - {{user_info['user_name']}}-{{as_info['as_type']}}</h1>
 					<div class="btn-2">
+						{% if as_info['as_type']=='동시통역'%}
 						<button class="btn">동시재생</button>
+						{% endif %}
 						<button class="btn">저장</button>
 					</div>
 				</div>

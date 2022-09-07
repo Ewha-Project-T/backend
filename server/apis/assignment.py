@@ -67,8 +67,7 @@ class Prob_add(Resource):
         description = args['prob_exp']
         re_limit = args['prob_replay']
         speed = args['prob_play_speed']
-        print(speed)
-        if(speed==None):
+        if(speed==""):
             speed=1
         disclosure = args['prob_open']
         upload_path= args['prob_sound_path']

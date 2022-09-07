@@ -28,7 +28,9 @@ submitFileList.push("{{i.wav_url}}");
 var probTextList = []; // 문제텍스트
 {% if original_stt_result != None %}
 {% for i in range(original_stt_result|length) %}
+{% autoescape false %}
 probTextList.push("{{original_stt_result[i].textFile}}"); 
+{% endautoescape %}
 //임시로 넣음
 //probTextList.push("{{original_stt_result[i].timestamps}}")
 //probTextList.push("{{original_stt_result[i].annotations}}")
@@ -41,7 +43,9 @@ var submitTextList = []; //녹음텍스트
 submitTextList.push("{{stt_result[i].textFile}}");
 {% endfor %}
 {% endif %}
+{% autoescape false %}
 var oriInputText = "{{ as_info['original_text'] }}";
+{% endautoescape %}
 var audioOptions = {
 	controls: true,
 	autoplay: false,
@@ -154,9 +158,7 @@ $(document).ready(function(){
 								<span class="btn btn-h2-small oriTextBtn">원문</span>
 								<span class="btn btn-h2-small sttTextBtn">STT</span>
 							</h2>
-							{% autoescape false %}
 							<div></div>
-							{% autoescape %}
 						</div>
 						<div class="assignmentTextDiv">
 							<h2>통역 전사문</h2>

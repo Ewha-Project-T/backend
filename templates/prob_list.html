@@ -19,6 +19,12 @@ $(document).on("click",".probDelDiv", function(){
 	}
 	return false;
 });
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+            alert("{{messages[-1]}}");
+    {% endif %}
+{% endwith %}
+
 	</script>
 {% endblock %}
 

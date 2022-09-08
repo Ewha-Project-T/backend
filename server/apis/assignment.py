@@ -1,7 +1,7 @@
 from ast import keyword
 import json
 from pickle import TRUE
-from flask import jsonify,render_template, request, redirect, url_for,abort,make_response
+from flask import jsonify,render_template, request, redirect, url_for,abort,make_response,flash
 from flask_restful import reqparse, Resource
 from worker import do_stt_work
 from flask_jwt_extended import (
@@ -196,9 +196,13 @@ class Prob_feedback(Resource):
         as_name=get_as_name(as_no)
         wav_url,uuid=get_prob_wav_url(as_no,user_info,lecture_no)
         if(wav_url==None):
+            flash("과제 제출을 해주세요")
             return redirect(host_url + url_for('prob', lecture_no=lecture_no))
         wav_url_example=get_wav_url(as_no)
         stt_result=get_stt_result(uuid)
+        if(stt_result==None):
+            flash("stt 작업중입니다.")
+            return redirect(host_url + url_for('prob', lecture_no=lecture_no))
         original_stt_result=get_original_stt_result(wav_url_example)
         as_info=get_as_info(lecture_no,as_no)
         return make_response(render_template("prob_feedback.html",user_info=user_info,as_name=as_name,wav_url=wav_url,wav_url_example=wav_url_example,stt_result=stt_result,original_stt_result=original_stt_result,as_info=as_info))

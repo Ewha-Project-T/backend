@@ -1,7 +1,7 @@
 from distutils.command.upload import upload
 from server.apis import assignment, lecture
 from server.services.stt_service import mapping_sst_user
-from ..model import Attendee, SttJob, User, Lecture, Assignment,Prob_region,Assignment_check,Assignment_check_list,Stt
+from ..model import Assignment_feedback, Attendee, SttJob, User, Lecture, Assignment,Prob_region,Assignment_check,Assignment_check_list,Stt
 from server import db
 from functools import wraps
 from flask_jwt_extended import create_refresh_token, create_access_token, verify_jwt_in_request, get_jwt, get_jwt_identity
@@ -108,20 +108,21 @@ def mod_as(lecture_no,as_no,week,limit_time,as_name,as_type,keyword,description,
         lecture_major=major_convert[lecture_major]
     else:
         lecture_major="ko-KR"
-    for reg in region:
-        reg=reg.replace("'",'"')
-        json_reg=json.loads(reg)
-        reg_index=json_reg["index"]
-        reg_start=json_reg["start"]
-        reg_end=json_reg["end"]
+    if region!=None:
+        for reg in region:
+            reg=reg.replace("'",'"')
+            json_reg=json.loads(reg)
+            reg_index=json_reg["index"]
+            reg_start=json_reg["start"]
+            reg_end=json_reg["end"]
 
-        split_url=split_wav_save(upload_url,int(reg_start),int(reg_end))
-        mapping_sst_user(acc.assignment_no, split_url,user_info)
+            split_url=split_wav_save(upload_url,int(reg_start),int(reg_end))
+            mapping_sst_user(acc.assignment_no, split_url,user_info)
 
-        task = do_stt_work.delay(split_url,lecture_major)
-        pr = Prob_region(assignment_no=acc.assignment_no,region_index=reg_index,start=reg_start,end=reg_end,upload_url=split_url, job_id=task.id)
-        db.session.add(pr)
-        db.session.commit()
+            task = do_stt_work.delay(split_url,lecture_major)
+            pr = Prob_region(assignment_no=acc.assignment_no,region_index=reg_index,start=reg_start,end=reg_end,upload_url=split_url, job_id=task.id)
+            db.session.add(pr)
+            db.session.commit()
 
 
 def get_wav_url(as_no):
@@ -282,3 +283,26 @@ def get_as_info(lecture_no,assignment_no):
     as_list_result["original_text"]=original_text.replace(">","&gt")
     as_list_result["upload_url"]=vars(acc)["upload_url"]
     return as_list_result
+
+def set_feedback(as_no,lecture_no,professor_review,feedback,user_info):
+    attend=Attendee.query.filter_by(user_no=user_info["user_no"],lecture_no=lecture_no).first()
+    check=Assignment_check.query.filter_by(assignment_no=as_no,attendee_no=attend.attendee_no,assignment_check=1).order_by(Assignment_check.check_no.desc()).first()
+    check.professor_review=professor_review
+    db.session.add(check)
+    db.session.commit()
+    if feedback!=None:
+        for reg in feedback:
+            reg=reg.replace("'",'"')
+            json_reg=json.loads(reg)
+            #reg_index=json_reg["index"]
+            #reg_start=json_reg["start"]
+            #reg_end=json_reg["end"]
+            acc=Assignment_feedback.query.filter_by(check_no=check.check_no)#target_text,text_type,comment 추가필요
+            db.session.add(acc)
+            db.session.commit()
+'''         
+             target_text = db.Column(db.Text, nullable=False)
+            text_type = db.Column(db.Text)
+            comment = db.Column(db.Text, nullable=False)
+'''
+            

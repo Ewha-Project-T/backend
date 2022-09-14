@@ -75,7 +75,7 @@ def signup_email_validate(sender_email,code):
 
     send_mail(send_from=email, send_to=[sender_email],
           subject=subject, message=message,
-          mtype='html', username=id, password=pw)
+          mtype='html', username=email, password=pw)
 
 
 def gen_verify_email_code(user_email):

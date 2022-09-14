@@ -29,7 +29,7 @@ class Verify_email(Resource):
         email = args['email']
         code = args['code']
         s_code = get_access_code(email)
-        if(s_code==None):
+        if(s_code==0):
             flash("인증코드가 만료 되었습니다.\n로그인을 진행해 인증코드를 발급 받아주세요")
             return redirect(host_url+ url_for('login'))
         if code == s_code:

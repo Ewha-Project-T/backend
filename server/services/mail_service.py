@@ -91,7 +91,7 @@ def gen_verify_email_code(user_email):
 def get_access_code(user_email):
     acc = User.query.filter_by(email=user_email).first()
     if(acc.access_code_time+timedelta(minutes=15)>datetime.now()):
-        return None
+        return 0
     return acc.access_code
 
 def access_check_success(user_email):

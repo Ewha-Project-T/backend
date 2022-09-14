@@ -32,8 +32,7 @@ class Login(Resource):
                 msg="User Not Found"
                 return redirect(host_url + url_for('login', msg=msg))
             if(result==LoginResult.NEED_ADMIN_CHECK):
-                msg="you need admin check"
-                return redirect(host_url + url_for('login', msg=msg))
+                return redirect(host_url + url_for('email', email=user_email))
             if(result==LoginResult.LOGIN_COUNT_EXCEEDED):
                 msg="clogin count exceeded"
                 return redirect(host_url + url_for('login', msg=msg))

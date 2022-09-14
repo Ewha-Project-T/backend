@@ -71,7 +71,7 @@ def signup_email_validate(sender_email,code):
     with open(url_for('mail_check.html'),'rt',encoding='UTF-8') as f:
         print(f.read())
         message = f.read().replace('[code]',code)
-        message = f.read().replace('[email]',sender_email)
+        message = message.replace('[email]',sender_email)
 
     send_mail(send_from=email, send_to=[sender_email],
           subject=subject, message=message,

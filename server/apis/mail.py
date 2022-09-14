@@ -17,13 +17,17 @@ class Email(Resource):
         parser.add_argument('email', type=str)
         args = parser.parse_args()
         user_email = args['email']
-        gen_verify_email_code(user_email)
+        signup_email_validate(user_email,gen_verify_email_code(user_email))
         flash("이메일 인증을 완료해 주세요")
         return redirect(host_url+ url_for('login'))
 class Verify_email(Resource):
     def get(self):
-        code = request.form['code']
-        email=request.form['email']
+        parser = reqparse.RequestParser()
+        parser.add_argument('email', type=str)
+        parser.add_argument('code', type=str)
+        args = parser.parse_args()
+        email = args['email']
+        code = args['code']
         s_code = get_access_code(email)
         if(s_code==None):
             flash("인증코드가 만료 되었습니다.\n로그인을 진행해 인증코드를 발급 받아주세요")

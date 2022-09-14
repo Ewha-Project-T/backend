@@ -1,5 +1,12 @@
 {% extends 'layout_nologin.html' %}
 
+<script>
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+            alert("{{messages[-1]}}");
+    {% endif %}
+{% endwith %}
+</script>
 {% block content %}
 
 		<div class="videoDiv">

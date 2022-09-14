@@ -1,3 +1,4 @@
+from curses import flash
 import smtplib
 from pathlib import Path
 from email.mime.multipart import MIMEMultipart
@@ -6,6 +7,13 @@ from email.mime.text import MIMEText
 from email.utils import formatdate
 from email import encoders
 import os
+from flask import Flask,render_template,request,url_for
+import uuid,hashlib
+import binascii
+from ..model import User
+from server import db
+from datetime import datetime, timedelta
+
 
 def send_mail(send_from, send_to, subject, message, mtype='plain', files=[],
               server="mail.ewha.ac.kr", port=2525, username='', password=''):
@@ -60,12 +68,34 @@ def signup_email_validate(sender_email,code):
     pw = 'nlp_project1' # pass
     email ='x.sw@ewha.ac.kr'#mail address
     subject = '[인증코드 발송]Ewha Language Translation Platform 인증 코드 안내'
-    with open('./templates/mail_check.html','rt',encoding='UTF-8') as f:
+    with open(url_for('mail_check.html'),'rt',encoding='UTF-8') as f:
         print(f.read())
         message = f.read().replace('[code]',code)
+        message = f.read().replace('[email]',sender_email)
 
     send_mail(send_from=email, send_to=[sender_email],
           subject=subject, message=message,
           mtype='html', username=email, password=pw)
 
-signup_email_validate('riotgames@kakao.com','99999')
+
+def gen_verify_email_code(user_email):
+    salt = str(binascii.hexlify(os.urandom(16)))
+    r_key = str(uuid.uuid4())
+    code = hashlib.sha512(str(r_key + salt).encode('utf-8')).hexdigest()
+    acc = User.query.filter_by(email=user_email).first()
+    acc.access_code=code
+    db.session.add(acc)
+    db.session.commit()
+    return code
+
+def get_access_code(user_email):
+    acc = User.query.filter_by(email=user_email).first()
+    if(acc.access_code_time+timedelta(minutes=15)>datetime.now()):
+        return None
+    return acc.access_code
+
+def access_check_success(user_email):
+    acc = User.query.filter_by(email=user_email).first()
+    acc.access_check=1
+    db.session.add(acc)
+    db.session.commit()

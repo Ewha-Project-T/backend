@@ -109,7 +109,7 @@ class Join(Resource):
             result=register(user_email,user_pw,user_name,user_major, user_perm)
             if(result==RegisterResult.SUCCESS):
                 msg="register success"
-                return redirect(host_url+ url_for('login'))
+                return redirect(host_url+ url_for('email',email=user_email))
 
             elif(result==RegisterResult.USEREMAIL_EXIST):
                 msg="user email exist"
@@ -126,11 +126,6 @@ class Join(Resource):
         else:
             msg="invalid email"
             return redirect(host_url + url_for('join', msg=msg))
-
-class Email_check(Resource):
-    def get(self):
-        return make_response(render_template('mail_check.html'))
-
 	
 class LoginRefresh(Resource):#리프래쉬 토큰
     @jwt_required(refresh=True)

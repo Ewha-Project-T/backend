@@ -10,7 +10,8 @@ from server import db
 import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
 from os import environ as env
-
+import binascii
+from os import urandom
 app=Flask(__name__, static_folder='./static')
 app.config['SWAGGER'] = {
     'title': 'API Docs',
@@ -30,7 +31,7 @@ sentry_sdk.init(
     traces_sample_rate=1.0
 )
 """
-app.config['SECRET_KEY'] = 'Shadow-Hunter-nerf-plz'#추후 랜덤문자열로 바꿀것 ㅎㅎ;
+app.config['SECRET_KEY'] = str(binascii.hexlify(urandom(16)))
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=4)
 app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=1)
 app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{env['SQL_USER']}:{env['SQL_PASSWORD']}@{env['SQL_HOST']}:{env['SQL_PORT']}/{env['SQL_DATABASE']}"

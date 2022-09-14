@@ -68,7 +68,7 @@ def signup_email_validate(sender_email,code):
     pw = 'nlp_project1' # pass
     email ='x.sw@ewha.ac.kr'#mail address
     subject = '[인증코드 발송]Ewha Language Translation Platform 인증 코드 안내'
-    with open(url_for('mail_check.html'),'rt',encoding='UTF-8') as f:
+    with  open('./templates/mail_check.html','rt',encoding='UTF-8') as f:
         print(f.read())
         message = f.read().replace('[code]',code)
         message = message.replace('[email]',sender_email)

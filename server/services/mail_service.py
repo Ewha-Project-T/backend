@@ -90,6 +90,7 @@ def gen_verify_email_code(user_email):
 
 def get_access_code(user_email):
     acc = User.query.filter_by(email=user_email).first()
+    print(acc.access_code_time)
     if(acc.access_code_time+timedelta(minutes=15)>datetime.now()):
         return 0
     return acc.access_code

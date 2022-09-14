@@ -121,8 +121,14 @@ function createFeedback(txt){
 function createFeedbackTagList(id){
 	if($("#" + id + " .feedbackTagList").length == 0){
 		var tagList = [];
-		tagList.push("asdf");
-		tagList.push("zxcv");
+		tagList.push("내용오역");
+		tagList.push("불필요한 첨가");
+		tagList.push("일관성 문제");
+		tagList.push("표현 어색");
+		tagList.push("칭찬");
+		tagList.push("필러");
+		tagList.push("백트래킹");
+		tagList.push("지연");
 
 		var ele = $("<ul />").addClass("feedbackTagList").hide();
 		for(var i=0; i<tagList.length; i++){

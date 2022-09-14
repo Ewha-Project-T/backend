@@ -151,9 +151,11 @@ class Prob_submit(Resource):
         args = parser.parse_args()
         as_no=args['as_no']
         lecture_no = args['lecture_no']
-        wav_url=get_wav_url(as_no)
         as_info=get_as_info(lecture_no,as_no)
         user_info=get_jwt_identity()
+        if(as_info['as_type']=="번역"):
+            return make_response(render_template("prob_submit2.html",as_no=as_no,lecture_no=lecture_no,as_info=as_info,user_info=user_info))
+        wav_url=get_wav_url(as_no)
         return make_response(render_template("prob_submit.html",wav_url=wav_url,as_no=as_no,lecture_no=lecture_no,as_info=as_info,user_info=user_info))
     @jwt_required()
     def post(self):

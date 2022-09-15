@@ -183,7 +183,20 @@ function saveFeedback(){
 			"comment": cmt
 		});
 	}
-	console.log(feedbackList);
+	var params = {
+			"lecture_no":"{{lecture_no}}",
+			"as_no":"{{as_no}}",
+			"feedback":feedbackList,
+		};
+	$.ajax({
+			url: "/prob_feedback",
+			type: "POST",
+			headers: {'Content-Type': 'application/json'},
+			data: JSON.stringify(params),
+			success: function(d){
+				location.href="/prob?lecture_no={{lecture_no}}"
+			}
+		});
 }
 
 var examplePlayer;

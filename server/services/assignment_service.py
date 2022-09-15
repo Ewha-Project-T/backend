@@ -303,3 +303,19 @@ def set_feedback(as_no,lecture_no,professor_review,feedback,user_info):
             db.session.commit()
 
             
+def get_feedback(as_no,lecture_no,user_info):
+    attend=Attendee.query.filter_by(user_no=user_info["user_no"],lecture_no=lecture_no).first()
+    check=Assignment_check.query.filter_by(assignment_no=as_no,attendee_no=attend.attendee_no,assignment_check=1).order_by(Assignment_check.check_no.desc()).first()
+    pro_review=check.professor_review
+    if(pro_review==""):
+        pro_review=None
+    acc=Assignment_feedback.query.filter_by(check_no=check.check_no).all()
+    feedback_list=[]
+    if(acc==None):
+        feedback_list=None
+    for i in acc:
+        tmp={}
+        tmp["text"]=i.target_text
+        tmp["tagList"]=i.text_type.split(",")
+        tmp["comment"]=i.comment
+    return pro_review,feedback_list

@@ -117,7 +117,11 @@ function createFeedback(txt){
 
 	$(".feedbackContentDiv>ul").append(ele);
 }
-
+{% if feedbacklist !=None %}
+	{% for i in feedbacklist %}
+		console.log(i);
+	{% endfor %}
+{% endif %}
 function createFeedbackTagList(id){
 	if($("#" + id + " .feedbackTagList").length == 0){
 		var tagList = [];
@@ -303,7 +307,7 @@ $(document).ready(function(){
 							<h2>총평</h2>
 							<div>
 								입력하는곳
-								<textarea id="professor_review" style="width: 698px; height: 294px;"></textarea>
+								<textarea id="professor_review" style="width: 698px; height: 294px;">{% if professor_review!=None %} {{professor_review}} {% endif %}</textarea>
 							</div>
 						</div>
 					</div>

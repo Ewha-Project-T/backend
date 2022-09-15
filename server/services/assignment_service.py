@@ -318,4 +318,5 @@ def get_feedback(as_no,lecture_no,user_info):
         tmp["text"]=i.target_text
         tmp["tagList"]=i.text_type.split(",")
         tmp["comment"]=i.comment
+        feedback_list.append(tmp)
     return pro_review,feedback_list

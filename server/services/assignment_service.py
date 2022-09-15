@@ -290,19 +290,16 @@ def set_feedback(as_no,lecture_no,professor_review,feedback,user_info):
     check.professor_review=professor_review
     db.session.add(check)
     db.session.commit()
+    Assignment_feedback.query.filter_by(check_no=check.check_no).delete()
     if feedback!=None:
         for reg in feedback:
             reg=reg.replace("'",'"')
             json_reg=json.loads(reg)
-            #reg_index=json_reg["index"]
-            #reg_start=json_reg["start"]
-            #reg_end=json_reg["end"]
-            acc=Assignment_feedback.query.filter_by(check_no=check.check_no)#target_text,text_type,comment 추가필요
+            reg_text=json_reg["text"]
+            reg_taglist=','.join(json_reg["tagList"])
+            reg_comment=json_reg["comment"]
+            acc=Assignment_feedback.query.filter_by(check_no=check.check_no,target_text=reg_text,text_type=reg_taglist,comment=reg_comment)
             db.session.add(acc)
             db.session.commit()
-'''         
-             target_text = db.Column(db.Text, nullable=False)
-            text_type = db.Column(db.Text)
-            comment = db.Column(db.Text, nullable=False)
-'''
+
             

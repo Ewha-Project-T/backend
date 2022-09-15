@@ -183,7 +183,22 @@ function saveFeedback(){
 			"comment": cmt
 		});
 	}
-	console.log(feedbackList);
+	pro_rev=$("#professor_review").val();
+	var params = {
+			"lecture_no":"{{lecture_no}}",
+			"as_no":"{{as_no}}",
+			"feedback":feedbackList,
+			"professor_review":pro_rev
+		};
+	$.ajax({
+			url: "/prob_feedback",
+			type: "POST",
+			headers: {'Content-Type': 'application/json'},
+			data: JSON.stringify(params),
+			success: function(d){
+				location.href="/prob?lecture_no={{lecture_no}}"
+			}
+		});
 }
 
 var examplePlayer;
@@ -286,7 +301,10 @@ $(document).ready(function(){
 						</div>
 						<div class="commentTextDiv">
 							<h2>총평</h2>
-							<div>입력하는곳 </div>
+							<div>
+								입력하는곳
+								<textarea id="professor_review" style="width: 698px; height: 294px;"></textarea>
+							</div>
 						</div>
 					</div>
 					<div class="feedbackContentDiv">

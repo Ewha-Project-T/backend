@@ -291,8 +291,8 @@ def set_feedback(as_no,lecture_no,professor_review,feedback,user_info):
     db.session.add(check)
     db.session.commit()
     acc=Assignment_feedback.query.filter_by(check_no=check.check_no).all()
-    if(acc!=None):
-        db.session.delete(acc)
+    for i in acc:
+        db.session.delete(i)
         db.session.commit()
     if feedback!=None:
         for reg in feedback:

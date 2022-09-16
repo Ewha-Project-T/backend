@@ -7,7 +7,7 @@ from functools import wraps
 from flask_jwt_extended import create_refresh_token, create_access_token, verify_jwt_in_request, get_jwt, get_jwt_identity
 from pydub import AudioSegment, silence
 from worker import do_stt_work
-
+from markupsafe import Markup,escape
 import json
 import os
 # import librosa
@@ -293,16 +293,7 @@ def set_feedback(as_no,lecture_no,professor_review,feedback,user_info):
     Assignment_feedback.query.filter_by(check_no=check.check_no).delete()
     if feedback!=None:
         for reg in feedback:
-            check_text=0
-            reg=list(reg)
-            for idx in range(len(reg)):
-                if reg[idx]=='"' and check_text==0:
-                    check_text=1
-                elif reg[idx]=='"' and check_text==1:
-                    check_text=0
-                if check_text==0 and reg[idx]=="'":
-                    reg[idx]='"'       
-            reg=''.join(reg)
+            reg=escape(reg)
             print(reg)
             json_reg=json.loads(reg)
             reg_text=json_reg["text"]
@@ -325,12 +316,8 @@ def get_feedback(as_no,lecture_no,user_info):
         feedback_list=None
     for i in acc:
         tmp={}
-        tmp["text"]=i.target_text.replace("<","&lt")
-        tmp["text"]=tmp["text"].replace(">","&gt")
-        tmp["tagList"]=i.text_type.replace("<","&lt")
-        tmp["tagList"]=tmp["tagList"].replace(">","&gt")
-        tmp["tagList"]=tmp["tagList"].split(",")
-        tmp["comment"]=i.comment.replace("<","&lt")
-        tmp["comment"]=tmp["comment"].replace(">","&gt")
+        tmp["text"]=escape(i.target_text)
+        tmp["tagList"]=escape(i.text_type.split(","))
+        tmp["comment"]=escape(i.comment)
         feedback_list.append(tmp)
     return pro_review,feedback_list

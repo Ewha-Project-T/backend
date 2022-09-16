@@ -117,11 +117,13 @@ function createFeedback(txt){
 
 	$(".feedbackContentDiv>ul").append(ele);
 }
+{% autoescape false %}
 {% if feedback_list !=None %}
 	{% for i in feedback_list %}
 		console.log("{{i}}");
 	{% endfor %}
 {% endif %}
+{% endautoescape %}
 function createFeedbackTagList(id){
 	if($("#" + id + " .feedbackTagList").length == 0){
 		var tagList = [];

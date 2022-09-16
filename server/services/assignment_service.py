@@ -293,7 +293,17 @@ def set_feedback(as_no,lecture_no,professor_review,feedback,user_info):
     Assignment_feedback.query.filter_by(check_no=check.check_no).delete()
     if feedback!=None:
         for reg in feedback:
-            reg=reg.replace("'",'"')
+            check_text=0
+            reg=list(reg)
+            for idx in range(len(reg)):
+                if reg[idx]=='"' and check_text==0:
+                    check_text=1
+                elif reg[idx]=='"' and check_text==1:
+                    check_text=0
+                if check_text==0 and reg[idx]=="'":
+                    reg[idx]='"'       
+            reg=''.join(reg)
+            print(reg)
             json_reg=json.loads(reg)
             reg_text=json_reg["text"]
             reg_taglist=','.join(json_reg["tagList"])
@@ -316,6 +326,7 @@ def get_feedback(as_no,lecture_no,user_info):
     for i in acc:
         tmp={}
         tmp["text"]=i.target_text
+        
         tmp["tagList"]=i.text_type.split(",")
         tmp["comment"]=i.comment
         feedback_list.append(tmp)

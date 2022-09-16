@@ -290,10 +290,12 @@ def set_feedback(as_no,lecture_no,professor_review,feedback,user_info):
     check.professor_review=professor_review
     db.session.add(check)
     db.session.commit()
-    Assignment_feedback.query.filter_by(check_no=check.check_no).delete()
+    acc=Assignment_feedback.query.filter_by(check_no=check.check_no).all()
+    if(acc!=None):
+        db.session.delete(acc)
+        db.session.commit()
     if feedback!=None:
         for reg in feedback:
-            print(reg)
             json_reg=json.loads(reg)
             reg_text=json_reg["text"]
             reg_taglist=','.join(json_reg["tagList"])

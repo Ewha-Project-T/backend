@@ -296,6 +296,16 @@ def set_feedback(as_no,lecture_no,professor_review,feedback,user_info):
         db.session.commit()
     if feedback!=None:
         for reg in feedback:
+            check_text=0
+            reg=list(reg)
+            for idx in range(len(reg)):
+                if reg[idx]=='"' and check_text==0:
+                    check_text=1
+                elif reg[idx]=='"' and check_text==1:
+                    check_text=0
+                if check_text==0 and reg[idx]=="'":
+                    reg[idx]='"'       
+            reg=''.join(reg)
             json_reg=json.loads(reg)
             reg_text=json_reg["text"]
             reg_taglist=','.join(json_reg["tagList"])

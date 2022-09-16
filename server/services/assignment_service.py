@@ -325,9 +325,12 @@ def get_feedback(as_no,lecture_no,user_info):
         feedback_list=None
     for i in acc:
         tmp={}
-        tmp["text"]=i.target_text
-        
-        tmp["tagList"]=i.text_type.split(",")
-        tmp["comment"]=i.comment
+        tmp["text"]=i.target_text.replace("<","&lt")
+        tmp["text"]=tmp["text"].replace(">","&gt")
+        tmp["tagList"]=i.text_type.replace("<","&lt")
+        tmp["tagList"]=tmp["tagList"].replace(">","&gt")
+        tmp["tagList"]=tmp["tagList"].split(",")
+        tmp["comment"]=i.comment.replace("<","&lt")
+        tmp["comment"]=tmp["comment"].replace(">","&gt")
         feedback_list.append(tmp)
     return pro_review,feedback_list

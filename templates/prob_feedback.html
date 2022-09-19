@@ -239,10 +239,9 @@ $(document).ready(function(){
 	// 플레이어 로딩
 	examplePlayer = videojs("exampleAudioWaveSurfer", audioOptions, function(){ });
 	submitPlayer = videojs("assignmentAudioWaveSurfer", audioOptions, function(){ });
-
+	{% endif %}
 	// 1번문제 로딩
 	loadData(0);
-	{% endif %}
 	// 피드백 로딩
 {% autoescape false %}
 {% if feedback_list !=None %}

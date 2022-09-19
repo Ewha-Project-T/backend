@@ -163,14 +163,16 @@ class Prob_submit(Resource):
         parser.add_argument('lecture_no', type=int)
         parser.add_argument('as_no', type=int)
         parser.add_argument('submitUUID',type=str,action='append')
+        parser.add_argument('text',type=str)
         args = parser.parse_args()
         as_no=args['as_no']
         lecture_no = args['lecture_no']
         uuid=args['submitUUID']
         user_info=get_jwt_identity()
-        if(uuid=="0"):
-            parser.add_argument('text',type=str)
+        print(uuid*100)
+        if(uuid[0]=="0"):
             text=args['text']
+            print(text*100)
             check_assignment(as_no,lecture_no,uuid,user_info,text)
         else:
             check_assignment(as_no,lecture_no,uuid,user_info)

@@ -70,8 +70,10 @@ var audioOptions = {
 function loadData(index){
 	index = parseInt(index);
 	probIndex = index;
+	{% if as_info['as_type']!='번역' %}
 	examplePlayer.src({ src: probFileList[index], type: 'audio/wav'});
 	submitPlayer.src({ src: submitFileList[index], type: 'audio/wav'});
+	{% endif %}
 	$(".exampleTextDiv div").empty().text(probTextList[index]);
 	$(".assignmentTextDiv div").empty().text(submitTextList[index]);
 }

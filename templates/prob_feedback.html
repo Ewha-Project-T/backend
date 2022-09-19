@@ -37,6 +37,10 @@ probTextList.push("{{original_stt_result[i].textFile}}");
 {% endfor %}
 {% endif %}
 var submitTextList = []; //녹음텍스트
+{% if as_info['as_type']=='번역' %}
+	submitTextList.push("{{user_trans_result}}");
+{% endif %}
+
 {% if stt_result != None %}
 {% for i in range(stt_result|length) %}
 submitTextList.push("{{stt_result[i].textFile}}");
@@ -229,13 +233,14 @@ function feedbackSort(){
 var examplePlayer;
 var submitPlayer;
 $(document).ready(function(){
+	{% if as_info['as_type']!='번역' %}
 	// 플레이어 로딩
 	examplePlayer = videojs("exampleAudioWaveSurfer", audioOptions, function(){ });
 	submitPlayer = videojs("assignmentAudioWaveSurfer", audioOptions, function(){ });
 
 	// 1번문제 로딩
 	loadData(0);
-
+	{% endif %}
 	// 피드백 로딩
 {% autoescape false %}
 {% if feedback_list !=None %}

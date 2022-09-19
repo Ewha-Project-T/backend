@@ -214,8 +214,8 @@ class Prob_feedback(Resource):
             return redirect(host_url + url_for('prob', lecture_no=lecture_no))
         original_stt_result=get_original_stt_result(wav_url_example)
         as_info=get_as_info(lecture_no,as_no)
-        professor_review,feedback_list=get_feedback(as_no,lecture_no,user_info)
-        return make_response(render_template("prob_feedback.html",user_info=user_info,as_name=as_name,wav_url=wav_url,wav_url_example=wav_url_example,stt_result=stt_result,original_stt_result=original_stt_result,as_info=as_info,lecture_no=lecture_no,as_no=as_no,professor_review=professor_review,feedback_list=feedback_list))
+        user_trans_result,professor_review,feedback_list=get_feedback(as_no,lecture_no,user_info)
+        return make_response(render_template("prob_feedback.html",user_info=user_info,as_name=as_name,wav_url=wav_url,wav_url_example=wav_url_example,stt_result=stt_result,original_stt_result=original_stt_result,as_info=as_info,lecture_no=lecture_no,as_no=as_no,professor_review=professor_review,feedback_list=feedback_list,user_trans_result=user_trans_result))
 
 
     @jwt_required()

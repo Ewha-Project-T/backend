@@ -168,7 +168,12 @@ class Prob_submit(Resource):
         lecture_no = args['lecture_no']
         uuid=args['submitUUID']
         user_info=get_jwt_identity()
-        check_assignment(as_no,lecture_no,uuid,user_info)
+        if(uuid=="0"):
+            parser.add_argument('text',type=str)
+            text=args['text']
+            check_assignment(as_no,lecture_no,uuid,user_info,text)
+        else:
+            check_assignment(as_no,lecture_no,uuid,user_info)
 class Prob_del(Resource):
     @jwt_required()
     def get(self):#과제 삭제

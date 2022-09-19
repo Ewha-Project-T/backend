@@ -87,6 +87,7 @@ class Assignment_check(db.Model):
     attendee_no = db.Column(db.Integer, db.ForeignKey("ATTENDEE.attendee_no", ondelete="CASCADE"), nullable=True)
     assignment_check = db.Column(db.Integer, default=0)
     professor_review= db.Column(db.Text)
+    user_trans_result= db.Column(db.Text)
    
     attendee = db.relationship("Attendee", back_populates="assignment_check")
     assignment = db.relationship("Assignment", back_populates="assignment_check")

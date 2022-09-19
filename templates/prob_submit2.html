@@ -9,7 +9,25 @@ $(document).ready(function(){
 	// 제출
 	$(document).on("click", ".submitRecordDataBtn", function(){
 		var txt = $("#submitText").val();
+
+		var param = {
+			"submitUUID": "0",
+			"as_no": {{as_no}},
+			"lecture_no":{{lecture_no}},
+			"text":txt
+		};
+
+		$.ajax({
+			url: "/prob_submit",
+			type: "POST",
+			headers: {'Content-Type': 'application/json'},
+			data: JSON.stringify(param),
+			success: function(d){
+				location.href="/prob?lecture_no={{lecture_no}}"
+			}
+		});
 	});
+
 });
 </script>
 {% endblock %}

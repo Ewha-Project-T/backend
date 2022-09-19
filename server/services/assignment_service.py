@@ -181,20 +181,21 @@ def delete_assignment(assignment_no):
     db.session.delete(acc)
     db.session.commit
     
-def check_assignment(as_no,lecture_no,uuid,user_info):
+def  check_assignment(as_no,lecture_no,uuid,user_info,text=""):
     acc=Prob_region.query.filter_by(assignment_no=as_no).all()
-    if(len(acc)!=len(uuid)):
+    if(len(acc)!=len(uuid) and text==""):
         return
     attend=Attendee.query.filter_by(user_no=user_info["user_no"],lecture_no=lecture_no).first()
     Assignment_check.query.filter_by(assignment_no=as_no,attendee_no=attend.attendee_no,assignment_check=1).delete()#check_list도 cascade되는지 확인
-    acc=Assignment_check(assignment_no=as_no,attendee_no=attend.attendee_no,assignment_check=1)
+    acc=Assignment_check(assignment_no=as_no,attendee_no=attend.attendee_no,assignment_check=1,user_trans_result=text)
     db.session.add(acc)
     db.session.commit()
-    for uu in uuid:
-        acc2=Assignment_check_list(check_no=acc.check_no,acl_uuid=uu)
-        db.session.add(acc2)
-        db.session.commit()
-        do_stt_work.delay(uu)
+    if(text==""):
+        for uu in uuid:
+            acc2=Assignment_check_list(check_no=acc.check_no,acl_uuid=uu)
+            db.session.add(acc2)
+            db.session.commit()
+            do_stt_work.delay(uu)
 
 def get_as_name(as_no):
     acc=Assignment.query.filter_by(assignment_no=as_no).first()

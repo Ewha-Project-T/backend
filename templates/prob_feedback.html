@@ -316,14 +316,14 @@ $(document).ready(function(){
 					<li idx="{{ loop.index - 1 }}">구간 {{ loop.index }}</li>
 					{% endfor %}
 				</ul>
-
+					{% if as_info['as_type']!='번역' %}
 				<div class="exampleAudioDiv">
 					<audio id="exampleAudioWaveSurfer" class="video-js vjs-default-skin"></audio>
 				</div>
 				<div class="assignmentAudioDiv">
 					<audio id="assignmentAudioWaveSurfer" class="video-js vjs-default-skin"></audio>
 				</div>
-
+					{% endif %}
 				<div class="probTextDiv">
 					<div class="probTextContentDiv">
 						<div class="exampleTextDiv">
@@ -334,7 +334,7 @@ $(document).ready(function(){
 							<div></div>
 						</div>
 						<div class="assignmentTextDiv">
-							<h2>통역 전사문</h2>
+							<h2>{% if as_info['as_type']=='번역' %}학생 번역문{% else %}통역 전사문{% endif %}</h2>
 							<div></div>
 						</div>
 						<div class="commentTextDiv">

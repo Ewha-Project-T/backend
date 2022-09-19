@@ -1,256 +1,17 @@
 {% extends 'layout_login.html' %}
 
 {% block stylesheet %}
-		<link href="{{ url_for('static', filename='css/videojs/video-js.min.css') }}" rel="stylesheet">
-		<link href="{{ url_for('static', filename='css/videojs/videojs.wavesurfer.min.css') }}" rel="stylesheet">
-		<link href="{{ url_for('static', filename='css/videojs/videojs.record.min.css') }}" rel="stylesheet">
 {% endblock %}
 
 {% block script %}
-		<script type="text/javascript" src="{{ url_for('static', filename='js/videojs/video.min.js') }}"></script>
-		<script type="text/javascript" src="{{ url_for('static', filename='js/videojs/adapter.js') }}"></script>
-		<script type="text/javascript" src="{{ url_for('static', filename='js/videojs/recorder.js') }}"></script>
-		<script type="text/javascript" src="{{ url_for('static', filename='js/videojs/wavesurfer.min.js') }}"></script>
-		<script type="text/javascript" src="{{ url_for('static', filename='js/videojs/wavesurfer.microphone.min.js') }}"></script>
-		<script type="text/javascript" src="{{ url_for('static', filename='js/videojs/videojs.wavesurfer.min.js') }}"></script>
-		<script type="text/javascript" src="{{ url_for('static', filename='js/videojs/videojs.record.min.js') }}"></script>
-		<script type="text/javascript" src="{{ url_for('static', filename='js/videojs/videojs.record.recorderjs.min.js') }}"></script>
-		<script type="text/javascript">
-
-
-// 문제 파일
-
-// 플레이어
-var exampleAudioPlayer;
-var submitAudioPlayer;
-var fd;
-var submitSeq = "";
-var exampleAudioPlayFlag = false;
-
-// 과제타입
-var submitType = "{{ as_info['as_type'] }}";
-
-// 문제세팅
-var probIndex;
-function loadProb(index){
-	$(".submitProbTab li").removeClass("focus");
-	$(".submitProbTab li[probIndex=" + index + "]").addClass("focus");
-	index = parseInt(index);
-	probIndex = index;
-	exampleAudioPlayer.src({src: probFileList[index], type: 'audio/wav'});
-	if(submitAudioPlayer.record().isRecording()){
-		submitAudioPlayer.record().stop();
-	}
-
-	var btnEle = $(".simultaneousBtn");
-	btnEle.removeClass("recoding");
-	btnEle.text("통역시작");
-}
-
+<script type="text/javascript">
 $(document).ready(function(){
-        // 원음
-        const sampleAudioOptions = {
-                controls: true,
-                autoplay: false,
-                fluid: false,
-                bigPlayButton: false,
-                plugins: {
-                        wavesurfer: {
-                                backend: 'MediaElement',
-                                displayMilliseconds: false,
-                                debug: true,
-                                waveColor: '#086280',
-                                progressColor: 'black',
-                                cursorColor: 'black',
-                                hideScrollbar: true
-                        }
-                }
-        };
-        exampleAudioPlayer = videojs('exampleAudioWaveSurfer', sampleAudioOptions, function() {
-		// 1번문제 세팅
-		loadProb(0);
-        });
-
-	exampleAudioPlayer.on('playing', function(){ 
-		exampleAudioPlayFlag = true; 
-	});
-
-	exampleAudioPlayer.on(['waiting', 'pause'], function(){ 
-		exampleAudioPlayFlag = false; 
-	});
-
-        exampleAudioPlayer.on("ended", function(){
-		exampleAudioPlayFlag = false;
-                // 재생 끝났을때
-		if(submitType == "순차통역"){
-			exampleAudioPlayer.pause();
-			exampleAudioPlayer.currentTime(0);
-			submitAudioPlayer.record().start();
-		}else if(submitType == "동시통역"){
-			exampleAudioPlayer.pause();
-			exampleAudioPlayer.currentTime(0);
-			submitAudioPlayer.record().stop();
-		}
-        });
-
-        // 녹음
-        var submitAudioOptions = {
-                controls: true,
-                bigPlayButton: false,
-                fluid: false,
-                plugins: {
-                        wavesurfer: {
-                                backend: 'WebAudio',
-                                waveColor: '#6fffe9',
-                                progressColor: 'black',
-                                displayMilliseconds: true,
-                                debug: true,
-                                cursorWidth: 1,
-                                hideScrollbar: true,
-                                plugins: [
-                                        WaveSurfer.microphone.create({
-                                                bufferSize: 4096,
-                                                numberOfInputChannels: 1,
-                                                numberOfOutputChannels: 1,
-                                                constraints: {
-                                                        video: false,
-                                                        audio: true
-                                                }
-                                        })
-                                ]
-                        },
-                        record: {
-                                audio: true,
-                                video: false,
-                                maxLength: 600,
-                                displayMilliseconds: true,
-                                debug: true,
-                                audioEngine: 'recorder.js'
-                        }
-                }
-        };
-        submitAudioPlayer = videojs('submitAudioWaveSurfer', submitAudioOptions, function() {
-        });
-
-        submitAudioPlayer.on('ready', function(){
-                submitAudioPlayer.record().getDevice();
-        });
-
-        submitAudioPlayer.on('deviceError', function() {
-		alert('지원하지 않는 장비입니다.');
-                console.log('device error:', submitAudioPlayer.deviceErrorCode);
-        });
-
-        submitAudioPlayer.on('error', function(element, error) {
-                console.error(error);
-        });
-
-        submitAudioPlayer.on('startRecord', function() {
-                console.log('started recording!');
-        });
-
-        submitAudioPlayer.on('finishRecord', function() {
-                console.log('finished recording: ', submitAudioPlayer.recordedData);
-		recordEndBtnEvent();
-        });
-
-        // 통역시작
-        $(document).on("click", ".simultaneousBtn", function(){
-                var btnEle = $(this);
-		if(submitType == "순차통역" && !exampleAudioPlayFlag){
-			if(submitType == "순차통역"){
-				if(!btnEle.hasClass("recoding")){
-					alert("문제" + (parseInt(probIndex) + 1) + " 통역시작");
-					// 녹음시작 (원음 재생만)
-					exampleAudioPlayer.play();
-					btnEle.addClass("recoding");
-					btnEle.text("통역완료");
-				}else{
-					exampleAudioPlayer.pause();
-					exampleAudioPlayer.currentTime(0)
-					submitAudioPlayer.record().stop();
-					btnEle.removeClass("recoding");
-					btnEle.text("통역시작");
-				}
-			}
-		}else if(submitType == "동시통역"){
-	                if(!btnEle.hasClass("recoding")){
-				alert("문제" + (parseInt(probIndex) + 1) + " 통역시작");
-	                        // 녹음시작
-	                        exampleAudioPlayer.play();
-	                        submitAudioPlayer.record().start();
-	                        btnEle.addClass("recoding");
-	                        btnEle.text("통역완료");
-	                }else{
-	                        // 녹음아님
-	                        exampleAudioPlayer.pause();
-	                        exampleAudioPlayer.currentTime(0)
-	                        submitAudioPlayer.record().stop();
-	                        btnEle.removeClass("recoding");
-	                        btnEle.text("통역시작");
-	                }
-		}
-        });
-
-        // 녹음본 제출
-//        $(document).on("click", ".recordTempSaveBtn", function(){
-	function recordEndBtnEvent(){
-                // 녹음 데이터 보내기
-                fd = new FormData();
-                fd.append('assignment',{{as_no}})
-                fd.append('wav', submitAudioPlayer.recordedData);
-                $.ajax({
-                        url: "/stt",
-                        type: "PUT",
-                        data: fd,
-                        processData: false,
-                        contentType: false
-                }).done(function(data){
-			submitDataList[probIndex] = data.file;
-			$(".submitProbTab li[probIndex=" + probIndex + "]").addClass('tmpSave');
-			// 다음문제 세팅
-			if($(".submitProbTab li").not(".tmpSave").length > 0){
-				alert("임시저장 되었습니다.");
-				var nextProbIndex = $($(".submitProbTab li").not(".tmpSave")[0]).attr("probindex");
-				loadProb(nextProbIndex);
-			}else{
-				alert("모든 문제가 녹음되었습니다.\n제출버튼을 눌러 완료해주세요");
-			}
-                });
-	}
-//        });
-
+	// 제출
 	$(document).on("click", ".submitRecordDataBtn", function(){
-		var submitUUID = [];
-		for(var i=0; i<submitDataList.length; i++){
-			if(submitDataList[i] == ""){
-				alert("모든 문제를 녹음해주세요.");
-				return false;
-			}
-			submitUUID.push(submitDataList[i]);
-		}
-		var param = {
-			"submitUUID": submitUUID,
-			"as_no": {{as_no}},
-			"lecture_no":{{lecture_no}}
-		};
-
-		$.ajax({
-			url: "/prob_submit",
-			type: "POST",
-			headers: {'Content-Type': 'application/json'},
-			data: JSON.stringify(param),
-			success: function(d){
-				location.href="/prob?lecture_no={{lecture_no}}"
-			}
-		});
-	});
-
-	$(document).on("click", ".submitProbTab li", function(){
-		loadProb($(this).attr("probIndex"));
+		var txt = $("#submitText").val();
 	});
 });
-		</script>
+</script>
 {% endblock %}
 
 {% block content %}
@@ -259,22 +20,17 @@ $(document).ready(function(){
 				<div class="probKeywordDiv">
 					<span>문제 키워드 : 테스트 키워드</span>
 				</div>
-				<ul class="submitProbTab">
-				</ul>
-				<div class="exampleAudioDiv">
-					<h2>원음</h2>
-					<audio id="exampleAudioWaveSurfer" class="video-js vjs-default-skin"></audio>
-				</div>
-				<div class="submitAudioDiv">
-					<h2>내음성</h2>
-					<audio id="submitAudioWaveSurfer" class="video-js vjs-default-skin"></audio>
-				</div>
-				<div class="recordControllerDiv">
-					<!--button class="btn sequentialBtn">통역 시작</button-->
-					<button class="btn simultaneousBtn">통역 시작</button>
+				<div class="nomalTrans">
+					<div class="exampleTextDiv">
+						<h2>원문</h2>
+						<textarea id="exampleText"></textarea>
+					</div>
+					<div class="submitTextDiv">
+						<h2>번역문</h2>
+						<textarea id="submitText"></textarea>
+					</div>
 				</div>
 				<div class="recordBtnDiv btnDiv btn-2 btn-align-right">
-					<button class="btn btn-temp recordTempSaveBtn">임시저장</button>
 					<button class="btn btn-submit submitRecordDataBtn">제출</button>
 				</div>
 			</div>

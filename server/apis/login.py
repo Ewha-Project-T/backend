@@ -26,7 +26,7 @@ class Login(Resource):
         args = parser.parse_args()
         user_email = args['email']
         user_pw = args['pw']
-        if re.match("^[A-Za-z0-9]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[A-Za-z0-9])*\.[A-Za-z]{2,3}$", user_email):#나중에 ewha.ac.kr같은 것만 되게 수정해야됨
+        if re.match("^[A-Za-z0-9]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[A-Za-z0-9])*\.[A-Za-z]{2,3}$", user_email):
             result, account = login(user_email, user_pw)
             if(result==LoginResult.ACC_IS_NOT_FOUND):
                 msg="User Not Found"

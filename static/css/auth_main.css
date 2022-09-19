@@ -96,6 +96,12 @@ li { display: block; }
 .recordBtnDiv { margin-top: 30px; }
 .btn-align-right { width: 30%; margin: 20px 0px auto auto; }
 
+.nomalTrans { overflow: hidden; }
+.nomalTrans .exampleTextDiv { float: left; width: 50%; }
+.nomalTrans .submitTextDiv { float: right; width: 50%; }
+.nomalTrans textarea { padding: 10px; width: 95%; border-radius: 10px; height: 500px; }
+
+
 /* 과제 피드백 */
 .feedbackDiv .feedbackTitleDiv { overflow: hidden; }
 .feedbackDiv .feedbackTitleDiv h1 { text-align: left; float: left; }
@@ -115,13 +121,14 @@ li { display: block; }
 .feedbackDiv .probTextDiv .probTextContentDiv .commentTextDiv { clear: both; width: 98%; margin-right: 2%; }
 .feedbackDiv .probTextDiv .probTextContentDiv .commentTextDiv h2 { font-size: 1.3rem; }
 .feedbackDiv .probTextDiv .probTextContentDiv .commentTextDiv div { background-color: #d0d0d0; height: 300px; border-radius: 10px; margin-top: 10px; padding: 5px; }
+.feedbackDiv .probTextDiv .probTextContentDiv .commentTextDiv div textarea { padding: 10px; width: 100%; height: 100%; border: 0px; border-radius: 10px; }
 .feedbackDiv .probTextDiv .feedbackContentDiv { float: right; width: 33%; }
 .feedbackDiv .probTextDiv .feedbackContentDiv .feedbackContentTitleDiv { overflow: hidden; }
 .feedbackDiv .probTextDiv .feedbackContentDiv .feedbackContentTitleDiv h2 { font-size: 1.3rem; float: left; }
 .feedbackDiv .probTextDiv .feedbackContentDiv .feedbackContentTitleDiv .btn { float: right; height: 30px; margin: 0px; width: 150px; }
 .feedbackDiv .probTextDiv .feedbackContentDiv .feedbackContentRowDiv { border-radius: 10px; overflow: hidden; margin-top: 10px; margin-bottom: 10px; }
 .feedbackDiv .probTextDiv .feedbackContentDiv .feedbackContentRowDiv .feedbackContentRowTitleDiv { height: 30px; background-color: #ff8d00; padding: 5px; overflow: hidden; text-overflow: ellipsis; white-space: noowrap; text-align: right; }
-.feedbackDiv .probTextDiv .feedbackContentDiv .feedbackContentRowDiv .feedbackContentRowContentDiv { height: 200px; background-color: #d0d0d0; padding: 5px; }
+.feedbackDiv .probTextDiv .feedbackContentDiv .feedbackContentRowDiv .feedbackContentRowContentDiv { height: 280px; background-color: #d0d0d0; padding: 5px; }
 
 .feedbackDiv .probTextDiv .feedbackContentDiv .feedbackContentRowContentDiv .feedbackContentTagDiv { position: relative; }
 .feedbackDiv .probTextDiv .feedbackContentDiv .feedbackContentRowContentDiv .feedbackContentTagDiv ul { min-height: 100px; padding: 10px; background-color: #fff; border-radius: 5px; }
@@ -132,7 +139,7 @@ li { display: block; }
 .feedbackDiv .probTextDiv .feedbackContentDiv .feedbackContentRowContentDiv .feedbackContentTagDiv .feedbackTagList { position: absolute; width: 100%; border: 1px solid #d0d0d0; height: 100px; overflow-y: auto; }
 .feedbackDiv .probTextDiv .feedbackContentDiv .feedbackContentRowContentDiv .feedbackContentTagDiv .feedbackTagList li { border-bottom: 1px solid #d0d0d0; }
 .feedbackDiv .probTextDiv .feedbackContentDiv .feedbackContentRowContentDiv .feedbackContentCmtDiv { margin-top: 10px; }
-.feedbackDiv .probTextDiv .feedbackContentDiv .feedbackContentRowContentDiv .feedbackContentCmtDiv textarea { padding: 10px; background-color: #fff; border-radius: 5px; width: 100%; }
+.feedbackDiv .probTextDiv .feedbackContentDiv .feedbackContentRowContentDiv .feedbackContentCmtDiv textarea { padding: 10px; background-color: #fff; border-radius: 5px; width: 100%; height: 100px; }
 
 /* 과제생성 */
 .probAddFormDiv { width: 100%; overflow: hidden; }

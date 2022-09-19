@@ -65,11 +65,10 @@ def signup_email_validate(sender_email,code):
     #pw = os.environ['pw']
     #email = os.environ['email']
     id = 'x.sw' # id
-    pw = 'nlp_project1' # pass
+    pw = '' # pass
     email ='x.sw@ewha.ac.kr'#mail address
     subject = '[인증코드 발송]Ewha Language Translation Platform 인증 코드 안내'
     with  open('./templates/mail_check.html','rt',encoding='UTF-8') as f:
-        print(f.read())
         message = f.read().replace('[code]',code)
         message = message.replace('[email]',sender_email)
 
@@ -86,12 +85,12 @@ def gen_verify_email_code(user_email):
     acc.access_code=code
     db.session.add(acc)
     db.session.commit()
+    print("gencode:"+code)
     return code
 
 def get_access_code(user_email):
     acc = User.query.filter_by(email=user_email).first()
-    print(acc.access_code_time)
-    if(acc.access_code_time+timedelta(minutes=15)>datetime.now()):
+    if(acc.access_code_time+timedelta(minutes=15)>datetime.now()+timedelta(hours=9)):
         return 0
     return acc.access_code
 

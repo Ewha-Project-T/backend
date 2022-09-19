@@ -83,6 +83,9 @@ function selectText(){
 }
 
 function createFeedback(txt){
+	if(txt.trim() == ""){
+		return false;
+	}
 	var checkEle = $(".feedbackContentDiv ul .feedbackContentTxtDiv");
 	for(var i=0; i<checkEle.length; i++){
 		if($(checkEle[i]).text().trim() == txt.trim()){
@@ -116,14 +119,9 @@ function createFeedback(txt){
 	ele.append(rowDiv);
 
 	$(".feedbackContentDiv>ul").append(ele);
+	feedbackSort();
+	return seq;
 }
-{% autoescape false %}
-{% if feedback_list !=None %}
-	{% for i in feedback_list %}
-		console.log("{{i}}");
-	{% endfor %}
-{% endif %}
-{% endautoescape %}
 function createFeedbackTagList(id){
 	if($("#" + id + " .feedbackTagList").length == 0){
 		var tagList = [];
@@ -163,6 +161,10 @@ function createFeedbackTag(id, tag){
 
 	$("#" + id + " .feedbackTagView").append(ele);
 	$("#" + id + " .feedbackTagList").hide();
+}
+
+function setFeedbackComment(id, comment){
+	$("#" + id + " .feedbackContentCmtDiv textarea").val(comment);
 }
 
 function deleteFeedbackTag(e){
@@ -207,6 +209,23 @@ function saveFeedback(){
 		});
 }
 
+function feedbackSort(){
+	var sortList = [];
+	var eleList = $(".feedbackContentDiv>ul>li")
+	var pEle = $(".feedbackContentDiv>ul").clone();
+	var assignmentText = $(".assignmentTextDiv div").text();
+
+	for(var i=0; i<eleList.length; i++){
+		var txt = $(eleList[i]).find(".feedbackContentTxtDiv").text();
+		sortList.push({"id": $(eleList[i]).attr("id"), "index": assignmentText.indexOf(txt)});
+	}
+	sortList.sort(function(a, b){ return a.index < b.index ? -1 : a.index > b.index ? 1 : 0; });
+	$(".feedbackContentDiv>ul").empty();
+	for(var i=0; i<sortList.length; i++){
+		$(".feedbackContentDiv>ul").append(pEle.find("li#" + sortList[i].id));
+	}
+}
+
 var examplePlayer;
 var submitPlayer;
 $(document).ready(function(){
@@ -216,6 +235,19 @@ $(document).ready(function(){
 
 	// 1번문제 로딩
 	loadData(0);
+
+	// 피드백 로딩
+{% autoescape false %}
+{% if feedback_list !=None %}
+	{% for i in feedback_list %}
+	seq = createFeedback("{{ i.text }}");
+	{% for tag in i.tagList %}
+	createFeedbackTag(seq, "{{ tag }}");
+	{% endfor %}
+	setFeedbackComment(seq, "{{ i.comment }}");
+	{% endfor %}
+{% endif %}
+{% endautoescape %}
 
 	// 탭 클릭
 	$(document).on("click", ".feedbackProbTab li", function(){
@@ -308,8 +340,7 @@ $(document).ready(function(){
 						<div class="commentTextDiv">
 							<h2>총평</h2>
 							<div>
-								입력하는곳
-								<textarea id="professor_review" style="width: 698px; height: 294px;">{% if professor_review!=None %} {{professor_review}} {% endif %}</textarea>
+								<textarea id="professor_review">{% if professor_review!=None %} {{professor_review}} {% endif %}</textarea>
 							</div>
 						</div>
 					</div>

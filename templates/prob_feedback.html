@@ -44,13 +44,6 @@ var submitTextList = []; //녹음텍스트
 {% if stt_result != None %}
 {% for i in range(stt_result|length) %}
 submitTextList.push("{{stt_result[i].textFile}}");
-	{% for j in range(stt_feedback[i]|length) %}
-		var sf_start={{stt_feedback[i][j]['start']}}
-		var sf_end={{stt_feedback[i][j]['end']}}
-		var sf_type="{{stt_feedback[i][j]['type']}}"
-		seq = createFeedback(submitTextList[{{i}}].slice(sf_start,sf_end));
-		createFeedbackTag(seq, sf_type);
-	{% endfor %}
 {% endfor %}
 {% endif %}
 {% autoescape false %}
@@ -247,6 +240,16 @@ $(document).ready(function(){
 	examplePlayer = videojs("exampleAudioWaveSurfer", audioOptions, function(){ });
 	submitPlayer = videojs("assignmentAudioWaveSurfer", audioOptions, function(){ });
 	{% endif %}
+{% for i in range(stt_result|length) %}
+	{% for j in range(stt_feedback[i]|length) %}
+		var sf_start={{stt_feedback[i][j]['start']}}
+		var sf_end={{stt_feedback[i][j]['end']}}
+		var sf_type="{{stt_feedback[i][j]['type']}}"
+		seq = createFeedback(submitTextList[{{i}}].slice(sf_start,sf_end));
+		createFeedbackTag(seq, sf_type);
+	{% endfor %}
+{% endfor %}
+
 	// 1번문제 로딩
 	loadData(0);
 	// 피드백 로딩

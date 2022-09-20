@@ -223,7 +223,7 @@ def get_stt_result(uuid):
         tmp["textFile"]=original_text.replace(">","&gt")
         tmp["timestamps"]=json_result["timestamps"]
         tmp["annotations"]=json_result["annotations"]
-        ann=ast.literal_eval(tmp["annotations"])
+        ann=ast.literal_eval(str(tmp["annotations"]))
         stt_feedback_list.append(ann)
         tmp["is_seq"]=acc.is_seq
         stt_result_list.append(tmp)

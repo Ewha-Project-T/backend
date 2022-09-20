@@ -242,9 +242,9 @@ $(document).ready(function(){
 	{% endif %}
 {% for i in range(stt_result|length) %}
 	{% for j in range(stt_feedback[i]|length) %}
-		var sf_start={{stt_feedback[i][j]['start']}}
-		var sf_end={{stt_feedback[i][j]['end']}}
-		var sf_type="{{stt_feedback[i][j]['type']}}"
+		var sf_start={{stt_feedback[i][j]['start']}};
+		var sf_end={{stt_feedback[i][j]['end']}};
+		var sf_type="{{stt_feedback[i][j]['type']}}";
 		seq = createFeedback(submitTextList[{{i}}].slice(sf_start,sf_end));
 		createFeedbackTag(seq, sf_type);
 	{% endfor %}

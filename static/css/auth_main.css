@@ -118,6 +118,7 @@ li { display: block; }
 .feedbackDiv .probTextDiv .probTextContentDiv .assignmentTextDiv { float: left; width: 48%; margin-right: 2%; margin-bottom: 10px; }
 .feedbackDiv .probTextDiv .probTextContentDiv .assignmentTextDiv h2 { font-size: 1.3rem; }
 .feedbackDiv .probTextDiv .probTextContentDiv .assignmentTextDiv div { background-color: #d0d0d0; height: 600px; border-radius: 10px; margin-top: 10px; padding: 5px; overflow-y: auto; }
+.feedbackDiv .probTextDiv .probTextContentDiv .assignmentTextDiv div .feedbackBlock { background-color: #fdff83; }
 .feedbackDiv .probTextDiv .probTextContentDiv .commentTextDiv { clear: both; width: 98%; margin-right: 2%; }
 .feedbackDiv .probTextDiv .probTextContentDiv .commentTextDiv h2 { font-size: 1.3rem; }
 .feedbackDiv .probTextDiv .probTextContentDiv .commentTextDiv div { background-color: #d0d0d0; height: 300px; border-radius: 10px; margin-top: 10px; padding: 5px; }

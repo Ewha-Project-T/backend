@@ -31,9 +31,6 @@ var probTextList = []; // 문제텍스트
 {% autoescape false %}
 probTextList.push("{{original_stt_result[i].textFile}}"); 
 {% endautoescape %}
-//임시로 넣음
-//probTextList.push("{{original_stt_result[i].timestamps}}")
-//probTextList.push("{{original_stt_result[i].annotations}}")
 {% endfor %}
 {% endif %}
 var submitTextList = []; //녹음텍스트
@@ -80,27 +77,48 @@ function loadData(index){
 
 function selectText(){
 	var txt = "";
+	var sOffset = 0;
+	var eOffset = 0;
 	if(document.getSelection){
 		txt = document.getSelection().toString();
+		var nodeIdx = Array.from(document.getSelection().anchorNode.parentElement.childNodes).indexOf(document.getSelection().anchorNode);
+		var nodeEnd = Array.from(document.getSelection().anchorNode.parentElement.childNodes).indexOf(document.getSelection().extentNode);
+		if(nodeIdx != nodeEnd){
+			return false;
+		}
+		var preTextLength = 0;
+		for(var i=0; i<nodeIdx; i++){
+			preTextLength += $(document.getSelection().anchorNode.parentElement.childNodes[i]).text().length;
+		}
+		sOffset = document.getSelection().anchorOffset + preTextLength;
+		eOffset = document.getSelection().focusOffset + preTextLength;
+		if(sOffset > eOffset){
+			var tmp = eOffset;
+			eOffset = sOffset;
+			sOffset = tmp;
+		}
 	}else if(document.selection){
 		txt = document.selection.createRange().text;
+		sOffset = document.selection.createRange().startOffset;
+		eOffset = document.selection.createRange().endOffset;
 	}
-	return txt;
+	return {'txt': txt, 'sOffset': sOffset, 'eOffset': eOffset};
 }
 
-function createFeedback(txt){
+function createFeedback(txt, s, e){
 	if(txt.trim() == ""){
 		return false;
 	}
+/*
 	var checkEle = $(".feedbackContentDiv ul .feedbackContentTxtDiv");
 	for(var i=0; i<checkEle.length; i++){
 		if($(checkEle[i]).text().trim() == txt.trim()){
 			return false;
 		}
 	}
-
+*/
 	var seq = new Date().getTime() + "" +new Date().getMilliseconds();
-	var ele = $("<li />").attr({ "id": seq });
+	var ele = $("<li />").attr({ "id": seq, "sOffset": s, "eOffset": e });
 	var rowDiv = $("<div />").addClass("feedbackContentRowDiv");
 	var rowTitleDiv = $("<div />").addClass("feedbackContentRowTitleDiv");
 	var rowContentDiv = $("<div />").addClass("feedbackContentRowContentDiv");
@@ -184,6 +202,8 @@ function saveFeedback(){
 	for(var i=0; i<feedbackEleList.length; i++){
 		var ele = $(feedbackEleList[i]);
 		var txt = ele.find(".feedbackContentTxtDiv").text();
+		var sOffset = ele.attr("sOffset");
+		var eOffset = ele.attr("eOffset");
 		var tagList = [];
 		var tagEleList = ele.find(".feedbackTagView .feedbackTag");
 		for(var j=0; j<tagEleList.length; j++){
@@ -193,6 +213,8 @@ function saveFeedback(){
 
 		feedbackList.push({
 			"text": txt,
+			"sOffset": sOffset,
+			"eOffset": eOffset,
 			"tagList": tagList,
 			"comment": cmt
 		});
@@ -219,17 +241,32 @@ function feedbackSort(){
 	var sortList = [];
 	var eleList = $(".feedbackContentDiv>ul>li")
 	var pEle = $(".feedbackContentDiv>ul").clone();
-	var assignmentText = $(".assignmentTextDiv div").text();
+	var assignmentText = submitTextList[probIndex];
+	var blockAssignmentText = "";
 
 	for(var i=0; i<eleList.length; i++){
-		var txt = $(eleList[i]).find(".feedbackContentTxtDiv").text();
-		sortList.push({"id": $(eleList[i]).attr("id"), "index": assignmentText.indexOf(txt)});
+//		var txt = $(eleList[i]).find(".feedbackContentTxtDiv").text();
+//		sortList.push({"id": $(eleList[i]).attr("id"), "index": assignmentText.indexOf(txt)});
+		sortList.push({"id": $(eleList[i]).attr("id"), "sOffset": $(eleList[i]).attr("sOffset"), "eOffset": $(eleList[i]).attr("eOffset")});
 	}
-	sortList.sort(function(a, b){ return a.index < b.index ? -1 : a.index > b.index ? 1 : 0; });
+	sortList.sort(function(a, b){ return a.sOffset < b.sOffset ? -1 : a.sOffset > b.sOffset ? 1 : 0; });
 	$(".feedbackContentDiv>ul").empty();
+	var peOffset = 0;
 	for(var i=0; i<sortList.length; i++){
 		$(".feedbackContentDiv>ul").append(pEle.find("li#" + sortList[i].id));
+		var sOffset = sortList[i].sOffset;
+		var eOffset = sortList[i].eOffset;
+		if(i == 0){
+			blockAssignmentText = assignmentText.slice(0, sOffset) + "<span class='feedbackBlock'>" + assignmentText.slice(sOffset, eOffset) + "</span>";
+			peOffset = eOffset;
+		}else if(i == sortList.length - 1){
+			blockAssignmentText = blockAssignmentText + assignmentText.slice(peOffset, sOffset) + "<span class='feedbackBlock'>" + assignmentText.slice(sOffset, eOffset) + "</span>" + assignmentText.slice(eOffset);
+		}else{
+			blockAssignmentText = blockAssignmentText + assignmentText.slice(peOffset, sOffset) + "<span class='feedbackBlock'>" + assignmentText.slice(sOffset, eOffset) + "</span>";
+			peOffset = eOffset;
+		}
 	}
+	$(".assignmentTextDiv div").html(blockAssignmentText);
 }
 
 var examplePlayer;
@@ -240,23 +277,13 @@ $(document).ready(function(){
 	examplePlayer = videojs("exampleAudioWaveSurfer", audioOptions, function(){ });
 	submitPlayer = videojs("assignmentAudioWaveSurfer", audioOptions, function(){ });
 	{% endif %}
-{% for i in range(stt_result|length) %}
-	{% for j in range(stt_feedback[i]|length) %}
-		var sf_start={{stt_feedback[i][j]['start']}};
-		var sf_end={{stt_feedback[i][j]['end']}};
-		var sf_type="{{stt_feedback[i][j]['type']}}";
-		seq = createFeedback(submitTextList[{{i}}].slice(sf_start,sf_end));
-		createFeedbackTag(seq, sf_type);
-	{% endfor %}
-{% endfor %}
-
 	// 1번문제 로딩
 	loadData(0);
 	// 피드백 로딩
 {% autoescape false %}
 {% if feedback_list !=None %}
 	{% for i in feedback_list %}
-	seq = createFeedback("{{ i.text }}");
+	seq = createFeedback("{{ i.text }}", {{i.start}}, {{i.end}});
 	{% for tag in i.tagList %}
 	createFeedbackTag(seq, "{{ tag }}");
 	{% endfor %}
@@ -264,6 +291,18 @@ $(document).ready(function(){
 	{% endfor %}
 {% endif %}
 {% endautoescape %}
+	// stt 피드백
+{% if stt_result != None %}
+{% for i in range(stt_result|length) %}
+        {% for j in range(stt_feedback[i]|length) %}
+                var sf_start={{stt_feedback[i][j]['start']}}
+                var sf_end={{stt_feedback[i][j]['end']}}
+                var sf_type="{{stt_feedback[i][j]['type']}}"
+                seq = createFeedback(submitTextList[{{i}}].slice(sf_start,sf_end), sf_start, sf_end);
+                createFeedbackTag(seq, sf_type);
+        {% endfor %}
+{% endfor %}
+{% endif %}
 
 	// 탭 클릭
 	$(document).on("click", ".feedbackProbTab li", function(){
@@ -272,13 +311,18 @@ $(document).ready(function(){
 
 	// 피드백 상자 생성
 	$(document).on("mouseup", ".feedbackDiv .probTextDiv .probTextContentDiv .assignmentTextDiv div", function(){
-		var txt = selectText();
-		createFeedback(txt);
+		var txtObj = selectText();
+		if(txtObj == false){
+			return false;
+		}
+		var txt = txtObj.txt;
+		createFeedback(txt, txtObj.sOffset, txtObj.eOffset);
 	});
 
 	// 피드백 상자 삭제
 	$(document).on("click", ".feedbackContentRowTitleDiv span", function(){
 		$(this).parents("li").remove();
+		feedbackSort();
 	});
 
 	// 원음 버튼

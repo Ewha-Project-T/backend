@@ -203,8 +203,10 @@ def get_as_name(as_no):
 
 def get_stt_result(uuid):
     stt_result_list=[]
+    stt_feedback_list=[]
     for i in uuid:
         tmp={}
+        tmp2=[]
         stt_acc=Stt.query.filter_by(wav_file=i["uuid"]).first()
         acc=SttJob.query.filter_by(stt_no=stt_acc.stt_no).first()
         if acc==None:
@@ -221,9 +223,11 @@ def get_stt_result(uuid):
         tmp["textFile"]=original_text.replace(">","&gt")
         tmp["timestamps"]=json_result["timestamps"]
         tmp["annotations"]=json_result["annotations"]
+        ann=ast.literal_eval(tmp["annotations"])
+        stt_feedback_list.append(ann)
         tmp["is_seq"]=acc.is_seq
         stt_result_list.append(tmp)
-    return stt_result_list
+    return stt_result_list,stt_feedback_list
     
 def mod_assignment_listing(lecture_no,assignment_no):
     as_list_result={}

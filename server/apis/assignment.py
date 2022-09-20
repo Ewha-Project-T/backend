@@ -208,14 +208,14 @@ class Prob_feedback(Resource):
             flash("과제 제출을 해주세요")
             return redirect(host_url + url_for('prob', lecture_no=lecture_no))
         wav_url_example=get_wav_url(as_no)
-        stt_result=get_stt_result(uuid)
+        stt_result,stt_feedback=get_stt_result(uuid)
         if(stt_result==None):
             flash("stt 작업중입니다. 잠시 후에 접속해주세요")
             return redirect(host_url + url_for('prob', lecture_no=lecture_no))
         original_stt_result=get_original_stt_result(wav_url_example)
         as_info=get_as_info(lecture_no,as_no)
         user_trans_result,professor_review,feedback_list=get_feedback(as_no,lecture_no,user_info)
-        return make_response(render_template("prob_feedback.html",user_info=user_info,as_name=as_name,wav_url=wav_url,wav_url_example=wav_url_example,stt_result=stt_result,original_stt_result=original_stt_result,as_info=as_info,lecture_no=lecture_no,as_no=as_no,professor_review=professor_review,feedback_list=feedback_list,user_trans_result=user_trans_result))
+        return make_response(render_template("prob_feedback.html",user_info=user_info,as_name=as_name,wav_url=wav_url,wav_url_example=wav_url_example,stt_result=stt_result,original_stt_result=original_stt_result,as_info=as_info,lecture_no=lecture_no,as_no=as_no,professor_review=professor_review,feedback_list=feedback_list,user_trans_result=user_trans_result,stt_feedback=stt_feedback))
 
 
     @jwt_required()

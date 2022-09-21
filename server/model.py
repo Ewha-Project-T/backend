@@ -1,5 +1,6 @@
 from ast import keyword
 from calendar import week
+from tracemalloc import start
 from server import db
 import os
 import sys
@@ -101,6 +102,8 @@ class Assignment_feedback(db.Model):
     target_text = db.Column(db.Text, nullable=False)
     text_type = db.Column(db.Text)
     comment = db.Column(db.Text, nullable=False)
+    start= db.Column(db.Integer)
+    end= db.Column(db.Integer)
 
     check = db.relationship("Assignment_check", back_populates="feedback")
 

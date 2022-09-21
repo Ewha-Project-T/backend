@@ -295,7 +295,9 @@ def set_feedback(as_no,lecture_no,professor_review,feedback,user_info):
             reg_text=json_reg["text"]
             reg_taglist=','.join(json_reg["tagList"])
             reg_comment=json_reg["comment"]
-            acc=Assignment_feedback(check_no=check.check_no,target_text=reg_text,text_type=reg_taglist,comment=reg_comment)
+            start=json_reg["sOffset"]
+            end=json_reg["eOffset"]
+            acc=Assignment_feedback(check_no=check.check_no,target_text=reg_text,text_type=reg_taglist,comment=reg_comment,start=start,end=end)
             db.session.add(acc)
             db.session.commit()
 
@@ -322,5 +324,7 @@ def get_feedback(as_no,lecture_no,user_info):
         tmp["tagList"]=tmp["tagList"].split(",")
         tmp["comment"]=i.comment.replace("<","&lt")
         tmp["comment"]=tmp["comment"].replace(">","&gt")
+        tmp["start"]=i.start
+        tmp["end"]=i.end
         feedback_list.append(tmp)
     return utr,pro_review,feedback_list

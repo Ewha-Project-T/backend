@@ -117,6 +117,18 @@ function createFeedback(txt, s, e){
 		}
 	}
 */
+	var checkEle = $(".feedbackContentDiv>ul>li");
+	for(var i=0; i<checkEle.length; i++){
+		var sOffset = parseInt($(checkEle[i]).attr("sOffset"));
+		var eOffset = parseInt($(checkEle[i]).attr("eOffset"));
+		if(sOffset <= s && s <= eOffset){
+			return false;
+		}
+		if(sOffset <= e && e <= eOffset){
+			return false;
+		}
+	}
+
 	var seq = new Date().getTime() + "" +new Date().getMilliseconds();
 	var ele = $("<li />").attr({ "id": seq, "sOffset": s, "eOffset": e });
 	var rowDiv = $("<div />").addClass("feedbackContentRowDiv");
@@ -247,7 +259,7 @@ function feedbackSort(){
 	for(var i=0; i<eleList.length; i++){
 //		var txt = $(eleList[i]).find(".feedbackContentTxtDiv").text();
 //		sortList.push({"id": $(eleList[i]).attr("id"), "index": assignmentText.indexOf(txt)});
-		sortList.push({"id": $(eleList[i]).attr("id"), "sOffset": $(eleList[i]).attr("sOffset"), "eOffset": $(eleList[i]).attr("eOffset")});
+		sortList.push({"id": $(eleList[i]).attr("id"), "sOffset": parseInt($(eleList[i]).attr("sOffset")), "eOffset": parseInt($(eleList[i]).attr("eOffset"))});
 	}
 	sortList.sort(function(a, b){ return a.sOffset < b.sOffset ? -1 : a.sOffset > b.sOffset ? 1 : 0; });
 	$(".feedbackContentDiv>ul").empty();
@@ -283,7 +295,7 @@ $(document).ready(function(){
 {% autoescape false %}
 {% if feedback_list !=None %}
 	{% for i in feedback_list %}
-	seq = createFeedback("{{ i.text }}", 0, 0);
+	seq = createFeedback("{{ i.text }}", {{i.start}}, {{i.end}});
 	{% for tag in i.tagList %}
 	createFeedbackTag(seq, "{{ tag }}");
 	{% endfor %}

@@ -71,7 +71,7 @@ function loadData(index){
 	examplePlayer.src({ src: probFileList[index], type: 'audio/wav'});
 	submitPlayer.src({ src: submitFileList[index], type: 'audio/wav'});
 	{% endif %}
-	$(".exampleTextDiv div").empty().text(probTextList[index]);
+	$(".exampleTextDiv div").empty().text(oriInputText);
 	$(".assignmentTextDiv div").empty().text(submitTextList[index]);
 }
 

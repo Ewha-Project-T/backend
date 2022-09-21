@@ -164,7 +164,7 @@ $(document).ready(function(){
 	});
 	// 기존파일 로딩
 	$(".probSoundUpload").hide();
-	{% if as_info['as_type']!='번역' %}
+	{% if as_list['as_type']!='번역' %}
 	$(".probAddFormRightDiv>.inputFormDiv").show();
 	$("input[name=prob_sound_path]").val('{{as_list["upload_url"]}}');
 	probAudioPlayer.load('{{as_list["upload_url"]}}');

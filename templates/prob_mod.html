@@ -169,6 +169,7 @@ $(document).ready(function(){
 	$(".probAddFormRightDiv>.inputFormDiv").show();
 	$("input[name=prob_sound_path]").val('{{as_list["upload_url"]}}');
 	probAudioPlayer.load('{{as_list["upload_url"]}}');
+	regionUpdate("", "");
 	{% endif %}
 });
 </script>
@@ -227,6 +228,7 @@ $(document).ready(function(){
 				</div>
 				<div class="inputFormDiv-2 w25">
 					<label for class="probAddFormLabel">번역언어</label>
+					<div>
 					<span>출발언어<select class="inputStyle01" name="prob_translang_source">
 						<option value="jp"{% if as_list['translang']=="jp" %} selected {% endif %}>일본어</option>
 						<option value="en"{% if as_list['translang']=="en" %} selected {% endif %}>영어</option>
@@ -237,6 +239,7 @@ $(document).ready(function(){
 					<span>도착언어<select class="inputStyle01" name="prob_translang_destination">
 						<option value="ko" selected>한국어</option>
 					</select></span>
+					</div>
 				</div>
 			</div>
 			<div class="inputFormDiv">

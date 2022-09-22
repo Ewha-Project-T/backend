@@ -138,7 +138,8 @@ $(document).ready(function(){
 			"prob_name": $("input[name=prob_name]").val(),
 			"prob_type": $("select[name=prob_type]").val(),
 			"prob_keyword": $("input[name=prob_keyword]").val(),
-			"prob_translang": $("select[name=prob_translang]").val(),
+			"prob_translang_source": $("select[name=prob_translang_source]").val(),
+			"prob_translang_destination": $("select[name=prob_translang_destination]").val(),
 			"prob_exp": $("textarea[name=prob_exp]").val(),
 			"prob_replay": $("select[name=prob_replay]").val(),
 			"prob_play_speed": $("input[name=prob_play_speed]").val(),
@@ -225,12 +226,17 @@ $(document).ready(function(){
 					<input type="text" class="inputStyle01" name="prob_keyword" value='{{as_list["keyword"]}}'>
 				</div>
 				<div class="inputFormDiv-2 w25">
-					<label for class="probAddFormLabel">통역언어</label>
-					<select class="inputStyle01" name="prob_translang">
-						<option value="jp-ko"{% if as_list['translang']=="jp-ko" %} selected {% endif %}>일본어-한국어</option>
-						<option value="en-ko"{% if as_list['translang']=="en-ko" %} selected {% endif %}>영어-한국어</option>
-						<option value="cn-ko"{% if as_list['translang']=="cn-ko" %} selected {% endif %}>중국어-한국어</option>
-					</select>
+					<label for class="probAddFormLabel">번역언어</label>
+					<span>출발언어<select class="inputStyle01" name="prob_translang_source">
+						<option value="jp"{% if as_list['translang']=="jp" %} selected {% endif %}>일본어</option>
+						<option value="en"{% if as_list['translang']=="en" %} selected {% endif %}>영어</option>
+						<option value="cn"{% if as_list['translang']=="cn" %} selected {% endif %}>중국어</option>
+						<option value="fr"{% if as_list['translang']=="fr" %} selected {% endif %}>불어</option>
+						<option value="ko"{% if as_list['translang']=="ko" %} selected {% endif %}>한국어</option>
+					</select></span>
+					<span>도착언어<select class="inputStyle01" name="prob_translang_destination">
+						<option value="ko" selected>한국어</option>
+					</select></span>
 				</div>
 			</div>
 			<div class="inputFormDiv">

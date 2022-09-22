@@ -35,13 +35,12 @@ def prob_listing(lecture_no):
     return as_list_result
 
 #major_convert={"한일통역":"ja-JP","한일번역":"ja-JP","한중통역":"zh-CN","한중번역":"zh-CN","한영통역":"en-US","한영번역":"en-US","한불통역":"fr-FR","한불번역":"fr-FR"}#임시용
-major_convert={"jp-ko":"ja-JP","en-ko":"en-US","cn-ko":"zh-CN"}
-def make_as(lecture_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,original_text="",upload_url="",region=None,user_info=None,prob_translang="ko-KR"):
-    acc=Assignment(lecture_no=lecture_no,week=week,limit_time=limit_time,as_name=as_name,as_type=as_type,keyword=keyword,description=description,re_limit=re_limit,speed=speed,disclosure=disclosure,original_text=original_text,upload_url=upload_url,translang=prob_translang)
+major_convert={"jp":"ja-JP","en":"en-US","cn":"zh-CN","fr":"fr-FR"}
+def make_as(lecture_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,original_text="",upload_url="",region=None,user_info=None,prob_translang_source="ko",prob_translang_destination="ko"):
+    acc=Assignment(lecture_no=lecture_no,week=week,limit_time=limit_time,as_name=as_name,as_type=as_type,keyword=keyword,description=description,re_limit=re_limit,speed=speed,disclosure=disclosure,original_text=original_text,upload_url=upload_url,translang=prob_translang_source)
     db.session.add(acc)
     db.session.commit()
-    print(prob_translang)
-    lecture_major=prob_translang
+    lecture_major=prob_translang_source
     if(lecture_major in major_convert):
         lecture_major=major_convert[lecture_major]
     else:
@@ -69,7 +68,7 @@ def split_wav_save(upload_url,start,end):
     return uuid_str
     
 
-def mod_as(lecture_no,as_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,original_text="",upload_url="",region="",user_info=None,prob_translang="ko-KR"):
+def mod_as(lecture_no,as_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,original_text="",upload_url="",region="",user_info=None,prob_translang_source="ko",prob_translang_destination="ko"):
     acc=Assignment.query.filter_by(assignment_no=as_no).first()
     if(lecture_no!=""):
         acc.lecture_no=lecture_no
@@ -83,8 +82,8 @@ def mod_as(lecture_no,as_no,week,limit_time,as_name,as_type,keyword,description,
         acc.as_type=as_type
     if(keyword!=""):
         acc.keyword=keyword
-    if(prob_translang):
-        acc.translang=prob_translang
+    if(prob_translang_source!="ko"):
+        acc.translang=prob_translang_source
     if(description!=""):
         acc.description=description
     if(re_limit!=""):
@@ -104,7 +103,7 @@ def mod_as(lecture_no,as_no,week,limit_time,as_name,as_type,keyword,description,
     Prob_region.query.filter_by(assignment_no=as_no).delete()
     db.session.commit
 
-    lecture_major=prob_translang
+    lecture_major=prob_translang_source
     if(lecture_major in major_convert):
         lecture_major=major_convert[lecture_major]
     else:

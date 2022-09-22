@@ -48,7 +48,8 @@ class Prob_add(Resource):
         parser.add_argument('prob_name', type=str, required=True, help="as_name is required")
         parser.add_argument('prob_type', type=str, required=True, help="as_type is required")
         parser.add_argument('prob_keyword', type=str)
-        parser.add_argument('prob_translang',type=str)
+        parser.add_argument('prob_translang_source',type=str)
+        parser.add_argument('prob_translang_destination',type=str)
         parser.add_argument('prob_exp', type=str)
         parser.add_argument('prob_replay', type=str)
         parser.add_argument('prob_play_speed', type=str)
@@ -63,7 +64,8 @@ class Prob_add(Resource):
         as_name = args['prob_name']
         as_type = args['prob_type']
         keyword = args['prob_keyword']
-        prob_translang=args['prob_translang']
+        prob_translang_source=args['prob_translang_source']
+        prob_translang_destination=args['prob_translang_destination']
         description = args['prob_exp']
         re_limit = args['prob_replay']
         speed = args['prob_play_speed']
@@ -80,7 +82,7 @@ class Prob_add(Resource):
         original_text = args['original_text']
         original_text=original_text.replace("<","&lt")
         original_text=original_text.replace(">","&gt")
-        make_as(lecture_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,original_text,upload_path,prob_region,user_info,prob_translang)
+        make_as(lecture_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,original_text,upload_path,prob_region,user_info,prob_translang_source,prob_translang_destination)
         return{"msg" : "success"},200
 
 class Prob_mod(Resource):
@@ -105,7 +107,8 @@ class Prob_mod(Resource):
         parser.add_argument('prob_name', type=str)
         parser.add_argument('prob_type', type=str)
         parser.add_argument('prob_keyword', type=str)
-        parser.add_argument('prob_translang',type=str)
+        parser.add_argument('prob_translang_source',type=str)
+        parser.add_argument('prob_translang_destination',type=str)
         parser.add_argument('prob_exp', type=str)
         parser.add_argument('prob_replay', type=str)
         parser.add_argument('prob_play_speed')
@@ -121,7 +124,8 @@ class Prob_mod(Resource):
         as_name = args['prob_name']
         as_type = args['prob_type']
         keyword = args['prob_keyword']
-        prob_translang=args['prob_translang']
+        prob_translang_source=args['prob_translang_source']
+        prob_translang_destination=args['prob_translang_destination']
         description = args['prob_exp']
         re_limit = args['prob_replay']
         speed = args['prob_play_speed']
@@ -137,7 +141,7 @@ class Prob_mod(Resource):
         original_text=original_text.replace(">","&gt")
         user_info=get_jwt_identity()
         if(lecture_access_check(user_info["user_no"],lecture_no) or user_info["user_perm"]==0):
-            mod_as(lecture_no,as_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,original_text,upload_path,prob_region,user_info,prob_translang)
+            mod_as(lecture_no,as_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,original_text,upload_path,prob_region,user_info,prob_translang_source,prob_translang_destination)
             return{"msg" : "assignment delete success"},200
         else:
             return{"msg": "access denied"}

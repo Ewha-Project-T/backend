@@ -81,7 +81,7 @@ $(document).ready(function(){
 		for(var i=0; i<region.length; i++){
 			var liEle = $("<li />");
 			var spanEle = $("<span />");
-			spanEle.addClass("btn").attr("region", i).text("구간 " + i + " : " + region[i].start.toFixed() + " ~ " + region[i].end.toFixed());
+			spanEle.addClass("btn").attr("region", i).text("구간 " + i + " : " + Math.floor( region[i].start/ 60).toFixed()  + "분 " + Math.floor(region[i].start % 60).toFixed() + "초" + " ~ " + Math.floor( region[i].end/ 60).toFixed()  + "분 " + Math.floor(region[i].end % 60).toFixed() + "초");
 			spanEle.attr("start", region[i].start.toFixed());
 			spanEle.attr("end", region[i].end.toFixed());
 			var imgEle = $("<img />");

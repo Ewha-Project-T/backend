@@ -205,11 +205,10 @@ def get_stt_result(uuid):
     stt_feedback_list=[]
     for i in uuid:
         tmp={}
-        tmp2=[]
         stt_acc=Stt.query.filter_by(wav_file=i["uuid"]).first()
         acc=SttJob.query.filter_by(stt_no=stt_acc.stt_no).first()
         if acc==None:
-            return None
+            return None,None
         tmp["sound"]=acc.sound
         tmp["startidx"]=acc.startidx
         tmp["endidx"]=acc.endidx

@@ -111,6 +111,7 @@ $(document).ready(function(){
      		probAudioPlayer.addRegion({start : {{i["start"]}}, end: {{i.end}}});
    		{% endfor %}
 		audioSizeUpdate();
+		regionUpdate("", "");
 	});
 	probAudioPlayer.on('region-update-end', function(region, e){
 		regionUpdate(region, e);
@@ -169,7 +170,6 @@ $(document).ready(function(){
 	$(".probAddFormRightDiv>.inputFormDiv").show();
 	$("input[name=prob_sound_path]").val('{{as_list["upload_url"]}}');
 	probAudioPlayer.load('{{as_list["upload_url"]}}');
-	regionUpdate("", "");
 	{% endif %}
 });
 </script>

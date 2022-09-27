@@ -10,6 +10,7 @@
 <script src="{{ url_for('static', filename='js/wavesurfer/wavesurfer.minimap.js') }}"></script>
 <script type="text/javascript">
 var probAudioPlayer;
+var check_new_upload=1;
 $(document).ready(function(){
 	// 파일업로드
 	$(document).on("change", "input[name=prob_sound_file]", function(){
@@ -28,6 +29,7 @@ $(document).ready(function(){
 				//polling_id = setInterval(() => { translation_polling(d.job) }, 1000)
 				//$(".loader-bg").removeClass("hidden")
 				probAudioPlayer.clearRegions();
+				check_new_upload=0;
 				probAudioPlayer.load(d.file_path);
 			}
 		});
@@ -109,7 +111,9 @@ $(document).ready(function(){
 	}
 	probAudioPlayer.on('waveform-ready', function(){
 		{% for i in audio_list %}
-     		probAudioPlayer.addRegion({start : {{i["start"]}}, end: {{i.end}}});
+			if(check_new_upload){
+     			probAudioPlayer.addRegion({start : {{i["start"]}}, end: {{i.end}}});
+			}
    		{% endfor %}
 		audioSizeUpdate();
 		regionUpdate("", "");

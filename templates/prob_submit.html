@@ -16,6 +16,22 @@
 		<script type="text/javascript" src="{{ url_for('static', filename='js/videojs/videojs.record.min.js') }}"></script>
 		<script type="text/javascript" src="{{ url_for('static', filename='js/videojs/videojs.record.recorderjs.min.js') }}"></script>
 		<script type="text/javascript">
+// 비프음
+var beepAudio = new Audio("/static/audio/hal.wav");
+beepAudio.addEventListener("ended", function(){ 
+	var btnEle = $(".simultaneousBtn");
+	if(submitType == "순차통역"){
+		exampleAudioPlayer.play();
+		btnEle.addClass("recoding");
+		btnEle.text("통역완료");
+	}else if(submitType == "동시통역"){
+		exampleAudioPlayer.play();
+		submitAudioPlayer.record().start();
+		btnEle.addClass("recoding");
+		btnEle.text("통역완료");
+	}
+});
+
 // 문제 파일
 var probFileList = [];
 {% for i in wav_url %}
@@ -58,7 +74,7 @@ function loadProb(index){
 $(document).ready(function(){
         // 원음
         const sampleAudioOptions = {
-                controls: true,
+                controls: false,
                 autoplay: false,
                 fluid: false,
                 bigPlayButton: false,
@@ -116,6 +132,7 @@ $(document).ready(function(){
                                 debug: true,
                                 cursorWidth: 1,
                                 hideScrollbar: true,
+				normalize: true,
                                 plugins: [
                                         WaveSurfer.microphone.create({
                                                 bufferSize: 4096,
@@ -160,6 +177,8 @@ $(document).ready(function(){
 
         submitAudioPlayer.on('finishRecord', function() {
                 console.log('finished recording: ', submitAudioPlayer.recordedData);
+		exampleAudioPlayer.pause();
+		exampleAudioPlayer.currentTime(0);
 		recordEndBtnEvent();
         });
 
@@ -169,11 +188,15 @@ $(document).ready(function(){
 		if(submitType == "순차통역" && !exampleAudioPlayFlag){
 			if(submitType == "순차통역"){
 				if(!btnEle.hasClass("recoding")){
-					alert("문제" + (parseInt(probIndex) + 1) + " 통역시작");
+//					alert("문제" + (parseInt(probIndex) + 1) + " 통역시작");
+					beepAudio.currentTime = 0;
+					beepAudio.play();
 					// 녹음시작 (원음 재생만)
+/* 상단 beepAudio 종료 이벤트로
 					exampleAudioPlayer.play();
 					btnEle.addClass("recoding");
 					btnEle.text("통역완료");
+*/
 				}else{
 					exampleAudioPlayer.pause();
 					exampleAudioPlayer.currentTime(0)
@@ -184,12 +207,16 @@ $(document).ready(function(){
 			}
 		}else if(submitType == "동시통역"){
 	                if(!btnEle.hasClass("recoding")){
-				alert("문제" + (parseInt(probIndex) + 1) + " 통역시작");
+//				alert("문제" + (parseInt(probIndex) + 1) + " 통역시작");
+				beepAudio.currentTime = 0;
+				beepAudio.play();
 	                        // 녹음시작
+/* 상단 beepAudio 종료 이벤트로
 	                        exampleAudioPlayer.play();
 	                        submitAudioPlayer.record().start();
 	                        btnEle.addClass("recoding");
 	                        btnEle.text("통역완료");
+*/
 	                }else{
 	                        // 녹음아님
 	                        exampleAudioPlayer.pause();
@@ -258,6 +285,10 @@ $(document).ready(function(){
 	$(document).on("click", ".submitProbTab li", function(){
 		loadProb($(this).attr("probIndex"));
 	});
+
+	$(document).on("change", "#exampleAudioVolumn", function(){
+		exampleAudioPlayer.player().volume($(this).val()/10);
+	});
 });
 		</script>
 {% endblock %}
@@ -276,6 +307,7 @@ $(document).ready(function(){
 				<div class="exampleAudioDiv">
 					<h2>원음</h2>
 					<audio id="exampleAudioWaveSurfer" class="video-js vjs-default-skin"></audio>
+					<input type="range" min="0" max="20" id="exampleAudioVolumn">
 				</div>
 				<div class="submitAudioDiv">
 					<h2>내음성</h2>

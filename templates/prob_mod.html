@@ -23,7 +23,7 @@ $(document).ready(function(){
 			contentType: false,
 			data: formData,
 			success: function(d){
-				$(".probSoundUpload").hide();
+				//$(".probSoundUpload").hide();
 				$(".probAddFormRightDiv>.inputFormDiv").show();
 				$("input[name=prob_sound_path]").val(d.file_path);
 				//polling_id = setInterval(() => { translation_polling(d.job) }, 1000)

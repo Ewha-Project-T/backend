@@ -264,10 +264,17 @@ function feedbackSort(){
 	sortList.sort(function(a, b){ return a.sOffset < b.sOffset ? -1 : a.sOffset > b.sOffset ? 1 : 0; });
 	$(".feedbackContentDiv>ul").empty();
 	var peOffset = 0;
+	if(sortList.length == 0){
+		blockAssignmentText = assignmentText;
+	}
 	for(var i=0; i<sortList.length; i++){
 		$(".feedbackContentDiv>ul").append(pEle.find("li#" + sortList[i].id));
 		var sOffset = sortList[i].sOffset;
 		var eOffset = sortList[i].eOffset;
+		if(sortList.length == 1){
+			blockAssignmentText = assignmentText.slice(0, sOffset) + "<span class='feedbackBlock'>" + assignmentText.slice(sOffset, eOffset) + "</span>" + assignmentText.slice(eOffset);
+			break;
+		}
 		if(i == 0){
 			blockAssignmentText = assignmentText.slice(0, sOffset) + "<span class='feedbackBlock'>" + assignmentText.slice(sOffset, eOffset) + "</span>";
 			peOffset = eOffset;

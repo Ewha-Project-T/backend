@@ -69,6 +69,8 @@ function loadProb(index){
 	var btnEle = $(".simultaneousBtn");
 	btnEle.removeClass("recoding");
 	btnEle.text("통역시작");
+
+	$("#exampleAudioVolumn").val(exampleAudioPlayer.player().volume() * 10);
 }
 
 $(document).ready(function(){
@@ -287,6 +289,7 @@ $(document).ready(function(){
 	});
 
 	$(document).on("change", "#exampleAudioVolumn", function(){
+		console.log($(this).val()/10);
 		exampleAudioPlayer.player().volume($(this).val()/10);
 	});
 });

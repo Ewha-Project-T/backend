@@ -149,7 +149,9 @@ li { display: block; }
 .probAddFormDiv .inputFormDiv .inputFormDiv-1 { float: left; width: 49%; }
 .probAddFormDiv .inputFormDiv .inputFormDiv-2 { float: right; width: 49%; }
 .probAddFormDiv .inputFormDiv .w75 { width: 74%; }
+.probAddFormDiv .inputFormDiv .w50 { width: 49%; }
 .probAddFormDiv .inputFormDiv .w25 { width: 24%; }
+.probAddFormDiv .inputFormDiv .mr1p { margin-right: 1%; }
 .probAddFormDiv .probAddFormRightDiv { float: right; width: 49%; overflow: hidden; }
 .probAddFormDiv .probAddFormRightDiv .probTextDiv { padding: 10px 0px; }
 .probAddFormDiv .probAddFormRightDiv>.inputFormDiv { display: none; }

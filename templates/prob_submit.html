@@ -87,7 +87,7 @@ $(document).ready(function(){
                                 progressColor: 'black',
                                 cursorColor: 'black',
                                 hideScrollbar: true,
-				audioRate: {{ as_info['speed'] }}
+								{% if as_info['speed']!= None %} audioRate: {{ as_info['speed'] }} {% else %} audioRate:1 {% endif %}
                         }
                 }
         };

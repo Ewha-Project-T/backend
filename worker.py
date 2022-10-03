@@ -22,6 +22,10 @@ BROKER = os.environ['REDIS_BACKEND']
 CELERY_RESULT_BACKEND = os.environ['REDIS_BACKEND']
 celery = Celery("tasks", broker=BROKER, backend=CELERY_RESULT_BACKEND)
 
+engine = create_engine(f"mysql+pymysql://{env['SQL_USER']}:{env['SQL_PASSWORD']}@{env['SQL_HOST']}:{env['SQL_PORT']}/{env['SQL_DATABASE']}")
+base.metadata.bind = engine
+session = orm.scoped_session(orm.sessionmaker())(bind=engine)
+
 class Stt(base):
     __tablename__ = "STT"
     stt_no = Column(Integer, primary_key=True)
@@ -75,10 +79,6 @@ def process_stt_result(stt):
 
 @celery.task(bind=True)
 def do_stt_work(self, filename, locale="ko-KR"):
-    engine = create_engine(f"mysql+pymysql://{env['SQL_USER']}:{env['SQL_PASSWORD']}@{env['SQL_HOST']}:{env['SQL_PORT']}/{env['SQL_DATABASE']}")
-    base.metadata.bind = engine
-    session = orm.scoped_session(orm.sessionmaker())(bind=engine)
-
     self.update_state(state='INDEXING')
 
     filepath = f"{os.environ['UPLOAD_PATH']}/{filename}.wav"
@@ -211,6 +211,7 @@ def do_stt_work(self, filename, locale="ko-KR"):
 
     stt = session.query(Stt).filter_by(wav_file=filename).first()
     if not stt:
+        session.close()
         return False
 
     job = SttJob(
@@ -230,10 +231,6 @@ def do_stt_work(self, filename, locale="ko-KR"):
 
 @celery.task(bind=True)
 def do_sequential_stt_work(self, filename, index, locale="ko-KR"):
-    engine = create_engine(f"mysql+pymysql://{env['SQL_USER']}:{env['SQL_PASSWORD']}@{env['SQL_HOST']}:{env['SQL_PORT']}/{env['SQL_DATABASE']}")
-    base.metadata.bind = engine
-    session = orm.scoped_session(orm.sessionmaker())(bind=engine)
-
     filepath = f"{os.environ['UPLOAD_PATH']}/{filename}.wav"
     myaudio = AudioSegment.from_file(filepath)
 
@@ -373,6 +370,7 @@ def do_sequential_stt_work(self, filename, index, locale="ko-KR"):
     
     stt = session.query(Stt).filter_by(wav_file=filename).first()
     if stt is None:
+        session.close()
         return False
 
     job = SttJob(

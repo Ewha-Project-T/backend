@@ -17,7 +17,7 @@
 		<script type="text/javascript" src="{{ url_for('static', filename='js/videojs/videojs.record.recorderjs.min.js') }}"></script>
 		<script type="text/javascript">
 // 비프음
-var beepAudio = new Audio("/static/audio/five_hong.mp3");
+var beepAudio = new Audio("/static/audio/beep-07a.wav");
 beepAudio.addEventListener("ended", function(){ 
 	var btnEle = $(".simultaneousBtn");
 	if(submitType == "순차통역"){
@@ -71,6 +71,15 @@ function loadProb(index){
 	btnEle.text("통역시작");
 
 	$("#exampleAudioVolumn").val(exampleAudioPlayer.player().volume() * 10);
+}
+
+// 팝업
+function displayMsgPop(txt){
+	$(".popMsgDiv span").text(txt);
+	$(".popMsgDiv").fadeIn();
+	setTimeout(function(){
+		$(".popMsgDiv").fadeOut();
+	}, 1000);
 }
 
 $(document).ready(function(){
@@ -248,7 +257,7 @@ $(document).ready(function(){
 			$(".submitProbTab li[probIndex=" + probIndex + "]").addClass('tmpSave');
 			// 다음문제 세팅
 			if($(".submitProbTab li").not(".tmpSave").length > 0){
-				alert("임시저장 되었습니다.");
+				displayMsgPop("임시저장 되었습니다.");
 				var nextProbIndex = $($(".submitProbTab li").not(".tmpSave")[0]).attr("probindex");
 				loadProb(nextProbIndex);
 			}else{
@@ -325,4 +334,5 @@ $(document).ready(function(){
 					<button class="btn btn-submit submitRecordDataBtn">제출</button>
 				</div>
 			</div>
+<div class="popMsgDiv"><span></span></div>
 {% endblock %}

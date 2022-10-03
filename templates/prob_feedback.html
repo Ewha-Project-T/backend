@@ -235,6 +235,7 @@ function saveFeedback(){
 	var params = {
 			"lecture_no":"{{lecture_no}}",
 			"as_no":"{{as_no}}",
+      "user_no":"{{user_no}}",
 			"feedback":feedbackList,
 			"professor_review":pro_rev
 		};
@@ -386,7 +387,9 @@ $(document).ready(function(){
 						{% if as_info['as_type']=='동시통역'%}
 						<button class="btn">동시재생</button>
 						{% endif %}
+            {% if user_info["user_perm"] == 0 or user_info["user_perm"]== 3 %}
 						<button class="btn saveFeedback">저장</button>
+            {% endif %}
 					</div>
 				</div>
 

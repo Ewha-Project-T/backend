@@ -11,6 +11,8 @@ li { display: block; }
 .btn-2 .btn-temp { float: left; background-color: #d8d8d8; color: #fff; line-height: 50px; }
 .btn-2 .btn-submit { float: right; color: #fff; }
 .btn-h2-small { font-size: 0.6em; padding: 4px; float: right; height: 25px; line-height: 17px; margin-top: 3px; margin-left: 3px; }
+.clickPointer { cursor: pointer; }
+.popMsgDiv { display: none; position: fixed; top: 120px; right: 20%; background-color: #3f7a4c; color: #ffffff; padding: 10px 20px; border-radius: 10px; font-weight: bold; }
 
 /* 강의목록 */
 .menuBarDiv { overflow: hidden; padding: 10px 40px; background-color: #3f7a4c; color: #ffffff; }
@@ -49,14 +51,14 @@ li { display: block; }
 .lectureAddFormDiv .inputFormDiv .lectureAddFormLebel { font-size: 1rem; font-weight: bold; }
 .lectureAddFormDiv .inputFormDiv .inputFormDiv-1 { float: left; width: 45%; }
 .lectureAddFormDiv .inputFormDiv .inputFormDiv-2 { float: right; width: 45%; }
-.lectureAddFormDiv .inputFormDiv .userList { height: 100px; overflow-y: auto; }
+.lectureAddFormDiv .inputFormDiv .userList { height: 100px; overflow-y: auto; cursor: pointer; }
 .lectureAddFormDiv .inputFormDiv .userList input { display: none; }
 .userListPopDiv { position: absolute; top: 50%; left: 50%; width: 600px; height: 500px; background-color: #d8d8d8; margin-left: -300px; margin-top: -250px; padding: 10px; display: none; }
 .userListPopDiv .userSearchDiv { overflow: hidden; padding: 5px; }
 .userListPopDiv .userSearchDiv select { float: left; width: 45%; background-color: #ffffff; }
 .userListPopDiv .userSearchDiv input { float: right; width: 45%; background-color: #ffffff; }
 .userListPopDiv .userListDiv { padding: 5px; overflow: hidden; height: 360px; overflow-y: auto; background-color: #ffffff; }
-.userListPopDiv .userListDiv li { overflow: hidden; padding: 5px 0px; }
+.userListPopDiv .userListDiv li { overflow: hidden; padding: 5px 0px; cursor: pointer; }
 .userListPopDiv .userListDiv li input { float: left; width: 20px; height: 20px; }
 .userListPopDiv .userListDiv li span { float: left; width: 170px; padding: 0px 5px; }
 .userListPopDiv .btn-popClose { background-color: #ffffff; color: #000000; float: left; line-height: 50px; }
@@ -124,17 +126,18 @@ li { display: block; }
 .feedbackDiv .probTextDiv .probTextContentDiv .commentTextDiv div { background-color: #d0d0d0; height: 300px; border-radius: 10px; margin-top: 10px; padding: 5px; }
 .feedbackDiv .probTextDiv .probTextContentDiv .commentTextDiv div textarea { padding: 10px; width: 100%; height: 100%; border: 0px; border-radius: 10px; }
 .feedbackDiv .probTextDiv .feedbackContentDiv { float: right; width: 33%; }
+.feedbackDiv .probTextDiv .feedbackContentDiv>ul { height: 900px; overflow-y: auto; }
 .feedbackDiv .probTextDiv .feedbackContentDiv .feedbackContentTitleDiv { overflow: hidden; }
 .feedbackDiv .probTextDiv .feedbackContentDiv .feedbackContentTitleDiv h2 { font-size: 1.3rem; float: left; }
 .feedbackDiv .probTextDiv .feedbackContentDiv .feedbackContentTitleDiv .btn { float: right; height: 30px; margin: 0px; width: 150px; }
 .feedbackDiv .probTextDiv .feedbackContentDiv .feedbackContentRowDiv { border-radius: 10px; overflow: hidden; margin-top: 10px; margin-bottom: 10px; }
 .feedbackDiv .probTextDiv .feedbackContentDiv .feedbackContentRowDiv .feedbackContentRowTitleDiv { height: 30px; background-color: #ff8d00; padding: 5px; overflow: hidden; text-overflow: ellipsis; white-space: noowrap; text-align: right; }
-.feedbackDiv .probTextDiv .feedbackContentDiv .feedbackContentRowDiv .feedbackContentRowContentDiv { height: 280px; background-color: #d0d0d0; padding: 5px; }
+.feedbackDiv .probTextDiv .feedbackContentDiv .feedbackContentRowDiv .feedbackContentRowContentDiv { height: 215px; background-color: #d0d0d0; padding: 5px; }
 
 .feedbackDiv .probTextDiv .feedbackContentDiv .feedbackContentRowContentDiv .feedbackContentTagDiv { position: relative; }
-.feedbackDiv .probTextDiv .feedbackContentDiv .feedbackContentRowContentDiv .feedbackContentTagDiv ul { min-height: 100px; padding: 10px; background-color: #fff; border-radius: 5px; }
-.feedbackDiv .probTextDiv .feedbackContentDiv .feedbackContentRowContentDiv .feedbackContentTagDiv .feedbackTagView { overflow-y: auto; height: 100px; }
-.feedbackDiv .probTextDiv .feedbackContentDiv .feedbackContentRowContentDiv .feedbackContentTagDiv .feedbackTagView li { float: left; margin-right: 10px; }
+.feedbackDiv .probTextDiv .feedbackContentDiv .feedbackContentRowContentDiv .feedbackContentTagDiv ul { min-height: 70px; padding: 10px; background-color: #fff; border-radius: 5px; }
+.feedbackDiv .probTextDiv .feedbackContentDiv .feedbackContentRowContentDiv .feedbackContentTagDiv .feedbackTagView { overflow-y: auto; height: 70px; }
+.feedbackDiv .probTextDiv .feedbackContentDiv .feedbackContentRowContentDiv .feedbackContentTagDiv .feedbackTagView li { float: left; margin-right: 10px; margin-bottom: 10px; }
 .feedbackDiv .probTextDiv .feedbackContentDiv .feedbackContentRowContentDiv .feedbackContentTagDiv .feedbackTagAdd { position: absolute; top: 50%; right: 0px; margin-top: -10px; }
 .feedbackDiv .probTextDiv .feedbackContentDiv .feedbackContentRowContentDiv .feedbackContentTagDiv li span.feedbackTag { background-color: #dfdfdf; border-radius: 5px; padding: 2px 5px; }
 .feedbackDiv .probTextDiv .feedbackContentDiv .feedbackContentRowContentDiv .feedbackContentTagDiv .feedbackTagList { position: absolute; width: 100%; border: 1px solid #d0d0d0; height: 100px; overflow-y: auto; }

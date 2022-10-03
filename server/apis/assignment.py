@@ -8,7 +8,7 @@ from flask_jwt_extended import (
     jwt_required, get_jwt_identity, create_access_token, get_jwt
 )
 import re
-from ..services.assignment_service import prob_listing,make_as,mod_as,get_wav_url,delete_assignment,check_assignment,get_as_name,get_prob_wav_url,get_stt_result,get_original_stt_result,mod_assignment_listing,get_as_info,set_feedback,get_feedback
+from ..services.assignment_service import prob_listing,make_as,mod_as,get_wav_url,delete_assignment,check_assignment,get_as_name,get_prob_wav_url,get_stt_result,get_original_stt_result,mod_assignment_listing,get_as_info,set_feedback,get_feedback,get_prob_submit_list
 from ..services.lecture_service import lecture_access_check
 from werkzeug.utils import secure_filename
 from os import environ as env
@@ -28,7 +28,7 @@ class Prob(Resource):
         args = parser.parse_args()
         lecture_no = args['lecture_no']
         prob_list=prob_listing(lecture_no)
-        return make_response(render_template("prob_list.html",prob_list=prob_list,lecture_no=lecture_no,user_perm=user_info["user_perm"],user_info=user_info))
+        return make_response(render_template("prob_list.html",prob_list=prob_list,lecture_no=lecture_no,user_perm=user_info["user_perm"],user_info=user_info,user_no=user_info["user_no"]))
 
 class Prob_add(Resource):
     @jwt_required()
@@ -202,12 +202,14 @@ class Prob_feedback(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('lecture_no', type=int)
         parser.add_argument('as_no', type=int)
+        parser.add_argument('user_no', type=int)
         args = parser.parse_args()
         as_no=args['as_no']
         lecture_no = args['lecture_no']
+        user_no = args['user_no']
         user_info=get_jwt_identity()
         as_name=get_as_name(as_no)
-        wav_url,uuid=get_prob_wav_url(as_no,user_info,lecture_no)
+        wav_url,uuid=get_prob_wav_url(as_no,user_no,lecture_no)
         if(wav_url==None):
             flash("과제 제출을 해주세요")
             return redirect(host_url + url_for('prob', lecture_no=lecture_no))
@@ -218,8 +220,8 @@ class Prob_feedback(Resource):
             return redirect(host_url + url_for('prob', lecture_no=lecture_no))
         original_stt_result=get_original_stt_result(wav_url_example)
         as_info=get_as_info(lecture_no,as_no)
-        user_trans_result,professor_review,feedback_list=get_feedback(as_no,lecture_no,user_info)
-        return make_response(render_template("prob_feedback.html",user_info=user_info,as_name=as_name,wav_url=wav_url,wav_url_example=wav_url_example,stt_result=stt_result,original_stt_result=original_stt_result,as_info=as_info,lecture_no=lecture_no,as_no=as_no,professor_review=professor_review,feedback_list=feedback_list,user_trans_result=user_trans_result,stt_feedback=stt_feedback))
+        user_trans_result,professor_review,feedback_list=get_feedback(as_no,lecture_no,user_no)
+        return make_response(render_template("prob_feedback.html",user_info=user_info,as_name=as_name,wav_url=wav_url,wav_url_example=wav_url_example,stt_result=stt_result,original_stt_result=original_stt_result,as_info=as_info,lecture_no=lecture_no,as_no=as_no,professor_review=professor_review,feedback_list=feedback_list,user_trans_result=user_trans_result,stt_feedback=stt_feedback,user_no=user_no))
 
 
     @jwt_required()
@@ -227,15 +229,30 @@ class Prob_feedback(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('lecture_no', type=int)
         parser.add_argument('as_no', type=int)
+        parser.add_argument('user_no', type=int)
         parser.add_argument('professor_review', type=str)
         parser.add_argument('feedback',type=str,action='append')
         args = parser.parse_args()
         as_no=args['as_no']
         lecture_no = args['lecture_no']
+        user_no = args['user_no']
         professor_review=args['professor_review']
         feedback=args['feedback']
         user_info=get_jwt_identity()
-        set_feedback(as_no,lecture_no,professor_review,feedback,user_info)
+        set_feedback(as_no,lecture_no,professor_review,feedback,user_no)
+
+class Prob_submit_list(Resource):
+        @jwt_required()
+        def get(self):
+            parser = reqparse.RequestParser()
+            parser.add_argument('lecture_no', type=int)
+            parser.add_argument('as_no', type=int)
+            args = parser.parse_args()
+            as_no=args['as_no']
+            lecture_no = args['lecture_no']
+            user_info=get_jwt_identity()
+            user_list=get_prob_submit_list(as_no,lecture_no)
+            return make_response(render_template("prob_submit_list.html",user_info=user_info,user_list=user_list,as_no=as_no,lecture_no=lecture_no))
 
 
 

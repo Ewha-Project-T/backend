@@ -1,0 +1,69 @@
+{% extends 'layout_login.html' %}
+
+{% block stylesheet %}
+{% endblock %}
+
+{% block script %}
+	<script type="text/javascript">
+		// 강의만들기 수강생 팝업
+		$(document).on("click", ".userList", function(){
+			$(".userListPopDiv").show();
+		}).addClass("clickPointer");
+
+		// 강의만들기 수강생 팝업 줄 클릭
+		$(document).on("click", ".userListPopDiv li", function(){
+			var ele = $(this).find("input[type=checkbox]");
+			if(ele.is(':checked')){
+				ele.prop("checked", false);
+				$(this).removeClass("checked");
+			}else{
+				ele.prop("checked", true);
+				$(this).addClass("checked");
+			}
+		});
+
+		// 강의만들기 수강생 팝업 닫기
+		$(document).on("click", ".btn-popClose", function(){
+			$(".userListPopDiv").hide();
+		});
+
+		// 강의만들기 수강생 선택완료
+		$(document).on("click", ".btn-popSelect", function(){
+			var eleList = $(".userListPopDiv").find("li.checked").clone();
+			$(".userList").empty();
+			$(".userList").append(eleList);
+			$(".userListPopDiv").hide();
+		});
+		function lectureSubmit(){
+			var lecture_attendee = [];
+			var attendeeEle = $(".userList li");
+			for(var i=0; i<attendeeEle.length; i++){
+				lecture_attendee.push({
+					"major": $(attendeeEle[i]).find("span")[0].innerText,
+					"email": $(attendeeEle[i]).find("span")[1].innerText,
+					"name": $(attendeeEle[i]).find("span")[2].innerText
+				});
+			}
+
+
+			return false;
+		}
+	</script>
+{% endblock %}
+
+{% block content %}
+			
+				<div class="userListDiv">
+					<ul>
+						{% for i in user_list %}
+						<li>
+							<span>{{i.major}}</span>
+							<span>{{i.email}}</span>
+							<span>{{i.name}}</span>
+              <span>{{i.check}}</span>
+              <span><img src="{{ url_for('static', filename='images/feedback_icon.png') }}" class="weekProbFeedbackBtn" alt="펜" link="{{ url_for('prob_feedback',as_no=as_no,lecture_no=lecture_no,user_no=i.user_no) }}"></span>
+						</li>
+						{% endfor %}
+					</ul>
+				</div>
+{% endblock %}

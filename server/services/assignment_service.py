@@ -32,6 +32,7 @@ def prob_listing(lecture_no):
         tmp["original_text"]=vars(lec)["original_text"]
         tmp["upload_url"]=vars(lec)["upload_url"]
         as_list_result.append(tmp)
+    db.session.remove()
     return as_list_result
 
 #major_convert={"한일통역":"ja-JP","한일번역":"ja-JP","한중통역":"zh-CN","한중번역":"zh-CN","한영통역":"en-US","한영번역":"en-US","한불통역":"fr-FR","한불번역":"fr-FR"}#임시용
@@ -158,8 +159,8 @@ def get_original_stt_result(prob_result):
         original_result.append(tmp)
     return original_result
 
-def get_prob_wav_url(as_no,user_info,lecture_no):
-    attend=Attendee.query.filter_by(user_no=user_info["user_no"],lecture_no=lecture_no).first()
+def get_prob_wav_url(as_no,user_no,lecture_no):
+    attend=Attendee.query.filter_by(user_no=user_no,lecture_no=lecture_no).first()
     check=Assignment_check.query.filter_by(assignment_no=as_no,attendee_no=attend.attendee_no,assignment_check=1).order_by(Assignment_check.check_no.desc()).first()
     if(check==None):
         return None,None
@@ -277,8 +278,8 @@ def get_as_info(lecture_no,assignment_no):
     as_list_result["upload_url"]=vars(acc)["upload_url"]
     return as_list_result
 
-def set_feedback(as_no,lecture_no,professor_review,feedback,user_info):
-    attend=Attendee.query.filter_by(user_no=user_info["user_no"],lecture_no=lecture_no).first()
+def set_feedback(as_no,lecture_no,professor_review,feedback,user_no):
+    attend=Attendee.query.filter_by(user_no=user_no,lecture_no=lecture_no).first()
     check=Assignment_check.query.filter_by(assignment_no=as_no,attendee_no=attend.attendee_no,assignment_check=1).order_by(Assignment_check.check_no.desc()).first()
     check.professor_review=professor_review
     db.session.add(check)
@@ -300,8 +301,8 @@ def set_feedback(as_no,lecture_no,professor_review,feedback,user_info):
             db.session.commit()
 
             
-def get_feedback(as_no,lecture_no,user_info):
-    attend=Attendee.query.filter_by(user_no=user_info["user_no"],lecture_no=lecture_no).first()
+def get_feedback(as_no,lecture_no,user_no):
+    attend=Attendee.query.filter_by(user_no=user_no,lecture_no=lecture_no).first()
     check=Assignment_check.query.filter_by(assignment_no=as_no,attendee_no=attend.attendee_no,assignment_check=1).order_by(Assignment_check.check_no.desc()).first()
     pro_review=check.professor_review
     utr=check.user_trans_result
@@ -326,3 +327,26 @@ def get_feedback(as_no,lecture_no,user_info):
         tmp["end"]=i.end
         feedback_list.append(tmp)
     return utr,pro_review,feedback_list
+    
+def get_prob_submit_list(as_no,lecture_no):
+    submit_list=[]
+    attend=Attendee.query.filter_by(lecture_no=lecture_no).all()
+    for i in attend:
+        tmp={}
+        tmp["attendee_no"]=i.attendee_no
+        tmp["user_no"]=i.user_no
+        user=User.query.filter_by(user_no=i.user_no).first()
+        if(user.permission!=1):
+            continue
+        tmp["major"]=user.major
+        tmp["email"]=user.email
+        tmp["name"]=user.name
+        check=Assignment_check.query.filter_by(assignment_no=as_no,attendee_no=i.attendee_no,assignment_check=1).order_by(Assignment_check.check_no.desc()).first()
+        if(check==None):
+            tmp["check"]="No"
+        else:
+            tmp["check"]="Yes"
+        submit_list.append(tmp)
+
+    return submit_list
+

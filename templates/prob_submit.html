@@ -68,8 +68,7 @@ function loadProb(index){
 
 	var btnEle = $(".simultaneousBtn");
 	btnEle.removeClass("recoding");
-	btnEle.text("통역시작");
-
+	btnEle.text("구간 "+(probIndex+1)+" - 통역시작");
 	$("#exampleAudioVolumn").val(exampleAudioPlayer.player().volume() * 10);
 }
 
@@ -213,7 +212,7 @@ $(document).ready(function(){
 					exampleAudioPlayer.currentTime(0)
 					submitAudioPlayer.record().stop();
 					btnEle.removeClass("recoding");
-					btnEle.text("통역시작");
+					btnEle.text("구간 "+(probIndex+1)+" - 통역시작");
 				}
 			}
 		}else if(submitType == "동시통역"){
@@ -234,7 +233,7 @@ $(document).ready(function(){
 	                        exampleAudioPlayer.currentTime(0)
 	                        submitAudioPlayer.record().stop();
 	                        btnEle.removeClass("recoding");
-	                        btnEle.text("통역시작");
+	                        btnEle.text("구간 "+(probIndex+1)+" - 통역시작");
 	                }
 		}
         });

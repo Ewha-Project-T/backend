@@ -14,6 +14,12 @@ li { display: block; }
 .clickPointer { cursor: pointer; }
 .popMsgDiv { display: none; position: fixed; top: 120px; right: 20%; background-color: #3f7a4c; color: #ffffff; padding: 10px 20px; border-radius: 10px; font-weight: bold; }
 
+.boardStyle01 { width: 100%; font-size: 1.2em; }
+.boardStyle01 li { overflow: hidden; padding: 5px; border-bottom: 1px solid #000; text-align: center; }
+.boardStyle01 li.head { font-weight: bold; border-bottom: 3px double #000; }
+.boardStyle01 li .w20 { width: 20%; float: left; }
+.boardStyle01 img { width: 30px; height: 30px; }
+
 /* 강의목록 */
 .menuBarDiv { overflow: hidden; padding: 10px 40px; background-color: #3f7a4c; color: #ffffff; }
 .menuBarDiv .logoDiv { float: left; width: 20%; }

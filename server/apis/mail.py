@@ -18,8 +18,8 @@ class Email(Resource):
         args = parser.parse_args()
         user_email = args['email']
         signup_email_validate(user_email,gen_verify_email_code(user_email))
-        flash("이메일 인증을 완료해 주세요")
-        return redirect(host_url+ url_for('login'))
+        msg="인증코드가 발급되었습니다.\n이메일 인증을 완료해 주세요."
+        return redirect(host_url+ url_for('login',msg=msg))
 class Verify_email(Resource):
     def get(self):
         parser = reqparse.RequestParser()
@@ -31,13 +31,13 @@ class Verify_email(Resource):
         s_code = get_access_code(email)
         print("scode:"+str(s_code))
         if(s_code==0):
-            flash("인증코드가 만료 되었습니다.\n로그인을 진행해 인증코드를 발급 받아주세요")
-            return redirect(host_url+ url_for('login'))
+            msg="인증코드가 만료 되었습니다.\n로그인을 진행해 인증코드를 발급 받아주세요"
+            return redirect(host_url+ url_for('login',msg=msg))
         if code == s_code:
-            flash("인증 되었습니다.")
+            msg="인증 되었습니다."
             access_check_success(email)
-            return redirect(host_url+ url_for('login'))
+            return redirect(host_url+ url_for('login',msg=msg))
         else:
-            flash("인증코드가 유효하지 않습니다.")
-            return redirect(host_url+ url_for('login'))
+            msg="인증코드가 유효하지 않습니다."
+            return redirect(host_url+ url_for('login',msg=msg))
     

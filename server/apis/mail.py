@@ -31,7 +31,7 @@ class Verify_email(Resource):
         s_code = get_access_code(email)
         print("scode:"+str(s_code))
         if(s_code==0):
-            msg="인증코드가 만료 되었습니다.\n로그인을 진행해 인증코드를 발급 받아주세요"
+            msg="인증코드가 만료 되었습니다.\n로그인을 진행해 인증코드를 새로 발급 받아주세요"
             return redirect(host_url+ url_for('login',msg=msg))
         if code == s_code:
             msg="인증 되었습니다."

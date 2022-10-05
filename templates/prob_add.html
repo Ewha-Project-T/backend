@@ -143,6 +143,24 @@ $(document).ready(function(){
 				"end": $(regionBtnEle[i]).attr("end")
 			});
 		}
+		var params = new FormData();
+		params.append("lecture_no", "{{lecture_no}}");
+		params.append("prob_sound_path", $("input[name=prob_sound_path]").val());
+		params.append("prob_week", $("select[name=prob_week]").val());
+		params.append("prob_timeEnd", $("input[name=prob_timeEnd]").val());
+		params.append("prob_name", $("input[name=prob_name]").val());
+		params.append("prob_type", $("select[name=prob_type]").val());
+		params.append("prob_keyword", $("textarea[name=prob_keyword]").val());
+		params.append("prob_translang_source", $("select[name=prob_translang_source]").val());
+		params.append("prob_translang_destination", $("select[name=prob_translang_destination]").val());
+		params.append("prob_exp", $("textarea[name=prob_exp]").val());
+		params.append("prob_replay", $("select[name=prob_replay]").val());
+		params.append("prob_play_speed", $("input[name=prob_play_speed]").val());
+		params.append("prob_open", $("input[name=prob_open]:checked").length > 0 ? $("input[name=prob_open]:checked").val() : "off");
+		params.append("original_text",  $("textarea[name=prob_sound_text]").val());
+		params.append("prob_region", region);
+		params.append("prob_original_text_file", $("input[name=prob_original_text_file]")[0].files[0]);
+		/*
 		var params = {
 			"lecture_no":"{{lecture_no}}",
 			"prob_sound_path": $("input[name=prob_sound_path]").val(),
@@ -160,7 +178,7 @@ $(document).ready(function(){
 			"original_text": $("textarea[name=prob_sound_text]").val(),
 			"prob_region": region,
 			"prob_original_text_file" : $("input[name=prob_original_text_file]")[0].files[0]
-		};
+		};*/
 		console.log(JSON.stringify(params));
 		$.ajax({
 			url: "{{ url_for('prob_add') }}",

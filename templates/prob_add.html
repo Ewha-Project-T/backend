@@ -49,7 +49,6 @@ $(document).ready(function(){
 			}
 		});
 	});
-
 	$(document).on("change", "select[name='prob_type']", function(){
 		var d = $(this).val();
 		if(d == "번역"){
@@ -159,7 +158,8 @@ $(document).ready(function(){
 			"prob_play_speed": $("input[name=prob_play_speed]").val(),
 			"prob_open": $("input[name=prob_open]:checked").length > 0 ? $("input[name=prob_open]:checked").val() : "off",
 			"original_text": $("textarea[name=prob_sound_text]").val(),
-			"prob_region": region
+			"prob_region": region,
+			"prob_original_text_file" : $("input[name=prob_original_text_file]")[0].files[0]
 		};
 		console.log(JSON.stringify(params));
 		$.ajax({
@@ -257,6 +257,7 @@ $(document).ready(function(){
 		<div class="probAddFormRightDiv">
 			<div class="probTextDiv">
 				<label class="probTextLabel">원문</label>
+				<input type="file" name="prob_original_text_file">
 				<textarea name="prob_sound_text" class="inputStyle01" style="height:100px"></textarea>
 			</div>
 			<div class="probSoundUpload">

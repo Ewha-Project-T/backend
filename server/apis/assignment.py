@@ -57,6 +57,7 @@ class Prob_add(Resource):
         parser.add_argument('prob_region', type=str, action='append')
         parser.add_argument('original_text', type=str)
         parser.add_argument('prob_sound_path', type=str)
+        parser.add_argument('prob_original_text_file', type=FileStorage, location='files')
         args=parser.parse_args()
         lecture_no = args['lecture_no']
         week = args['prob_week']
@@ -78,8 +79,12 @@ class Prob_add(Resource):
         else:
             disclosure=1
         prob_region=args['prob_region']
+        original_text_file=args['prob_original_text_file']
         user_info=get_jwt_identity()
         original_text = args['original_text']
+        if(original_text_file!=None):
+            original_text=original_text_file.read()
+        print(original_text)
         original_text=original_text.replace("<","&lt")
         original_text=original_text.replace(">","&gt")
         make_as(lecture_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,original_text,upload_path,prob_region,user_info,prob_translang_source,prob_translang_destination)

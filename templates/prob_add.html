@@ -29,6 +29,18 @@ $(document).ready(function(){
 		*/
 	}
 
+	// 원문업로드
+	$(document).on("change", "input[prob_original_text_file]", function(){
+		formData.append("prob_sound", $("input[name=prob_original_text_file]")[0].files[0]);
+		processFile($("input[name=prob_original_text_file]")[0].files[0]);
+		function processFile(file) {
+    		var reader = new FileReader();
+    		reader.onload = function () {
+        		$("textarea[name=prob_sound_text]").text(reader.result);
+    		};
+    		reader.readAsText(file);
+		}
+	});
 	// 파일업로드
 	$(document).on("change", "input[name=prob_sound_file]", function(){
 		var formData = new FormData();
@@ -144,7 +156,6 @@ $(document).ready(function(){
 			});
 		}
 		var formData = new FormData();
-		formData.append("prob_original_text_file", $("input[name=prob_original_text_file]")[0].files[0]);
 		var params = {
 			"lecture_no":"{{lecture_no}}",
 			"prob_sound_path": $("input[name=prob_sound_path]").val(),
@@ -161,7 +172,6 @@ $(document).ready(function(){
 			"prob_open": $("input[name=prob_open]:checked").length > 0 ? $("input[name=prob_open]:checked").val() : "off",
 			"original_text": $("textarea[name=prob_sound_text]").val(),
 			"prob_region": region,
-			"prob_original_text_file" : formData
 		};
 		console.log(JSON.stringify(params));
 		$.ajax({

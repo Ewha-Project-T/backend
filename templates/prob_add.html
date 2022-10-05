@@ -30,9 +30,7 @@ $(document).ready(function(){
 	}
 
 	// 원문업로드
-	$(document).on("change", "input[prob_original_text_file]", function(){
-		formData.append("prob_sound", $("input[name=prob_original_text_file]")[0].files[0]);
-		processFile($("input[name=prob_original_text_file]")[0].files[0]);
+	$(document).on("change", "input[name=prob_original_text_file]", function(){
 		function processFile(file) {
     		var reader = new FileReader();
     		reader.onload = function () {
@@ -40,6 +38,7 @@ $(document).ready(function(){
     		};
     		reader.readAsText(file);
 		}
+		processFile($("input[name=prob_original_text_file]")[0].files[0]);
 	});
 	// 파일업로드
 	$(document).on("change", "input[name=prob_sound_file]", function(){

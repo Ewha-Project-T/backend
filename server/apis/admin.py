@@ -32,10 +32,11 @@ class Admin(Resource):
 class Admin2(Resource):
     @admin_required()
     def get(self):#활성화 필요한 계정명단
+        user_info=get_jwt_identity()
         result,user_list = user_listing(1)
         if(result==AdminResult.NOT_FOUND):
             return {"msg":"none user"},404
-        return make_response(render_template("admin_list.html",user_list=user_list))
+        return make_response(render_template("admin_list.html",user_list=user_list,user_info=user_info))
     @admin_required()
     def post(self):
         parser = reqparse.RequestParser()

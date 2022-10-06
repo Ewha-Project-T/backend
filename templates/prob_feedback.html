@@ -144,8 +144,9 @@ function createFeedback(txt, s, e){
 	rowTitleDiv.append($("<span />").text("X"));
 	{% endif %}
 	rowContentTagDiv.append($("<ul />").addClass("feedbackTagView"));
+	{% if user_info["user_perm"]!=1 %}
 	rowContentTagDiv.append(rowContentTagAdd);
-
+	{% endif %}
 	rowContentCmtDiv.append($("<textarea />"));
 
 	rowContentDiv.append(rowContentTxtDiv);

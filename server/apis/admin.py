@@ -19,7 +19,7 @@ class Admin(Resource):
         if(result==AdminResult.NOT_FOUND):
             return {"msg":"none user"},404
         return make_response(render_template("admin_list.html",user_list=user_list,user_info=user_info))
-    
+    @admin_required()
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('email',type=str, required=True, help="email is required")
@@ -36,7 +36,7 @@ class Admin2(Resource):
         if(result==AdminResult.NOT_FOUND):
             return {"msg":"none user"},404
         return make_response(render_template("admin_list.html",user_list=user_list))
-
+    @admin_required()
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('email',type=str, required=True, help="email is required")

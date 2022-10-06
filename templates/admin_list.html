@@ -4,6 +4,42 @@
 {% endblock %}
 
 {% block script %}
+<script type="text/javascript">
+	//승인
+	$(document).on("click", ".accessBtn", function(){
+
+		var param = {
+			"email": $(span[name="email"]).val()
+		};
+
+		$.ajax({
+			url: "/admin",
+			type: "POST",
+			headers: {'Content-Type': 'application/json'},
+			data: JSON.stringify(param),
+			success: function(d){
+				console.log("access success")
+			}
+		});
+	});
+	//삭제
+	$(document).on("click", ".delBtn", function(){
+
+		var param = {
+			"email": $(span[name="email"]).val()
+		};
+
+		$.ajax({
+			url: "/admin2",
+			type: "POST",
+			headers: {'Content-Type': 'application/json'},
+			data: JSON.stringify(param),
+			success: function(d){
+				console.log("del success")
+			}
+		});
+	});
+</script>
 {% endblock %}
 
 {% block content %}
@@ -21,12 +57,14 @@
 		{% for i in user_list %}
 		<li>
 			<span class="w20">{{i.user_no}}</span>
-			<span class="w20">{{i.email}}</span>
+			<span class="w20" name="email">{{i.email}}</span>
 			<span class="w20">{{i.major}}</span>
 			<span class="w20">{{i.name}}</span>
 			<span class="w20">{{i.permission}}</span>
 			<span class="w20">{{i.login_fail}}</span>
 			<span class="w20">{{i.access_check}}</span>
+			<span class="w20"><button class="btn btn-submit accessBtn">승인</button></span>
+			<span class="w20"><button class="btn btn-submit delBtn">삭제</button></span>
 		</li>
 		{% endfor %}
 {% endblock %}

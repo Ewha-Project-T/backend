@@ -24,7 +24,10 @@
 					<img src="{{ url_for('static', filename='images/ewha_logo.png') }}" />
 				</div>
 				<ul class="menuBarList">
-					<li class="link" link="{{ url_for('lecture') }}">Home</li>
+					<li class="link" link="{{ url_for('lecture') }}">{% if user_info['user_perm']==0 %}강의보기{% else %}Home{% endif %}</li>
+					{% if user_info['user_perm']==0 %}
+					<li class="link" link="{{ url_for('admin2') }}">미승인 유저 보기</li>
+					{% endif %}
 				</ul>
 				<div class="loginInfoDiv">
 					<img src="{{ url_for('static', filename='images/myphoto.png') }}" class="myphotoBtn">

@@ -147,7 +147,7 @@ function createFeedback(txt, s, e){
 	{% if user_info["user_perm"]!=1 %}
 	rowContentTagDiv.append(rowContentTagAdd);
 	{% endif %}
-	rowContentCmtDiv.append($("<textarea readonly/>"));
+	rowContentCmtDiv.append($("<textarea {% if user_info["user_perm"]!=1 %}readonly{% endif %}/>"));
 	rowContentDiv.append(rowContentTxtDiv);
 	rowContentDiv.append(rowContentTagDiv);
 	rowContentDiv.append(rowContentCmtDiv);

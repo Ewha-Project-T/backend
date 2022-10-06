@@ -136,11 +136,13 @@ function createFeedback(txt, s, e){
 	var rowContentDiv = $("<div />").addClass("feedbackContentRowContentDiv");
 	var rowContentTxtDiv = $("<div />").addClass("feedbackContentTxtDiv").text(txt);
 	var rowContentTagDiv = $("<div />").addClass("feedbackContentTagDiv");
+	{% if user_info["user_perm"]!=1 %}
 	var rowContentTagAdd = $("<span />").addClass("feedbackTagAdd").text("▼");
+	{% endif %}
 	var rowContentCmtDiv = $("<div />").addClass("feedbackContentCmtDiv");
-
+	{% if user_info["user_perm"]!=1 %}
 	rowTitleDiv.append($("<span />").text("X"));
-
+	{% endif %}
 	rowContentTagDiv.append($("<ul />").addClass("feedbackTagView"));
 	rowContentTagDiv.append(rowContentTagAdd);
 
@@ -424,7 +426,7 @@ $(document).ready(function(){
 						<div class="commentTextDiv">
 							<h2>총평</h2>
 							<div>
-								<textarea id="professor_review">{% if professor_review!=None %} {{professor_review}} {% endif %}</textarea>
+								<textarea id="professor_review" {% if user_info["user_perm"]==1 %} readonly {% endif %}>{% if professor_review!=None %} {{professor_review}} {% endif %}</textarea>
 							</div>
 						</div>
 					</div>

@@ -1,76 +1,32 @@
 {% extends 'layout_login.html' %}
 
 {% block stylesheet %}
-		<link rel="stylesheet" href="{{ url_for('static', filename='css/slick.css') }}">
-		<link rel="stylesheet" href="{{ url_for('static', filename='css/slick-theme.css') }}">
 {% endblock %}
 
 {% block script %}
-		<script type="text/javascript" src="{{ url_for('static', filename='js/slick.min.js') }}"></script>
-		<script type="text/javascript">
-		$(document).ready(function(){
-			$(".sliderDiv").slick({
-				slide: "Div",
-				infinite: true,
-				slidesToShow: 1,
-				slideToScroll: 1,
-				dots: true,
-				autoplay: true,
-				autoplaySpeed: 2000,
-			});
-		});
-		</script>
 {% endblock %}
 
 {% block content %}
-			<div class="bannerDiv">
-				<div class="sliderDiv slider">
-					<div><img src="{{ url_for('static', filename='/images/banner01.jpg') }}"></div>
-					<div><img src="{{ url_for('static', filename='/images/banner02.jpg') }}"></div>
-				</div>
-			</div>
+<div class="contentDiv">
+	<ul class="boardStyle01">
+		<li class="head">
+			<span class="w20">idx</span>
+			<span class="w20">이메일</span>
+			<span class="w20">전공</span>
+			<span class="w20">이름</span>
+			<span class="w20">권한(1:학생,2:조교,3:교수)</span>
+			<span class="w20">로그인 실패</span>
+			<span class="w20">관리자 승인</span>
+		</li>
+		{% for i in user_list %}
+		<li>
+			<span class="w20">{{i.user_no}}</span>
+			<span class="w20">{{i.email}}</span>
+			<span class="w20">{{i.major}}</span>
+			<span class="w20">{{i.name}}</span>
+			<span class="w20">{{i.permission}}</span>
+			<span class="w20">{{i.login_fail}}</span>
+			<span class="w20">{{i.access_check}}</span>
 			
-			<div class="contentDiv">
-				<h1>유저목록</h1>
-				<div class="topContentMenu">
-					<div class="semesterDiv">
-						<select class="semesterSelect inputStyle01" name="semesterSelect">
-						<option>2022-1학기</option>
-						<option>2022-2학기</option>
-						</select>
-					</div>
-					<div class="searchDiv">
-						<input type="text" name="searchInput" class="searchInput inputStyle01">
-					</div>
-				</div>
-				<div class="lectureListDiv">
-					<ul>
-					{% for  i in user_list %}
-						<li>
-							<div class="lectureInfoDiv">
-								<div class="lectureTitleDiv">
-									<span>idx:{{i.user_no}}</span><br><span>email:{{i.email}}</span>
-									<img src="x">
-								</div>
-								<div class="lectureContentDiv">
-									<span>{{i.major}}<br>name:{{i.name}}<br>permission:{{i.permission}}<br>login_fail:{{i.login_fail}}<br>access_check:{{i.access_check}}</span>
-								</div>
-								<div class="likeDiv">
-									<img src="x">
-									<span>{{i.year}}</span>
-								</div>
-							</div>
-						</li>
-					{% endfor %}
-						
-						<li>
-							<div class="lectureInfoAddDiv">
-								<div class="lectureInfoAddBtnDiv">
-									<img src="x" alt="추가버튼">
-								</div>
-							</div>
-						</li>
-					</ul>
-				</div>
-			</div>
+		</li>
 {% endblock %}

@@ -148,7 +148,9 @@ function createFeedback(txt, s, e){
 	rowContentTagDiv.append(rowContentTagAdd);
 	{% endif %}
 	rowContentCmtDiv.append($("<textarea />"));
-
+	{% if user_info["user_perm"]!=1 %}
+	rowContentCmtDiv.attr("readonly");
+	{% endif %}
 	rowContentDiv.append(rowContentTxtDiv);
 	rowContentDiv.append(rowContentTagDiv);
 	rowContentDiv.append(rowContentCmtDiv);
@@ -206,7 +208,6 @@ function createFeedbackTag(id, tag){
 }
 
 function setFeedbackComment(id, comment){
-	$("#" + id + " .feedbackContentCmtDiv textarea").attr("readonly");
 	$("#" + id + " .feedbackContentCmtDiv textarea").val(comment);
 }
 

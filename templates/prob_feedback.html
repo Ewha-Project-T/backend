@@ -198,8 +198,9 @@ function createFeedbackTag(id, tag){
 	var tagSpanDel = $("<span />").addClass("feedbackTagDel").text("X");
 	{% endif %}
 	ele.append(tagSpan);
+	{% if user_info["user_perm"]!=1 %}
 	ele.append(tagSpanDel);
-
+	{% endif %}
 	$("#" + id + " .feedbackTagView").append(ele);
 	$("#" + id + " .feedbackTagList").hide();
 }

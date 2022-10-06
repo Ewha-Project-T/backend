@@ -207,6 +207,7 @@ function createFeedbackTag(id, tag){
 
 function setFeedbackComment(id, comment){
 	$("#" + id + " .feedbackContentCmtDiv textarea").val(comment);
+	$("#" + id + " .feedbackContentCmtDiv textarea").attr("readonly");
 }
 
 function deleteFeedbackTag(e){

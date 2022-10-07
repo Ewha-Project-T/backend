@@ -9,7 +9,7 @@
 	$(document).on("click", ".accessBtn", function(){
 
 		var param = {
-			"email": $("span[name=email]").val()
+			"email": $(this).attr('value')
 		};
 
 		$.ajax({
@@ -26,7 +26,7 @@
 	$(document).on("click", ".delBtn", function(){
 
 		var param = {
-			"email": $("span[name=email]").val()
+			"email": $(this).attr('value')
 		};
 
 		$.ajax({
@@ -63,8 +63,8 @@
 			<span class="w20">{{i.permission}}</span>
 			<span class="w20">{{i.login_fail}}</span>
 			<span class="w20">{{i.access_check}}</span>
-			<span class="w20"><button class="btn btn-submit accessBtn">승인</button></span>
-			<span class="w20"><button class="btn btn-submit delBtn">삭제</button></span>
+			<span class="w20"><button class="btn btn-submit accessBtn" value="{{i.email}}">승인</button></span>
+			<span class="w20"><button class="btn btn-submit delBtn" value="{{i.email}}">삭제</button></span>
 		</li>
 		{% endfor %}
 {% endblock %}

@@ -345,7 +345,7 @@ def get_prob_submit_list(as_no,lecture_no):
         check=Assignment_check.query.filter_by(assignment_no=as_no,attendee_no=i.attendee_no,assignment_check=1).order_by(Assignment_check.check_no.desc()).first()
         if(check==None):
             tmp["check"]="No"
-            tmp["submit_time"]=" "
+            tmp["submit_time"]="ㅤ"
         else:
             tmp["check"]="Yes"
             tmp["submit_time"]=check.submit_time

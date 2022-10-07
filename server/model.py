@@ -89,6 +89,7 @@ class Assignment_check(db.Model):
     assignment_check = db.Column(db.Integer, default=0)
     professor_review= db.Column(db.Text)
     user_trans_result= db.Column(db.Text)
+    submit_time=db.Column(db.DateTime, onupdate=datetime.utcnow()+timedelta(hours=9))#테이블 삭제시 오류날수도
    
     attendee = db.relationship("Attendee", back_populates="assignment_check")
     assignment = db.relationship("Assignment", back_populates="assignment_check")

@@ -174,10 +174,8 @@ class Prob_submit(Resource):
         lecture_no = args['lecture_no']
         uuid=args['submitUUID']
         user_info=get_jwt_identity()
-        print(uuid*100)
         if(uuid[0]=="0"):
             text=args['text']
-            print(text*100)
             check_assignment(as_no,lecture_no,uuid,user_info,text)
         else:
             check_assignment(as_no,lecture_no,uuid,user_info)

@@ -38,5 +38,10 @@ def del_user(email):
     db.session.delete(acc)
     db.session.commit
 
+def init_pass_cnt(email):
+    acc = User.query.filter_by(email=email).first()
+    acc.login_fail_limit=0
+    db.session.add(acc)
+    db.session.commit
 
 

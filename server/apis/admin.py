@@ -6,7 +6,7 @@ from flask_jwt_extended import (
 import re
 
 from ..services.login_service import admin_required
-from ..services.admin_service import user_listing, activating_user,AdminResult,del_user
+from ..services.admin_service import user_listing, activating_user,AdminResult,del_user,init_pass_cnt
 from ..services.lecture_service import lecture_listing
 from os import environ as env
 host_url=env["HOST"]
@@ -44,4 +44,12 @@ class Admin2(Resource):
         args= parser.parse_args()
         email=args['email']
         del_user(email)
+        return {"msg":"success"}
+
+    def patch(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('email',type=str, required=True, help="email is required")
+        args= parser.parse_args()
+        email=args['email']
+        init_pass_cnt(email)
         return {"msg":"success"}

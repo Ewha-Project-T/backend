@@ -18,7 +18,7 @@
 			headers: {'Content-Type': 'application/json'},
 			data: JSON.stringify(param),
 			success: function(d){
-				console.log("access success")
+				location.reload(true);
 			}
 		});
 	});
@@ -35,10 +35,27 @@
 			headers: {'Content-Type': 'application/json'},
 			data: JSON.stringify(param),
 			success: function(d){
-				console.log("del success")
+				location.reload(true);
 			}
 		});
 	});
+	//초기화
+	$(document).on("click", ".initBtn", function(){
+
+	var param = {
+		"email": $(this).attr('value')
+	};
+
+	$.ajax({
+		url: "/admin2",
+		type: "PATCH",
+		headers: {'Content-Type': 'application/json'},
+		data: JSON.stringify(param),
+		success: function(d){
+			location.reload(true);
+		}
+	});
+});
 </script>
 {% endblock %}
 
@@ -65,6 +82,7 @@
 			<span class="w20">{{i.access_check}}</span>
 			<span class="w20"><button class="btn btn-submit accessBtn" value="{{i.email}}">승인</button></span>
 			<span class="w20"><button class="btn btn-submit delBtn" value="{{i.email}}">삭제</button></span>
+			<span class="w20"><button class="btn btn-submit initBtn" value="{{i.email}}">로그인횟수초기화</button></span>
 		</li>
 		{% endfor %}
 {% endblock %}

@@ -14,6 +14,7 @@
 			<span class="w20">이메일</span>
 			<span class="w20">이름</span>
 			<span class="w20">제출여부</span>
+			<span class="w20">제출시간</span>
 			<span class="w20">피드백작성</span>
 		</li>
 		{% for i in user_list %}
@@ -22,6 +23,7 @@
 			<span class="w20">{{i.email}}</span>
 			<span class="w20">{{i.name}}</span>
 			<span class="w20">{{i.check}}</span>
+			<span class="w20">2022-10-07-2</span>
 			<span class="w20"><img src="{{ url_for('static', filename='images/feedback_icon.png') }}" class="weekProbFeedbackBtn" alt="펜" link="{{ url_for('prob_feedback',as_no=as_no,lecture_no=lecture_no,user_no=i.user_no) }}"></span>
 		</li>
 		{% endfor %}

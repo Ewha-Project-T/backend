@@ -46,6 +46,7 @@ class Admin2(Resource):
         del_user(email)
         return {"msg":"success"}
 
+    @admin_required()
     def patch(self):
         parser = reqparse.RequestParser()
         parser.add_argument('email',type=str, required=True, help="email is required")

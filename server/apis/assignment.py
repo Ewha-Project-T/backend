@@ -32,7 +32,7 @@ class Prob(Resource):
         return make_response(render_template("prob_list.html",prob_list=prob_list,lecture_no=lecture_no,user_perm=user_info["user_perm"],user_info=user_info,user_no=user_info["user_no"]))
 
 class Prob_add(Resource):
-    @jwt_required()
+    @jwt_required()#자습용과제 기능에따라 달라질수있으므로 보류
     def get(self):
         parser = reqparse.RequestParser()
         parser.add_argument('lecture_no', type=int, required=True, help="lecture_no is required")
@@ -41,7 +41,7 @@ class Prob_add(Resource):
         user_info=get_jwt_identity()
         return make_response(render_template("prob_add.html",lecture_no=lecture_no,user_info=user_info))
     @jwt_required()
-    def post(self):#과제만들기
+    def post(self):#과제만들기 #자습용과제 기능에따라 달라질수있으므로 보류
         parser = reqparse.RequestParser()
         parser.add_argument('lecture_no', type=int)
         parser.add_argument('prob_week', type=str, required=True, help="week is required")
@@ -261,6 +261,7 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 class prob_upload(Resource):
+    @jwt_required()
     def post(self):
         parser = reqparse.RequestParser()      
         parser.add_argument('prob_sound', type=FileStorage, location='files')        

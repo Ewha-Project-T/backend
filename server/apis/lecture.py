@@ -30,7 +30,7 @@ class Lecture(Resource):
 
 class Lecture_mod_del(Resource):
     
-    @jwt_required()
+    @professor_required()
     def get(self):#강의삭제/권한관리 만든사람, 관리자
         parser = reqparse.RequestParser()
         parser.add_argument('lecture_no', type=int)
@@ -44,6 +44,7 @@ class Lecture_mod_del(Resource):
             return{"msg": "access denied"}
 
 class Student(Resource):
+    @professor_required()
     def get(self):#학생조회 이름과 전공으로 검색 후 리스팅
         parser = reqparse.RequestParser()
         parser.add_argument('name', type=str)
@@ -56,6 +57,7 @@ class Student(Resource):
         
     
 class Major(Resource):
+    @professor_required()
     def get(self):#해당전공 과목 리스팅
         parser=reqparse.RequestParser()
         parser.add_argument('major',type=str)
@@ -65,6 +67,7 @@ class Major(Resource):
         return jsonify(major_list=major_list)
 
 class Attend(Resource):
+    @professor_required()
     def get(self):# lecture no로 해당 강의의 수강생 명단 리스팅
         parser=reqparse.RequestParser()
         parser.add_argument('lecture_no',type=int)
@@ -72,7 +75,7 @@ class Attend(Resource):
         lecture_no=args['lecture_no']
         attendee_list=attendee_listing(lecture_no)
         return jsonify(attendee_list=attendee_list)
-
+    @professor_required()
     def post(self):#수강생 명단추가
         parser=reqparse.RequestParser()
         parser.add_argument('user_no',type=int)
@@ -90,13 +93,13 @@ class Attend(Resource):
         return {"msg":"add success"}
 
 class Lecture_add(Resource):
-    @jwt_required()
+    @professor_required()
     def get(self):
         user_list=get_all_user()
         user_info=get_jwt_identity()
         now = datetime.now()
         return make_response(render_template("lecture_add.html",user_list=user_list,user_info=user_info,year=str(now.year)))
-    @jwt_required()
+    @professor_required()
     def post(self):#강의생성/교수이상의권한
         user_info=get_jwt_identity()
         parser = reqparse.RequestParser()
@@ -119,7 +122,7 @@ class Lecture_add(Resource):
         return{"msg" : "lecture make success"},201
 
 class Lecture_mod(Resource):
-    @jwt_required()
+    @professor_required()
     def get(self):
         user_list=get_all_user()
         parser = reqparse.RequestParser()
@@ -129,7 +132,7 @@ class Lecture_mod(Resource):
         mod_list,attend_list=mod_lecutre_listing(lecture_no)
         user_info=get_jwt_identity()
         return make_response(render_template("lecture_mod.html",user_list=user_list,lecture_no=lecture_no,mod_list=mod_list,attend_list=attend_list,user_info=user_info))
-    @jwt_required()
+    @professor_required()
     def post(self):#강의수정권한관리 만든사람, 관리자
         user_info=get_jwt_identity()
         parser = reqparse.RequestParser()

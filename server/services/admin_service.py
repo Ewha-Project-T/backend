@@ -11,7 +11,7 @@ def user_listing(mode=None):#mode none일시 전체검색, 1일시 가입승인�
     if(mode==None):
         acc_list = User.query.all()
     else:
-        acc_list = User.query.filter_by(access_check=0).all()
+        acc_list = User.query.filter_by(access_check_admin=0).all()
     user_list = []
     for user in acc_list:
         tmp_uesr = {}
@@ -29,7 +29,7 @@ def user_listing(mode=None):#mode none일시 전체검색, 1일시 가입승인�
 
 def activating_user(email):#일단기능만 에러처리는 나중에~
     acc= User.query.filter_by(email=email).first()
-    acc.access_check=1
+    acc.access_check_admin=1
     db.session.add(acc)
     db.session.commit
 

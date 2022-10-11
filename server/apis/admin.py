@@ -35,7 +35,7 @@ class Admin2(Resource):
         user_info=get_jwt_identity()
         result,user_list = user_listing(1)
         if(result==AdminResult.NOT_FOUND):
-            return {"msg":"none user"},404
+            return redirect(host_url + url_for('admin'))
         return make_response(render_template("admin_list.html",user_list=user_list,user_info=user_info))
     @admin_required()
     def post(self):

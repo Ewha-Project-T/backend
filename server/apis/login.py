@@ -29,12 +29,15 @@ class Login(Resource):
         if re.match("^[A-Za-z0-9]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[A-Za-z0-9])*\.[A-Za-z]{2,3}$", user_email):
             result, account = login(user_email, user_pw)
             if(result==LoginResult.ACC_IS_NOT_FOUND):
-                msg="User Not Found"
+                msg="아이디와 비밀번호를 확인해주세요."
                 return redirect(host_url + url_for('login', msg=msg))
-            if(result==LoginResult.NEED_ADMIN_CHECK):
+            if(result==LoginResult.NEED_EMAIL_CHECK):
                 return redirect(host_url + url_for('email', email=user_email))
             if(result==LoginResult.LOGIN_COUNT_EXCEEDED):
-                msg="clogin count exceeded"
+                msg="로그인 시도횟수초과 관리자에게 연락바랍니다."
+                return redirect(host_url + url_for('login', msg=msg))
+            if(result==LoginResult.NEED_ADMIN_CHECK):
+                msg="관리자의 승인이 필요합니다."
                 return redirect(host_url + url_for('login', msg=msg))
             if(result==LoginResult.SUCCESS):
                 msg=""
@@ -51,10 +54,10 @@ class Login(Resource):
                     return res
     
 
-            msg="invalid password"
+            msg="아이디와 비밀번호를 확인해주세요."
             return redirect(host_url + url_for('login', msg=msg))
         else:
-            msg="check email"
+            msg="아이디와 비밀번호를 확인해주세요."
             return redirect(host_url + url_for('login', msg=msg))
 class Logout(Resource):
 

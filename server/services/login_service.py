@@ -10,8 +10,9 @@ class LoginResult:
     INVALID_EMAILPW = 1
     LOGIN_COUNT_EXCEEDED=2
     ACC_IS_NOT_FOUND = 3
-    NEED_ADMIN_CHECK = 4
-    INTERNAL_ERROR = 5
+    NEED_EMAIL_CHECK = 4
+    NEED_ADMIN_CHECK = 5
+    INTERNAL_ERROR = 6
     
 class RegisterResult:
     SUCCESS = 0
@@ -32,6 +33,8 @@ def login(user_email, user_pw):
         acc.login_fail_limit=0
         db.session.commit
         if(acc.access_check==0):
+            return LoginResult.NEED_EMAIL_CHECK, acc
+        if(acc.access_check_admin==0):
             return LoginResult.NEED_ADMIN_CHECK, acc
         return LoginResult.SUCCESS, acc
     acc.login_fail_limit+=1

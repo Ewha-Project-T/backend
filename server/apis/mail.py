@@ -17,8 +17,11 @@ class Email(Resource):
         parser.add_argument('email', type=str)
         args = parser.parse_args()
         user_email = args['email']
-        signup_email_validate(user_email,gen_verify_email_code(user_email))
-        msg="인증코드가 발급되었습니다.\n이메일 인증을 완료해 주세요."
+        if(get_access_code(user_email)==0):
+            signup_email_validate(user_email,gen_verify_email_code(user_email))
+            msg="인증코드가 발급되었습니다.\n이메일 인증을 완료해 주세요."
+        else:
+            msg="이메일 인증이 필요합니다.\n가입하신 이메일에서 확인해주세요."
         return redirect(host_url+ url_for('login',msg=msg))
 class Verify_email(Resource):
     def get(self):

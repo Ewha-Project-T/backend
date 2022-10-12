@@ -37,7 +37,7 @@ $(document).on("click",".probDelDiv", function(){
 
 							<div class="weekProbTitleDiv">
 								<h2>1주차 과제</h2>
-								{% if prob_list1!=None %}
+								{% if prob_list1 %}
 								<img src="{{ url_for('static', filename='images/bottom-arrow.png') }}" class="weekProbDetailViewBtn" alt="아래화살표">
 								{% endif %}
 								{% if user_perm == 0 or user_perm== 3 %}
@@ -66,7 +66,7 @@ $(document).on("click",".probDelDiv", function(){
 						<div class="weekProbDiv">
 							<div class="weekProbTitleDiv">
 								<h2>2주차 과제</h2>
-								{% if prob_list2!=None %}
+								{% if prob_list2 %}
 								<img src="{{ url_for('static', filename='images/bottom-arrow.png') }}" class="weekProbDetailViewBtn" alt="아래화살표">
 								{% endif %}
 								{% if user_perm == 0 or user_perm== 3 %}
@@ -95,7 +95,7 @@ $(document).on("click",".probDelDiv", function(){
 						<div class="weekProbDiv">
 							<div class="weekProbTitleDiv">
 								<h2>3주차 과제</h2>
-								{% if prob_list3!=None %}
+								{% if prob_list3 %}
 								<img src="{{ url_for('static', filename='images/bottom-arrow.png') }}" class="weekProbDetailViewBtn" alt="아래화살표">
 								{% endif %}
 								{% if user_perm == 0 or user_perm== 3 %}
@@ -124,7 +124,7 @@ $(document).on("click",".probDelDiv", function(){
 						<div class="weekProbDiv">
 							<div class="weekProbTitleDiv">
 								<h2>4주차 과제</h2>
-								{% if prob_list4!=None %}
+								{% if prob_list4 %}
 								<img src="{{ url_for('static', filename='images/bottom-arrow.png') }}" class="weekProbDetailViewBtn" alt="아래화살표">
 								{% endif %}
 								{% if user_perm == 0 or user_perm== 3 %}
@@ -153,7 +153,7 @@ $(document).on("click",".probDelDiv", function(){
 						<div class="weekProbDiv">
 							<div class="weekProbTitleDiv">
 								<h2>5주차 과제</h2>
-								{% if prob_list5!=None %}
+								{% if prob_list5 %}
 								<img src="{{ url_for('static', filename='images/bottom-arrow.png') }}" class="weekProbDetailViewBtn" alt="아래화살표">
 								{% endif %}
 								{% if user_perm == 0 or user_perm== 3 %}
@@ -182,7 +182,7 @@ $(document).on("click",".probDelDiv", function(){
 						<div class="weekProbDiv">
 							<div class="weekProbTitleDiv">
 								<h2>6주차 과제</h2>
-								{% if prob_list6!=None %}
+								{% if prob_list6 %}
 								<img src="{{ url_for('static', filename='images/bottom-arrow.png') }}" class="weekProbDetailViewBtn" alt="아래화살표">
 								{% endif %}
 								{% if user_perm == 0 or user_perm== 3 %}
@@ -211,7 +211,7 @@ $(document).on("click",".probDelDiv", function(){
 						<div class="weekProbDiv">
 							<div class="weekProbTitleDiv">
 								<h2>7주차 과제</h2>
-								{% if prob_list7!=None %}
+								{% if prob_list7 %}
 								<img src="{{ url_for('static', filename='images/bottom-arrow.png') }}" class="weekProbDetailViewBtn" alt="아래화살표">
 								{% endif %}
 								{% if user_perm == 0 or user_perm== 3 %}
@@ -240,7 +240,7 @@ $(document).on("click",".probDelDiv", function(){
 						<div class="weekProbDiv">
 							<div class="weekProbTitleDiv">
 								<h2>8주차 과제</h2>
-								{% if prob_list8!=None %}
+								{% if prob_list8 %}
 								<img src="{{ url_for('static', filename='images/bottom-arrow.png') }}" class="weekProbDetailViewBtn" alt="아래화살표">
 								{% endif %}
 								{% if user_perm == 0 or user_perm== 3 %}
@@ -269,7 +269,7 @@ $(document).on("click",".probDelDiv", function(){
 						<div class="weekProbDiv">
 							<div class="weekProbTitleDiv">
 								<h2>9주차 과제</h2>
-								{% if prob_list9!=None %}
+								{% if prob_list9 %}
 								<img src="{{ url_for('static', filename='images/bottom-arrow.png') }}" class="weekProbDetailViewBtn" alt="아래화살표">
 								{% endif %}
 								{% if user_perm == 0 or user_perm== 3 %}
@@ -298,7 +298,7 @@ $(document).on("click",".probDelDiv", function(){
 						<div class="weekProbDiv">
 							<div class="weekProbTitleDiv">
 								<h2>10주차 과제</h2>
-								{% if prob_list10!=None %}
+								{% if prob_list10 %}
 								<img src="{{ url_for('static', filename='images/bottom-arrow.png') }}" class="weekProbDetailViewBtn" alt="아래화살표">
 								{% endif %}
 								{% if user_perm == 0 or user_perm== 3 %}
@@ -327,7 +327,7 @@ $(document).on("click",".probDelDiv", function(){
 						<div class="weekProbDiv">
 							<div class="weekProbTitleDiv">
 								<h2>11주차 과제</h2>
-								{% if prob_list11!=None %}
+								{% if prob_list11 %}
 								<img src="{{ url_for('static', filename='images/bottom-arrow.png') }}" class="weekProbDetailViewBtn" alt="아래화살표">
 								{% endif %}
 								{% if user_perm == 0 or user_perm== 3 %}
@@ -356,7 +356,7 @@ $(document).on("click",".probDelDiv", function(){
 						<div class="weekProbDiv">
 							<div class="weekProbTitleDiv">
 								<h2>12주차 과제</h2>
-								{% if prob_list12!=None %}
+								{% if prob_list12 %}
 								<img src="{{ url_for('static', filename='images/bottom-arrow.png') }}" class="weekProbDetailViewBtn" alt="아래화살표">
 								{% endif %}
 								{% if user_perm == 0 or user_perm== 3 %}
@@ -385,7 +385,7 @@ $(document).on("click",".probDelDiv", function(){
 						<div class="weekProbDiv">
 							<div class="weekProbTitleDiv">
 								<h2>13주차 과제</h2>
-								{% if prob_list13!=None %}
+								{% if prob_list13 %}
 								<img src="{{ url_for('static', filename='images/bottom-arrow.png') }}" class="weekProbDetailViewBtn" alt="아래화살표">
 								{% endif %}
 								{% if user_perm == 0 or user_perm== 3 %}
@@ -414,7 +414,7 @@ $(document).on("click",".probDelDiv", function(){
 						<div class="weekProbDiv">
 							<div class="weekProbTitleDiv">
 								<h2>14주차 과제</h2>
-								{% if prob_list14!=None %}
+								{% if prob_list14 %}
 								<img src="{{ url_for('static', filename='images/bottom-arrow.png') }}" class="weekProbDetailViewBtn" alt="아래화살표">
 								{% endif %}
 								{% if user_perm == 0 or user_perm== 3 %}
@@ -443,7 +443,7 @@ $(document).on("click",".probDelDiv", function(){
 						<div class="weekProbDiv">
 							<div class="weekProbTitleDiv">
 								<h2>15주차 과제</h2>
-								{% if prob_list15!=None %}
+								{% if prob_list15 %}
 								<img src="{{ url_for('static', filename='images/bottom-arrow.png') }}" class="weekProbDetailViewBtn" alt="아래화살표">
 								{% endif %}
 								{% if user_perm == 0 or user_perm== 3 %}
@@ -472,7 +472,7 @@ $(document).on("click",".probDelDiv", function(){
 						<div class="weekProbDiv">
 							<div class="weekProbTitleDiv">
 								<h2>16주차 과제</h2>
-								{% if prob_list16!=None %}
+								{% if prob_list16 %}
 								<img src="{{ url_for('static', filename='images/bottom-arrow.png') }}" class="weekProbDetailViewBtn" alt="아래화살표">
 								{% endif %}
 								{% if user_perm == 0 or user_perm== 3 %}

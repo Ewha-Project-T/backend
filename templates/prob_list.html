@@ -34,25 +34,416 @@ $(document).on("click",".probDelDiv", function(){
 				<ul class="weekProbWrapper">
 					<li>
 						<div class="weekProbDiv">
+
 							<div class="weekProbTitleDiv">
-								<h2>1주차 아래 화살표 클릭 하면 과제리스트 보임/더하기 누르면 과제추가</h2>
+								<h2>1주차 과제</h2>
 								<img src="{{ url_for('static', filename='images/bottom-arrow.png') }}" class="weekProbDetailViewBtn" alt="아래화살표">
 								{% if user_perm == 0 or user_perm== 3 %}
 								<img src="{{ url_for('static', filename='images/plus.png') }}" class="weekProbAddBtn link" alt="+" link="{{ url_for('prob_add',lecture_no=lecture_no) }}">
 								{% endif %}
 							</div>
-							{% for  i in prob_list %}
+							{% for  i in prob_list1 %}
 							<div class="weekProbDetailDiv">
 								<ul>
 									<li>
 										<div class="weekProbDetailRowDiv">
 											<span class="">{{i.as_name}}</span>
 											{% if user_perm == 0 or user_perm== 3 %}
-                      <img src="{{ url_for('static', filename='images/feedback_icon.png') }}" class="weekProbFeedbackBtn" alt="펜" link="{{ url_for('prob_submit_list',as_no=i.assignment_no,lecture_no=lecture_no) }}">
+                     						<img src="{{ url_for('static', filename='images/feedback_icon.png') }}" class="weekProbFeedbackBtn" alt="펜" link="{{ url_for('prob_submit_list',as_no=i.assignment_no,lecture_no=lecture_no) }}">
 											<img src="{{ url_for('static', filename='images/del_icon.png') }}" class="weekProbDetailDelBtn probDelDiv" link="{{ url_for('prob_del',lecture_no=lecture_no,as_no=i.assignment_no) }}" alt="-">
 											<img src="{{ url_for('static', filename='images/edit_icon.png') }}" class="lectureInfoDiv weekProbDetailEditBtn" link="{{ url_for('prob_mod',lecture_no=lecture_no,as_no=i.assignment_no) }}">
-                      {% else %}                                                                                          
-                      <img src="{{ url_for('static', filename='images/feedback_icon.png') }}" class="weekProbFeedbackBtn" alt="펜" link="{{ url_for('prob_feedback',as_no=i.assignment_no,lecture_no=lecture_no,user_no=user_no) }}">                           <img src="{{ url_for('static', filename='images/submit_icon.png') }}" class="weekProbSubmitBtn link" link="{{ url_for('prob_submit',as_no=i.assignment_no,lecture_no=lecture_no) }}">
+                      						{% else %}                                                                                          
+                      						<img src="{{ url_for('static', filename='images/feedback_icon.png') }}" class="weekProbFeedbackBtn" alt="펜" link="{{ url_for('prob_feedback',as_no=i.assignment_no,lecture_no=lecture_no,user_no=user_no) }}">                           <img src="{{ url_for('static', filename='images/submit_icon.png') }}" class="weekProbSubmitBtn link" link="{{ url_for('prob_submit',as_no=i.assignment_no,lecture_no=lecture_no) }}">
+											{% endif %}
+										</div>
+									</li>
+								</ul>
+							</div>
+							{% endfor %}
+
+							<div class="weekProbTitleDiv">
+								<h2>2주차 과제</h2>
+								<img src="{{ url_for('static', filename='images/bottom-arrow.png') }}" class="weekProbDetailViewBtn" alt="아래화살표">
+								{% if user_perm == 0 or user_perm== 3 %}
+								<img src="{{ url_for('static', filename='images/plus.png') }}" class="weekProbAddBtn link" alt="+" link="{{ url_for('prob_add',lecture_no=lecture_no) }}">
+								{% endif %}
+							</div>
+							{% for  i in prob_list2 %}
+							<div class="weekProbDetailDiv">
+								<ul>
+									<li>
+										<div class="weekProbDetailRowDiv">
+											<span class="">{{i.as_name}}</span>
+											{% if user_perm == 0 or user_perm== 3 %}
+                     						<img src="{{ url_for('static', filename='images/feedback_icon.png') }}" class="weekProbFeedbackBtn" alt="펜" link="{{ url_for('prob_submit_list',as_no=i.assignment_no,lecture_no=lecture_no) }}">
+											<img src="{{ url_for('static', filename='images/del_icon.png') }}" class="weekProbDetailDelBtn probDelDiv" link="{{ url_for('prob_del',lecture_no=lecture_no,as_no=i.assignment_no) }}" alt="-">
+											<img src="{{ url_for('static', filename='images/edit_icon.png') }}" class="lectureInfoDiv weekProbDetailEditBtn" link="{{ url_for('prob_mod',lecture_no=lecture_no,as_no=i.assignment_no) }}">
+                      						{% else %}                                                                                          
+                      						<img src="{{ url_for('static', filename='images/feedback_icon.png') }}" class="weekProbFeedbackBtn" alt="펜" link="{{ url_for('prob_feedback',as_no=i.assignment_no,lecture_no=lecture_no,user_no=user_no) }}">                           <img src="{{ url_for('static', filename='images/submit_icon.png') }}" class="weekProbSubmitBtn link" link="{{ url_for('prob_submit',as_no=i.assignment_no,lecture_no=lecture_no) }}">
+											{% endif %}
+										</div>
+									</li>
+								</ul>
+							</div>
+							{% endfor %}
+
+							<div class="weekProbTitleDiv">
+								<h2>3주차 과제</h2>
+								<img src="{{ url_for('static', filename='images/bottom-arrow.png') }}" class="weekProbDetailViewBtn" alt="아래화살표">
+								{% if user_perm == 0 or user_perm== 3 %}
+								<img src="{{ url_for('static', filename='images/plus.png') }}" class="weekProbAddBtn link" alt="+" link="{{ url_for('prob_add',lecture_no=lecture_no) }}">
+								{% endif %}
+							</div>
+							{% for  i in prob_list3 %}
+							<div class="weekProbDetailDiv">
+								<ul>
+									<li>
+										<div class="weekProbDetailRowDiv">
+											<span class="">{{i.as_name}}</span>
+											{% if user_perm == 0 or user_perm== 3 %}
+                     						<img src="{{ url_for('static', filename='images/feedback_icon.png') }}" class="weekProbFeedbackBtn" alt="펜" link="{{ url_for('prob_submit_list',as_no=i.assignment_no,lecture_no=lecture_no) }}">
+											<img src="{{ url_for('static', filename='images/del_icon.png') }}" class="weekProbDetailDelBtn probDelDiv" link="{{ url_for('prob_del',lecture_no=lecture_no,as_no=i.assignment_no) }}" alt="-">
+											<img src="{{ url_for('static', filename='images/edit_icon.png') }}" class="lectureInfoDiv weekProbDetailEditBtn" link="{{ url_for('prob_mod',lecture_no=lecture_no,as_no=i.assignment_no) }}">
+                      						{% else %}                                                                                          
+                      						<img src="{{ url_for('static', filename='images/feedback_icon.png') }}" class="weekProbFeedbackBtn" alt="펜" link="{{ url_for('prob_feedback',as_no=i.assignment_no,lecture_no=lecture_no,user_no=user_no) }}">                           <img src="{{ url_for('static', filename='images/submit_icon.png') }}" class="weekProbSubmitBtn link" link="{{ url_for('prob_submit',as_no=i.assignment_no,lecture_no=lecture_no) }}">
+											{% endif %}
+										</div>
+									</li>
+								</ul>
+							</div>
+							{% endfor %}
+
+							<div class="weekProbTitleDiv">
+								<h2>4주차 과제</h2>
+								<img src="{{ url_for('static', filename='images/bottom-arrow.png') }}" class="weekProbDetailViewBtn" alt="아래화살표">
+								{% if user_perm == 0 or user_perm== 3 %}
+								<img src="{{ url_for('static', filename='images/plus.png') }}" class="weekProbAddBtn link" alt="+" link="{{ url_for('prob_add',lecture_no=lecture_no) }}">
+								{% endif %}
+							</div>
+							{% for  i in prob_list4 %}
+							<div class="weekProbDetailDiv">
+								<ul>
+									<li>
+										<div class="weekProbDetailRowDiv">
+											<span class="">{{i.as_name}}</span>
+											{% if user_perm == 0 or user_perm== 3 %}
+                     						<img src="{{ url_for('static', filename='images/feedback_icon.png') }}" class="weekProbFeedbackBtn" alt="펜" link="{{ url_for('prob_submit_list',as_no=i.assignment_no,lecture_no=lecture_no) }}">
+											<img src="{{ url_for('static', filename='images/del_icon.png') }}" class="weekProbDetailDelBtn probDelDiv" link="{{ url_for('prob_del',lecture_no=lecture_no,as_no=i.assignment_no) }}" alt="-">
+											<img src="{{ url_for('static', filename='images/edit_icon.png') }}" class="lectureInfoDiv weekProbDetailEditBtn" link="{{ url_for('prob_mod',lecture_no=lecture_no,as_no=i.assignment_no) }}">
+                      						{% else %}                                                                                          
+                      						<img src="{{ url_for('static', filename='images/feedback_icon.png') }}" class="weekProbFeedbackBtn" alt="펜" link="{{ url_for('prob_feedback',as_no=i.assignment_no,lecture_no=lecture_no,user_no=user_no) }}">                           <img src="{{ url_for('static', filename='images/submit_icon.png') }}" class="weekProbSubmitBtn link" link="{{ url_for('prob_submit',as_no=i.assignment_no,lecture_no=lecture_no) }}">
+											{% endif %}
+										</div>
+									</li>
+								</ul>
+							</div>
+							{% endfor %}
+
+							<div class="weekProbTitleDiv">
+								<h2>5주차 과제</h2>
+								<img src="{{ url_for('static', filename='images/bottom-arrow.png') }}" class="weekProbDetailViewBtn" alt="아래화살표">
+								{% if user_perm == 0 or user_perm== 3 %}
+								<img src="{{ url_for('static', filename='images/plus.png') }}" class="weekProbAddBtn link" alt="+" link="{{ url_for('prob_add',lecture_no=lecture_no) }}">
+								{% endif %}
+							</div>
+							{% for  i in prob_list5 %}
+							<div class="weekProbDetailDiv">
+								<ul>
+									<li>
+										<div class="weekProbDetailRowDiv">
+											<span class="">{{i.as_name}}</span>
+											{% if user_perm == 0 or user_perm== 3 %}
+                     						<img src="{{ url_for('static', filename='images/feedback_icon.png') }}" class="weekProbFeedbackBtn" alt="펜" link="{{ url_for('prob_submit_list',as_no=i.assignment_no,lecture_no=lecture_no) }}">
+											<img src="{{ url_for('static', filename='images/del_icon.png') }}" class="weekProbDetailDelBtn probDelDiv" link="{{ url_for('prob_del',lecture_no=lecture_no,as_no=i.assignment_no) }}" alt="-">
+											<img src="{{ url_for('static', filename='images/edit_icon.png') }}" class="lectureInfoDiv weekProbDetailEditBtn" link="{{ url_for('prob_mod',lecture_no=lecture_no,as_no=i.assignment_no) }}">
+                      						{% else %}                                                                                          
+                      						<img src="{{ url_for('static', filename='images/feedback_icon.png') }}" class="weekProbFeedbackBtn" alt="펜" link="{{ url_for('prob_feedback',as_no=i.assignment_no,lecture_no=lecture_no,user_no=user_no) }}">                           <img src="{{ url_for('static', filename='images/submit_icon.png') }}" class="weekProbSubmitBtn link" link="{{ url_for('prob_submit',as_no=i.assignment_no,lecture_no=lecture_no) }}">
+											{% endif %}
+										</div>
+									</li>
+								</ul>
+							</div>
+							{% endfor %}
+
+							<div class="weekProbTitleDiv">
+								<h2>6주차 과제</h2>
+								<img src="{{ url_for('static', filename='images/bottom-arrow.png') }}" class="weekProbDetailViewBtn" alt="아래화살표">
+								{% if user_perm == 0 or user_perm== 3 %}
+								<img src="{{ url_for('static', filename='images/plus.png') }}" class="weekProbAddBtn link" alt="+" link="{{ url_for('prob_add',lecture_no=lecture_no) }}">
+								{% endif %}
+							</div>
+							{% for  i in prob_list6 %}
+							<div class="weekProbDetailDiv">
+								<ul>
+									<li>
+										<div class="weekProbDetailRowDiv">
+											<span class="">{{i.as_name}}</span>
+											{% if user_perm == 0 or user_perm== 3 %}
+                     						<img src="{{ url_for('static', filename='images/feedback_icon.png') }}" class="weekProbFeedbackBtn" alt="펜" link="{{ url_for('prob_submit_list',as_no=i.assignment_no,lecture_no=lecture_no) }}">
+											<img src="{{ url_for('static', filename='images/del_icon.png') }}" class="weekProbDetailDelBtn probDelDiv" link="{{ url_for('prob_del',lecture_no=lecture_no,as_no=i.assignment_no) }}" alt="-">
+											<img src="{{ url_for('static', filename='images/edit_icon.png') }}" class="lectureInfoDiv weekProbDetailEditBtn" link="{{ url_for('prob_mod',lecture_no=lecture_no,as_no=i.assignment_no) }}">
+                      						{% else %}                                                                                          
+                      						<img src="{{ url_for('static', filename='images/feedback_icon.png') }}" class="weekProbFeedbackBtn" alt="펜" link="{{ url_for('prob_feedback',as_no=i.assignment_no,lecture_no=lecture_no,user_no=user_no) }}">                           <img src="{{ url_for('static', filename='images/submit_icon.png') }}" class="weekProbSubmitBtn link" link="{{ url_for('prob_submit',as_no=i.assignment_no,lecture_no=lecture_no) }}">
+											{% endif %}
+										</div>
+									</li>
+								</ul>
+							</div>
+							{% endfor %}
+							
+							<div class="weekProbTitleDiv">
+								<h2>7주차 과제</h2>
+								<img src="{{ url_for('static', filename='images/bottom-arrow.png') }}" class="weekProbDetailViewBtn" alt="아래화살표">
+								{% if user_perm == 0 or user_perm== 3 %}
+								<img src="{{ url_for('static', filename='images/plus.png') }}" class="weekProbAddBtn link" alt="+" link="{{ url_for('prob_add',lecture_no=lecture_no) }}">
+								{% endif %}
+							</div>
+							{% for  i in prob_list7 %}
+							<div class="weekProbDetailDiv">
+								<ul>
+									<li>
+										<div class="weekProbDetailRowDiv">
+											<span class="">{{i.as_name}}</span>
+											{% if user_perm == 0 or user_perm== 3 %}
+                     						<img src="{{ url_for('static', filename='images/feedback_icon.png') }}" class="weekProbFeedbackBtn" alt="펜" link="{{ url_for('prob_submit_list',as_no=i.assignment_no,lecture_no=lecture_no) }}">
+											<img src="{{ url_for('static', filename='images/del_icon.png') }}" class="weekProbDetailDelBtn probDelDiv" link="{{ url_for('prob_del',lecture_no=lecture_no,as_no=i.assignment_no) }}" alt="-">
+											<img src="{{ url_for('static', filename='images/edit_icon.png') }}" class="lectureInfoDiv weekProbDetailEditBtn" link="{{ url_for('prob_mod',lecture_no=lecture_no,as_no=i.assignment_no) }}">
+                      						{% else %}                                                                                          
+                      						<img src="{{ url_for('static', filename='images/feedback_icon.png') }}" class="weekProbFeedbackBtn" alt="펜" link="{{ url_for('prob_feedback',as_no=i.assignment_no,lecture_no=lecture_no,user_no=user_no) }}">                           <img src="{{ url_for('static', filename='images/submit_icon.png') }}" class="weekProbSubmitBtn link" link="{{ url_for('prob_submit',as_no=i.assignment_no,lecture_no=lecture_no) }}">
+											{% endif %}
+										</div>
+									</li>
+								</ul>
+							</div>
+							{% endfor %}
+
+							<div class="weekProbTitleDiv">
+								<h2>8주차 과제</h2>
+								<img src="{{ url_for('static', filename='images/bottom-arrow.png') }}" class="weekProbDetailViewBtn" alt="아래화살표">
+								{% if user_perm == 0 or user_perm== 3 %}
+								<img src="{{ url_for('static', filename='images/plus.png') }}" class="weekProbAddBtn link" alt="+" link="{{ url_for('prob_add',lecture_no=lecture_no) }}">
+								{% endif %}
+							</div>
+							{% for  i in prob_list8 %}
+							<div class="weekProbDetailDiv">
+								<ul>
+									<li>
+										<div class="weekProbDetailRowDiv">
+											<span class="">{{i.as_name}}</span>
+											{% if user_perm == 0 or user_perm== 3 %}
+                     						<img src="{{ url_for('static', filename='images/feedback_icon.png') }}" class="weekProbFeedbackBtn" alt="펜" link="{{ url_for('prob_submit_list',as_no=i.assignment_no,lecture_no=lecture_no) }}">
+											<img src="{{ url_for('static', filename='images/del_icon.png') }}" class="weekProbDetailDelBtn probDelDiv" link="{{ url_for('prob_del',lecture_no=lecture_no,as_no=i.assignment_no) }}" alt="-">
+											<img src="{{ url_for('static', filename='images/edit_icon.png') }}" class="lectureInfoDiv weekProbDetailEditBtn" link="{{ url_for('prob_mod',lecture_no=lecture_no,as_no=i.assignment_no) }}">
+                      						{% else %}                                                                                          
+                      						<img src="{{ url_for('static', filename='images/feedback_icon.png') }}" class="weekProbFeedbackBtn" alt="펜" link="{{ url_for('prob_feedback',as_no=i.assignment_no,lecture_no=lecture_no,user_no=user_no) }}">                           <img src="{{ url_for('static', filename='images/submit_icon.png') }}" class="weekProbSubmitBtn link" link="{{ url_for('prob_submit',as_no=i.assignment_no,lecture_no=lecture_no) }}">
+											{% endif %}
+										</div>
+									</li>
+								</ul>
+							</div>
+							{% endfor %}
+
+							<div class="weekProbTitleDiv">
+								<h2>9주차 과제</h2>
+								<img src="{{ url_for('static', filename='images/bottom-arrow.png') }}" class="weekProbDetailViewBtn" alt="아래화살표">
+								{% if user_perm == 0 or user_perm== 3 %}
+								<img src="{{ url_for('static', filename='images/plus.png') }}" class="weekProbAddBtn link" alt="+" link="{{ url_for('prob_add',lecture_no=lecture_no) }}">
+								{% endif %}
+							</div>
+							{% for  i in prob_list9 %}
+							<div class="weekProbDetailDiv">
+								<ul>
+									<li>
+										<div class="weekProbDetailRowDiv">
+											<span class="">{{i.as_name}}</span>
+											{% if user_perm == 0 or user_perm== 3 %}
+                     						<img src="{{ url_for('static', filename='images/feedback_icon.png') }}" class="weekProbFeedbackBtn" alt="펜" link="{{ url_for('prob_submit_list',as_no=i.assignment_no,lecture_no=lecture_no) }}">
+											<img src="{{ url_for('static', filename='images/del_icon.png') }}" class="weekProbDetailDelBtn probDelDiv" link="{{ url_for('prob_del',lecture_no=lecture_no,as_no=i.assignment_no) }}" alt="-">
+											<img src="{{ url_for('static', filename='images/edit_icon.png') }}" class="lectureInfoDiv weekProbDetailEditBtn" link="{{ url_for('prob_mod',lecture_no=lecture_no,as_no=i.assignment_no) }}">
+                      						{% else %}                                                                                          
+                      						<img src="{{ url_for('static', filename='images/feedback_icon.png') }}" class="weekProbFeedbackBtn" alt="펜" link="{{ url_for('prob_feedback',as_no=i.assignment_no,lecture_no=lecture_no,user_no=user_no) }}">                           <img src="{{ url_for('static', filename='images/submit_icon.png') }}" class="weekProbSubmitBtn link" link="{{ url_for('prob_submit',as_no=i.assignment_no,lecture_no=lecture_no) }}">
+											{% endif %}
+										</div>
+									</li>
+								</ul>
+							</div>
+							{% endfor %}
+
+							<div class="weekProbTitleDiv">
+								<h2>10주차 과제</h2>
+								<img src="{{ url_for('static', filename='images/bottom-arrow.png') }}" class="weekProbDetailViewBtn" alt="아래화살표">
+								{% if user_perm == 0 or user_perm== 3 %}
+								<img src="{{ url_for('static', filename='images/plus.png') }}" class="weekProbAddBtn link" alt="+" link="{{ url_for('prob_add',lecture_no=lecture_no) }}">
+								{% endif %}
+							</div>
+							{% for  i in prob_list10 %}
+							<div class="weekProbDetailDiv">
+								<ul>
+									<li>
+										<div class="weekProbDetailRowDiv">
+											<span class="">{{i.as_name}}</span>
+											{% if user_perm == 0 or user_perm== 3 %}
+                     						<img src="{{ url_for('static', filename='images/feedback_icon.png') }}" class="weekProbFeedbackBtn" alt="펜" link="{{ url_for('prob_submit_list',as_no=i.assignment_no,lecture_no=lecture_no) }}">
+											<img src="{{ url_for('static', filename='images/del_icon.png') }}" class="weekProbDetailDelBtn probDelDiv" link="{{ url_for('prob_del',lecture_no=lecture_no,as_no=i.assignment_no) }}" alt="-">
+											<img src="{{ url_for('static', filename='images/edit_icon.png') }}" class="lectureInfoDiv weekProbDetailEditBtn" link="{{ url_for('prob_mod',lecture_no=lecture_no,as_no=i.assignment_no) }}">
+                      						{% else %}                                                                                          
+                      						<img src="{{ url_for('static', filename='images/feedback_icon.png') }}" class="weekProbFeedbackBtn" alt="펜" link="{{ url_for('prob_feedback',as_no=i.assignment_no,lecture_no=lecture_no,user_no=user_no) }}">                           <img src="{{ url_for('static', filename='images/submit_icon.png') }}" class="weekProbSubmitBtn link" link="{{ url_for('prob_submit',as_no=i.assignment_no,lecture_no=lecture_no) }}">
+											{% endif %}
+										</div>
+									</li>
+								</ul>
+							</div>
+							{% endfor %}
+
+							<div class="weekProbTitleDiv">
+								<h2>11주차 과제</h2>
+								<img src="{{ url_for('static', filename='images/bottom-arrow.png') }}" class="weekProbDetailViewBtn" alt="아래화살표">
+								{% if user_perm == 0 or user_perm== 3 %}
+								<img src="{{ url_for('static', filename='images/plus.png') }}" class="weekProbAddBtn link" alt="+" link="{{ url_for('prob_add',lecture_no=lecture_no) }}">
+								{% endif %}
+							</div>
+							{% for  i in prob_list11 %}
+							<div class="weekProbDetailDiv">
+								<ul>
+									<li>
+										<div class="weekProbDetailRowDiv">
+											<span class="">{{i.as_name}}</span>
+											{% if user_perm == 0 or user_perm== 3 %}
+                     						<img src="{{ url_for('static', filename='images/feedback_icon.png') }}" class="weekProbFeedbackBtn" alt="펜" link="{{ url_for('prob_submit_list',as_no=i.assignment_no,lecture_no=lecture_no) }}">
+											<img src="{{ url_for('static', filename='images/del_icon.png') }}" class="weekProbDetailDelBtn probDelDiv" link="{{ url_for('prob_del',lecture_no=lecture_no,as_no=i.assignment_no) }}" alt="-">
+											<img src="{{ url_for('static', filename='images/edit_icon.png') }}" class="lectureInfoDiv weekProbDetailEditBtn" link="{{ url_for('prob_mod',lecture_no=lecture_no,as_no=i.assignment_no) }}">
+                      						{% else %}                                                                                          
+                      						<img src="{{ url_for('static', filename='images/feedback_icon.png') }}" class="weekProbFeedbackBtn" alt="펜" link="{{ url_for('prob_feedback',as_no=i.assignment_no,lecture_no=lecture_no,user_no=user_no) }}">                           <img src="{{ url_for('static', filename='images/submit_icon.png') }}" class="weekProbSubmitBtn link" link="{{ url_for('prob_submit',as_no=i.assignment_no,lecture_no=lecture_no) }}">
+											{% endif %}
+										</div>
+									</li>
+								</ul>
+							</div>
+							{% endfor %}
+
+							<div class="weekProbTitleDiv">
+								<h2>12주차 과제</h2>
+								<img src="{{ url_for('static', filename='images/bottom-arrow.png') }}" class="weekProbDetailViewBtn" alt="아래화살표">
+								{% if user_perm == 0 or user_perm== 3 %}
+								<img src="{{ url_for('static', filename='images/plus.png') }}" class="weekProbAddBtn link" alt="+" link="{{ url_for('prob_add',lecture_no=lecture_no) }}">
+								{% endif %}
+							</div>
+							{% for  i in prob_list12 %}
+							<div class="weekProbDetailDiv">
+								<ul>
+									<li>
+										<div class="weekProbDetailRowDiv">
+											<span class="">{{i.as_name}}</span>
+											{% if user_perm == 0 or user_perm== 3 %}
+                     						<img src="{{ url_for('static', filename='images/feedback_icon.png') }}" class="weekProbFeedbackBtn" alt="펜" link="{{ url_for('prob_submit_list',as_no=i.assignment_no,lecture_no=lecture_no) }}">
+											<img src="{{ url_for('static', filename='images/del_icon.png') }}" class="weekProbDetailDelBtn probDelDiv" link="{{ url_for('prob_del',lecture_no=lecture_no,as_no=i.assignment_no) }}" alt="-">
+											<img src="{{ url_for('static', filename='images/edit_icon.png') }}" class="lectureInfoDiv weekProbDetailEditBtn" link="{{ url_for('prob_mod',lecture_no=lecture_no,as_no=i.assignment_no) }}">
+                      						{% else %}                                                                                          
+                      						<img src="{{ url_for('static', filename='images/feedback_icon.png') }}" class="weekProbFeedbackBtn" alt="펜" link="{{ url_for('prob_feedback',as_no=i.assignment_no,lecture_no=lecture_no,user_no=user_no) }}">                           <img src="{{ url_for('static', filename='images/submit_icon.png') }}" class="weekProbSubmitBtn link" link="{{ url_for('prob_submit',as_no=i.assignment_no,lecture_no=lecture_no) }}">
+											{% endif %}
+										</div>
+									</li>
+								</ul>
+							</div>
+							{% endfor %}
+
+							<div class="weekProbTitleDiv">
+								<h2>13주차 과제</h2>
+								<img src="{{ url_for('static', filename='images/bottom-arrow.png') }}" class="weekProbDetailViewBtn" alt="아래화살표">
+								{% if user_perm == 0 or user_perm== 3 %}
+								<img src="{{ url_for('static', filename='images/plus.png') }}" class="weekProbAddBtn link" alt="+" link="{{ url_for('prob_add',lecture_no=lecture_no) }}">
+								{% endif %}
+							</div>
+							{% for  i in prob_list13 %}
+							<div class="weekProbDetailDiv">
+								<ul>
+									<li>
+										<div class="weekProbDetailRowDiv">
+											<span class="">{{i.as_name}}</span>
+											{% if user_perm == 0 or user_perm== 3 %}
+                     						<img src="{{ url_for('static', filename='images/feedback_icon.png') }}" class="weekProbFeedbackBtn" alt="펜" link="{{ url_for('prob_submit_list',as_no=i.assignment_no,lecture_no=lecture_no) }}">
+											<img src="{{ url_for('static', filename='images/del_icon.png') }}" class="weekProbDetailDelBtn probDelDiv" link="{{ url_for('prob_del',lecture_no=lecture_no,as_no=i.assignment_no) }}" alt="-">
+											<img src="{{ url_for('static', filename='images/edit_icon.png') }}" class="lectureInfoDiv weekProbDetailEditBtn" link="{{ url_for('prob_mod',lecture_no=lecture_no,as_no=i.assignment_no) }}">
+                      						{% else %}                                                                                          
+                      						<img src="{{ url_for('static', filename='images/feedback_icon.png') }}" class="weekProbFeedbackBtn" alt="펜" link="{{ url_for('prob_feedback',as_no=i.assignment_no,lecture_no=lecture_no,user_no=user_no) }}">                           <img src="{{ url_for('static', filename='images/submit_icon.png') }}" class="weekProbSubmitBtn link" link="{{ url_for('prob_submit',as_no=i.assignment_no,lecture_no=lecture_no) }}">
+											{% endif %}
+										</div>
+									</li>
+								</ul>
+							</div>
+							{% endfor %}
+
+							<div class="weekProbTitleDiv">
+								<h2>14주차 과제</h2>
+								<img src="{{ url_for('static', filename='images/bottom-arrow.png') }}" class="weekProbDetailViewBtn" alt="아래화살표">
+								{% if user_perm == 0 or user_perm== 3 %}
+								<img src="{{ url_for('static', filename='images/plus.png') }}" class="weekProbAddBtn link" alt="+" link="{{ url_for('prob_add',lecture_no=lecture_no) }}">
+								{% endif %}
+							</div>
+							{% for  i in prob_list14 %}
+							<div class="weekProbDetailDiv">
+								<ul>
+									<li>
+										<div class="weekProbDetailRowDiv">
+											<span class="">{{i.as_name}}</span>
+											{% if user_perm == 0 or user_perm== 3 %}
+                     						<img src="{{ url_for('static', filename='images/feedback_icon.png') }}" class="weekProbFeedbackBtn" alt="펜" link="{{ url_for('prob_submit_list',as_no=i.assignment_no,lecture_no=lecture_no) }}">
+											<img src="{{ url_for('static', filename='images/del_icon.png') }}" class="weekProbDetailDelBtn probDelDiv" link="{{ url_for('prob_del',lecture_no=lecture_no,as_no=i.assignment_no) }}" alt="-">
+											<img src="{{ url_for('static', filename='images/edit_icon.png') }}" class="lectureInfoDiv weekProbDetailEditBtn" link="{{ url_for('prob_mod',lecture_no=lecture_no,as_no=i.assignment_no) }}">
+                      						{% else %}                                                                                          
+                      						<img src="{{ url_for('static', filename='images/feedback_icon.png') }}" class="weekProbFeedbackBtn" alt="펜" link="{{ url_for('prob_feedback',as_no=i.assignment_no,lecture_no=lecture_no,user_no=user_no) }}">                           <img src="{{ url_for('static', filename='images/submit_icon.png') }}" class="weekProbSubmitBtn link" link="{{ url_for('prob_submit',as_no=i.assignment_no,lecture_no=lecture_no) }}">
+											{% endif %}
+										</div>
+									</li>
+								</ul>
+							</div>
+							{% endfor %}
+
+							<div class="weekProbTitleDiv">
+								<h2>15주차 과제</h2>
+								<img src="{{ url_for('static', filename='images/bottom-arrow.png') }}" class="weekProbDetailViewBtn" alt="아래화살표">
+								{% if user_perm == 0 or user_perm== 3 %}
+								<img src="{{ url_for('static', filename='images/plus.png') }}" class="weekProbAddBtn link" alt="+" link="{{ url_for('prob_add',lecture_no=lecture_no) }}">
+								{% endif %}
+							</div>
+							{% for  i in prob_list15 %}
+							<div class="weekProbDetailDiv">
+								<ul>
+									<li>
+										<div class="weekProbDetailRowDiv">
+											<span class="">{{i.as_name}}</span>
+											{% if user_perm == 0 or user_perm== 3 %}
+                     						<img src="{{ url_for('static', filename='images/feedback_icon.png') }}" class="weekProbFeedbackBtn" alt="펜" link="{{ url_for('prob_submit_list',as_no=i.assignment_no,lecture_no=lecture_no) }}">
+											<img src="{{ url_for('static', filename='images/del_icon.png') }}" class="weekProbDetailDelBtn probDelDiv" link="{{ url_for('prob_del',lecture_no=lecture_no,as_no=i.assignment_no) }}" alt="-">
+											<img src="{{ url_for('static', filename='images/edit_icon.png') }}" class="lectureInfoDiv weekProbDetailEditBtn" link="{{ url_for('prob_mod',lecture_no=lecture_no,as_no=i.assignment_no) }}">
+                      						{% else %}                                                                                          
+                      						<img src="{{ url_for('static', filename='images/feedback_icon.png') }}" class="weekProbFeedbackBtn" alt="펜" link="{{ url_for('prob_feedback',as_no=i.assignment_no,lecture_no=lecture_no,user_no=user_no) }}">                           <img src="{{ url_for('static', filename='images/submit_icon.png') }}" class="weekProbSubmitBtn link" link="{{ url_for('prob_submit',as_no=i.assignment_no,lecture_no=lecture_no) }}">
+											{% endif %}
+										</div>
+									</li>
+								</ul>
+							</div>
+							{% endfor %}
+
+							<div class="weekProbTitleDiv">
+								<h2>16주차 과제</h2>
+								<img src="{{ url_for('static', filename='images/bottom-arrow.png') }}" class="weekProbDetailViewBtn" alt="아래화살표">
+								{% if user_perm == 0 or user_perm== 3 %}
+								<img src="{{ url_for('static', filename='images/plus.png') }}" class="weekProbAddBtn link" alt="+" link="{{ url_for('prob_add',lecture_no=lecture_no) }}">
+								{% endif %}
+							</div>
+							{% for  i in prob_list16 %}
+							<div class="weekProbDetailDiv">
+								<ul>
+									<li>
+										<div class="weekProbDetailRowDiv">
+											<span class="">{{i.as_name}}</span>
+											{% if user_perm == 0 or user_perm== 3 %}
+                     						<img src="{{ url_for('static', filename='images/feedback_icon.png') }}" class="weekProbFeedbackBtn" alt="펜" link="{{ url_for('prob_submit_list',as_no=i.assignment_no,lecture_no=lecture_no) }}">
+											<img src="{{ url_for('static', filename='images/del_icon.png') }}" class="weekProbDetailDelBtn probDelDiv" link="{{ url_for('prob_del',lecture_no=lecture_no,as_no=i.assignment_no) }}" alt="-">
+											<img src="{{ url_for('static', filename='images/edit_icon.png') }}" class="lectureInfoDiv weekProbDetailEditBtn" link="{{ url_for('prob_mod',lecture_no=lecture_no,as_no=i.assignment_no) }}">
+                      						{% else %}                                                                                          
+                      						<img src="{{ url_for('static', filename='images/feedback_icon.png') }}" class="weekProbFeedbackBtn" alt="펜" link="{{ url_for('prob_feedback',as_no=i.assignment_no,lecture_no=lecture_no,user_no=user_no) }}">                           <img src="{{ url_for('static', filename='images/submit_icon.png') }}" class="weekProbSubmitBtn link" link="{{ url_for('prob_submit',as_no=i.assignment_no,lecture_no=lecture_no) }}">
 											{% endif %}
 										</div>
 									</li>

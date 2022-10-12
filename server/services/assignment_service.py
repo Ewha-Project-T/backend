@@ -17,7 +17,22 @@ import ast
 
 def prob_listing(lecture_no):
     as_list=Assignment.query.filter_by(lecture_no=lecture_no).all()
-    as_list_result=[]
+    as_list_result1=[]
+    as_list_result2=[]
+    as_list_result3=[]
+    as_list_result4=[]
+    as_list_result5=[]
+    as_list_result6=[]
+    as_list_result7=[]
+    as_list_result8=[]
+    as_list_result9=[]
+    as_list_result10=[]
+    as_list_result11=[]
+    as_list_result12=[]
+    as_list_result13=[]
+    as_list_result14=[]
+    as_list_result15=[]
+    as_list_result16=[]
     for lec in as_list:
         tmp={}
         tmp["assignment_no"]=vars(lec)["assignment_no"]
@@ -32,8 +47,56 @@ def prob_listing(lecture_no):
         tmp["disclosure"]=vars(lec)["disclosure"]
         tmp["original_text"]=vars(lec)["original_text"]
         tmp["upload_url"]=vars(lec)["upload_url"]
-        as_list_result.append(tmp)
+        if(tmp["week"]=="1주차"):
+            as_list_result1.append(tmp)
+        elif(tmp["week"]=="2주차"):
+            as_list_result2.append(tmp)
+        elif(tmp["week"]=="3주차"):
+            as_list_result3.append(tmp)
+        elif(tmp["week"]=="4주차"):
+            as_list_result4.append(tmp)
+        elif(tmp["week"]=="5주차"):
+            as_list_result5.append(tmp)
+        elif(tmp["week"]=="6주차"):
+            as_list_result6.append(tmp)
+        elif(tmp["week"]=="7주차"):
+            as_list_result7.append(tmp)
+        elif(tmp["week"]=="8주차"):
+            as_list_result8.append(tmp)
+        elif(tmp["week"]=="9주차"):
+            as_list_result9.append(tmp)
+        elif(tmp["week"]=="10주차"):
+            as_list_result10.append(tmp)
+        elif(tmp["week"]=="11주차"):
+            as_list_result11.append(tmp)
+        elif(tmp["week"]=="12주차"):
+            as_list_result12.append(tmp)
+        elif(tmp["week"]=="13주차"):
+            as_list_result13.append(tmp)
+        elif(tmp["week"]=="14주차"):
+            as_list_result14.append(tmp)
+        elif(tmp["week"]=="15주차"):
+            as_list_result15.append(tmp)
+        elif(tmp["week"]=="16주차"):
+            as_list_result16.append(tmp)
     db.session.remove()
+    as_list_result={}
+    as_list_result["1"]=as_list_result1
+    as_list_result["2"]=as_list_result2
+    as_list_result["3"]=as_list_result3
+    as_list_result["4"]=as_list_result4
+    as_list_result["5"]=as_list_result5
+    as_list_result["6"]=as_list_result6
+    as_list_result["7"]=as_list_result7
+    as_list_result["8"]=as_list_result8
+    as_list_result["9"]=as_list_result9
+    as_list_result["10"]=as_list_result10
+    as_list_result["11"]=as_list_result11
+    as_list_result["12"]=as_list_result12
+    as_list_result["13"]=as_list_result13
+    as_list_result["14"]=as_list_result14
+    as_list_result["15"]=as_list_result15
+    as_list_result["16"]=as_list_result16
     return as_list_result
 
 #major_convert={"한일통역":"ja-JP","한일번역":"ja-JP","한중통역":"zh-CN","한중번역":"zh-CN","한영통역":"en-US","한영번역":"en-US","한불통역":"fr-FR","한불번역":"fr-FR"}#임시용

@@ -22,6 +22,7 @@ def user_listing(mode=None):#mode none일시 전체검색, 1일시 가입승인�
         tmp_uesr["permission"] = user.permission
         tmp_uesr["login_fail"] = user.login_fail_limit
         tmp_uesr["access_check"] = user.access_check
+        tmp_uesr["access_check_admin"] = user.access_check_admin
         user_list.append(tmp_uesr)
     if not user_list:
         return AdminResult.NOT_FOUND,user_list

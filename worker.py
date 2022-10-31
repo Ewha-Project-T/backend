@@ -109,51 +109,54 @@ def do_stt_work(self, filename, locale="ko-KR"):
         myaudio[startidx[i]:endidx[i]].export(filepath, format="wav")
         files += [ domain + "/" + filepath ]
         local_file += [ filepath ]
-    
-    webhook_res = requests.post(
-        os.environ["STT_URL"],
-        headers={
-            "Content-Type": "application/json",
-            "Ocp-Apim-Subscription-Key": os.environ["STT_KEY"]
-        },
-        json={
-            "contentUrls": files,
-            "properties": {
-                "diarizationEnabled": False,
-                "wordLevelTimestampsEnabled": True,
-                "punctuationMode": "DictatedAndAutomatic",
-                "profanityFilterMode": "Masked"
-            },
-            "locale": locale,
-            "displayName": "Transcription of file using default model for en-US"
-        }
-    ).json()
-
-    url = webhook_res["links"]["files"]
-    res = { 'values': [] }
-    while len(res["values"]) == 0:
-        res = requests.get(
-            url,
-            headers={ "Ocp-Apim-Subscription-Key": os.environ['STT_KEY'] }
-        ).json()
-
-        time.sleep(1)
-    
-    for file in local_file:
-        os.unlink(file)
-
-    self.update_state(state='STT-DONE')
-
-    result = {'textFile': '', 'timestamps': [], 'annotations': []}
-    for i in range(len(sound)):
-        result['timestamps'].append({'start': startidx[i], 'end': endidx[i]})
-
-    flag = True
-    text = ''
-    delay_result = 0
-    pause_result = 0
 
     try:
+        result = {'textFile': '', 'timestamps': [], 'annotations': []}
+
+        if not len(files) > 0:
+            raise Exception("INVALID-FILE")
+
+        webhook_res = requests.post(
+            os.environ["STT_URL"],
+            headers={
+                "Content-Type": "application/json",
+                "Ocp-Apim-Subscription-Key": os.environ["STT_KEY"]
+            },
+            json={
+                "contentUrls": files,
+                "properties": {
+                    "diarizationEnabled": False,
+                    "wordLevelTimestampsEnabled": True,
+                    "punctuationMode": "DictatedAndAutomatic",
+                    "profanityFilterMode": "Masked"
+                },
+                "locale": locale,
+                "displayName": "Transcription of file using default model for en-US"
+            }
+        ).json()
+        url = webhook_res["links"]["files"]
+        res = { 'values': [] }
+        while len(res["values"]) == 0:
+            res = requests.get(
+                url,
+                headers={ "Ocp-Apim-Subscription-Key": os.environ['STT_KEY'] }
+            ).json()
+
+            time.sleep(1)
+        
+        for file in local_file:
+            os.unlink(file)
+
+        self.update_state(state='STT-DONE')
+
+        for i in range(len(sound)):
+            result['timestamps'].append({'start': startidx[i], 'end': endidx[i]})
+
+        flag = True
+        text = ''
+        delay_result = 0
+        pause_result = 0
+
         values = res["values"]
         for i in range(len(values)):
             kind = values[i]["kind"]
@@ -212,6 +215,8 @@ def do_stt_work(self, filename, locale="ko-KR"):
     except IndexError as e: # for none recognized text exception (recog["recognizedPhrases"][0]["nBest"][0]["lexical"])
         print(e)
         self.update_state(state='INDEX_ERROR')
+    except Exception as e:
+        self.update_state(state=e.args[0])
 
     stt = session.query(Stt).filter_by(wav_file=filename).first()
     if not stt:

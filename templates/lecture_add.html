@@ -34,6 +34,15 @@
 			$(".userList").append(eleList);
 			$(".userListPopDiv").hide();
 		});
+   //학생목록 필터링
+ 		$(document).on("change", "input[name=inputStyle02]", function(){
+			var ele = $.trim($(this).val());
+      var option = $.trim($("select[name=inputStyle02]").val());
+      $('.userListDiv > ul > li').hide();
+      var temp=$('.'+option+':contains("'+ele+'")');
+      $(temp).parent().show();
+		});
+   
 		function lectureSubmit(){
 			var lecture_attendee = [];
 			var attendeeEle = $(".userList li");
@@ -152,10 +161,13 @@
 			</div>
 			<div class="userListPopDiv">
 				<div class="userSearchDiv">
-					<select class="inputStyle01">
+					<select class="inputStyle01" name="inputStyle02">
 						<option>학과</option>
+            <option>이메일</option>
+            <option>이름</option>
+                                 
 					</select>
-					<input class="inputStyle01" type="text">
+					<input class="inputStyle01" name="inputStyle02" type="text">
 				</div>
 				<div class="userListDiv">
 					<ul>
@@ -168,9 +180,9 @@
 						{% for i in user_list %}
 						<li>
 							<input type="checkbox">
-							<span>{{i.major}}</span>
-							<span>{{i.email}}</span>
-							<span>{{i.name}}</span>
+							<span class="학과">{{i.major}}</span>
+							<span class="이메일">{{i.email}}</span>
+							<span class="이름">{{i.name}}</span>
 						</li>
 						{% endfor %}
 					</ul>

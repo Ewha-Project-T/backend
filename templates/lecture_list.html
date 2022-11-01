@@ -36,6 +36,14 @@
 			}
 			return false;
 		});
+   //연도 학기 필터
+ 		$(document).on("change", "select[name=semesterSelect]", function(){
+      var option = $.trim($("select[name=semesterSelect]").val());
+      $('.lectureListDiv > ul > li').hide();
+      var temp=$('div[name*="'+option+'"]');
+      $(temp).parent().show();
+      $(".lectureInfoAddDiv").parent().show();
+		});
 			</script>
 {% endblock %}
 
@@ -66,7 +74,7 @@
 					<ul>
 						{% for  i in lecture_list %}
 						<li>
-							<div class="lectureInfoDiv">
+							<div class="lectureInfoDiv" name="{{i.year}}-{{i.semester}}">
 								<div class="lectureTitleDiv link" link="{{ url_for('prob',lecture_no=i.lecture_no) }}">
 									<span>{{i.lecture_name}}<br>{{i.professor}}</span>
 									<img src="{{ url_for('static', filename='images/homework.png') }}">

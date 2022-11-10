@@ -106,6 +106,7 @@ class Assignment_feedback(db.Model):
     comment = db.Column(db.Text, nullable=False)
     start= db.Column(db.Integer)
     end= db.Column(db.Integer)
+    part= db.Column(db.Integer)
 
     check = db.relationship("Assignment_check", back_populates="feedback")
 

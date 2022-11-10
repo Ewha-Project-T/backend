@@ -37,12 +37,36 @@ var submitTextList = []; //녹음텍스트
 {% if as_info['as_type']=='번역' %}
 	submitTextList.push("{{user_trans_result}}");
 {% endif %}
-
 {% if stt_result != None %}
 {% for i in range(stt_result|length) %}
 submitTextList.push("{{stt_result[i].textFile}}");
 {% endfor %}
 {% endif %}
+
+var feedbackList = []; // 피드백 리스트
+{% autoescape false %}
+{% if feedback_list !=None %}
+	{% for i in feedback_list %}
+    var feedbackTmp;
+    feedbackTmp  = {"probIndex":{{i.probIndex}}, "text": "{{i.text}}", "start": {{i.start}}, "end": {{i.end}}, "tag":["{{i.tagList}}"], "comment": "{{i.comment}}", "stt_flag": 0};
+    feedbackList.push(feedbackTmp);
+	{% endfor %}
+{% endif %}
+{% endautoescape %}
+//stt_result
+{% if stt_result != None %}
+{% for i in range(stt_result|length) %}
+        {% for j in range(stt_feedback[i]|length) %}
+                var feedbackTmp;
+                var sf_start={{stt_feedback[i][j]['start']}}
+                var sf_end={{stt_feedback[i][j]['end']}}
+                var sf_type="{{stt_feedback[i][j]['type']}}"
+                feedbackTmp  = {"probIndex":{{i}}, "text": submitTextList[{{i}}].slice(sf_start,sf_end), "start": sf_start, "end": sf_end, "tag":[sf_type], "comment": "", "stt_flag":1};
+                feedbackList.push(feedbackTmp);
+        {% endfor %}
+{% endfor %}
+{% endif %}
+
 {% autoescape false %}
 var oriInputText = "{{ as_info['original_text'] }}";
 {% endautoescape %}
@@ -71,8 +95,23 @@ function loadData(index){
 	examplePlayer.src({ src: probFileList[index], type: 'audio/wav'});
 	submitPlayer.src({ src: submitFileList[index], type: 'audio/wav'});
 	{% endif %}
+	// 원문, stt 세팅
 	$(".exampleTextDiv div").empty().text(oriInputText);
 	$(".assignmentTextDiv div").empty().text(submitTextList[index]);
+
+	// 피드백 세팅
+	$(".feedbackContentDiv ul").empty();
+	var feedback;
+	for(var i=0; i<feedbackList.length; i++){
+		feedback = feedbackList[i];
+		if(feedback['probIndex'] == probIndex){
+			var seq = createFeedback(feedback['text'], feedback['start'], feedback['end'],feedback['stt_flag']);
+			for(var j=0; j<feedback['tag'].length; j++){
+				createFeedbackTag(seq, feedback['tag'][j]);
+			}
+			setFeedbackComment(seq, feedback['comment']);
+		}
+	}
 }
 
 function selectText(){
@@ -105,7 +144,7 @@ function selectText(){
 	return {'txt': txt, 'sOffset': sOffset, 'eOffset': eOffset};
 }
 
-function createFeedback(txt, s, e){
+function createFeedback(txt, s, e,stt_flag){
 	if(txt.trim() == ""){
 		return false;
 	}
@@ -129,10 +168,13 @@ function createFeedback(txt, s, e){
 		}
 	}
 
-	var seq = new Date().getTime() + "" +new Date().getMilliseconds();
+	var seq = new Date().getTime() + "" + new Date().getMilliseconds() + Math.floor(Math.random()*10000).toString();
 	var ele = $("<li />").attr({ "id": seq, "sOffset": s, "eOffset": e });
 	var rowDiv = $("<div />").addClass("feedbackContentRowDiv");
-	var rowTitleDiv = $("<div />").addClass("feedbackContentRowTitleDiv");
+  if(stt_flag==0)
+      var rowTitleDiv = $("<div />").addClass("feedbackContentRowTitleDiv");
+  else
+      var rowTitleDiv = $("<div />").addClass("feedbackContentRowTitleDiv2");
 	var rowContentDiv = $("<div />").addClass("feedbackContentRowContentDiv");
 	var rowContentTxtDiv = $("<div />").addClass("feedbackContentTxtDiv").text(txt);
 	var rowContentTagDiv = $("<div />").addClass("feedbackContentTagDiv");
@@ -219,6 +261,9 @@ function saveFeedback(){
 	for(var i=0; i<feedbackEleList.length; i++){
 		var ele = $(feedbackEleList[i]);
 		var txt = ele.find(".feedbackContentTxtDiv").text();
+    var stt_flag = ele.find(".feedbackContentRowTitleDiv2");
+    if(stt_flag.length>0)
+        continue;
 		var sOffset = ele.attr("sOffset");
 		var eOffset = ele.attr("eOffset");
 		var tagList = [];
@@ -229,6 +274,7 @@ function saveFeedback(){
 		var cmt = ele.find(".feedbackContentCmtDiv textarea").val();
 
 		feedbackList.push({
+			"probIndex": probIndex,
 			"text": txt,
 			"sOffset": sOffset,
 			"eOffset": eOffset,
@@ -240,7 +286,7 @@ function saveFeedback(){
 	var params = {
 			"lecture_no":"{{lecture_no}}",
 			"as_no":"{{as_no}}",
-      "user_no":"{{user_no}}",
+			"user_no":"{{user_no}}",
 			"feedback":feedbackList,
 			"professor_review":pro_rev
 		};
@@ -250,7 +296,7 @@ function saveFeedback(){
 			headers: {'Content-Type': 'application/json'},
 			data: JSON.stringify(params),
 			success: function(d){
-				location.href="/prob?lecture_no={{lecture_no}}"
+			  location.href="prob_submit_list?as_no={{as_info['as_no']}}&lecture_no={{lecture_no}}"
 			}
 		});
 }
@@ -265,7 +311,11 @@ function feedbackSort(){
 	for(var i=0; i<eleList.length; i++){
 //		var txt = $(eleList[i]).find(".feedbackContentTxtDiv").text();
 //		sortList.push({"id": $(eleList[i]).attr("id"), "index": assignmentText.indexOf(txt)});
-		sortList.push({"id": $(eleList[i]).attr("id"), "sOffset": parseInt($(eleList[i]).attr("sOffset")), "eOffset": parseInt($(eleList[i]).attr("eOffset"))});
+    var stt_flag=0;
+    if($(eleList[i]).find(".feedbackContentRowTitleDiv2").length>0)
+      stt_flag=1;
+
+		sortList.push({"id": $(eleList[i]).attr("id"), "sOffset": parseInt($(eleList[i]).attr("sOffset")), "eOffset": parseInt($(eleList[i]).attr("eOffset")), "stt_flag":stt_flag});
 	}
 	sortList.sort(function(a, b){ return a.sOffset < b.sOffset ? -1 : a.sOffset > b.sOffset ? 1 : 0; });
 	$(".feedbackContentDiv>ul").empty();
@@ -277,6 +327,7 @@ function feedbackSort(){
 		$(".feedbackContentDiv>ul").append(pEle.find("li#" + sortList[i].id));
 		var sOffset = sortList[i].sOffset;
 		var eOffset = sortList[i].eOffset;
+    if(sortList[i].stt_flag==0){
 		if(sortList.length == 1){
 			blockAssignmentText = assignmentText.slice(0, sOffset) + "<span class='feedbackBlock'>" + assignmentText.slice(sOffset, eOffset) + "</span>" + assignmentText.slice(eOffset);
 			break;
@@ -290,6 +341,21 @@ function feedbackSort(){
 			blockAssignmentText = blockAssignmentText + assignmentText.slice(peOffset, sOffset) + "<span class='feedbackBlock'>" + assignmentText.slice(sOffset, eOffset) + "</span>";
 			peOffset = eOffset;
 		}
+   }else{
+     if(sortList.length == 1){
+			blockAssignmentText = assignmentText.slice(0, sOffset) + "<span class='feedbackBlock2'>" + assignmentText.slice(sOffset, eOffset) + "</span>" + assignmentText.slice(eOffset);
+			break;
+		}
+		if(i == 0){
+			blockAssignmentText = assignmentText.slice(0, sOffset) + "<span class='feedbackBlock2'>" + assignmentText.slice(sOffset, eOffset) + "</span>";
+			peOffset = eOffset;
+		}else if(i == sortList.length - 1){
+			blockAssignmentText = blockAssignmentText + assignmentText.slice(peOffset, sOffset) + "<span class='feedbackBlock2'>" + assignmentText.slice(sOffset, eOffset) + "</span>" + assignmentText.slice(eOffset);
+		}else{
+			blockAssignmentText = blockAssignmentText + assignmentText.slice(peOffset, sOffset) + "<span class='feedbackBlock2'>" + assignmentText.slice(sOffset, eOffset) + "</span>";
+			peOffset = eOffset;
+		}
+   }
 	}
 	$(".assignmentTextDiv div").html(blockAssignmentText);
 }
@@ -304,7 +370,7 @@ $(document).ready(function(){
 	{% endif %}
 	// 1번문제 로딩
 	loadData(0);
-	// 피드백 로딩
+/*	// 피드백 로딩
 {% autoescape false %}
 {% if feedback_list !=None %}
 	{% for i in feedback_list %}
@@ -328,7 +394,7 @@ $(document).ready(function(){
         {% endfor %}
 {% endfor %}
 {% endif %}
-
+*/
 	// 탭 클릭
 	$(document).on("click", ".feedbackProbTab li", function(){
 		loadData($(this).attr("idx"));
@@ -341,7 +407,7 @@ $(document).ready(function(){
 			return false;
 		}
 		var txt = txtObj.txt;
-		createFeedback(txt, txtObj.sOffset, txtObj.eOffset);
+		createFeedback(txt, txtObj.sOffset, txtObj.eOffset,0);
 	});
 
 	// 피드백 상자 삭제

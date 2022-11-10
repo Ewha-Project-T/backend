@@ -127,7 +127,7 @@ $(document).ready(function(){
      			probAudioPlayer.addRegion({start : {{i["start"]}}, end: {{i.end}}});
 			}
    		{% endfor %}
-		audioSizeUpdate();
+		//audioSizeUpdate();
 		regionUpdate("", "");
 	});
 	probAudioPlayer.on('region-update-end', function(region, e){

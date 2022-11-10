@@ -326,6 +326,7 @@ def get_as_info(lecture_no,assignment_no):
     acc= Assignment.query.filter_by(lecture_no=lecture_no,assignment_no=assignment_no).first()
     if acc==None:
         return None
+    as_list_result["as_no"]=vars(acc)["assignment_no"]
     as_list_result["lecture_no"]=vars(acc)["lecture_no"]
     as_list_result["week"]=vars(acc)["week"]
     as_list_result["limit_time"]=vars(acc)["limit_time"]
@@ -348,7 +349,11 @@ def set_feedback(as_no,lecture_no,professor_review,feedback,user_no):
     check.professor_review=professor_review
     db.session.add(check)
     db.session.commit()
-    acc=Assignment_feedback.query.filter_by(check_no=check.check_no).all()
+    part=0
+    if feedback!=None:
+        json_reg=ast.literal_eval(feedback[0])
+        part=json_reg["probIndex"]
+    acc=Assignment_feedback.query.filter_by(check_no=check.check_no,part=part).all()
     for i in acc:
         db.session.delete(i)
         db.session.commit()
@@ -360,7 +365,8 @@ def set_feedback(as_no,lecture_no,professor_review,feedback,user_no):
             reg_comment=json_reg["comment"]
             start=json_reg["sOffset"]
             end=json_reg["eOffset"]
-            acc=Assignment_feedback(check_no=check.check_no,target_text=reg_text,text_type=reg_taglist,comment=reg_comment,start=start,end=end)
+            part=json_reg["probIndex"]
+            acc=Assignment_feedback(check_no=check.check_no,target_text=reg_text,text_type=reg_taglist,comment=reg_comment,start=start,end=end,part=part)
             db.session.add(acc)
             db.session.commit()
 
@@ -384,11 +390,12 @@ def get_feedback(as_no,lecture_no,user_no):
         tmp["text"]=tmp["text"].replace(">","&gt")
         tmp["tagList"]=i.text_type.replace("<","&lt")
         tmp["tagList"]=tmp["tagList"].replace(">","&gt")
-        tmp["tagList"]=tmp["tagList"].split(",")
+        tmp["tagList"]=tmp["tagList"].replace(",",'","')
         tmp["comment"]=i.comment.replace("<","&lt")
         tmp["comment"]=tmp["comment"].replace(">","&gt")
         tmp["start"]=i.start
         tmp["end"]=i.end
+        tmp["probIndex"]=i.part
         feedback_list.append(tmp)
     return utr,pro_review,feedback_list
     
@@ -400,7 +407,7 @@ def get_prob_submit_list(as_no,lecture_no):
         tmp["attendee_no"]=i.attendee_no
         tmp["user_no"]=i.user_no
         user=User.query.filter_by(user_no=i.user_no).first()
-        if(user.permission!=1):
+        if(user.permission!=1 and user.permission!=2):#조교권한 학생급으로 변경
             continue
         tmp["major"]=user.major
         tmp["email"]=user.email

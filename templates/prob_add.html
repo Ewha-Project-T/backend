@@ -193,7 +193,7 @@ $(document).ready(function(){
 
 {% block content %}
 <div class="contentDiv">
-	<h1>과제 추가</h1>
+	<h1>{% if user_info['user_perm']==1 or user_info['user_perm']==2 %}자습용 과제 추가{% else %}과제 추가{% endif%}</h1>
 	<div class="probAddFormDiv">
 		<div class="probAddFormLeftDiv">
 			<div class="inputFormDiv">
@@ -276,8 +276,8 @@ $(document).ready(function(){
 				</div>
 			</div>
 			<div class="inputFormDiv">
-				<input type="checkbox" name="prob_open">
-				<label for class="probAddFormLabel">자습용 과제(개발중)</label>
+				<input type="checkbox" name="prob_open"{% if user_info['user_perm']==1 or user_info['user_perm']==2 %}checked disabled{% endif %}>
+				<label for class="probAddFormLabel">자습용 과제</label>
 			</div>
 		</div>
 		<div class="probAddFormRightDiv">

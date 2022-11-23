@@ -15,8 +15,10 @@ import os
 import uuid
 import ast
 
-def prob_listing(lecture_no):
-    as_list=Assignment.query.filter_by(lecture_no=lecture_no).all()
+def prob_listing(lecture_no,user_no):
+    as_list=Assignment.query.filter_by(lecture_no=lecture_no,disclosure=1).all()
+    as_list2=Assignment.query.filter_by(user_no=user_no,disclosure=0).all()
+    as_list.extend(as_list2)
     as_list_result1=[]
     as_list_result2=[]
     as_list_result3=[]
@@ -101,8 +103,8 @@ def prob_listing(lecture_no):
 
 #major_convert={"한일통역":"ja-JP","한일번역":"ja-JP","한중통역":"zh-CN","한중번역":"zh-CN","한영통역":"en-US","한영번역":"en-US","한불통역":"fr-FR","한불번역":"fr-FR"}#임시용
 major_convert={"jp":"ja-JP","en":"en-US","cn":"zh-CN","fr":"fr-FR"}
-def make_as(lecture_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,original_text="",upload_url="",region=None,user_info=None,prob_translang_source="ko",prob_translang_destination="ko"):
-    acc=Assignment(lecture_no=lecture_no,week=week,limit_time=limit_time,as_name=as_name,as_type=as_type,keyword=keyword,description=description,re_limit=re_limit,speed=speed,disclosure=disclosure,original_text=original_text,upload_url=upload_url,translang=prob_translang_source)
+def make_as(user_no,lecture_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,original_text="",upload_url="",region=None,user_info=None,prob_translang_source="ko",prob_translang_destination="ko"):
+    acc=Assignment(user_no=user_no,lecture_no=lecture_no,week=week,limit_time=limit_time,as_name=as_name,as_type=as_type,keyword=keyword,description=description,re_limit=re_limit,speed=speed,disclosure=disclosure,original_text=original_text,upload_url=upload_url,translang=prob_translang_source)
     db.session.add(acc)
     db.session.commit()
     lecture_major=prob_translang_source

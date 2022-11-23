@@ -23,6 +23,7 @@ class User(db.Model):
     access_code= db.Column(db.String(150),nullable=True)
     access_code_time=db.Column(db.DateTime, onupdate=datetime.utcnow()+timedelta(hours=9))#테이블 삭제시 오류날수도
 
+    assignment= db.relationship("Assignment",back_populates="user",cascade="all, delete",passive_deletes=True,)
     attendee= db.relationship("Attendee",back_populates="user",cascade="all, delete",passive_deletes=True,)
     stt= db.relationship("Stt",back_populates="user",cascade="all, delete",passive_deletes=True,)
     def __init__(self, *args, **kwargs):
@@ -62,6 +63,7 @@ class Attendee(db.Model):
 class Assignment(db.Model):
     __tablename__="ASSIGNMENT"
     assignment_no = db.Column(db.Integer, primary_key=True)
+    user_no = db.Column(db.Integer, db.ForeignKey("USER.user_no", ondelete="CASCADE"), nullable=True)
     lecture_no = db.Column(db.Integer, db.ForeignKey("LECTURE.lecture_no", ondelete="CASCADE"), nullable=True)
     week = db.Column(db.String(20), nullable=False)
     limit_time = db.Column(db.DateTime, nullable=False)
@@ -76,6 +78,7 @@ class Assignment(db.Model):
     original_text= db.Column(db.Text)
     upload_url= db.Column(db.String(100))
     
+    user = db.relationship("User",back_populates="assignment")
     lecture = db.relationship("Lecture",back_populates="assignment")
 
     assignment_check= db.relationship("Assignment_check",back_populates="assignment",cascade="all, delete",passive_deletes=True,)

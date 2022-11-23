@@ -28,7 +28,7 @@ class Prob(Resource):
         parser.add_argument('lecture_no', type=int, required=True, help="lecture_no is required")
         args = parser.parse_args()
         lecture_no = args['lecture_no']
-        prob_list=prob_listing(lecture_no)
+        prob_list=prob_listing(lecture_no,user_info["user_no"])
         return make_response(render_template("prob_list.html",prob_list1=prob_list["1"],prob_list2=prob_list["2"],prob_list3=prob_list["3"],prob_list4=prob_list["4"],prob_list5=prob_list["5"],prob_list6=prob_list["6"],prob_list7=prob_list["7"],prob_list8=prob_list["8"],prob_list9=prob_list["9"],prob_list10=prob_list["10"],prob_list11=prob_list["11"],prob_list12=prob_list["12"],prob_list13=prob_list["13"],prob_list14=prob_list["14"],prob_list15=prob_list["15"],prob_list16=prob_list["16"],lecture_no=lecture_no,user_perm=user_info["user_perm"],user_info=user_info,user_no=user_info["user_no"]))
 
 class Prob_add(Resource):
@@ -83,7 +83,7 @@ class Prob_add(Resource):
         original_text = args['original_text']
         original_text=original_text.replace("<","&lt")
         original_text=original_text.replace(">","&gt")
-        make_as(lecture_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,original_text,upload_path,prob_region,user_info,prob_translang_source,prob_translang_destination)
+        make_as(user_info["user_no"],lecture_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,original_text,upload_path,prob_region,user_info,prob_translang_source,prob_translang_destination)
         return{"msg" : "success"},200
 
 class Prob_mod(Resource):

@@ -40,9 +40,7 @@ $(document).on("click",".probDelDiv", function(){
 								{% if prob_list1 %}
 								<img src="{{ url_for('static', filename='images/bottom-arrow.png') }}" class="weekProbDetailViewBtn" alt="아래화살표">
 								{% endif %}
-								{% if user_perm == 0 or user_perm== 3 %}
 								<img src="{{ url_for('static', filename='images/plus.png') }}" class="weekProbAddBtn link" alt="+" link="{{ url_for('prob_add',lecture_no=lecture_no) }}">
-								{% endif %}
 							</div>
 							{% for  i in prob_list1 %}
 							<div class="weekProbDetailDiv">

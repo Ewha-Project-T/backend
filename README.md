@@ -38,7 +38,7 @@ url/apidocs/#/경로로 이동
 앱빌드 명령어
 docker-compose build
 docker-compose -f docker-compose.dev.yml build  // 이미지 빌드 
-docker image ls
+docker image ls //이미지 목록확인
 ```
 
 ```

@@ -30,5 +30,31 @@ root
 swagger 보기:
 url/apidocs/#/경로로 이동
 
+## 도커 사용법
+```
+먼저 git clone 을 통해 https://github.com/Ewha-Project-T/ewha_deploy을 복사해줍니다.
+```
+```
+앱빌드 명령어
+docker-compose build
+docker-compose -f docker-compose.dev.yml build  // 이미지 빌드 
+docker image ls
+```
+
+```
+도커 사용시 명령어
+docker-compose down : 도커 컨테이너를 중지 시키고 삭제 합니다.
+docker-compose stop : 도커 컨테이너를 중지 시킵니다. 
+docker-compose start : 도커 컨테이너를 실행합니다. 
+docker-compose ps : 컨테이너 상태를 확인합니다.
+docker-compose exec [servicename] [shell cmd] : 도커 컨테이너 접속 
+접속시 컨테이너 명이 아니고 .yml 파일에 작성한  서비스 명(ubuntu)입니다.(ps명령어로 확인가능)
+```
+
+```
+도커관리법
+deploy는 그대로 두시면됩니다. deploy아래의 app폴더에 들어가 개발진행을 하면 됩니다.
+변경사항은 git 명령어를 통해 저장하시면 됩니다.
+```
 
 

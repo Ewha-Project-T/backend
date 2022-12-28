@@ -235,6 +235,7 @@ def do_stt_work(self, filename, locale="ko-KR"):
     job.stt_result = repr(result)
     session.add(job)
     session.commit()
+    session.close()
 
     return result
 
@@ -395,5 +396,6 @@ def do_sequential_stt_work(self, filename, index, locale="ko-KR"):
     job.stt_result = repr(result)
     session.add(job)
     session.commit()
+    session.close()
 
     return result

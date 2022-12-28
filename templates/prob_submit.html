@@ -23,12 +23,12 @@ beepAudio.addEventListener("ended", function(){
 	if(submitType == "순차통역"){
 		exampleAudioPlayer.play();
 		btnEle.addClass("recoding");
-		btnEle.text("통역완료");
+		btnEle.text("원음재생 중");
 	}else if(submitType == "동시통역"){
 		exampleAudioPlayer.play();
 		submitAudioPlayer.record().start();
 		btnEle.addClass("recoding");
-		btnEle.text("통역완료");
+		btnEle.text("통역종료");
 	}
 });
 
@@ -68,7 +68,11 @@ function loadProb(index){
 
 	var btnEle = $(".simultaneousBtn");
 	btnEle.removeClass("recoding");
+  {% if as_info['as_type']=="동시통역" %}
+  btnEle.text("통역시작");
+  {% else %}
 	btnEle.text("구간 "+(probIndex+1)+" - 통역시작");
+  {% endif %}
 	$("#exampleAudioVolumn").val(exampleAudioPlayer.player().volume() * 10);
 }
 
@@ -121,6 +125,8 @@ $(document).ready(function(){
 			exampleAudioPlayer.pause();
 			exampleAudioPlayer.currentTime(0);
 			submitAudioPlayer.record().start();
+      var btnEle = $(".simultaneousBtn");
+	    btnEle.text("통역완료");
 		}else if(submitType == "동시통역"){
 			exampleAudioPlayer.pause();
 			exampleAudioPlayer.currentTime(0);

@@ -22,6 +22,9 @@
 		
 		</script>
 		<script type="text/javascript">
+   const agent=window.navigator.userAgent.toLowerCase();
+if(!(agent.indexOf("chrome")>-1&& !!window.chrome))
+    alert("크롬 브라우저 미사용시 일부 기능이 제한될 수 있습니다.");
 			//강의삭제
 		$(document).on("click",".lectureDelDiv", function(){
 			if(confirm("삭제하시겠습니까?")){

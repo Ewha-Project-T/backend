@@ -1,8 +1,9 @@
-from celery import Celery
+from celery import Celery, Task
 from pydub import AudioSegment, silence
 from nltk.tokenize import sent_tokenize
 from sqlalchemy import create_engine, orm
 from sqlalchemy import Column, Text, Integer, String, Boolean, ForeignKey
+from sqlalchemy.orm import Session
 from sqlalchemy.ext.declarative import declarative_base, DeclarativeMeta
 
 import os
@@ -22,9 +23,10 @@ BROKER = os.environ['REDIS_BACKEND']
 CELERY_RESULT_BACKEND = os.environ['REDIS_BACKEND']
 celery = Celery("tasks", broker=BROKER, backend=CELERY_RESULT_BACKEND)
 
-engine = create_engine(f"mysql+pymysql://{env['SQL_USER']}:{env['SQL_PASSWORD']}@{env['SQL_HOST']}:{env['SQL_PORT']}/{env['SQL_DATABASE']}")
-base.metadata.bind = engine
-session = orm.scoped_session(orm.sessionmaker())(bind=engine)
+def get_session():
+    engine = create_engine(f"mysql+pymysql://{env['SQL_USER']}:{env['SQL_PASSWORD']}@{env['SQL_HOST']}:{env['SQL_PORT']}/{env['SQL_DATABASE']}")
+    base.metadata.bind = engine
+    return orm.scoped_session(orm.sessionmaker())(bind=engine)
 
 class Stt(base):
     __tablename__ = "STT"
@@ -61,6 +63,20 @@ class AlchemyEncoder(json.JSONEncoder):
 
         return json.JSONEncoder.default(self, obj)
 
+class DBTask(Task):
+    _session: Session = None
+
+    # def after_return(self, status, retval, task_id, args, kwargs, einfo):
+    #     if self._session is not None:
+    #         self._session.close()
+    #         self._session = None
+
+    @property
+    def session(self):
+        if self._session is None:
+            self._session = get_session()
+        return self._session
+
 def process_stt_result(stt):
     result = stt
     result = re.sub('니다', '니다. ', result)
@@ -77,8 +93,10 @@ def process_stt_result(stt):
     result = ' '.join(result)
     return result
 
-@celery.task(bind=True)
+@celery.task(base=DBTask, bind=True)
 def do_stt_work(self, filename, locale="ko-KR"):
+    session = self.session
+
     self.update_state(state='INDEXING')
 
     filepath = f"{os.environ['UPLOAD_PATH']}/{filename}.wav"
@@ -143,7 +161,6 @@ def do_stt_work(self, filename, locale="ko-KR"):
             ).json()
 
             time.sleep(1)
-        
         for file in local_file:
             os.unlink(file)
 
@@ -214,13 +231,14 @@ def do_stt_work(self, filename, locale="ko-KR"):
             result['textFile'] += stt
     except IndexError as e: # for none recognized text exception (recog["recognizedPhrases"][0]["nBest"][0]["lexical"])
         print(e)
+        # session.rollback()
         self.update_state(state='INDEX_ERROR')
     except Exception as e:
+        # session.rollback()
         self.update_state(state=e.args[0])
 
     stt = session.query(Stt).filter_by(wav_file=filename).first()
     if not stt:
-        session.close()
         return False
 
     job = SttJob(
@@ -235,12 +253,13 @@ def do_stt_work(self, filename, locale="ko-KR"):
     job.stt_result = repr(result)
     session.add(job)
     session.commit()
-    session.close()
 
     return result
 
-@celery.task(bind=True)
+@celery.task(base=DBTask, bind=True)
 def do_sequential_stt_work(self, filename, index, locale="ko-KR"):
+    session = get_session()
+
     filepath = f"{os.environ['UPLOAD_PATH']}/{filename}.wav"
     myaudio = AudioSegment.from_file(filepath)
 
@@ -299,7 +318,6 @@ def do_sequential_stt_work(self, filename, index, locale="ko-KR"):
                 "displayName": "Transcription of file using default model for en-US"
             }
         ).json()
-
         url = webhook_res["links"]["files"]
         res = { 'values': [] }
         while len(res["values"]) == 0:
@@ -380,7 +398,6 @@ def do_sequential_stt_work(self, filename, index, locale="ko-KR"):
     
     stt = session.query(Stt).filter_by(wav_file=filename).first()
     if stt is None:
-        session.close()
         return False
 
     job = SttJob(
@@ -396,6 +413,5 @@ def do_sequential_stt_work(self, filename, index, locale="ko-KR"):
     job.stt_result = repr(result)
     session.add(job)
     session.commit()
-    session.close()
 
     return result

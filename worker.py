@@ -24,7 +24,7 @@ CELERY_RESULT_BACKEND = os.environ['REDIS_BACKEND']
 celery = Celery("tasks", broker=BROKER, backend=CELERY_RESULT_BACKEND)
 
 def get_session():
-    engine = create_engine(f"mysql+pymysql://{env['SQL_USER']}:{env['SQL_PASSWORD']}@{env['SQL_HOST']}:{env['SQL_PORT']}/{env['SQL_DATABASE']}")
+    engine = create_engine(f"mysql+pymysql://{env['SQL_USER']}:{env['SQL_PASSWORD']}@{env['SQL_HOST']}:{env['SQL_PORT']}/{env['SQL_DATABASE']}", pool_pre_ping=True)
     base.metadata.bind = engine
     return orm.scoped_session(orm.sessionmaker())(bind=engine)
 
@@ -74,7 +74,7 @@ class DBTask(Task):
     @property
     def session(self):
         if self._session is None:
-            self._session = get_session()
+            self._session, self._engine = get_session()
         return self._session
 
 def process_stt_result(stt):
@@ -101,7 +101,6 @@ def do_stt_work(self, filename, locale="ko-KR"):
 
     filepath = f"{os.environ['UPLOAD_PATH']}/{filename}.wav"
     myaudio = AudioSegment.from_file(filepath)
-
     dBFS = myaudio.dBFS
     sound = silence.detect_nonsilent(
         myaudio, min_silence_len=1000, silence_thresh=dBFS - 16)  # 1초 이상의 silence
@@ -130,7 +129,6 @@ def do_stt_work(self, filename, locale="ko-KR"):
 
     try:
         result = {'textFile': '', 'timestamps': [], 'annotations': []}
-
         if not len(files) > 0:
             raise Exception("INVALID-FILE")
 
@@ -168,7 +166,6 @@ def do_stt_work(self, filename, locale="ko-KR"):
 
         for i in range(len(sound)):
             result['timestamps'].append({'start': startidx[i], 'end': endidx[i]})
-
         flag = True
         text = ''
         delay_result = 0
@@ -181,6 +178,8 @@ def do_stt_work(self, filename, locale="ko-KR"):
                 continue
 
             recog = requests.get(values[i]["links"]["contentUrl"]).json()
+            if(not recog["recognizedPhrases"]):
+                continue
             stt = process_stt_result(recog["recognizedPhrases"][0]["nBest"][0]["lexical"])
             text += stt
             sentences = sent_tokenize(stt)

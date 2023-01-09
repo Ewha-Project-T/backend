@@ -271,6 +271,7 @@ $(document).ready(function(){
                 });
 	}
 //        });
+$("input[name=prob_submit_file]").hide();   //첨부파일 숨기기
 
 	$(document).on("click", ".submitRecordDataBtn", function(){
 		var submitUUID = [];
@@ -298,6 +299,34 @@ $(document).ready(function(){
 		});
 	});
 
+//파일첨부기능
+  $(document).on("click", ".submitRecordFileBtn", function(){
+		$("input[name=prob_submit_file]").click();
+	});
+ 	$(document).on("change", "input[name=prob_submit_file]", function(){
+		var fd = new FormData();
+    fd.append('assignment',{{as_no}});
+		fd.append('wav', $("input[name=prob_submit_file]")[0].files[0]);
+		$.ajax({
+			url: "/stt",
+			type: "PUT",
+			processData: false,
+			contentType: false,
+			data: fd,
+			success: function(data){
+				submitDataList[probIndex] = data.file;
+			$(".submitProbTab li[probIndex=" + probIndex + "]").addClass('tmpSave');
+			// 다음문제 세팅
+			if($(".submitProbTab li").not(".tmpSave").length > 0){
+				displayMsgPop("임시저장 되었습니다.");
+				var nextProbIndex = $($(".submitProbTab li").not(".tmpSave")[0]).attr("probindex");
+				loadProb(nextProbIndex);
+			}else{
+				alert("모든 문제가 녹음되었습니다.\n제출버튼을 눌러 완료해주세요");
+			}
+			}
+		});
+	});
 	$(document).on("click", ".submitProbTab li", function(){
 		loadProb($(this).attr("probIndex"));
 	});
@@ -306,6 +335,7 @@ $(document).ready(function(){
 		console.log($(this).val()/10);
 		exampleAudioPlayer.player().volume($(this).val()/10);
 	});
+ 
 });
 		</script>
 {% endblock %}
@@ -337,6 +367,8 @@ $(document).ready(function(){
 				<div class="recordBtnDiv btnDiv btn-2 btn-align-right">
 					<!--<button class="btn btn-temp recordTempSaveBtn">임시저장</button>-->
 					<button class="btn btn-submit submitRecordDataBtn">과제 제출</button>
+           <input type="file" name="prob_submit_file">
+          <button class="btn btn-submit submitRecordFileBtn">파일첨부</button>
 				</div>
 			</div>
 <div class="popMsgDiv"><span></span></div>

@@ -68,7 +68,7 @@ var feedbackList = []; // 피드백 리스트
 {% endif %}
 
 {% autoescape false %}
-var oriInputText = "{{ as_info['original_text'] }}";
+var oriInputText = `{{ as_info['original_text'] }}`;
 {% endautoescape %}
 var audioOptions = {
 	controls: true,

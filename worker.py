@@ -74,7 +74,7 @@ class DBTask(Task):
     @property
     def session(self):
         if self._session is None:
-            self._session, self._engine = get_session()
+            self._session = get_session()
         return self._session
 
 def process_stt_result(stt):

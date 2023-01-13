@@ -131,7 +131,6 @@ def do_stt_work(self, filename, locale="ko-KR"):
         result = {'textFile': '', 'timestamps': [], 'annotations': []}
         if not len(files) > 0:
             raise Exception("INVALID-FILE")
-
         webhook_res = requests.post(
             os.environ["STT_URL"],
             headers={
@@ -172,12 +171,17 @@ def do_stt_work(self, filename, locale="ko-KR"):
         pause_result = 0
 
         values = res["values"]
+        tmp_textFile= ['' for i in range(len(values))]
         for i in range(len(values)):
+            tmp_seq=values[i]["name"]
+            tmp_seq = re.findall("-?\d+", tmp_seq)
+            tmp_seq=int(tmp_seq[0])
             kind = values[i]["kind"]
             if kind != "Transcription":
                 continue
 
             recog = requests.get(values[i]["links"]["contentUrl"]).json()
+            print(values[i])
             if(not recog["recognizedPhrases"]):
                 continue
             stt = process_stt_result(recog["recognizedPhrases"][0]["nBest"][0]["lexical"])
@@ -226,8 +230,7 @@ def do_stt_work(self, filename, locale="ko-KR"):
                 pidx.append(indx)
             for i in range(len(pidx)): # pause, delay 구분 없이 pause 로 통일
                 result['annotations'].append({'start': pidx[i], 'end': pidx[i] + 1, 'type': 'PAUSE', 'duration': silenceidx[i]})
-
-            result['textFile'] += stt
+            tmp_textFile[tmp_seq] = stt
     except IndexError as e: # for none recognized text exception (recog["recognizedPhrases"][0]["nBest"][0]["lexical"])
         print(e)
         # session.rollback()
@@ -235,7 +238,8 @@ def do_stt_work(self, filename, locale="ko-KR"):
     except Exception as e:
         # session.rollback()
         self.update_state(state=e.args[0])
-
+    tmp_text=''.join(tmp_textFile)
+    result['textFile']=tmp_text
     stt = session.query(Stt).filter_by(wav_file=filename).first()
     if not stt:
         return False
@@ -252,7 +256,6 @@ def do_stt_work(self, filename, locale="ko-KR"):
     job.stt_result = repr(result)
     session.add(job)
     session.commit()
-
     return result
 
 @celery.task(base=DBTask, bind=True)

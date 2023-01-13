@@ -61,6 +61,12 @@ $(document).ready(function(){
 		});
 	});
 	$(document).on("change", "select[name='prob_type']", function(){
+    $("input[name=prob_sound_file]").val('');
+    $(".waveRegionDiv ul").empty();
+    var region_length=Object.values(probAudioPlayer.regions.list).length;
+    for(let i=0; i<region_length;i++){
+        Object.values(probAudioPlayer.regions.list)[0].remove();
+    }
 		var d = $(this).val();
 		if(d == "번역"){
 			$(".probSoundUpload").hide();

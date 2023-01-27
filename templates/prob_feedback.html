@@ -35,11 +35,11 @@ probTextList.push("{{original_stt_result[i].textFile}}");
 {% endif %}
 var submitTextList = []; //녹음텍스트
 {% if as_info['as_type']=='번역' %}
-	submitTextList.push("{{user_trans_result}}");
+	submitTextList.push(`{{user_trans_result}}`);
 {% endif %}
 {% if stt_result != None %}
 {% for i in range(stt_result|length) %}
-submitTextList.push("{{stt_result[i].textFile}}");
+submitTextList.push(`{{stt_result[i].textFile}}`);
 {% endfor %}
 {% endif %}
 

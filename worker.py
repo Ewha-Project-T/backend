@@ -103,7 +103,7 @@ def do_stt_work(self, filename, locale="ko-KR"):
     myaudio = AudioSegment.from_file(filepath)
     dBFS = myaudio.dBFS
     sound = silence.detect_nonsilent(
-        myaudio, min_silence_len=1000, silence_thresh=dBFS - 16)  # 1초 이상의 silence
+        myaudio, min_silence_len=1000, silence_thresh=dBFS - 16, seek_step=100)  # 1초 이상의 silence
     sound = [[(start), (stop)] for start, stop in sound]
     startidx = []
     endidx = []
@@ -169,23 +169,23 @@ def do_stt_work(self, filename, locale="ko-KR"):
         text = ''
         delay_result = 0
         pause_result = 0
-
+        pause_idx=[]
         values = res["values"]
         tmp_textFile= ['' for i in range(len(values))]
         for i in range(len(values)):
             tmp_seq=values[i]["name"]
             tmp_seq = re.findall("-?\d+", tmp_seq)
             tmp_seq=int(tmp_seq[0])
+            print(str(tmp_seq))
             kind = values[i]["kind"]
             if kind != "Transcription":
                 continue
 
             recog = requests.get(values[i]["links"]["contentUrl"]).json()
-            print(values[i])
-            if(not recog["recognizedPhrases"]):
+            if(not recog["combinedRecognizedPhrases"]):
                 continue
-            stt = process_stt_result(recog["recognizedPhrases"][0]["nBest"][0]["lexical"])
-            text += stt
+            stt = process_stt_result(recog["combinedRecognizedPhrases"][0]["lexical"])
+            text = stt
             sentences = sent_tokenize(stt)
             for sentence in sentences:
                 # print(sentence)
@@ -197,49 +197,51 @@ def do_stt_work(self, filename, locale="ko-KR"):
                 if flag == False:
                     print("(pause: " + str(silenceidx[i])+"sec)")  # 침묵
                     text = text+'\n'
-                    pause_result += silenceidx[i]
+                    #pause_result += silenceidx[i]
+                    pause_idx.append(silenceidx[i])
                 else:
                     # 통역 개시 지연구간
                     print("(delay: " + str(silenceidx[i]) + "sec)")
                     text = text+'\n'
                     delay_result += silenceidx[i]
-
-            p = re.compile('(\w\(filler\)|\w+\s\w+\(backtracking\))')
-            fidx = []
-            while (True):
-                f = p.search(stt)
-                if f == None:
-                    break
-                fidx.append([f.start(), f.end()])
-                stt = re.sub("(\(filler\)|\(backtracking\))", "", stt, 1)
-
-            for i in range(len(fidx)):
-                if stt[fidx[i][0]] == '음' or stt[fidx[i][0]] == '그' or stt[fidx[i][0]] == '어':
-                    result['annotations'].append(
-                        {'start': fidx[i][0], 'end': fidx[i][0] + 1, 'type': 'FILLER'})
-                else:
-                    result['annotations'].append(
-                        {'start': fidx[i][0], 'end': fidx[i][1] - 14, 'type': 'BACKTRACKING'})
-
-            pidx = []
-            indx = -1
-            while True:
-                indx = stt.find('\n', indx + 1)
-                if indx == -1:
-                    break
-                pidx.append(indx)
-            for i in range(len(pidx)): # pause, delay 구분 없이 pause 로 통일
-                result['annotations'].append({'start': pidx[i], 'end': pidx[i] + 1, 'type': 'PAUSE', 'duration': silenceidx[i]})
-            tmp_textFile[tmp_seq] = stt
+            tmp_textFile[tmp_seq] = text#stt
     except IndexError as e: # for none recognized text exception (recog["recognizedPhrases"][0]["nBest"][0]["lexical"])
         print(e)
         # session.rollback()
         self.update_state(state='INDEX_ERROR')
     except Exception as e:
         # session.rollback()
+        print(e)
         self.update_state(state=e.args[0])
+        
+    
     tmp_text=''.join(tmp_textFile)
-    result['textFile']=tmp_text
+    #result['textFile']=tmp_text
+    stt=tmp_text
+    p = re.compile('(\w\(filler\)|\w+\s\w+\(backtracking\))')
+    fidx = []
+    while (True):
+        f = p.search(stt)
+        if f == None:
+            break
+        fidx.append([f.start(), f.end()])
+        stt = re.sub("(\(filler\)|\(backtracking\))", "", stt, 1)
+
+    for i in range(len(fidx)):
+        if stt[fidx[i][0]] == '음' or stt[fidx[i][0]] == '그' or stt[fidx[i][0]] == '어':
+            result['annotations'].append({'start': fidx[i][0], 'end': fidx[i][0] + 1, 'type': 'FILLER'})
+        else:
+            result['annotations'].append({'start': fidx[i][0], 'end': fidx[i][1] - 14, 'type': 'BACKTRACKING'})
+
+    #pidx = []
+    pidx = [m.start(0) + 1 for m in re.finditer('[^\.^\n]\n', stt)]
+    for i in range(len(pidx)):  # pause, delay 구분 없이 pause 로 통일
+        result['annotations'].append({'start': pidx[i], 'end': pidx[i] + 1, 'type': 'PAUSE', 'duration': pause_idx[i]})
+
+    if stt.endswith("\n"):
+        stt = stt[:-1]
+    result['textFile']=stt    
+    
     stt = session.query(Stt).filter_by(wav_file=filename).first()
     if not stt:
         return False

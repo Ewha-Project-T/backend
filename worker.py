@@ -188,7 +188,6 @@ def do_stt_work(self, filename, locale="ko-KR"):
             text = stt
             sentences = sent_tokenize(stt)
             for sentence in sentences:
-                # print(sentence)
                 if sentence.endswith('.'):
                     flag = True
                 else:
@@ -197,7 +196,6 @@ def do_stt_work(self, filename, locale="ko-KR"):
                 if flag == False:
                     print("(pause: " + str(silenceidx[i])+"sec)")  # 침묵
                     text = text+'\n'
-                    #pause_result += silenceidx[i]
                     pause_idx.append(silenceidx[i])
                 else:
                     # 통역 개시 지연구간
@@ -207,16 +205,13 @@ def do_stt_work(self, filename, locale="ko-KR"):
             tmp_textFile[tmp_seq] = text#stt
     except IndexError as e: # for none recognized text exception (recog["recognizedPhrases"][0]["nBest"][0]["lexical"])
         print(e)
-        # session.rollback()
         self.update_state(state='INDEX_ERROR')
     except Exception as e:
-        # session.rollback()
         print(e)
         self.update_state(state=e.args[0])
         
     
     tmp_text=''.join(tmp_textFile)
-    #result['textFile']=tmp_text
     stt=tmp_text
     p = re.compile('(\w\(filler\)|\w+\s\w+\(backtracking\))')
     fidx = []
@@ -233,7 +228,6 @@ def do_stt_work(self, filename, locale="ko-KR"):
         else:
             result['annotations'].append({'start': fidx[i][0], 'end': fidx[i][1] - 14, 'type': 'BACKTRACKING'})
 
-    #pidx = []
     pidx = [m.start(0) + 1 for m in re.finditer('[^\.^\n]\n', stt)]
     for i in range(len(pidx)):  # pause, delay 구분 없이 pause 로 통일
         result['annotations'].append({'start': pidx[i], 'end': pidx[i] + 1, 'type': 'PAUSE', 'duration': pause_idx[i]})

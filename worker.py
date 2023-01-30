@@ -93,12 +93,7 @@ def process_stt_result(stt):
     result = ' '.join(result)
     return result
 
-@celery.task(base=DBTask, bind=True)
-def do_stt_work(self, filename, locale="ko-KR"):
-    session = self.session
-
-    self.update_state(state='INDEXING')
-
+def basic_indexing(filename):
     filepath = f"{os.environ['UPLOAD_PATH']}/{filename}.wav"
     myaudio = AudioSegment.from_file(filepath)
     dBFS = myaudio.dBFS
@@ -113,10 +108,17 @@ def do_stt_work(self, filename, locale="ko-KR"):
         endidx.append(sound[i][1] + 200)
         if i < len(sound) - 1:
             silenceidx.append(sound[i + 1][0] - sound[i][1])
+    return sound, startidx, endidx, silenceidx, myaudio
 
+@celery.task(base=DBTask, bind=True)
+def do_stt_work(self, filename, locale="ko-KR"):
+    session = self.session
+    self.update_state(state='INDEXING')
+    
+    sound,startidx,endidx,silenceidx,myaudio=basic_indexing(filename)
     self.update_state(state='STT')
     
-    domain = os.getenv("DOMAIN", "https://ewha.ltra.cc")
+    domain = os.getenv("DOMAIN", "https://translation-platform.site:8443")
 
     files = []
     local_file = []

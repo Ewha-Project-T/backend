@@ -124,7 +124,6 @@ def basic_do_stt(res,sound,silenceidx):
         if not tmp_seq:#report.json 처리
             continue
         tmp_seq=int(tmp_seq[0])
-        print(str(tmp_seq))
         kind = values[i]["kind"]
         if kind != "Transcription":
             continue
@@ -154,6 +153,31 @@ def basic_do_stt(res,sound,silenceidx):
 
     tmp_text=''.join(tmp_textFile)                
     return tmp_text, pause_result, delay_result, pause_idx
+
+def basic_annotation_stt(result,stt):
+    p = re.compile('(\w\(filler\)|\w+\s\w+\(backtracking\))')
+    fidx = []
+    while (True):
+        f = p.search(stt)
+        if f == None:
+            break
+        fidx.append([f.start(), f.end()])
+        stt = re.sub("(\(filler\)|\(backtracking\))", "", stt, 1)
+
+    for i in range(len(fidx)):
+        if stt[fidx[i][0]] == '음' or stt[fidx[i][0]] == '그' or stt[fidx[i][0]] == '어':
+            result['annotations'].append({'start': fidx[i][0], 'end': fidx[i][0] + 1, 'type': 'FILLER'})
+        else:
+            result['annotations'].append({'start': fidx[i][0], 'end': fidx[i][1] - 14, 'type': 'BACKTRACKING'})
+
+    pidx = [m.start(0) + 1 for m in re.finditer('[^\.^\n]\n', stt)]
+    for i in range(len(pidx)):  # pause, delay 구분 없이 pause 로 통일
+        result['annotations'].append({'start': pidx[i], 'end': pidx[i] + 1, 'type': 'PAUSE', 'duration': pause_idx[i]})
+
+    if stt.endswith("\n"):
+        stt = stt[:-1]
+    result['textFile']=stt   
+    return result
 
 @celery.task(base=DBTask, bind=True)
 def do_stt_work(self, filename, locale="ko-KR"):
@@ -221,28 +245,7 @@ def do_stt_work(self, filename, locale="ko-KR"):
         self.update_state(state=e.args[0])
 
     stt,pause_result, delay_result, pause_idx=basic_do_stt(res,sound,silenceidx)
-    p = re.compile('(\w\(filler\)|\w+\s\w+\(backtracking\))')
-    fidx = []
-    while (True):
-        f = p.search(stt)
-        if f == None:
-            break
-        fidx.append([f.start(), f.end()])
-        stt = re.sub("(\(filler\)|\(backtracking\))", "", stt, 1)
-
-    for i in range(len(fidx)):
-        if stt[fidx[i][0]] == '음' or stt[fidx[i][0]] == '그' or stt[fidx[i][0]] == '어':
-            result['annotations'].append({'start': fidx[i][0], 'end': fidx[i][0] + 1, 'type': 'FILLER'})
-        else:
-            result['annotations'].append({'start': fidx[i][0], 'end': fidx[i][1] - 14, 'type': 'BACKTRACKING'})
-
-    pidx = [m.start(0) + 1 for m in re.finditer('[^\.^\n]\n', stt)]
-    for i in range(len(pidx)):  # pause, delay 구분 없이 pause 로 통일
-        result['annotations'].append({'start': pidx[i], 'end': pidx[i] + 1, 'type': 'PAUSE', 'duration': pause_idx[i]})
-
-    if stt.endswith("\n"):
-        stt = stt[:-1]
-    result['textFile']=stt    
+    result=basic_annotation_stt(result,stt)    
     
     stt = session.query(Stt).filter_by(wav_file=filename).first()
     if not stt:

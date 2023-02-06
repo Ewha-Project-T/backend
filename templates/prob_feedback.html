@@ -29,7 +29,7 @@ var probTextList = []; // 문제텍스트
 {% if original_stt_result != None %}
 {% for i in range(original_stt_result|length) %}
 {% autoescape false %}
-probTextList.push("{{original_stt_result[i].textFile}}"); 
+probTextList.push(`{{original_stt_result[i].textFile}}`); 
 {% endautoescape %}
 {% endfor %}
 {% endif %}

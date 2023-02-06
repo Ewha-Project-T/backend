@@ -121,6 +121,8 @@ def basic_do_stt(res,sound,silenceidx):
     for i in range(len(values)):
         tmp_seq=values[i]["name"]
         tmp_seq = re.findall("-?\d+", tmp_seq)
+        if not tmp_seq:#report.json 처리
+            continue
         tmp_seq=int(tmp_seq[0])
         print(str(tmp_seq))
         kind = values[i]["kind"]

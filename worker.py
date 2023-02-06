@@ -154,7 +154,7 @@ def basic_do_stt(res,sound,silenceidx):
     tmp_text=''.join(tmp_textFile)                
     return tmp_text, pause_result, delay_result, pause_idx
 
-def basic_annotation_stt(result,stt):
+def basic_annotation_stt(result,stt,pause_idx):
     p = re.compile('(\w\(filler\)|\w+\s\w+\(backtracking\))')
     fidx = []
     while (True):
@@ -245,7 +245,7 @@ def do_stt_work(self, filename, locale="ko-KR"):
         self.update_state(state=e.args[0])
 
     stt,pause_result, delay_result, pause_idx=basic_do_stt(res,sound,silenceidx)
-    result=basic_annotation_stt(result,stt)    
+    result=basic_annotation_stt(result,stt,pause_idx)    
     
     stt = session.query(Stt).filter_by(wav_file=filename).first()
     if not stt:

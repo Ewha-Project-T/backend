@@ -110,6 +110,49 @@ def basic_indexing(filename):
             silenceidx.append(sound[i + 1][0] - sound[i][1])
     return sound, startidx, endidx, silenceidx, myaudio
 
+def basic_do_stt(res,sound,silenceidx):
+    flag = True
+    text = ''
+    delay_result = 0
+    pause_result = 0
+    pause_idx=[]
+    values = res["values"]
+    tmp_textFile= ['' for i in range(len(values))]
+    for i in range(len(values)):
+        tmp_seq=values[i]["name"]
+        tmp_seq = re.findall("-?\d+", tmp_seq)
+        tmp_seq=int(tmp_seq[0])
+        print(str(tmp_seq))
+        kind = values[i]["kind"]
+        if kind != "Transcription":
+            continue
+
+        recog = requests.get(values[i]["links"]["contentUrl"]).json()
+        if(not recog["combinedRecognizedPhrases"]):
+            continue
+        stt = process_stt_result(recog["combinedRecognizedPhrases"][0]["lexical"])
+        text = stt
+        sentences = sent_tokenize(stt)
+        for sentence in sentences:
+            if sentence.endswith('.'):
+                flag = True
+            else:
+                flag = False
+        if i < len(sound) - 1:
+            if flag == False:
+                print("(pause: " + str(silenceidx[i])+"sec)")  # 침묵
+                text = text+'\n'
+                pause_idx.append(silenceidx[i])
+            else:
+                # 통역 개시 지연구간
+                print("(delay: " + str(silenceidx[i]) + "sec)")
+                text = text+'\n'
+                delay_result += silenceidx[i]
+        tmp_textFile[tmp_seq] = text
+
+    tmp_text=''.join(tmp_textFile)                
+    return tmp_text, pause_result, delay_result, pause_idx
+
 @celery.task(base=DBTask, bind=True)
 def do_stt_work(self, filename, locale="ko-KR"):
     session = self.session
@@ -167,54 +210,15 @@ def do_stt_work(self, filename, locale="ko-KR"):
 
         for i in range(len(sound)):
             result['timestamps'].append({'start': startidx[i], 'end': endidx[i]})
-        flag = True
-        text = ''
-        delay_result = 0
-        pause_result = 0
-        pause_idx=[]
-        values = res["values"]
-        tmp_textFile= ['' for i in range(len(values))]
-        for i in range(len(values)):
-            tmp_seq=values[i]["name"]
-            tmp_seq = re.findall("-?\d+", tmp_seq)
-            tmp_seq=int(tmp_seq[0])
-            print(str(tmp_seq))
-            kind = values[i]["kind"]
-            if kind != "Transcription":
-                continue
 
-            recog = requests.get(values[i]["links"]["contentUrl"]).json()
-            if(not recog["combinedRecognizedPhrases"]):
-                continue
-            stt = process_stt_result(recog["combinedRecognizedPhrases"][0]["lexical"])
-            text = stt
-            sentences = sent_tokenize(stt)
-            for sentence in sentences:
-                if sentence.endswith('.'):
-                    flag = True
-                else:
-                    flag = False
-            if i < len(sound) - 1:
-                if flag == False:
-                    print("(pause: " + str(silenceidx[i])+"sec)")  # 침묵
-                    text = text+'\n'
-                    pause_idx.append(silenceidx[i])
-                else:
-                    # 통역 개시 지연구간
-                    print("(delay: " + str(silenceidx[i]) + "sec)")
-                    text = text+'\n'
-                    delay_result += silenceidx[i]
-            tmp_textFile[tmp_seq] = text#stt
     except IndexError as e: # for none recognized text exception (recog["recognizedPhrases"][0]["nBest"][0]["lexical"])
         print(e)
         self.update_state(state='INDEX_ERROR')
     except Exception as e:
         print(e)
         self.update_state(state=e.args[0])
-        
-    
-    tmp_text=''.join(tmp_textFile)
-    stt=tmp_text
+
+    stt,pause_result, delay_result, pause_idx=basic_do_stt(res,sound,silenceidx)
     p = re.compile('(\w\(filler\)|\w+\s\w+\(backtracking\))')
     fidx = []
     while (True):

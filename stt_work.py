@@ -4,7 +4,7 @@ from nltk.tokenize import sent_tokenize
 import os
 import requests
 import re
-
+import fugashi
 
 #한국어버전시작
 def process_stt_result(stt):
@@ -111,57 +111,22 @@ def basic_annotation_stt(result,stt,pause_idx):
 #한국어버전 끝
 
 #일본어버전 시작
-def simultaneous_stt(filename):
-    myaudio = AudioSegment.from_file(
-        f'{filename}')  # 경로 변경 필요
-    length, startidx, endidx, silenceidx = indexing(myaudio)
-    stt, pause_result, delay_result, pause_idx, start_idx, end_idx = do_stt(
-        length, myaudio, startidx, endidx, silenceidx)
 
-    result = {'textFile': '', 'timestamps': [], 'annotations': []}
-    for i in range(len(start_idx)):
-        result['timestamps'].append({'start': start_idx[i], 'end': end_idx[i]})
-
-    stt = re.sub("\n{2,}","\n",stt)
-
-    if stt.startswith("\n"):
-        stt = stt[1:]
-    
-    p = re.compile('(\w\(filler\)|\w+\s\w+\(backtracking\))')
-    fidx = []
-    while (True):
-        f = p.search(stt)
-        if f == None:
-            break
-        fidx.append([f.start(), f.end()])
-        stt = re.sub("(\(filler\)|\(backtracking\))", "", stt, 1)
-
-    for i in range(len(fidx)):
-        if stt[fidx[i][0]] == 'え' or stt[fidx[i][0]] == 'ま':
-            result['annotations'].append(
-                {'start': fidx[i][0], 'end': fidx[i][0] + 1, 'type': 'FILLER'})
-        if stt[fidx[i][0]] == 'あの' or stt[fidx[i][0]] == 'えと' or stt[fidx[i][0]] == 'その':
-            result['annotations'].append(
-                {'start': fidx[i][0], 'end': fidx[i][0] + 2, 'type': 'FILLER'})
-        else:
-            result['annotations'].append(
-                {'start': fidx[i][0], 'end': fidx[i][1] - 14, 'type': 'BACKTRACK'})
-
-    pidx = [m.start(0) + 1 for m in re.finditer('[^\.^\n]\n', stt)]
-    for i in range(len(pidx)):  # pause, delay 구분 없이 pause 로 통일
-        result['annotations'].append(
-            {'start': pidx[i], 'end': pidx[i] + 1, 'type': 'PAUSE', 'duration': pause_idx[i]})
-
-    if stt.endswith("\n"):
-        stt = stt[:-1]
-
-    result['textFile'] = stt
-
+def japan_process_stt_result(stt):
+    result = stt
+    for i in range(len(result)):
+        if result[i] == 'え' or result[i] == 'ま' or result[i] == 'あの' or result[i] == 'えと' or result[i] == 'その':
+            result[i] = result[i] + "(filler)"
+        if len(result) > 1 and result[i-1][0] == result[i][0] and result[i-1] in result[i]:
+            result[i] = result[i] + "(backtracking)"
+        # elif len(result) > 1 and result[i-1][0] == result[i][0] and len(result[i-1]) <= len(result[i]):
+        #     result[i] = result[i] + "(backtracking)" #앞뒤단어의 첫글자가 같을때
+    result = ' '.join(result)
     return result
 
-
-def indexing(myaudio):
-    print("detecting silence")
+def japan_basic_indexing(filename):
+    filepath = f"{os.environ['UPLOAD_PATH']}/{filename}.wav"
+    myaudio = AudioSegment.from_file(filepath)
     dBFS = myaudio.dBFS
     sound = silence.detect_nonsilent(
         myaudio, min_silence_len=1000, silence_thresh=dBFS - 16, seek_step=100)  # 1초 이상의 silence
@@ -194,25 +159,9 @@ def indexing(myaudio):
             if i < len(sound) - 1:
                 silenceidx.append(sound[i + 1][0] - sound[i][1])
         i = i+1
-    return length, startidx, endidx, silenceidx
+    return length, startidx, endidx, silenceidx, myaudio
 
-
-
-
-def process_stt_result(stt):
-    result = stt
-    for i in range(len(result)):
-        if result[i] == 'え' or result[i] == 'ま' or result[i] == 'あの' or result[i] == 'えと' or result[i] == 'その':
-            result[i] = result[i] + "(filler)"
-        if len(result) > 1 and result[i-1][0] == result[i][0] and result[i-1] in result[i]:
-            result[i] = result[i] + "(backtracking)"
-        # elif len(result) > 1 and result[i-1][0] == result[i][0] and len(result[i-1]) <= len(result[i]):
-        #     result[i] = result[i] + "(backtracking)" #앞뒤단어의 첫글자가 같을때
-    result = ' '.join(result)
-    return result
-
-
-
+# worker.py 로 이동 필요
 def req_upload(file, completion,fullText=True):
 
     invoke_url = 'https://clovaspeech-gw.ncloud.com/external/v1/4257/c2761d7a201319106f45d6557ef2a076e6285af96da7e4da3fce4c910a2e7174'
@@ -237,7 +186,7 @@ def req_upload(file, completion,fullText=True):
 
 
 
-def do_stt(length, myaudio, startidx, endidx, silenceidx):
+def japan_basic_do_stt(length, myaudio, startidx, endidx, silenceidx):
 
     
     flag = True
@@ -303,4 +252,37 @@ def do_stt(length, myaudio, startidx, endidx, silenceidx):
                 continue
         os.remove("temp.wav")
     return text, pause_result, delay_result, pause_idx, start_idx, end_idx
+
+def japan_basic_annotation_stt(result,stt,pause_idx):
+    p = re.compile('(\w\(filler\)|\w+\s\w+\(backtracking\))')
+    fidx = []
+    while (True):
+        f = p.search(stt)
+        if f == None:
+            break
+        fidx.append([f.start(), f.end()])
+        stt = re.sub("(\(filler\)|\(backtracking\))", "", stt, 1)
+
+    for i in range(len(fidx)):
+        if stt[fidx[i][0]] == 'え' or stt[fidx[i][0]] == 'ま':
+            result['annotations'].append(
+                {'start': fidx[i][0], 'end': fidx[i][0] + 1, 'type': 'FILLER'})
+        if stt[fidx[i][0]] == 'あの' or stt[fidx[i][0]] == 'えと' or stt[fidx[i][0]] == 'その':
+            result['annotations'].append(
+                {'start': fidx[i][0], 'end': fidx[i][0] + 2, 'type': 'FILLER'})
+        else:
+            result['annotations'].append(
+                {'start': fidx[i][0], 'end': fidx[i][1] - 14, 'type': 'BACKTRACK'})
+
+    pidx = [m.start(0) + 1 for m in re.finditer('[^\.^\n]\n', stt)]
+    for i in range(len(pidx)):  # pause, delay 구분 없이 pause 로 통일
+        result['annotations'].append(
+            {'start': pidx[i], 'end': pidx[i] + 1, 'type': 'PAUSE', 'duration': pause_idx[i]})
+
+    if stt.endswith("\n"):
+        stt = stt[:-1]
+
+    result['textFile'] = stt
+
+    return result
 #일본어버전 끝

@@ -6,7 +6,6 @@ import requests
 import re
 
 
-#한국어버전시작
 def process_stt_result(stt):
     result = stt
     result = re.sub('니다', '니다. ', result)
@@ -108,4 +107,3 @@ def basic_annotation_stt(result,stt,pause_idx):
         stt = stt[:-1]
     result['textFile']=stt   
     return result
-#한국어버전 끝

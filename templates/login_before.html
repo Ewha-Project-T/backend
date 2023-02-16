@@ -1,0 +1,48 @@
+
+	{% extends 'layout_nologin.html' %}
+
+<script>
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+            alert("{{messages[-1]}}");
+    {% endif %}
+{% endwith %}
+</script>
+{% block content %}
+
+		<div class="videoDiv">
+			<video autoplay muted loop id="myVideo">
+				<source src="{{ url_for('static',filename='background.mp4') }}" type="video/mp4">
+			</video>
+		</div>
+		<div class="viewport-header">
+			<div class="wrapper-bg"></div>
+			<div class="wrapper">
+				<h1>Translation-Platform<br><span>LOGIN</span></h1>
+				<form method="POST" id="form1" action="{{ url_for('login') }}" onsubmit="return loginFormCheck();">
+					<div class="field email">
+						<div class="input-area">
+							<input type="text" id="email" name="email" placeholder="Email Address">
+							<i class="icon fas fa-envelope"></i>
+							<i class="error error-icon fas fa-exclamation-circle"></i>
+						</div>
+						<div class="error error-txt">Email can't be blank</div>
+					</div>
+					<div class="field password">
+						<div class="input-area">
+							<input type="password" id="pw" name="pw" placeholder="Password">
+							<i class="icon fas fa-lock"></i>
+							<i class="error error-icon fas fa-exclamation-circle"></i>
+						</div>
+						<div class="error error-txt">Password can't be blank</div>
+					</div>
+					<input type="submit" id="login" value="Login">
+				</form>
+				<div class="sign-txt">Not yet member? <a href="{{ url_for('join') }}">Signup now</a></div>
+				<div class="logo">
+					<!-- <img src="{{ url_for('static',filename='/images/gsti_logo.jpg') }}"> -->
+				</div>
+			</div>
+		</div>
+{% endblock %}
+

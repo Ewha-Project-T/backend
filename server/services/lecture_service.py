@@ -39,12 +39,12 @@ def lecture_listing(user_no=None):
 def make_lecture(name,year,semester,major,separated,professor,attendee,user_info):
     acc=Lecture(lecture_name=name,year=year,semester=semester,major=major,separated=separated,professor=professor)
     db.session.add(acc)
-    db.session.commit
+    db.session.commit()
     this_lecture=Lecture.query.order_by(Lecture.lecture_no.desc()).first()
     professor_no=user_info["user_no"]
     professor=Attendee(user_no=professor_no,lecture_no=this_lecture.lecture_no,permission=3)
     db.session.add(professor)
-    db.session.commit
+    db.session.commit()
     for attendee_user in attendee:
         attendee_user=attendee_user.replace("'",'"')
         user=json.loads(attendee_user)
@@ -55,7 +55,7 @@ def make_lecture(name,year,semester,major,separated,professor,attendee,user_info
             continue
         attend=Attendee(user_no=user_acc.user_no,lecture_no=this_lecture.lecture_no,permission=user_acc.permission)
         db.session.add(attend)
-        db.session.commit
+        db.session.commit()
 
 
 def modify_lecture(no,name,year,semester,major,separated,professor,attendee,user_info):
@@ -91,7 +91,7 @@ def modify_lecture(no,name,year,semester,major,separated,professor,attendee,user
         if attend_acc==None:
             attend=Attendee(user_no=user_acc.user_no,lecture_no=no,permission=user_acc.permission)
             db.session.add(attend)
-            db.session.commit
+            db.session.commit()
             this_attendee=Attendee.query.order_by(Attendee.attendee_no.desc()).first()
             attend_list.append(this_attendee.attendee_no)
         else:
@@ -100,13 +100,13 @@ def modify_lecture(no,name,year,semester,major,separated,professor,attendee,user
     for att in attend:
         if att.attendee_no not in attend_list:
             db.session.delete(att)
-            db.session.commit
+            db.session.commit()
 
 
 def delete_lecture(lecture_no):
     acc = Lecture.query.filter_by(lecture_no=lecture_no).first()
     db.session.delete(acc)
-    db.session.commit
+    db.session.commit()
 
 def search_student(name,major):
     acc=User.query.filter_by(name=name,major=major).all()
@@ -139,7 +139,7 @@ def major_listing(major):
 def attendee_add(user_no,lecture_no,perm):
     acc=Attendee(user_no=user_no,lecture_no=lecture_no,permission=perm)
     db.session.add(acc)
-    db.session.commit
+    db.session.commit()
 
 def attendee_listing(lecture_no):
     acc=Attendee.query.filter_by(lecture_no=lecture_no)

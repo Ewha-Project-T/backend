@@ -54,3 +54,256 @@ form select { width: 100%; height: 100%; outline: none; padding: 0 45px; font-si
 .btn-2 .btn { display: inline-block; width: 45%; font-size: 1.4rem; }
 .btn-2 .btn-cancel { float: left; background-color: #d8d8d8; color: #fff; line-height: 50px; }
 .btn-2 .btn-submit { float: right; color: #fff; }
+
+
+/*login*/
+
+a{
+    text-decoration-line : none;
+    text-decoration : none;
+    color: black;
+}
+
+.login-wrapper {
+    width: 100%;
+    height: 100%;
+    margin-top: 8%;
+    box-sizing: border-box;
+}
+
+.login-wrapper > h2 {
+    font-size: 24px;
+    color: #6a24fe;
+
+    height: auto;
+}
+.login-wrapper2 {
+    width: 400px;
+    margin: 0 auto;
+    background-color: #ffffff;
+    border-radius: 10px;
+    
+}
+.login-wrapper-padding {
+    padding: 20px;
+}
+
+
+.findview {
+    text-align: center;
+    font-size: 13px;
+    margin-top: 5%;
+}
+@media (max-width: 800px) {
+    .login-wrapper2 {
+        width: 300px;
+        margin: 0 auto;
+        background-color: #ffffff;
+        border-radius: 10px;
+    }
+    .login-wrapper {
+        margin-top: 25%;
+    }
+
+    .findview{
+        text-align: center;
+        font-size: 10px;
+        margin-top: 5%;
+        text-decoration-line : none;
+        text-decoration : none;
+    }
+}
+
+.register-wrapper {
+    width: 100%;
+    height: 100%;
+    margin-top: 3%;
+    box-sizing: border-box;
+}
+
+.register-wrapper2 {
+    width: 500px;
+    margin: 0 auto;
+    background-color: #ffffff;
+    border-radius: 10px;
+    border:solid 2px #D3D3D3;
+}
+.register-wrapper-padding {
+    padding: 20px;
+}
+
+@media (max-width: 800px) {
+    .register-wrapper2 {
+        width: 400px;
+        margin: 0 auto;
+        background-color: #ffffff;
+        border-radius: 10px;
+    }
+    .register-wrapper {
+        margin-top: 10%;
+    }
+}
+
+.id-text {
+    margin-bottom: 3%;
+    color: grey;
+}
+
+.bg-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 150%;
+    width: 100%;
+    z-index: -1;
+}
+
+.bg-video__content {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+}
+
+.error-tag {
+    font-size: 12px;
+    color: red;
+}
+
+.pwerror-tag {
+    font-size: 12px;
+    color: red;
+}
+
+.cpwerror-tag {
+    font-size: 12px;
+    color: red;
+}
+.input-area {
+    margin-top: 3%;
+    margin-bottom: 8%;
+}
+
+.major_chk {
+    width: 100%;
+    padding: 0.8em 0.5em;
+    border: solid 1px #d3d3d3;
+    border-radius: 9px;
+    font-family: inherit;
+    background-color: #ffffff;
+
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.major_chk:focus {
+    outline: 2px solid #04653d;
+    border-radius: 9px;
+    background-color: #ffffff;
+}
+
+.job_chk {
+    width: 100%;
+    padding: 0.8em 0.5em;
+    border: solid 1px #d3d3d3;
+    border-radius: 9px;
+    font-family: inherit;
+    background-color: #ffffff;
+
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.job_chk:focus {
+    outline: 2px solid #04653d;
+    border-radius: 9px;
+    background-color: #ffffff;
+}
+
+.input-style {
+    width: 100%;
+    height: 48px;
+    padding: 0 10px;
+    box-sizing: border-box;
+    margin-bottom: 8px;
+    border: solid 1px #d3d3d3;
+    border-radius: 9px;
+    background-color: #ffffff;
+}
+.input-style::placeholder {
+    color: #d2d2d2;
+}
+
+.input-style:focus {
+    outline: 2px solid #04653d;
+}
+
+.email_chk {
+    margin-bottom: 16%;
+}
+
+.pass_chk {
+    margin-bottom: 6%;
+}
+
+.cpass_chk {
+    margin-bottom: 16%;
+}
+
+#form1 > input {
+    width: 100%;
+    height: 48px;
+    padding: 0 10px;
+    box-sizing: border-box;
+    margin-bottom: 8px;
+    border: solid 1px #d3d3d3;
+    border-radius: 9px;
+    background-color: #ffffff;
+    font-size: 14px;
+}
+#form1 > input::placeholder {
+    color: #d2d2d2;
+}
+
+#form1 > input:focus {
+    outline: 2px solid #04653d;
+}
+
+#form1 > input[type='submit'] {
+    color: #fff;
+    font-size: 16px;
+    background-color: #04653d;
+    margin-top: 10%;
+    border-radius: 12px;
+}
+
+
+#form1 > input[type='checkbox'] {
+    display: none;
+}
+#form1 > label {
+    color: #999999;
+    font-size:13px;
+}
+#form1 input[type='checkbox'] + label {
+    cursor: pointer;
+    appearance: none;
+    width: 5%;
+    padding-left: 26px;
+    
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+#form1 input[type='checkbox']:checked + label {
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+#register-form > input[type='submit'] {
+    color: #fff;
+    font-size: 16px;
+    background-color: #04653d;
+    margin-top: 10%;
+    border-radius: 12px;
+}

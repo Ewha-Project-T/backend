@@ -9,38 +9,43 @@
 </script>
 {% block content %}
 
-		<div class="videoDiv">
-			<video autoplay muted loop id="myVideo">
-				<source src="{{ url_for('static',filename='background.mp4') }}" type="video/mp4">
-			</video>
-		</div>
-		<div class="viewport-header">
-			<div class="wrapper-bg"></div>
-			<div class="wrapper">
-				<h1>Translation-Platform<br><span>LOGIN</span></h1>
-				<form method="POST" id="form1" action="{{ url_for('login') }}" onsubmit="return loginFormCheck();">
-					<div class="field email">
-						<div class="input-area">
-							<input type="text" id="email" name="email" placeholder="Email Address">
-							<i class="icon fas fa-envelope"></i>
-							<i class="error error-icon fas fa-exclamation-circle"></i>
-						</div>
-						<div class="error error-txt">Email can't be blank</div>
-					</div>
-					<div class="field password">
-						<div class="input-area">
-							<input type="password" id="pw" name="pw" placeholder="Password">
-							<i class="icon fas fa-lock"></i>
-							<i class="error error-icon fas fa-exclamation-circle"></i>
-						</div>
-						<div class="error error-txt">Password can't be blank</div>
-					</div>
-					<input type="submit" id="login" value="Login">
-				</form>
-				<div class="sign-txt">Not yet member? <a href="{{ url_for('join') }}">Signup now</a></div>
-				<div class="logo">
-					<!-- <img src="{{ url_for('static',filename='/images/gsti_logo.jpg') }}"> -->
-				</div>
+<div class="bg-video">
+	<video class="bg-video__content" autoplay muted loop>
+		<source src="static/background.mp4" type="video/mp4" />
+	</video>
+</div>
+<div class="login-wrapper">
+	<div class="login-wrapper2">
+		<div class="login-wrapper-padding">
+			<h2>
+				<img
+					src="https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FbCAVka%2FbtrY2o9XY6e%2Fld0UENc2vedDW60ngkDyI1%2Fimg.jpg"
+					width="50%"
+					height="50%"
+					style="margin: auto; display: block; margin-bottom: 15%;"
+				/>
+			</h2>
+
+			<form method="POST" action="{{ url_for('login') }}" id="form1" id="login-form" style="margin-top: 10%;" onsubmit="return loginFormCheck();">
+				<div class="id-text">이메일</div>
+				<input type="text" id="email" name="email" placeholder="Email" />
+				<!-- <div class="error error-txt">Email can't be blank</div>-->
+
+				<div class="id-text">비밀번호</div>
+				<input type="password" id="pw" name="pw" placeholder="Password" />
+				<!-- <div class="error error-txt">Password can't be blank</div>-->
+				<label for="remember-check">
+					<input type="checkbox" id="remember-check" style="width:5%;" /> 자동로그인
+				</label>
+				<input type="submit" id="login" value="Login" />
+			</form>
+			
+			<div class="findview">
+				<a>아이디 찾기 |</a> 
+				<a>비밀번호 찾기 |</a>
+				<a href="{{ url_for('join') }}"> 회원가입</a>
 			</div>
 		</div>
+	</div>
+</div>
 {% endblock %}

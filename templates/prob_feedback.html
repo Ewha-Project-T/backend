@@ -15,7 +15,9 @@
 		<script type="text/javascript" src="{{ url_for('static', filename='js/videojs/videojs.wavesurfer.min.js') }}"></script>
 		<script type="text/javascript" src="{{ url_for('static', filename='js/videojs/videojs.record.min.js') }}"></script>
 		<script type="text/javascript" src="{{ url_for('static', filename='js/videojs/videojs.record.recorderjs.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
 <script type="text/javascript">
+
 var probIndex;
 var probFileList = []; // 문제파일
 {% for i in wav_url_example %}
@@ -96,7 +98,11 @@ function loadData(index){
 	submitPlayer.src({ src: submitFileList[index], type: 'audio/wav'});
 	{% endif %}
 	// 원문, stt 세팅
-	$(".exampleTextDiv div").empty().text(oriInputText);
+  if(oriInputText==''){
+      $(".exampleTextDiv div").empty().text(probTextList[index]);
+  }else{
+	    $(".exampleTextDiv div").empty().text(oriInputText);
+  }
 	$(".assignmentTextDiv div").empty().text(submitTextList[index]);
 
 	// 피드백 세팅
@@ -120,6 +126,7 @@ function selectText(){
 	var eOffset = 0;
 	if(document.getSelection){
 		txt = document.getSelection().toString();
+		console.log(txt);
 		var nodeIdx = Array.from(document.getSelection().anchorNode.parentElement.childNodes).indexOf(document.getSelection().anchorNode);
 		var nodeEnd = Array.from(document.getSelection().anchorNode.parentElement.childNodes).indexOf(document.getSelection().extentNode);
 		if(nodeIdx != nodeEnd){
@@ -145,9 +152,13 @@ function selectText(){
 }
 
 function createFeedback(txt, s, e,stt_flag){
-	if(txt.trim() == ""){
+
+	//공백 처리
+	if(txt == ""){
+		
 		return false;
 	}
+
 /*
 	var checkEle = $(".feedbackContentDiv ul .feedbackContentTxtDiv");
 	for(var i=0; i<checkEle.length; i++){
@@ -172,8 +183,12 @@ function createFeedback(txt, s, e,stt_flag){
 	var ele = $("<li />").attr({ "id": seq, "sOffset": s, "eOffset": e });
 	var rowDiv = $("<div />").addClass("feedbackContentRowDiv");
   if(stt_flag==0)
+	
+
+  
       var rowTitleDiv = $("<div />").addClass("feedbackContentRowTitleDiv");
   else
+	
       var rowTitleDiv = $("<div />").addClass("feedbackContentRowTitleDiv2");
 	var rowContentDiv = $("<div />").addClass("feedbackContentRowContentDiv");
 	var rowContentTxtDiv = $("<div />").addClass("feedbackContentTxtDiv").text(txt);
@@ -203,7 +218,7 @@ function createFeedback(txt, s, e,stt_flag){
 	return seq;
 }
 function createFeedbackTagList(id){
-	if($("#" + id + " .feedbackTagList").length == 0){
+	if($("#" + id + " .feedbackTagList").length == 0 ){
 		var tagList = [];
 		tagList.push("내용오역");
 		tagList.push("불필요한 첨가");
@@ -342,19 +357,26 @@ function feedbackSort(){
 			peOffset = eOffset;
 		}
    }else{
-     if(sortList.length == 1){
-			blockAssignmentText = assignmentText.slice(0, sOffset) + "<span class='feedbackBlock2'>" + assignmentText.slice(sOffset, eOffset) + "</span>" + assignmentText.slice(eOffset);
+	
+	// 줄바꿈 아스키 코드 10 예외 처리: assignmentText.slice(sOffset, eOffset).charCodeAt(0) != 10  
+     if(sortList.length == 1 && assignmentText.slice(sOffset, eOffset).charCodeAt(0) != 10){
+			blockAssignmentText = assignmentText.slice(0, sOffset) + "<span class='feedbackBlock2' id ='hyun1'>" + assignmentText.slice(sOffset, eOffset) + "</span>" + assignmentText.slice(eOffset);
 			break;
 		}
-		if(i == 0){
-			blockAssignmentText = assignmentText.slice(0, sOffset) + "<span class='feedbackBlock2'>" + assignmentText.slice(sOffset, eOffset) + "</span>";
+		if(i == 0 && assignmentText.slice(sOffset, eOffset).charCodeAt(0) != 10){
+			blockAssignmentText = assignmentText.slice(0, sOffset) + "<span class='feedbackBlock2' id ='hyun'>" + assignmentText.slice(sOffset, eOffset) + "</span>";
 			peOffset = eOffset;
-		}else if(i == sortList.length - 1){
-			blockAssignmentText = blockAssignmentText + assignmentText.slice(peOffset, sOffset) + "<span class='feedbackBlock2'>" + assignmentText.slice(sOffset, eOffset) + "</span>" + assignmentText.slice(eOffset);
-		}else{
-			blockAssignmentText = blockAssignmentText + assignmentText.slice(peOffset, sOffset) + "<span class='feedbackBlock2'>" + assignmentText.slice(sOffset, eOffset) + "</span>";
+		}else if(i == sortList.length - 1 && assignmentText.slice(sOffset, eOffset).charCodeAt(0) != 10){ 
+			
+			blockAssignmentText = blockAssignmentText + assignmentText.slice(peOffset, sOffset) + "<span class='feedbackBlock2'id ='hyun3'>" + assignmentText.slice(sOffset, eOffset) + "</span>" + assignmentText.slice(eOffset);
+		}else if(assignmentText.slice(sOffset, eOffset).charCodeAt(0) != 10){
+
+			
+			
+			blockAssignmentText = blockAssignmentText + assignmentText.slice(peOffset, sOffset) + "<span class='feedbackBlock2' id ='hyun2'>" + assignmentText.slice(sOffset, eOffset) + "</span>";
 			peOffset = eOffset;
 		}
+		
    }
 	}
 	$(".assignmentTextDiv div").html(blockAssignmentText);
@@ -370,6 +392,7 @@ $(document).ready(function(){
 	{% endif %}
 	// 1번문제 로딩
 	loadData(0);
+  makeChart();
 /*	// 피드백 로딩
 {% autoescape false %}
 {% if feedback_list !=None %}
@@ -446,7 +469,52 @@ $(document).ready(function(){
 	$(document).on("click", ".saveFeedback", function(){
 		saveFeedback();
 	});
+ 
 });
+
+//차트추가
+function makeChart(){
+      const data1 = [3, 2, 1];
+      const data2 = [2, 3, 1,4,5,6];
+
+      const colors1 = ["rgba(255, 99, 132, 0.5)", "rgba(54, 162, 235, 0.5)", "rgba(255, 206, 86, 0.5)"];
+      const colors2 = ["rgba(255, 99, 132, 0.5)", "rgba(54, 162, 235, 0.5)", "rgba(255, 206, 86, 0.5),rgba(75, 192, 192, 0.5)", "rgba(153, 102, 255, 0.5)", "rgba(255, 159, 64, 0.5)"];
+
+      const labels = ["필러", "백트래킹", "지연"];
+      const labels2 = ["내용오역", "불필요한첨가", "일관성문제","표현어색","칭찬","기타"];
+
+      const pieChart1 = new Chart(document.getElementById("pie-chart-1"), {
+        type: "pie",
+        data: {
+          datasets: [{
+            data: data1,
+            backgroundColor: colors1
+          }],
+          labels: labels
+        },
+        options: {
+          legend: {
+            position: 'right'
+          }
+        }
+      });
+
+      const pieChart2 = new Chart(document.getElementById("pie-chart-2"), {
+        type: "pie",
+        data: {
+          datasets: [{
+            data: data2,
+            backgroundColor: colors2
+          }],
+          labels: labels2
+        },
+        options: {
+          legend: {
+            position: 'right'
+          }
+        }
+      });
+}
 </script>
 {% endblock %}
 
@@ -499,11 +567,17 @@ $(document).ready(function(){
 					</div>
 					<div class="feedbackContentDiv">
 						<div class="feedbackContentTitleDiv">
-							<h2>피드백</h2>
+							<h2>피드백.</h2>
 							<!--button class="btn">불러오기</button-->
 						</div>
 						<ul></ul>
 					</div>
+          <div> 
+          <canvas id="pie-chart-1"></canvas>
+          </div>
+          <div>
+          <canvas id="pie-chart-2"></canvas>
+          </div>
 				</div>
 			</div>
 {% endblock %}

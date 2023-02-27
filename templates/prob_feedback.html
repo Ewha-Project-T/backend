@@ -126,15 +126,18 @@ function selectText(){
 	var eOffset = 0;
 	if(document.getSelection){
 		txt = document.getSelection().toString();
-		console.log(txt);
+		
 		var nodeIdx = Array.from(document.getSelection().anchorNode.parentElement.childNodes).indexOf(document.getSelection().anchorNode);
 		var nodeEnd = Array.from(document.getSelection().anchorNode.parentElement.childNodes).indexOf(document.getSelection().extentNode);
+		
 		if(nodeIdx != nodeEnd){
+			
 			return false;
 		}
 		var preTextLength = 0;
 		for(var i=0; i<nodeIdx; i++){
 			preTextLength += $(document.getSelection().anchorNode.parentElement.childNodes[i]).text().length;
+			console.log($(document.getSelection().anchorNode.parentElement.childNodes[i]).text().length);
 		}
 		sOffset = document.getSelection().anchorOffset + preTextLength;
 		eOffset = document.getSelection().focusOffset + preTextLength;
@@ -148,6 +151,10 @@ function selectText(){
 		sOffset = document.selection.createRange().startOffset;
 		eOffset = document.selection.createRange().endOffset;
 	}
+	console.log(document.getSelection().anchorOffset,document.getSelection().focusOffset);
+	console.log(nodeIdx);
+	
+	console.log(txt,sOffset,eOffset,preTextLength);
 	return {'txt': txt, 'sOffset': sOffset, 'eOffset': eOffset};
 }
 
@@ -158,7 +165,7 @@ function createFeedback(txt, s, e,stt_flag){
 		
 		return false;
 	}
-
+	
 /*
 	var checkEle = $(".feedbackContentDiv ul .feedbackContentTxtDiv");
 	for(var i=0; i<checkEle.length; i++){
@@ -167,14 +174,20 @@ function createFeedback(txt, s, e,stt_flag){
 		}
 	}
 */
+//여기 수정
 	var checkEle = $(".feedbackContentDiv>ul>li");
+
 	for(var i=0; i<checkEle.length; i++){
 		var sOffset = parseInt($(checkEle[i]).attr("sOffset"));
 		var eOffset = parseInt($(checkEle[i]).attr("eOffset"));
+
+		//console.log(sOffset,s);
 		if(sOffset <= s && s <= eOffset){
+			console.log("T");
 			return false;
 		}
-		if(sOffset <= e && e <= eOffset){
+		else if(sOffset <= e && e <= eOffset){
+			console.log("F");
 			return false;
 		}
 	}
@@ -182,11 +195,12 @@ function createFeedback(txt, s, e,stt_flag){
 	var seq = new Date().getTime() + "" + new Date().getMilliseconds() + Math.floor(Math.random()*10000).toString();
 	var ele = $("<li />").attr({ "id": seq, "sOffset": s, "eOffset": e });
 	var rowDiv = $("<div />").addClass("feedbackContentRowDiv");
-  if(stt_flag==0)
+  if(stt_flag==0){
 	
 
-  
+		
       var rowTitleDiv = $("<div />").addClass("feedbackContentRowTitleDiv");
+  }
   else
 	
       var rowTitleDiv = $("<div />").addClass("feedbackContentRowTitleDiv2");
@@ -214,6 +228,7 @@ function createFeedback(txt, s, e,stt_flag){
 	ele.append(rowDiv);
 
 	$(".feedbackContentDiv>ul").append(ele);
+	
 	feedbackSort();
 	return seq;
 }
@@ -322,7 +337,7 @@ function feedbackSort(){
 	var pEle = $(".feedbackContentDiv>ul").clone();
 	var assignmentText = submitTextList[probIndex];
 	var blockAssignmentText = "";
-
+	
 	for(var i=0; i<eleList.length; i++){
 //		var txt = $(eleList[i]).find(".feedbackContentTxtDiv").text();
 //		sortList.push({"id": $(eleList[i]).attr("id"), "index": assignmentText.indexOf(txt)});
@@ -342,7 +357,33 @@ function feedbackSort(){
 		$(".feedbackContentDiv>ul").append(pEle.find("li#" + sortList[i].id));
 		var sOffset = sortList[i].sOffset;
 		var eOffset = sortList[i].eOffset;
+	
+	
+
+	if(!(sortList[i].stt_flag==0)){
+	
+		// 줄바꿈 아스키 코드 10 예외 처리: assignmentText.slice(sOffset, eOffset).charCodeAt(0) != 10  
+		 if(sortList.length == 1 && assignmentText.slice(sOffset, eOffset).charCodeAt(0) != 10){
+				blockAssignmentText = assignmentText.slice(0, sOffset) + "<span class='feedbackBlock2' id ='hyun1'>" + assignmentText.slice(sOffset, eOffset) + "</span>" + assignmentText.slice(eOffset);
+				break;
+			}
+			if(i == 0 && assignmentText.slice(sOffset, eOffset).charCodeAt(0) != 10){
+				blockAssignmentText = assignmentText.slice(0, sOffset) + "<span class='feedbackBlock2' id ='hyun'>" + assignmentText.slice(sOffset, eOffset) + "</span>";
+				peOffset = eOffset;
+			}else if(i == sortList.length - 1 && assignmentText.slice(sOffset, eOffset).charCodeAt(0) != 10){ 
+				
+				blockAssignmentText = blockAssignmentText + assignmentText.slice(peOffset, sOffset) + "<span class='feedbackBlock2'id ='hyun3'>" + assignmentText.slice(sOffset, eOffset) + "</span>" + assignmentText.slice(eOffset);
+			}else if(assignmentText.slice(sOffset, eOffset).charCodeAt(0) != 10){
+	
+				
+				
+				blockAssignmentText = blockAssignmentText + assignmentText.slice(peOffset, sOffset) + "<span class='feedbackBlock2' id ='hyun2'>" + assignmentText.slice(sOffset, eOffset) + "</span>";
+				peOffset = eOffset;
+			}
+			
+	   }
     if(sortList[i].stt_flag==0){
+		
 		if(sortList.length == 1){
 			blockAssignmentText = assignmentText.slice(0, sOffset) + "<span class='feedbackBlock'>" + assignmentText.slice(sOffset, eOffset) + "</span>" + assignmentText.slice(eOffset);
 			break;
@@ -356,28 +397,8 @@ function feedbackSort(){
 			blockAssignmentText = blockAssignmentText + assignmentText.slice(peOffset, sOffset) + "<span class='feedbackBlock'>" + assignmentText.slice(sOffset, eOffset) + "</span>";
 			peOffset = eOffset;
 		}
-   }else{
-	
-	// 줄바꿈 아스키 코드 10 예외 처리: assignmentText.slice(sOffset, eOffset).charCodeAt(0) != 10  
-     if(sortList.length == 1 && assignmentText.slice(sOffset, eOffset).charCodeAt(0) != 10){
-			blockAssignmentText = assignmentText.slice(0, sOffset) + "<span class='feedbackBlock2' id ='hyun1'>" + assignmentText.slice(sOffset, eOffset) + "</span>" + assignmentText.slice(eOffset);
-			break;
-		}
-		if(i == 0 && assignmentText.slice(sOffset, eOffset).charCodeAt(0) != 10){
-			blockAssignmentText = assignmentText.slice(0, sOffset) + "<span class='feedbackBlock2' id ='hyun'>" + assignmentText.slice(sOffset, eOffset) + "</span>";
-			peOffset = eOffset;
-		}else if(i == sortList.length - 1 && assignmentText.slice(sOffset, eOffset).charCodeAt(0) != 10){ 
-			
-			blockAssignmentText = blockAssignmentText + assignmentText.slice(peOffset, sOffset) + "<span class='feedbackBlock2'id ='hyun3'>" + assignmentText.slice(sOffset, eOffset) + "</span>" + assignmentText.slice(eOffset);
-		}else if(assignmentText.slice(sOffset, eOffset).charCodeAt(0) != 10){
-
-			
-			
-			blockAssignmentText = blockAssignmentText + assignmentText.slice(peOffset, sOffset) + "<span class='feedbackBlock2' id ='hyun2'>" + assignmentText.slice(sOffset, eOffset) + "</span>";
-			peOffset = eOffset;
-		}
-		
    }
+
 	}
 	$(".assignmentTextDiv div").html(blockAssignmentText);
 }
@@ -426,7 +447,9 @@ $(document).ready(function(){
 	// 피드백 상자 생성
 	$(document).on("mouseup", ".feedbackDiv .probTextDiv .probTextContentDiv .assignmentTextDiv div", function(){
 		var txtObj = selectText();
+		
 		if(txtObj == false){
+			
 			return false;
 		}
 		var txt = txtObj.txt;

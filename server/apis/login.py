@@ -59,6 +59,59 @@ class Login(Resource):
         else:
             msg="아이디와 비밀번호를 확인해주세요."
             return redirect(host_url + url_for('login', msg=msg))
+
+class Login2(Resource): 
+    def get(self):
+        msg = ""
+        if request.args.get('msg') != "":
+            msg = request.args.get('msg')
+        return make_response(render_template('login.html',msg=msg))
+    def post(self):#로그인
+        parser = reqparse.RequestParser()
+        parser.add_argument('email', type=str, required=True, help="EMAIL is required")
+        parser.add_argument('pw', type=str, required=True, help="PW is required")
+        args = parser.parse_args()
+        user_email = args['email']
+        user_pw = args['pw']
+        if re.match("^[A-Za-z0-9]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[A-Za-z0-9])*\.[A-Za-z]{2,3}$", user_email):
+            result, account = login(user_email, user_pw)
+            if(result==LoginResult.ACC_IS_NOT_FOUND):
+                msg="아이디와 비밀번호를 확인해주세요."
+                return {"msg":msg}, 403
+            if(result==LoginResult.NEED_EMAIL_CHECK):
+                return {"email":user_email,
+                        'location':host_url+'/email'}, 403
+            if(result==LoginResult.LOGIN_COUNT_EXCEEDED):
+                msg="로그인 시도횟수초과 관리자에게 연락바랍니다."
+                return {"msg":msg}, 403
+            if(result==LoginResult.NEED_ADMIN_CHECK):
+                msg="관리자의 승인이 필요합니다."
+                return {"msg":msg}, 403
+            if(result==LoginResult.SUCCESS):
+                msg=""
+                access_token, refresh_token = create_tokens(account)
+                if(account.permission==0):
+                    return {
+                        'access_token' : access_token,
+                        'refresh_token' : refresh_token,
+                        'loginSuccess': "true",
+                        'location':host_url+'/admin'
+                        }, 200
+                else:
+                    res = make_response()
+                    res.set_cookie('access_token',access_token)
+                    
+                    return jsonify({'access_token' : access_token,
+                        'refresh_token' : refresh_token,
+                        'loginSuccess': "true"})
+    
+
+            msg="아이디와 비밀번호를 확인해주세요."
+            return {"msg":msg}, 400
+        else:
+            msg="아이디와 비밀번호를 확인해주세요."
+            return {"msg":msg}, 400
+
 class Logout(Resource):
 
     @jwt_required(refresh=True)

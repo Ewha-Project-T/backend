@@ -107,8 +107,7 @@ def basic_annotation_stt(result,stt,pause_idx):
         stt = stt[:-1]
     result['textFile']=stt   
     return result
-<<<<<<< HEAD
-=======
+
 #한국어버전 끝
 
 #일본어버전 시작
@@ -287,4 +286,3 @@ def japan_basic_annotation_stt(result,stt,pause_idx):
 
     return result
 #일본어버전 끝
->>>>>>> 7f23e82a3167d7b05d5a5274c5a2c5698761e7ed

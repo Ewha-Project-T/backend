@@ -111,6 +111,33 @@ class Login2(Resource):
         else:
             msg="아이디와 비밀번호를 확인해주세요."
             return {"msg":msg}, 400
+class CheckToken(Resource):
+    @jwt_required()
+    def get(self):
+        current_user = get_jwt_identity()
+        if(current_user==None):
+            return {"isAuth": "false"},400
+        if(current_user["user_perm"]==0):
+            return {   "email": current_user["user_email"],
+                       "name": current_user["user_name"],
+                       "role": current_user["user_perm"],
+                       "isAuth": "true",
+                       "isAdmin": "true"},200
+        else:
+            return {   "email": current_user["user_email"],
+                       "name": current_user["user_name"],
+                       "role": current_user["user_perm"],
+                       "isAuth": "true",
+                       "isAdmin": "false"},200
+class Logout2(Resource):
+
+    @jwt_required(refresh=True)
+    def get(self):#로그아웃
+        jti = get_jwt()["jti"]
+        jwt_blocklist.add(jti)
+        res=make_response(redirect(host_url+url_for('login')))
+        unset_jwt_cookies(res)
+        return jsonify({'logoutSuccess': "true"})
 
 class Logout(Resource):
 

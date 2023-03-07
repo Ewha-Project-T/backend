@@ -1,6 +1,6 @@
 from server.apis.mail import Email, Verify_email
 from server.model import Lecture
-from .login import Login,Join, LoginRefresh, Logout,Login2
+from .login import Login,Join, LoginRefresh, Logout,Login2,Logout2,CheckToken
 from .lecture import Attend, Lecture, Lecture_mod, Lecture_mod_del, Student,Major, Lecture_add
 from .assignment import Prob, Prob_del, Prob_submit, Prob_feedback,Prob_mod,Prob_add, prob_upload, Prob_submit_list
 from .admin import Admin,Admin2
@@ -9,6 +9,8 @@ from .stt import Stt, SttJob, SttSeq, SttSeqJob
 def load_api(api_module):
     api_module.add_resource(Login,'/login',endpoint='login') # GET POST PUT PATCH DELETE
     api_module.add_resource(Login2,'/api/user/login',endpoint='login2') # GET POST PUT PATCH DELETE
+    api_module.add_resource(Logout2,'/api/user/logout',endpoint='logout2') # GET POST PUT PATCH DELETE
+    api_module.add_resource(CheckToken,'/api/user/auth',endpoint='checkToken') 
     api_module.add_resource(LoginRefresh,'/login-refresh',endpoint='login_refresh') 
     api_module.add_resource(Lecture,'/lecture',endpoint='lecture')
     api_module.add_resource(Admin,'/admin',endpoint='admin')

@@ -183,12 +183,12 @@ def req_upload(file, completion,fullText=True):
         'media': open(file, 'rb'),
         'params': (None, json.dumps(request_body, ensure_ascii=False).encode('UTF-8'), 'application/json')
     }
-    response = requests.post(headers=headers, url=invoke_url + '/recognizer/url', files=files)
+    response = requests.post(headers=headers, url=invoke_url + '/recognizer/upload', files=files)
     return response
 
 
 
-def japan_basic_do_stt(res, sound, startidx, endidx, silenceidx):
+def japan_basic_do_stt(length,res, sound, startidx, endidx, silenceidx):
 
     
     flag = True
@@ -198,37 +198,37 @@ def japan_basic_do_stt(res, sound, startidx, endidx, silenceidx):
     pause_idx = []
     start_idx = []
     end_idx = []
-    
-    dic = res[i]
-    # print(dic)
-    if dic.get("result") == "COMPLETED":
-        # tmp = dic.get("segments")
-        tagger = fugashi.Tagger()
-        words= [word.surface for word in tagger(dic['text'])]
-        stt = process_stt_result(words)
-        # print(stt)
-        text = text + stt
-        if len(stt)>0:
-            start_idx.append(startidx[i])
-            end_idx.append(endidx[i])
-        sentences = sent_tokenize(stt)
-        for sentence in sentences:
-            print(sentence)
-            if sentence.endswith('.'):
-                flag = True
-            else:
-                flag = False
-        if i < length - 1:
-            if flag == False:
-                print("(pause: " + str(silenceidx[i])+"sec)")  # 침묵
-                text = text+'\n'
-                pause_result += silenceidx[i]
-                pause_idx.append(silenceidx[i])
-            else:
-                # 통역 개시 지연구간
-                print("(delay: " + str(silenceidx[i]) + "sec)")
-                text = text+'\n'
-                delay_result += silenceidx[i]
+    for i in range(res):
+        dic = res[i]
+        # print(dic)
+        if dic.get("result") == "COMPLETED":
+            # tmp = dic.get("segments")
+            tagger = fugashi.Tagger()
+            words= [word.surface for word in tagger(dic['text'])]
+            stt = process_stt_result(words)
+            # print(stt)
+            text = text + stt
+            if len(stt)>0:
+                start_idx.append(startidx[i])
+                end_idx.append(endidx[i])
+            sentences = sent_tokenize(stt)
+            for sentence in sentences:
+                print(sentence)
+                if sentence.endswith('.'):
+                    flag = True
+                else:
+                    flag = False
+            if i < length - 1:
+                if flag == False:
+                    print("(pause: " + str(silenceidx[i])+"sec)")  # 침묵
+                    text = text+'\n'
+                    pause_result += silenceidx[i]
+                    pause_idx.append(silenceidx[i])
+                else:
+                    # 통역 개시 지연구간
+                    print("(delay: " + str(silenceidx[i]) + "sec)")
+                    text = text+'\n'
+                    delay_result += silenceidx[i]
     return text, pause_result, delay_result, pause_idx, start_idx, end_idx
 
 def japan_basic_annotation_stt(result,stt,pause_idx):

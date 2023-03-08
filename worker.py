@@ -7,8 +7,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.ext.declarative import declarative_base, DeclarativeMeta
 
 from stt_work import (
-    process_stt_result,basic_annotation_stt,basic_do_stt,basic_indexing,
-    japan_basic_annotation_stt,japan_basic_do_stt,japan_basic_indexing,japan_process_stt_result
+    KorStt,JpStt
 )
 
 import os
@@ -87,9 +86,9 @@ def do_stt_work(self, filename, locale="ko-KR"):
     session = self.session
     self.update_state(state='INDEXING')
     if(locale=="ja-JP"):
-        length,sound,startidx,endidx,silenceidx,myaudio=japan_basic_indexing(filename)
+        length,sound,startidx,endidx,silenceidx,myaudio=JpStt.japan_basic_indexing(filename)
     else:
-        length,sound,startidx,endidx,silenceidx,myaudio=basic_indexing(filename)
+        length,sound,startidx,endidx,silenceidx,myaudio=KorStt.basic_indexing(filename)
     self.update_state(state='STT')
     domain = os.getenv("DOMAIN", "https://translation-platform.site:8443")
 
@@ -108,21 +107,27 @@ def do_stt_work(self, filename, locale="ko-KR"):
             raise Exception("INVALID-FILE")
         
         if(locale=="ja-JP"):
-            request_body = {
-                'url': files,
-                'language': 'ja',
-                'completion': 'sync',#바꿀지고민
-                'fullText': True,
-                'noiseFiltering' : False
-            }
-            headers = {
-                'Accept': 'application/json;UTF-8',
-                'Content-Type': 'application/json;UTF-8',
-                'X-CLOVASPEECH-API-KEY': os.environ['CLOVASPEECH_STT_KEY']
-            }
-            requests.post(headers=headers,
-                             url=os.environ['CLOVASPEECH_STT_URL'] + '/recognizer/url',
-                             data=json.dumps(request_body).encode('UTF-8'))#이후 작업필요
+            res=[0 for i in range(local_file)]
+            for i in range(local_file):
+                response=JpStt.req_upload(file=local_file[i], completion='sync')
+                if response.status_code != 200:
+                    # raise RuntimeError("API server does not response correctly")
+                    try:
+                        response.raise_for_status()
+                        text = response.text.strip()
+                        if len(text) > 0:
+                            print("Recognized text: ", text)
+                        else:
+                            print("No speech detected")
+                    except requests.exceptions.HTTPError as e:
+                        print("HTTP error: ", e)
+                    except requests.exceptions.ConnectionError as e:
+                        print("Error connecting to server: ", e)
+                    except requests.exceptions.Timeout as e:
+                        print("Timeout error: ", e)
+                    except requests.exceptions.RequestException as e:
+                        print("Error: ", e)
+                res[i] = json.loads(response.text)
         else:
             webhook_res = requests.post(
                 os.environ["STT_URL"],
@@ -167,13 +172,13 @@ def do_stt_work(self, filename, locale="ko-KR"):
         self.update_state(state=e.args[0])
 
     if(locale=="ja-JP"):
-        stt,pause_result, delay_result, pause_idx=japan_basic_do_stt(res,sound,silenceidx)
+        stt,pause_result, delay_result, pause_idx=JpStt.japan_basic_do_stt(length,res,sound,startidx,endidx,silenceidx)
     else:
-        stt,pause_result, delay_result, pause_idx=basic_do_stt(res,sound,silenceidx) #인자맞추기 필요
+        stt,pause_result, delay_result, pause_idx=KorStt.basic_do_stt(res,sound,silenceidx) #인자맞추기 필요
     if(locale=="ja-JP"):
-        result=japan_basic_annotation_stt(result,stt,pause_idx)
+        result=JpStt.japan_basic_annotation_stt(result,stt,pause_idx)
     else:
-        result=basic_annotation_stt(result,stt,pause_idx)    
+        result=KorStt.basic_annotation_stt(result,stt,pause_idx)    
     
     stt = session.query(Stt).filter_by(wav_file=filename).first()
     if not stt:

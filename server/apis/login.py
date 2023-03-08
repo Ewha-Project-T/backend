@@ -98,12 +98,14 @@ class Login2(Resource):
                         'location':host_url+'/admin'
                         }, 200
                 else:
-                    res = make_response()
-                    res.set_cookie('access_token',access_token)
+                    res = make_response({'loginSuccess': "true"})
                     
-                    return jsonify({'access_token' : access_token,
-                        'refresh_token' : refresh_token,
-                        'loginSuccess': "true"})
+                    res.headers['Access-Control-Allow-Origin'] = 'http://localhost:3000'
+                    res.headers['Access-Control-Allow-Credentials'] = 'true'
+                    res.set_cookie('access_token',access_token)
+                    res.status_code = 200
+                    return res
+                   
     
 
             msg="아이디와 비밀번호를 확인해주세요."

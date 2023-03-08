@@ -48,7 +48,7 @@ with app.app_context():
 
 jwt=JWTManager(app)
 
-CORS(app,expose_headers='Location')
+CORS(app,expose_headers='Location', supports_credentials=True)
 myApi=Api(app, errors=Flask.errorhandler)
 
 

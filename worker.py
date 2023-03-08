@@ -6,9 +6,10 @@ from sqlalchemy import Column, Text, Integer, String, Boolean, ForeignKey
 from sqlalchemy.orm import Session
 from sqlalchemy.ext.declarative import declarative_base, DeclarativeMeta
 
-from stt_work import (
-    KorStt,JpStt
+from kr_stt_work import (
+    KorStt
 )
+from jp_stt_work import JpStt
 
 import os
 import uuid
@@ -172,9 +173,11 @@ def do_stt_work(self, filename, locale="ko-KR"):
         self.update_state(state=e.args[0])
 
     if(locale=="ja-JP"):
-        stt,pause_result, delay_result, pause_idx=JpStt.japan_basic_do_stt(length,res,sound,startidx,endidx,silenceidx)
+        jstt = JpStt() 
+        stt,pause_result, delay_result, pause_idx=jstt.japan_basic_do_stt(length,res,sound,startidx,endidx,silenceidx)
     else:
-        stt,pause_result, delay_result, pause_idx=KorStt.basic_do_stt(res,sound,silenceidx) #인자맞추기 필요
+        kstt = KorStt() 
+        stt, pause_result, delay_result, pause_idx = kstt.basic_do_stt(res, sound, silenceidx) #인자맞추기 필요
     if(locale=="ja-JP"):
         result=JpStt.japan_basic_annotation_stt(result,stt,pause_idx)
     else:

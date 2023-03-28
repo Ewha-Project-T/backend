@@ -102,9 +102,9 @@ def prob_listing(lecture_no,user_no):
     return as_list_result
 
 #major_convert={"한일통역":"ja-JP","한일번역":"ja-JP","한중통역":"zh-CN","한중번역":"zh-CN","한영통역":"en-US","한영번역":"en-US","한불통역":"fr-FR","한불번역":"fr-FR"}#임시용
-major_convert={"jp":"ja-JP","en":"en-US","cn":"zh-CN","fr":"fr-FR"}
+major_convert={"ko":"ko-KR","jp":"ja-JP","en":"en-US","cn":"zh-CN","fr":"fr-FR"}
 def make_as(user_no,lecture_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,original_text="",upload_url="",region=None,user_info=None,prob_translang_source="ko",prob_translang_destination="ko"):
-    acc=Assignment(user_no=user_no,lecture_no=lecture_no,week=week,limit_time=limit_time,as_name=as_name,as_type=as_type,keyword=keyword,description=description,re_limit=re_limit,speed=speed,disclosure=disclosure,original_text=original_text,upload_url=upload_url,translang=prob_translang_source)
+    acc=Assignment(user_no=user_no,lecture_no=lecture_no,week=week,limit_time=limit_time,as_name=as_name,as_type=as_type,keyword=keyword,description=description,re_limit=re_limit,speed=speed,disclosure=disclosure,original_text=original_text,upload_url=upload_url,translang=prob_translang_source,dest_translang=prob_translang_destination)
     db.session.add(acc)
     db.session.commit()
     lecture_major=prob_translang_source
@@ -119,11 +119,10 @@ def make_as(user_no,lecture_no,week,limit_time,as_name,as_type,keyword,descripti
             reg_index=json_reg["index"]
             reg_start=json_reg["start"]
             reg_end=json_reg["end"]
-
+            print(lecture_major)
             split_url=split_wav_save(upload_url,int(reg_start),int(reg_end))
             mapping_sst_user(acc.assignment_no, split_url,user_info)
-
-            task = do_stt_work.delay(filename=split_url,locale=lecture_major)
+            task = do_stt_work.delay(filename=split_url,locale=major_convert['jp'])
             pr = Prob_region(assignment_no=acc.assignment_no,region_index=reg_index,start=reg_start,end=reg_end,upload_url=split_url, job_id=task.id)
             db.session.add(pr)
             db.session.commit
@@ -163,6 +162,8 @@ def mod_as(lecture_no,as_no,week,limit_time,as_name,as_type,keyword,description,
         acc.original_text=original_text
     if(upload_url!=""):
         acc.upload_url=upload_url
+    if(prob_translang_destination!=""):
+        acc.dest_translang=prob_translang_destination
     db.session.add(acc)
     db.session.commit
     if region==None:
@@ -256,12 +257,14 @@ def  check_assignment(as_no,lecture_no,uuid,user_info,text=""):
     acc=Assignment_check(assignment_no=as_no,attendee_no=attend.attendee_no,assignment_check=1,user_trans_result=text,submit_time=(datetime.now()+timedelta(hours=6)))
     db.session.add(acc)
     db.session.commit()
+    acc_locale=Assignment.query.filter_by(assignment_no=as_no).first()
+    locale=acc_locale.dest_translang
     if(text==""):
         for uu in uuid:
             acc2=Assignment_check_list(check_no=acc.check_no,acl_uuid=uu)
             db.session.add(acc2)
             db.session.commit()
-            do_stt_work.delay(uu)
+            do_stt_work.delay(filename=uu,locale=major_convert[locale])
 
 def get_as_name(as_no):
     acc=Assignment.query.filter_by(assignment_no=as_no).first()

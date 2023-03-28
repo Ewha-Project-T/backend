@@ -101,15 +101,15 @@ def do_stt_work(self, filename, locale="ko-KR"):
         myaudio[startidx[i]:endidx[i]].export(filepath, format="wav")
         files += [ domain + "/" + filepath ]
         local_file += [ filepath ]
+    res=[0 for i in range(len(local_file))]
 
     try:
         result = {'textFile': '', 'timestamps': [], 'annotations': []}
-        if not len(files) > 0:
+        if not len(files) > 0:  
             raise Exception("INVALID-FILE")
         
         if(locale=="ja-JP"):
-            res=[0 for i in range(local_file)]
-            for i in range(local_file):
+            for i in range(len(local_file)):
                 response=JpStt.req_upload(file=local_file[i], completion='sync')
                 if response.status_code != 200:
                     # raise RuntimeError("API server does not response correctly")
@@ -164,17 +164,15 @@ def do_stt_work(self, filename, locale="ko-KR"):
 
         for i in range(len(sound)):
             result['timestamps'].append({'start': startidx[i], 'end': endidx[i]})
-
     except IndexError as e: # for none recognized text exception (recog["recognizedPhrases"][0]["nBest"][0]["lexical"])
         print(e)
         self.update_state(state='INDEX_ERROR')
     except Exception as e:
         print(e)
         self.update_state(state=e.args[0])
-
     if(locale=="ja-JP"):
         jstt = JpStt() 
-        stt,pause_result, delay_result, pause_idx=jstt.japan_basic_do_stt(length,res,sound,startidx,endidx,silenceidx)
+        stt,pause_result, delay_result, pause_idx, start_idx, end_idx=jstt.japan_basic_do_stt(length,res,sound,startidx,endidx,silenceidx)
     else:
         kstt = KorStt() 
         stt, pause_result, delay_result, pause_idx = kstt.basic_do_stt(res, sound, silenceidx) #인자맞추기 필요

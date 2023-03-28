@@ -6,6 +6,7 @@ import requests
 import re
 import fugashi
 import json
+import MeCab
 
 #일본어버전 시작
 class JpStt:
@@ -94,7 +95,7 @@ class JpStt:
         pause_idx = []
         start_idx = []
         end_idx = []
-        for i in range(res):
+        for i in range(len(res)):
             dic = res[i]
             # print(dic)
             if dic.get("result") == "COMPLETED":

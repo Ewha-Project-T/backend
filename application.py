@@ -48,7 +48,10 @@ with app.app_context():
 
 jwt=JWTManager(app)
 
-CORS(app,expose_headers='Location', supports_credentials=True)
+CORS(app, 
+     expose_headers='Location', 
+     supports_credentials=True
+)
 myApi=Api(app, errors=Flask.errorhandler)
 
 
@@ -85,7 +88,7 @@ def uploads(filename):
 @app.route("/", methods=['GET'])
 def hello():
     #return redirect('http://203.255.176.34:8080/login')
-    return redirect('https://translation-platform.site:8443/login')
+    return redirect('https://edu-trans.ewha.ac.kr:8443/login')
     #return redirect('https://ewha.ltra.cc/login')
 
 load_api(myApi)

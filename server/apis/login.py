@@ -98,13 +98,17 @@ class Login2(Resource):
                         'location':host_url+'/admin'
                         }, 200
                 else:
-                    res = make_response({'loginSuccess': "true"})
+                    resq = make_response({'loginSuccess': "true"})
                     
-                    res.headers['Access-Control-Allow-Origin'] = 'http://localhost:3000'
-                    res.headers['Access-Control-Allow-Credentials'] = 'true'
-                    res.set_cookie('access_token',access_token)
-                    res.status_code = 200
-                    return res
+                    resq.headers['Access-Control-Allow-Origin'] = 'https://frontend-krlwv.run.goorm.site'
+                    resq.headers['Access-Control-Allow-Headers'] = 'Content-Type,Authorization'
+                    resq.headers['Access-Control-Allow-Methods'] = 'POST'
+                    resq.headers['Access-Control-Allow-Credentials'] = 'true'
+                    resq.headers['Access-Control-Expose-Headers']= 'set-cookie'
+                    resq.set_cookie('access_token',access_token,secure=True, httponly=True, samesite='None')
+                    # resq.headers.add('Access-Control-Allow-Origin', '*')
+                    
+                    return resq
                    
     
 
@@ -126,11 +130,17 @@ class CheckToken(Resource):
                        "isAuth": "true",
                        "isAdmin": "true"},200
         else:
-            return {   "email": current_user["user_email"],
+            resq = make_response({   "email": current_user["user_email"],
                        "name": current_user["user_name"],
                        "role": current_user["user_perm"],
                        "isAuth": "true",
-                       "isAdmin": "false"},200
+                       "isAdmin": "false"})
+                    
+                    
+            resq.headers.add('Access-Control-Allow-Origin', '*')
+            resq.status_code = 200
+            return resq
+        
 class Logout2(Resource):
 
     @jwt_required(refresh=True)

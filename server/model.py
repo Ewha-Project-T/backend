@@ -77,6 +77,7 @@ class Assignment(db.Model):
     disclosure= db.Column(db.Integer,default=0)
     original_text= db.Column(db.Text)
     upload_url= db.Column(db.String(100))
+    dest_translang= db.Column(db.String(20))
     
     user = db.relationship("User",back_populates="assignment")
     lecture = db.relationship("Lecture",back_populates="assignment")

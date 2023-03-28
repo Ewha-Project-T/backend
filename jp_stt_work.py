@@ -6,11 +6,10 @@ import requests
 import re
 import fugashi
 import json
-import MeCab
 
 #일본어버전 시작
 class JpStt:
-    def japan_process_stt_result(self,stt):
+    def process_stt_result(self,stt):
         result = stt
         for i in range(len(result)):
             if result[i] == 'え' or result[i] == 'ま' or result[i] == 'あの' or result[i] == 'えと' or result[i] == 'その':
@@ -22,7 +21,7 @@ class JpStt:
         result = ' '.join(result)
         return result
 
-    def japan_basic_indexing(filename):
+    def basic_indexing(filename):
         filepath = f"{os.environ['UPLOAD_PATH']}/{filename}.wav"
         myaudio = AudioSegment.from_file(filepath)
         dBFS = myaudio.dBFS
@@ -85,7 +84,7 @@ class JpStt:
 
 
 
-    def japan_basic_do_stt(self,length,res, sound, startidx, endidx, silenceidx):
+    def basic_do_stt(self,length,res, sound, startidx, endidx, silenceidx):
 
         
         flag = True
@@ -102,7 +101,7 @@ class JpStt:
                 # tmp = dic.get("segments")
                 tagger = fugashi.Tagger()
                 words= [word.surface for word in tagger(dic['text'])]
-                stt = self.japan_process_stt_result(words)
+                stt = self.process_stt_result(words)
                 # print(stt)
                 text = text + stt
                 if len(stt)>0:
@@ -128,7 +127,7 @@ class JpStt:
                         delay_result += silenceidx[i]
         return text, pause_result, delay_result, pause_idx, start_idx, end_idx
 
-    def japan_basic_annotation_stt(result,stt,pause_idx):
+    def basic_annotation_stt(result,stt,pause_idx):
         p = re.compile('(\w\(filler\)|\w+\s\w+\(backtracking\))')
         fidx = []
         while (True):

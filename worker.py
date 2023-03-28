@@ -87,7 +87,7 @@ def do_stt_work(self, filename, locale="ko-KR"):
     session = self.session
     self.update_state(state='INDEXING')
     if(locale=="ja-JP"):
-        length,sound,startidx,endidx,silenceidx,myaudio=JpStt.japan_basic_indexing(filename)
+        length,sound,startidx,endidx,silenceidx,myaudio=JpStt.basic_indexing(filename)
     else:
         length,sound,startidx,endidx,silenceidx,myaudio=KorStt.basic_indexing(filename)
     self.update_state(state='STT')
@@ -172,12 +172,12 @@ def do_stt_work(self, filename, locale="ko-KR"):
         self.update_state(state=e.args[0])
     if(locale=="ja-JP"):
         jstt = JpStt() 
-        stt,pause_result, delay_result, pause_idx, start_idx, end_idx=jstt.japan_basic_do_stt(length,res,sound,startidx,endidx,silenceidx)
+        stt,pause_result, delay_result, pause_idx, start_idx, end_idx=jstt.basic_do_stt(length,res,sound,startidx,endidx,silenceidx)
     else:
         kstt = KorStt() 
         stt, pause_result, delay_result, pause_idx = kstt.basic_do_stt(res, sound, silenceidx) #인자맞추기 필요
     if(locale=="ja-JP"):
-        result=JpStt.japan_basic_annotation_stt(result,stt,pause_idx)
+        result=JpStt.basic_annotation_stt(result,stt,pause_idx)
     else:
         result=KorStt.basic_annotation_stt(result,stt,pause_idx)    
     

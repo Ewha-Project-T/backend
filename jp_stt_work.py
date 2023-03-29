@@ -146,7 +146,7 @@ class JpStt:
                     {'start': fidx[i][0], 'end': fidx[i][0] + 2, 'type': 'FILLER'})
             else:
                 result['annotations'].append(
-                    {'start': fidx[i][0], 'end': fidx[i][1] - 14, 'type': 'BACKTRACK'})
+                    {'start': fidx[i][1]-14, 'end': fidx[i][0], 'type': 'BACKTRACKING'})
 
         pidx = [m.start(0) + 1 for m in re.finditer('[^\.^\n]\n', stt)]
         for i in range(len(pidx)):  # pause, delay 구분 없이 pause 로 통일

@@ -26,18 +26,18 @@ class JpStt:
         myaudio = AudioSegment.from_file(filepath)
         dBFS = myaudio.dBFS
         sound = silence.detect_nonsilent(
-            myaudio, min_silence_len=1100, silence_thresh=dBFS - 16, seek_step=100)  # 1초 이상의 silence
+            myaudio, min_silence_len=1000, silence_thresh=dBFS - 16, seek_step=100)  # 1초 이상의 silence
         sound = [[(start), (stop)] for start, stop in sound]
+        length = len(sound)
         startidx = []
         endidx = []
         silenceidx = []
-        print("indexing")
         for i in range(0, len(sound)):
             startidx.append(sound[i][0])
-            endidx.append(sound[i][1] + 300)
+            endidx.append(sound[i][1] + 200)
             if i < len(sound) - 1:
                 silenceidx.append(sound[i + 1][0] - sound[i][1])
-        return sound, startidx, endidx, silenceidx
+        return length, sound, startidx, endidx, silenceidx, myaudio
 
     # worker.py 로 이동 필요
     def req_upload(file, completion,fullText=True):
@@ -135,8 +135,6 @@ class JpStt:
 
         if stt.endswith("\n"):
             stt = stt[:-1]
-
         result['textFile'] = stt
-
         return result
     #일본어버전 끝

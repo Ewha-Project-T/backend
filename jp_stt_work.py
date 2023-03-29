@@ -108,7 +108,8 @@ class JpStt:
         return text, pause_result, delay_result, pause_idx, start_idx, end_idx
 
     def basic_annotation_stt(result,stt,pause_idx):
-        p = re.compile('(\w\(filler\)|\w+\s\w+\(backtracking\))')
+        p = re.compile('(\w+\(filler\)|\w+\s\w+\(backtracking\))')
+
         fidx = []
         while (True):
             f = p.search(stt)
@@ -121,13 +122,12 @@ class JpStt:
             if stt[fidx[i][0]] == 'え' or stt[fidx[i][0]] == 'ま':
                 result['annotations'].append(
                     {'start': fidx[i][0], 'end': fidx[i][0] + 1, 'type': 'FILLER'})
-            elif stt[fidx[i][0]] == 'あの' or stt[fidx[i][0]] == 'えと' or stt[fidx[i][0]] == 'その':
+            elif stt[fidx[i][0]:fidx[i][0]+2] == 'あの' or stt[fidx[i][0]:fidx[i][0]+2] == 'えと' or stt[fidx[i][0]:fidx[i][0]+2] == 'その':
                 result['annotations'].append(
                     {'start': fidx[i][0], 'end': fidx[i][0] + 2, 'type': 'FILLER'})
             else:
                 result['annotations'].append(
-                    {'start': fidx[i][0], 'end': fidx[i][1]-14, 'type': 'BACKTRACKING'})
-
+                    {'start': fidx[i][0], 'end': fidx[i][1] - 14, 'type': 'BACKTRACKING'})
         pidx = [m.start(0) + 1 for m in re.finditer('[^\.^\n]\n', stt)]
         for i in range(len(pidx)):  # pause, delay 구분 없이 pause 로 통일
             result['annotations'].append(

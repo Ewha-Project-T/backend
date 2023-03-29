@@ -26,38 +26,18 @@ class JpStt:
         myaudio = AudioSegment.from_file(filepath)
         dBFS = myaudio.dBFS
         sound = silence.detect_nonsilent(
-            myaudio, min_silence_len=1000, silence_thresh=dBFS - 16, seek_step=100)  # 1초 이상의 silence
+            myaudio, min_silence_len=1100, silence_thresh=dBFS - 16, seek_step=100)  # 1초 이상의 silence
         sound = [[(start), (stop)] for start, stop in sound]
-        length = len(sound)
         startidx = []
         endidx = []
         silenceidx = []
-        duration = 0
-        i=0
         print("indexing")
-        while i < len(sound):
-            duration = sound[i][1] - sound[i][0]
-            if duration < 2000:
-                if i == 0:
-                    length = length - 1
-                    startidx.append(sound[i][0])
-                    endidx.append(sound[i+1][1] + 200)
-                    if len(sound) > 2:
-                        silenceidx.append(sound[i+2][0] - sound[i+1][1])
-                    i = i+1
-                else:
-                    length = length - 1
-                    endidx[-1] = sound[i][1] + 200
-                    if i < len(sound) - 1:
-                        silenceidx[-1] = sound[i + 1][0] - sound[i][1]
-            else: 
-                startidx.append(sound[i][0])
-                endidx.append(sound[i][1] + 200)
-                if i < len(sound) - 1:
-                    silenceidx.append(sound[i + 1][0] - sound[i][1])
-            i = i+1
-        
-        return length, sound, startidx, endidx, silenceidx, myaudio
+        for i in range(0, len(sound)):
+            startidx.append(sound[i][0])
+            endidx.append(sound[i][1] + 300)
+            if i < len(sound) - 1:
+                silenceidx.append(sound[i + 1][0] - sound[i][1])
+        return sound, startidx, endidx, silenceidx
 
     # worker.py 로 이동 필요
     def req_upload(file, completion,fullText=True):
@@ -84,7 +64,7 @@ class JpStt:
 
 
 
-    def basic_do_stt(self,length,res, sound, startidx, endidx, silenceidx):
+    def basic_do_stt(self, res, sound, startidx, endidx, silenceidx):
 
         
         flag = True
@@ -94,7 +74,7 @@ class JpStt:
         pause_idx = []
         start_idx = []
         end_idx = []
-        for i in range(len(res)):
+        for i in range(len(sound)):
             dic = res[i]
             # print(dic)
             if dic.get("result") == "COMPLETED":
@@ -114,7 +94,7 @@ class JpStt:
                         flag = True
                     else:
                         flag = False
-                if i < length - 1:
+                if i < len(sound) - 1:
                     if flag == False:
                         print("(pause: " + str(silenceidx[i])+"sec)")  # 침묵
                         text = text+'\n'

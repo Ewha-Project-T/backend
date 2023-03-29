@@ -64,7 +64,7 @@ class JpStt:
 
 
 
-    def basic_do_stt(self, res, sound, startidx, endidx, silenceidx):
+    def basic_do_stt(self, res, sound, silenceidx):
 
         
         flag = True
@@ -72,8 +72,6 @@ class JpStt:
         delay_result = 0
         pause_result = 0
         pause_idx = []
-        start_idx = []
-        end_idx = []
         for i in range(len(sound)):
             dic = res[i]
             # print(dic)
@@ -83,13 +81,9 @@ class JpStt:
                 words= [word.surface for word in tagger(dic['text'])]
                 stt = self.process_stt_result(words)
                 # print(stt)
-                text = text + stt
-                if len(stt)>0:
-                    start_idx.append(startidx[i])
-                    end_idx.append(endidx[i])
+                text = stt
                 sentences = sent_tokenize(stt)
                 for sentence in sentences:
-                    print(sentence)
                     if sentence.endswith('.'):
                         flag = True
                     else:
@@ -98,14 +92,14 @@ class JpStt:
                     if flag == False:
                         print("(pause: " + str(silenceidx[i])+"sec)")  # 침묵
                         text = text+'\n'
-                        pause_result += silenceidx[i]
                         pause_idx.append(silenceidx[i])
                     else:
                         # 통역 개시 지연구간
                         print("(delay: " + str(silenceidx[i]) + "sec)")
                         text = text+'\n'
                         delay_result += silenceidx[i]
-        return text, pause_result, delay_result, pause_idx, start_idx, end_idx
+        
+        return text, pause_result, delay_result, pause_idx
 
     def basic_annotation_stt(result,stt,pause_idx):
         p = re.compile('(\w+\(filler\)|\w+\s\w+\(backtracking\))')

@@ -181,10 +181,10 @@ def do_stt_work(self, filename, locale="ko-KR"):
     if(locale=="ja-JP"):
         jstt = JpStt() 
         print(res)
-        stt, pause_result, delay_result, pause_idx, start_idx, end_idx=jstt.basic_do_stt(length,res,sound,startidx,endidx,silenceidx)
+        stt, pause_result, delay_result, pause_idx, startidx, endidx=jstt.basic_do_stt(length,res,sound,startidx,endidx,silenceidx)
     else:
         kstt = KorStt() 
-        stt, pause_result, delay_result, pause_idx = kstt.basic_do_stt(res, sound, silenceidx) #인자맞추기 필요
+        stt, pause_result, delay_result, pause_idx, startidx, endidx=kstt.basic_do_stt(length,res,sound,startidx,endidx,silenceidx)
     if(locale=="ja-JP"):
         result=JpStt.basic_annotation_stt(result,stt,pause_idx)
     else:

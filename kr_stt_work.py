@@ -42,7 +42,7 @@ class KorStt:
                 silenceidx.append(sound[i + 1][0] - sound[i][1])
         return length, sound, startidx, endidx, silenceidx, myaudio
 
-    def basic_do_stt(self,res,sound,silenceidx):
+    def basic_do_stt(self,length,res, sound, startidx, endidx, silenceidx):
         flag = True
         text = ''
         delay_result = 0
@@ -84,7 +84,7 @@ class KorStt:
             tmp_textFile[tmp_seq] = text
 
         tmp_text=''.join(tmp_textFile)                
-        return tmp_text, pause_result, delay_result, pause_idx
+        return tmp_text, pause_result, delay_result, pause_idx, startidx, endidx
 
     def basic_annotation_stt(result,stt,pause_idx):
         p = re.compile('(\w\(filler\)|\w+\s\w+\(backtracking\))')

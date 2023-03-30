@@ -32,11 +32,30 @@ class JpStt:
         startidx = []
         endidx = []
         silenceidx = []
-        for i in range(0, len(sound)):
-            startidx.append(sound[i][0])
-            endidx.append(sound[i][1] + 200)
-            if i < len(sound) - 1:
-                silenceidx.append(sound[i + 1][0] - sound[i][1])
+        duration = 0
+        i=0
+        print("indexing")
+        while i < len(sound):
+            duration = sound[i][1] - sound[i][0]
+            if duration < 2000:
+                if i == 0:
+                    length = length - 1
+                    startidx.append(sound[i][0])
+                    endidx.append(sound[i+1][1] + 200)
+                    if len(sound) > 2:
+                        silenceidx.append(sound[i+2][0] - sound[i+1][1])
+                    i = i+1
+                else:
+                    length = length - 1
+                    endidx[-1] = sound[i][1] + 200
+                    if i < len(sound) - 1:
+                        silenceidx[-1] = sound[i + 1][0] - sound[i][1]
+            else: 
+                startidx.append(sound[i][0])
+                endidx.append(sound[i][1] + 200)
+                if i < len(sound) - 1:
+                    silenceidx.append(sound[i + 1][0] - sound[i][1])
+            i = i+1  
         return length, sound, startidx, endidx, silenceidx, myaudio
 
     # worker.py 로 이동 필요
@@ -64,7 +83,7 @@ class JpStt:
 
 
 
-    def basic_do_stt(self, res, sound, silenceidx):
+    def basic_do_stt(self,length,res, sound, startidx, endidx, silenceidx):
 
         
         flag = True
@@ -72,7 +91,9 @@ class JpStt:
         delay_result = 0
         pause_result = 0
         pause_idx = []
-        for i in range(len(sound)):
+        start_idx = []
+        end_idx = []
+        for i in range(len(res)):
             dic = res[i]
             # print(dic)
             if dic.get("result") == "COMPLETED":
@@ -81,25 +102,29 @@ class JpStt:
                 words= [word.surface for word in tagger(dic['text'])]
                 stt = self.process_stt_result(words)
                 # print(stt)
-                text = stt
+                text = text + stt
+                if len(stt)>0:
+                    start_idx.append(startidx[i])
+                    end_idx.append(endidx[i])
                 sentences = sent_tokenize(stt)
                 for sentence in sentences:
+                    print(sentence)
                     if sentence.endswith('.'):
                         flag = True
                     else:
                         flag = False
-                if i < len(sound) - 1:
+                if i < length - 1:
                     if flag == False:
                         print("(pause: " + str(silenceidx[i])+"sec)")  # 침묵
                         text = text+'\n'
+                        pause_result += silenceidx[i]
                         pause_idx.append(silenceidx[i])
                     else:
                         # 통역 개시 지연구간
                         print("(delay: " + str(silenceidx[i]) + "sec)")
                         text = text+'\n'
                         delay_result += silenceidx[i]
-        
-        return text, pause_result, delay_result, pause_idx
+        return text, pause_result, delay_result, pause_idx, start_idx, end_idx
 
     def basic_annotation_stt(result,stt,pause_idx):
         p = re.compile('(\w+\(filler\)|\w+\s\w+\(backtracking\))')

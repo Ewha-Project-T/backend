@@ -91,16 +91,24 @@ def do_stt_work(self, filename, locale="ko-KR"):
     else:
         length,sound,startidx,endidx,silenceidx,myaudio=KorStt.basic_indexing(filename)
     self.update_state(state='STT')
-    domain = os.getenv("DOMAIN", "https://translation-platform.site:8443")
+    domain = os.getenv("DOMAIN", "https://edu-trans.ewha.ac.kr:8443")
 
     files = []
     local_file = []
-    for i in range(len(sound)):
-        filetmp = uuid.uuid4()
-        filepath = f"{os.environ['UPLOAD_PATH']}/{filetmp}.wav"
-        myaudio[startidx[i]:endidx[i]].export(filepath, format="wav")
-        files += [ domain + "/" + filepath ]
-        local_file += [ filepath ]
+    if(locale=="ja-JP"):
+        for i in range(length):
+            filetmp = uuid.uuid4()
+            filepath = f"{os.environ['UPLOAD_PATH']}/{filetmp}.wav"
+            myaudio[startidx[i]:endidx[i]].export(filepath, format="wav")
+            files += [ domain + "/" + filepath ]
+            local_file += [ filepath ]
+    else:
+        for i in range(len(sound)):
+            filetmp = uuid.uuid4()
+            filepath = f"{os.environ['UPLOAD_PATH']}/{filetmp}.wav"
+            myaudio[startidx[i]:endidx[i]].export(filepath, format="wav")
+            files += [ domain + "/" + filepath ]
+            local_file += [ filepath ]
     res=[0 for i in range(len(local_file))]
 
     try:
@@ -172,7 +180,8 @@ def do_stt_work(self, filename, locale="ko-KR"):
         self.update_state(state=e.args[0])
     if(locale=="ja-JP"):
         jstt = JpStt() 
-        stt,pause_result, delay_result, pause_idx, start_idx, end_idx=jstt.basic_do_stt(length,res,sound,startidx,endidx,silenceidx)
+        print(res)
+        stt, pause_result, delay_result, pause_idx, start_idx, end_idx=jstt.basic_do_stt(length,res,sound,startidx,endidx,silenceidx)
     else:
         kstt = KorStt() 
         stt, pause_result, delay_result, pause_idx = kstt.basic_do_stt(res, sound, silenceidx) #인자맞추기 필요

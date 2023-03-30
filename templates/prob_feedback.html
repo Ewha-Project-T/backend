@@ -59,12 +59,15 @@ var feedbackList = []; // 피드백 리스트
 {% if stt_result != None %}
 {% for i in range(stt_result|length) %}
         {% for j in range(stt_feedback[i]|length) %}
+				
                 var feedbackTmp;
                 var sf_start={{stt_feedback[i][j]['start']}}
                 var sf_end={{stt_feedback[i][j]['end']}}
                 var sf_type="{{stt_feedback[i][j]['type']}}"
                 feedbackTmp  = {"probIndex":{{i}}, "text": submitTextList[{{i}}].slice(sf_start,sf_end), "start": sf_start, "end": sf_end, "tag":[sf_type], "comment": "", "stt_flag":1};
                 feedbackList.push(feedbackTmp);
+				console.log(feedbackTmp);
+				
         {% endfor %}
 {% endfor %}
 {% endif %}
@@ -110,12 +113,15 @@ function loadData(index){
 	var feedback;
 	for(var i=0; i<feedbackList.length; i++){
 		feedback = feedbackList[i];
+		
 		if(feedback['probIndex'] == probIndex){
 			var seq = createFeedback(feedback['text'], feedback['start'], feedback['end'],feedback['stt_flag']);
 			for(var j=0; j<feedback['tag'].length; j++){
 				createFeedbackTag(seq, feedback['tag'][j]);
+				
 			}
 			setFeedbackComment(seq, feedback['comment']);
+			
 		}
 	}
 }
@@ -160,6 +166,7 @@ function selectText(){
 
 function createFeedback(txt, s, e,stt_flag){
 
+	console.log(txt)
 	//공백 처리
 	if(txt == ""){
 		
@@ -181,15 +188,18 @@ function createFeedback(txt, s, e,stt_flag){
 		var sOffset = parseInt($(checkEle[i]).attr("sOffset"));
 		var eOffset = parseInt($(checkEle[i]).attr("eOffset"));
 
-		//console.log(sOffset,s);
+		console.log(sOffset,e,eOffset);
 		if(sOffset <= s && s <= eOffset){
 			console.log("T");
 			return false;
 		}
+		/*
 		else if(sOffset <= e && e <= eOffset){
+			console.log(sOffset,e,eOffset);
 			console.log("F");
 			return false;
 		}
+		*/
 	}
 
 	var seq = new Date().getTime() + "" + new Date().getMilliseconds() + Math.floor(Math.random()*10000).toString();
@@ -363,18 +373,21 @@ function feedbackSort(){
 	if(!(sortList[i].stt_flag==0)){
 	
 		// 줄바꿈 아스키 코드 10 예외 처리: assignmentText.slice(sOffset, eOffset).charCodeAt(0) != 10  
-		 if(sortList.length == 1 && assignmentText.slice(sOffset, eOffset).charCodeAt(0) != 10){
+		 if(sortList.length == 1){
+		//if(sortList.length == 1 && assignmentText.slice(sOffset, eOffset).charCodeAt(0) != 10){
 				blockAssignmentText = assignmentText.slice(0, sOffset) + "<span class='feedbackBlock2' id ='hyun1'>" + assignmentText.slice(sOffset, eOffset) + "</span>" + assignmentText.slice(eOffset);
 				break;
 			}
-			if(i == 0 && assignmentText.slice(sOffset, eOffset).charCodeAt(0) != 10){
+			if(i == 0){
+			//if(i == 0 && assignmentText.slice(sOffset, eOffset).charCodeAt(0) != 10){
 				blockAssignmentText = assignmentText.slice(0, sOffset) + "<span class='feedbackBlock2' id ='hyun'>" + assignmentText.slice(sOffset, eOffset) + "</span>";
 				peOffset = eOffset;
-			}else if(i == sortList.length - 1 && assignmentText.slice(sOffset, eOffset).charCodeAt(0) != 10){ 
+			}else if(i == sortList.length - 1){
+			//}else if(i == sortList.length - 1 && assignmentText.slice(sOffset, eOffset).charCodeAt(0) != 10){ 
 				
 				blockAssignmentText = blockAssignmentText + assignmentText.slice(peOffset, sOffset) + "<span class='feedbackBlock2'id ='hyun3'>" + assignmentText.slice(sOffset, eOffset) + "</span>" + assignmentText.slice(eOffset);
-			}else if(assignmentText.slice(sOffset, eOffset).charCodeAt(0) != 10){
-	
+			}else{
+			//}else if(assignmentText.slice(sOffset, eOffset).charCodeAt(0) != 10){
 				
 				
 				blockAssignmentText = blockAssignmentText + assignmentText.slice(peOffset, sOffset) + "<span class='feedbackBlock2' id ='hyun2'>" + assignmentText.slice(sOffset, eOffset) + "</span>";

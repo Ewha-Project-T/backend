@@ -6,6 +6,7 @@ import requests
 import re
 import fugashi
 import json
+import uuid
 
 #일본어버전 시작
 class JpStt:
@@ -21,7 +22,7 @@ class JpStt:
         result = ' '.join(result)
         return result
 
-    def basic_indexing(filename):
+    def basic_indexing(self,filename):
         filepath = f"{os.environ['UPLOAD_PATH']}/{filename}.wav"
         myaudio = AudioSegment.from_file(filepath)
         dBFS = myaudio.dBFS
@@ -59,7 +60,7 @@ class JpStt:
         return length, sound, startidx, endidx, silenceidx, myaudio
 
     # worker.py 로 이동 필요
-    def req_upload(file, completion,fullText=True):
+    def req_upload(self,file, completion,fullText=True):
 
         invoke_url = os.environ['CLOVASPEECH_STT_URL']
 
@@ -126,7 +127,7 @@ class JpStt:
                         delay_result += silenceidx[i]
         return text, pause_result, delay_result, pause_idx, start_idx, end_idx
 
-    def basic_annotation_stt(result,stt,pause_idx):
+    def basic_annotation_stt(self,result,stt,pause_idx):
         p = re.compile('(\w+\(filler\)|\w+\s\w+\(backtracking\))')
 
         fidx = []
@@ -156,4 +157,46 @@ class JpStt:
             stt = stt[:-1]
         result['textFile'] = stt
         return result
-    #일본어버전 끝
+
+    def request_api(self,length,myaudio,startidx,endidx):
+        domain = os.getenv("DOMAIN", "https://edu-trans.ewha.ac.kr:8443")
+        files = []
+        local_file = []
+        
+        for i in range(length):
+            filetmp = uuid.uuid4()
+            filepath = f"{os.environ['UPLOAD_PATH']}/{filetmp}.wav"
+            myaudio[startidx[i]:endidx[i]].export(filepath, format="wav")
+            files += [ domain + "/" + filepath ]
+            local_file += [ filepath ]
+
+        if not len(files) > 0:  
+            return None   
+        
+        res=[0 for i in range(length)]
+
+        for i in range(len(local_file)):
+                response=self.req_upload(file=local_file[i], completion='sync')
+                if response.status_code != 200:
+                    # raise RuntimeError("API server does not response correctly")
+                    try:
+                        response.raise_for_status()
+                        text = response.text.strip()
+                        if len(text) > 0:
+                            print("Recognized text: ", text)
+                        else:
+                            print("No speech detected")
+                    except requests.exceptions.HTTPError as e:
+                        print("HTTP error: ", e)
+                    except requests.exceptions.ConnectionError as e:
+                        print("Error connecting to server: ", e)
+                    except requests.exceptions.Timeout as e:
+                        print("Timeout error: ", e)
+                    except requests.exceptions.RequestException as e:
+                        print("Error: ", e)
+                res[i] = json.loads(response.text)
+
+        for file in local_file:
+            os.unlink(file)
+        return res
+    

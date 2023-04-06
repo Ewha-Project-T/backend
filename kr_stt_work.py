@@ -6,6 +6,8 @@ import requests
 import re
 import fugashi
 import json
+import time
+import uuid
 
 class KorStt:
     def process_stt_result(self,stt):
@@ -24,7 +26,7 @@ class KorStt:
         result = ' '.join(result)
         return result
 
-    def basic_indexing(filename):
+    def basic_indexing(self,filename):
         filepath = f"{os.environ['UPLOAD_PATH']}/{filename}.wav"
         myaudio = AudioSegment.from_file(filepath)
         dBFS = myaudio.dBFS
@@ -86,7 +88,7 @@ class KorStt:
         tmp_text=''.join(tmp_textFile)                
         return tmp_text, pause_result, delay_result, pause_idx, startidx, endidx
 
-    def basic_annotation_stt(result,stt,pause_idx):
+    def basic_annotation_stt(self,result,stt,pause_idx):
         p = re.compile('(\w\(filler\)|\w+\s\w+\(backtracking\))')
         fidx = []
         while (True):
@@ -110,5 +112,52 @@ class KorStt:
             stt = stt[:-1]
         result['textFile']=stt   
         return result
+
+    def request_api(self,length,myaudio,startidx,endidx):
+        domain = os.getenv("DOMAIN", "https://edu-trans.ewha.ac.kr:8443")
+
+        files = []
+        local_file = []
+        
+        for i in range(length):
+            filetmp = uuid.uuid4()
+            filepath = f"{os.environ['UPLOAD_PATH']}/{filetmp}.wav"
+            myaudio[startidx[i]:endidx[i]].export(filepath, format="wav")
+            files += [ domain + "/" + filepath ]
+            local_file += [ filepath ]
+
+        if not len(files) > 0:  
+            return None  
+        res={'values':[]}
+
+        webhook_res = requests.post(
+            os.environ["STT_URL"],
+            headers={
+                "Content-Type": "application/json",
+                "Ocp-Apim-Subscription-Key": os.environ["STT_KEY"]
+            },
+            json={
+                "contentUrls": files,
+                "properties": {
+                    "diarizationEnabled": False,
+                    "wordLevelTimestampsEnabled": True,
+                    "punctuationMode": "DictatedAndAutomatic",
+                    "profanityFilterMode": "Masked"
+                },
+                "locale": "ko-KR",
+                "displayName": "Transcription of file using default model for en-US"
+            }
+        ).json()
+        url = webhook_res["links"]["files"]
+        while len(res["values"]) == 0:
+            res = requests.get(
+                url,
+                headers={ "Ocp-Apim-Subscription-Key": os.environ['STT_KEY'] }
+            ).json()
+
+            time.sleep(1)
+        for file in local_file:
+            os.unlink(file)          
+        return res     
     #한국어버전 끝
 

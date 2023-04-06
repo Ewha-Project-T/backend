@@ -87,116 +87,41 @@ def do_stt_work(self, filename, locale="ko-KR"):
     session = self.session
     self.update_state(state='INDEXING')
     if(locale=="ja-JP"):
-        length,sound,startidx,endidx,silenceidx,myaudio=JpStt.basic_indexing(filename)
+        stt=JpStt()
     else:
-        length,sound,startidx,endidx,silenceidx,myaudio=KorStt.basic_indexing(filename)
-    self.update_state(state='STT')
-    domain = os.getenv("DOMAIN", "https://edu-trans.ewha.ac.kr:8443")
+        stt=KorStt()
+    length,sound,startidx,endidx,silenceidx,myaudio=stt.basic_indexing(filename)
 
-    files = []
-    local_file = []
-    if(locale=="ja-JP"):
-        for i in range(length):
-            filetmp = uuid.uuid4()
-            filepath = f"{os.environ['UPLOAD_PATH']}/{filetmp}.wav"
-            myaudio[startidx[i]:endidx[i]].export(filepath, format="wav")
-            files += [ domain + "/" + filepath ]
-            local_file += [ filepath ]
-    else:
-        for i in range(len(sound)):
-            filetmp = uuid.uuid4()
-            filepath = f"{os.environ['UPLOAD_PATH']}/{filetmp}.wav"
-            myaudio[startidx[i]:endidx[i]].export(filepath, format="wav")
-            files += [ domain + "/" + filepath ]
-            local_file += [ filepath ]
-    res=[0 for i in range(len(local_file))]
+    self.update_state(state='STT')
 
     try:
         result = {'textFile': '', 'timestamps': [], 'annotations': []}
-        if not len(files) > 0:  
-            raise Exception("INVALID-FILE")
         
-        if(locale=="ja-JP"):
-            for i in range(len(local_file)):
-                response=JpStt.req_upload(file=local_file[i], completion='sync')
-                if response.status_code != 200:
-                    # raise RuntimeError("API server does not response correctly")
-                    try:
-                        response.raise_for_status()
-                        text = response.text.strip()
-                        if len(text) > 0:
-                            print("Recognized text: ", text)
-                        else:
-                            print("No speech detected")
-                    except requests.exceptions.HTTPError as e:
-                        print("HTTP error: ", e)
-                    except requests.exceptions.ConnectionError as e:
-                        print("Error connecting to server: ", e)
-                    except requests.exceptions.Timeout as e:
-                        print("Timeout error: ", e)
-                    except requests.exceptions.RequestException as e:
-                        print("Error: ", e)
-                res[i] = json.loads(response.text)
-        else:
-            webhook_res = requests.post(
-                os.environ["STT_URL"],
-                headers={
-                    "Content-Type": "application/json",
-                    "Ocp-Apim-Subscription-Key": os.environ["STT_KEY"]
-                },
-                json={
-                    "contentUrls": files,
-                    "properties": {
-                        "diarizationEnabled": False,
-                        "wordLevelTimestampsEnabled": True,
-                        "punctuationMode": "DictatedAndAutomatic",
-                        "profanityFilterMode": "Masked"
-                    },
-                    "locale": locale,
-                    "displayName": "Transcription of file using default model for en-US"
-                }
-            ).json()
-            url = webhook_res["links"]["files"]
-            res = { 'values': [] }
-            while len(res["values"]) == 0:
-                res = requests.get(
-                    url,
-                    headers={ "Ocp-Apim-Subscription-Key": os.environ['STT_KEY'] }
-                ).json()
-
-                time.sleep(1)
-            for file in local_file:
-                os.unlink(file)
+        res=stt.request_api(length,myaudio,startidx,endidx)
+        if res==None:  
+            raise Exception("INVALID-FILE")        
 
         self.update_state(state='STT-DONE')
 
-        for i in range(len(sound)):
+        for i in range(length):
             result['timestamps'].append({'start': startidx[i], 'end': endidx[i]})
+
+        stt_text, pause_result, delay_result, pause_idx, startidx, endidx=stt.basic_do_stt(length,res,sound,startidx,endidx,silenceidx)
+        result=stt.basic_annotation_stt(result,stt_text,pause_idx)
     except IndexError as e: # for none recognized text exception (recog["recognizedPhrases"][0]["nBest"][0]["lexical"])
         print(e)
         self.update_state(state='INDEX_ERROR')
     except Exception as e:
         print(e)
         self.update_state(state=e.args[0])
-    if(locale=="ja-JP"):
-        jstt = JpStt() 
-        print(res)
-        stt, pause_result, delay_result, pause_idx, startidx, endidx=jstt.basic_do_stt(length,res,sound,startidx,endidx,silenceidx)
-    else:
-        kstt = KorStt() 
-        stt, pause_result, delay_result, pause_idx, startidx, endidx=kstt.basic_do_stt(length,res,sound,startidx,endidx,silenceidx)
-    if(locale=="ja-JP"):
-        result=JpStt.basic_annotation_stt(result,stt,pause_idx)
-    else:
-        result=KorStt.basic_annotation_stt(result,stt,pause_idx)    
-    
-    stt = session.query(Stt).filter_by(wav_file=filename).first()
-    if not stt:
+
+    stt_db = session.query(Stt).filter_by(wav_file=filename).first()
+    if not stt_db:
         return False
 
     job = SttJob(
         job_id=self.request.id,
-        stt_no=stt.stt_no,
+        stt_no=stt_db.stt_no,
         sound=repr(sound),
         startidx=repr(startidx),
         endidx=repr(endidx),

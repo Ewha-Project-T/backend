@@ -90,27 +90,10 @@ def do_stt_work(self, filename, locale="ko-KR"):
         stt=JpStt()
     else:
         stt=KorStt()
-    length,sound,startidx,endidx,silenceidx,myaudio=stt.basic_indexing(filename)
-
     self.update_state(state='STT')
 
     try:
-        result = {'textFile': '', 'timestamps': [], 'annotations': []}
-        
-        res=stt.request_api(length,myaudio,startidx,endidx)
-        if res==None:  
-            raise Exception("INVALID-FILE")        
-
-        self.update_state(state='STT-DONE')
-
-        for i in range(length):
-            result['timestamps'].append({'start': startidx[i], 'end': endidx[i]})
-
-        stt_text, pause_result, delay_result, pause_idx, startidx, endidx=stt.basic_do_stt(length,res,sound,startidx,endidx,silenceidx)
-        result=stt.basic_annotation_stt(result,stt_text,pause_idx)
-    except IndexError as e: # for none recognized text exception (recog["recognizedPhrases"][0]["nBest"][0]["lexical"])
-        print(e)
-        self.update_state(state='INDEX_ERROR')
+        result,sound,startidx,endidx,silenceidx=stt.execute(filename)
     except Exception as e:
         print(e)
         self.update_state(state=e.args[0])

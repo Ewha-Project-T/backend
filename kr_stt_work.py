@@ -158,6 +158,20 @@ class KorStt:
             time.sleep(1)
         for file in local_file:
             os.unlink(file)          
-        return res     
+        return res
+    
+    def execute(self,filename):
+        result = {'textFile': '', 'timestamps': [], 'annotations': []}
+        length,sound,startidx,endidx,silenceidx,myaudio=self.basic_indexing(filename)
+        res=self.request_api(length,myaudio,startidx,endidx)
+        if res==None:  
+            raise Exception("INVALID-FILE")        
+
+        for i in range(length):
+            result['timestamps'].append({'start': startidx[i], 'end': endidx[i]})
+
+        stt_text, pause_result, delay_result, pause_idx, startidx, endidx=self.basic_do_stt(length,res,sound,startidx,endidx,silenceidx)
+        result=self.basic_annotation_stt(result,stt_text,pause_idx)
+        return result,sound,startidx,endidx,silenceidx
     #한국어버전 끝
 

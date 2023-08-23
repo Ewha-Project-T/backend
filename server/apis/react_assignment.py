@@ -345,7 +345,7 @@ class Feedback2(Resource):
     #TODO: api테스트 완료 후 jwt 적용
     # @jwt_required()
     def get(self):
-        return jsonify({"msg":"hi"})
+        return jsonify({"msg":"hello"})
     #TODO: api테스트 완료 후 jwt 적용
     # @jwt_required()
     def post(self):

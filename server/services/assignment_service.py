@@ -1,7 +1,7 @@
 from distutils.command.upload import upload
 from server.apis import assignment, lecture
 from server.services.stt_service import mapping_sst_user
-from ..model import Assignment_feedback, Attendee, SttJob, User, Lecture, Assignment,Prob_region,Assignment_check,Assignment_check_list,Stt
+from ..model import Assignment_feedback, Attendee, SttJob, User, Lecture, Assignment,Prob_region,Assignment_check,Assignment_check_list,Stt,Feedback
 from server import db
 from functools import wraps
 from flask_jwt_extended import create_refresh_token, create_access_token, verify_jwt_in_request, get_jwt, get_jwt_identity
@@ -253,8 +253,11 @@ def  check_assignment(as_no,lecture_no,uuid,user_info,text=""):
     if(len(acc)!=len(uuid) and text==""):
         return
     attend=Attendee.query.filter_by(user_no=user_info["user_no"],lecture_no=lecture_no).first()
-    Assignment_check.query.filter_by(assignment_no=as_no,attendee_no=attend.attendee_no,assignment_check=1).delete()#check_list도 cascade되는지 확인
-    acc=Assignment_check(assignment_no=as_no,attendee_no=attend.attendee_no,assignment_check=1,user_trans_result=text,submit_time=(datetime.now()+timedelta(hours=6)))
+    submit_cnt=Assignment_check.query.filter_by(assignment_no=as_no,attendee_no=attend.attendee_no,assignment_check=1).count()
+    print(submit_cnt)
+    if(submit_cnt==None):
+        submit_cnt=0
+    acc=Assignment_check(assignment_no=as_no,attendee_no=attend.attendee_no,assignment_check=1,user_trans_result=text,submit_time=(datetime.now()+timedelta(hours=6)),submit_cnt=submit_cnt+1)
     db.session.add(acc)
     db.session.commit()
     acc_locale=Assignment.query.filter_by(assignment_no=as_no).first()
@@ -428,3 +431,173 @@ def get_prob_submit_list(as_no,lecture_no):
 
     return submit_list
 
+def make_json(text,denotations,attributes):
+    data = {
+        "text": text,
+        "denotations": denotations,
+        "attributes": attributes,
+        "config": {
+            "boundarydetection": False,
+            "non-edge characters": [],
+            "function availability": {
+                "relation": False,
+                "block": False,
+                "simple": False,
+                "replicate": False,
+                "replicate-auto": False,
+                "setting": False,
+                "read": False,
+                "write": False,
+                "write-auto": False,
+                "line-height": False,
+                "line-height-auto": False,
+                "help": False
+            },
+            "entity types": [
+                {
+                    "id": "Cancellation",
+                    "color": "#ff5050"
+                },
+                {
+                    "id": "Filler",
+                    "color": "#ffff50",
+                    "default": True
+                },
+                {
+                    "id": "Pause",
+                    "color": "#404040"
+                }
+            ],
+            "attribute types": [
+                {
+                    "pred": "Unsure",
+                    "value type": "flag",
+                    "default": True,
+                    "label": "?",
+                    "color": "#fa94c0"
+                },
+                {
+                    "pred": "Note",
+                    "value type": "string",
+                    "default": "",
+                    "values": []
+                }
+            ]
+        }
+    }
+    
+    return json.dumps(data, indent=4,ensure_ascii=False)
+
+
+def make_json_url(text,denotations,attributes,check,flag):
+    domain = os.getenv("DOMAIN", "https://edu-trans.ewha.ac.kr:8443")
+    filetmp = uuid.uuid4()
+    filepath = f"{os.environ['UPLOAD_PATH']}/{filetmp}.json"
+    if(flag):
+        data=make_json(text,denotations,attributes)
+        check.user_trans_result=data
+        db.session.add(check)
+        db.session.commit
+    else:
+        data=text
+    with open(filepath, 'w') as file:
+        file.write(data)
+    url =  domain + "/" + filepath 
+    return url
+
+def get_json_feedback(as_no,lecture_no,user_no):
+    attend=Attendee.query.filter_by(user_no=user_no,lecture_no=lecture_no).first()
+    check=Assignment_check.query.filter_by(assignment_no=as_no,attendee_no=attend.attendee_no,assignment_check=1).order_by(Assignment_check.check_no.desc()).first()
+    if(check==None):
+        return "error:nocheck",""
+    pro_review=check.professor_review
+    utr=check.user_trans_result
+    if(utr==""):
+        wav_url,uuid=get_prob_wav_url(as_no,user_no,lecture_no)
+        stt_result,stt_feedback=get_stt_result(uuid)
+        if(stt_result==None):
+            return "error:stt",""
+        text,denotations,attributes=parse_data(stt_result,stt_feedback)
+        denotations_json = json.loads(denotations)
+        attributes_json = json.loads(attributes)
+        url=make_json_url(text,denotations_json,attributes_json,check,1)
+    else:
+        url=make_json_url(utr,"","",check,0)
+        
+    return url, pro_review#json, 교수평가
+
+def save_json_feedback(as_no:int,lecture_no:int,user_no:int,text:str,result:str,dlist:list,clist:list)->None:
+    attend=Attendee.query.filter_by(user_no=user_no,lecture_no=lecture_no).first()
+    check=Assignment_check.query.filter_by(assignment_no=as_no,attendee_no=attend.attendee_no,assignment_check=1).order_by(Assignment_check.check_no.desc()).first()
+    if(result!=None):
+        check.professor_review=result    
+    if(text!=None):
+        check.user_trans_result=text
+    db.session.add(check)
+    db.session.commit()
+    acc=Feedback(attendee_no=attend.attendee_no,check_no=check.check_no,submission_count=check.submit_cnt,translation_error=clist[0],omission=clist[1],expression=clist[2],intonation=clist[3],grammar_error=clist[4],silence=dlist[0],filler=dlist[1],backtracking=dlist[2],others=dlist[3])
+    db.session.add(acc)
+    db.session.commit()
+
+def parse_data(stt_result,stt_feedback):
+    cnt=1
+    text=""
+    denotations="["
+    attributes="["
+    for i in range(len(stt_result)):
+        text=text+stt_result[i]['textFile']+"\n"
+        for j in range(len(stt_feedback[i])):
+            denotations+='{ "id": "T'+str(cnt)+'", "span": { "begin": '+str(stt_feedback[i][j]['start'])+', "end": '+str(stt_feedback[i][j]['end'])+' }, "obj": "'+str(stt_feedback[i][j]['type'])+'" },'
+            attributes+='{ "id": "A'+str(cnt)+'", "subj": "T'+str(cnt)+'", "pred": "Unsure", "obj": true },'
+            cnt+=1
+    denotations=denotations[:-1]
+    attributes=attributes[:-1]
+    denotations+="]"
+    attributes+="]"
+    return text,denotations,attributes
+
+def get_studentgraph(lecture_no,as_no,user_no):
+    attend=Attendee.query.filter_by(user_no=user_no,lecture_no=lecture_no).first()
+    check=Assignment_check.query.filter_by(assignment_no=as_no,attendee_no=attend.attendee_no,assignment_check=1).order_by(Assignment_check.submit_cnt.asc())
+    deliver_individual_list = []
+    content_individual_list = []
+    deliver_data_list = []
+    content_data_list = []
+
+    for row in check:
+        feed=Feedback.query.filter_by(attendee_no=attend.attendee_no,check_no=row.check_no)
+        if(feed==None):
+            return -1
+        deliver_data=[feed.silence, feed.filler, feed.backtracking, feed.others] 
+        content_data=[feed.translation_error, feed.omission, feed.expression, feed.intonation,feed.grammar_error]
+        deliver_individual_list.append({
+            "name": str(row.submit_cnt) + "회차",
+            "data": deliver_data
+        })
+        deliver_data_list.append(deliver_data)
+        content_individual_list.append({
+            "name": str(row.submit_cnt) + "회차",
+             "data": content_data
+        })
+        content_data_list.append(content_data)
+    deliver_average = [sum(col) / len(col) for col in zip(*deliver_data_list)]
+    content_average = [sum(col) / len(col) for col in zip(*content_data_list)]
+    response={
+        "DeliverIndividualList": deliver_individual_list,
+        "DeliverAverage": deliver_average,
+        "ContentIndividualList": content_individual_list,
+        "ContentAverage": content_average
+    }
+    return response
+
+def get_professorgraph(lecture_no,as_no,user_no):
+    check=Assignment_check.query.filter_by(assignment_no=as_no,assignment_check=1)
+    nam=[]
+    for i in check:
+        attend=Attendee.query.filter_by(attendee_no=i.attendee_no).first()
+        user=User.query.filter_by(user_no=attend.user_no).first()
+        nam.append({"name":user.name,"data": get_studentgraph(lecture_no,as_no,attend.user_no)})
+    response={
+        "result":nam
+    }
+    return response

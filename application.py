@@ -13,6 +13,7 @@ from os import environ as env
 import binascii
 from os import urandom
 app=Flask(__name__, static_folder='./static')
+#cors = CORS(app, resources={r"/*": {"origins": "https://ewaproject-lszyf.run.goorm.site"}},supports_credentials=True)
 app.config['SWAGGER'] = {
     'title': 'API Docs',
     'doc_dir': './docs/'
@@ -33,7 +34,7 @@ sentry_sdk.init(
 """
 app.config['SECRET_KEY'] = str(binascii.hexlify(urandom(16)))
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=4)
-app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=1)
+#app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=1)
 app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{env['SQL_USER']}:{env['SQL_PASSWORD']}@{env['SQL_HOST']}:{env['SQL_PORT']}/{env['SQL_DATABASE']}"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True 
@@ -47,11 +48,12 @@ with app.app_context():
     db.create_all()
 
 jwt=JWTManager(app)
-
+"""
 CORS(app, 
      expose_headers='Location', 
      supports_credentials=True
 )
+"""
 myApi=Api(app, errors=Flask.errorhandler)
 
 
@@ -73,13 +75,21 @@ def my_expired_token_callback(jwt_header, jwt_payload):
 
 @jwt.unauthorized_loader
 def handle_auth_error(e):
+    return jsonify({"isAuth":0,"msg":"handle_auth_error"})
+
+@jwt.invalid_token_loader
+def custom_invalid_token_callback(e):
+    return jsonify({'isauth': 0, "msg":"invalid token"})
+
+"""
     if(e=='Missing cookie "refresh_token_cookie"'):
         return redirect(host_url+ url_for('login'))
     return redirect(host_url + url_for('login_refresh'))
-
+"""
 host_url=env["HOST"]
+
 def unauth_res():
-    return redirect(host_url + url_for('login_refresh'))
+    return jsonify({"msg":"invalid token"})
 
 @app.route("/upload/<path:filename>")
 def uploads(filename):
@@ -91,6 +101,12 @@ def hello():
     return redirect('https://edu-trans.ewha.ac.kr:8443/login')
     #return redirect('https://ewha.ltra.cc/login')
 
+"""
+@app.after_request
+def add_cors_headers(response):
+    response.headers['Access-Control-Allow-Origin'] = 'https://ewaproject-lszyf.run.goorm.site'  # 허용할 도메인(들)로 교체하세요
+    return response
+"""
 load_api(myApi)
 
 app.run(host='0.0.0.0', port = 5000, debug=True) 

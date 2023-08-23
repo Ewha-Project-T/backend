@@ -7,18 +7,17 @@ import re
 from ..services.login_service import (
     login, register, LoginResult, RegisterResult, create_tokens, admin_required, professor_required, assistant_required,real_time_email_check
 )
-from flask_cors import cross_origin
+
 from os import environ as env
 host_url=env["HOST"]
 jwt_blocklist = set()
 perm_list={"학생":1,"조교":2,"교수":3}
 
-class Login(Resource): 
+
+class Login2(Resource): 
     def get(self):
-        msg = ""
-        if request.args.get('msg') != "":
-            msg = request.args.get('msg')
-        return make_response(render_template('login.html',msg=msg))
+        return jsonify({"msg":"loginpage"})
+    
     def post(self):#로그인
         parser = reqparse.RequestParser()
         parser.add_argument('email', type=str, required=True, help="EMAIL is required")
@@ -30,63 +29,67 @@ class Login(Resource):
             result, account = login(user_email, user_pw)
             if(result==LoginResult.ACC_IS_NOT_FOUND):
                 msg="아이디와 비밀번호를 확인해주세요."
-                return redirect(host_url + url_for('login', msg=msg))
+                return jsonify({ "registerSuccess" : 0,"msg":msg})
             if(result==LoginResult.NEED_EMAIL_CHECK):
-                return redirect(host_url + url_for('email', email=user_email))
+                msg="가입된 이메일에서 확인바랍니다."
+                return jsonify({ "registerSuccess" : 0,"msg":msg,'location':"/email", "email":user_email})
             if(result==LoginResult.LOGIN_COUNT_EXCEEDED):
                 msg="로그인 시도횟수초과 관리자에게 연락바랍니다."
-                return redirect(host_url + url_for('login', msg=msg))
+                return jsonify({ "registerSuccess" : 0,"msg":msg})
             if(result==LoginResult.NEED_ADMIN_CHECK):
                 msg="관리자의 승인이 필요합니다."
-                return redirect(host_url + url_for('login', msg=msg))
+                return jsonify({ "registerSuccess" : 0,"msg":msg})
             if(result==LoginResult.SUCCESS):
                 msg=""
                 access_token, refresh_token = create_tokens(account)
                 if(account.permission==0):
-                    res=make_response(redirect(host_url+url_for('admin')))
-                    set_access_cookies(res,access_token)
-                    set_refresh_cookies(res,refresh_token)
-                    return res
+                    resq = make_response({'loginSuccess': 1,'location':'/admin'})#location 추후 수정
+                    resq.set_cookie('access_token_cookie',access_token,secure=True, httponly=True, samesite='None')          
+                    return resq
                 else:
-                    res=make_response(redirect(host_url+url_for('lecture')))
-                    set_access_cookies(res,access_token)
-                    set_refresh_cookies(res,refresh_token)
-                    return res
-    
-
+                    resq = make_response({'loginSuccess': 1})
+                    resq.set_cookie('access_token_cookie',access_token,secure=True, httponly=True, samesite='None')         
+                    return resq
             msg="아이디와 비밀번호를 확인해주세요."
-            return redirect(host_url + url_for('login', msg=msg))
+            return jsonify({ "registerSuccess" : 0,"msg":msg})
         else:
             msg="아이디와 비밀번호를 확인해주세요."
-            return redirect(host_url + url_for('login', msg=msg))
+            return jsonify({ "registerSuccess" : 0,"msg":msg})
+class CheckToken(Resource):
+    @jwt_required()
+    def get(self):
+        current_user = get_jwt_identity()
+        if(current_user==None):
+            return {"isAuth": 0},400
+        if(current_user["user_perm"]==0):
+            return {   "email": current_user["user_email"],
+                       "name": current_user["user_name"],
+                       "role": current_user["user_perm"],
+                       "isAuth": 1,
+                       "isAdmin": 1},200
+        else:
+            return {   "email": current_user["user_email"],
+                       "name": current_user["user_name"],
+                       "role": current_user["user_perm"],
+                       "isAuth": 1,
+                       "isAdmin": 0},200
+                    
+        
+class Logout2(Resource):
 
-class Logout(Resource):
-
-    @jwt_required(refresh=True)
+    @jwt_required()
     def get(self):#로그아웃
         jti = get_jwt()["jti"]
         jwt_blocklist.add(jti)
-        res=make_response(redirect(host_url+url_for('login')))
-        unset_jwt_cookies(res)
-        return res
-
-class Join(Resource):
-    def get(self):
-        msg = ""
-        if request.args.get('msg') == "":
-            msg = request.args.get('msg')
-        parser = reqparse.RequestParser()
-        parser.add_argument('mode', type=str)
-        parser.add_argument('email', type=str)
-        args=parser.parse_args()
-        mode=args['mode']
-        email=args['email']
-        if(mode == "emailChk"):
-            result=real_time_email_check(email)
-            if(result==1):
-                return {"msg":"email_exist"}
+        resq = make_response({'logoutSuccess': "true",})
+        resq.set_cookie('access_token_cookie', '', expires=0, secure=True, httponly=True, samesite='None')
+        return resq
         
-        return make_response(render_template('join.html',msg=msg))
+
+
+class Join2(Resource):
+    def get(self):
+        return jsonify({"msg":"joinpage"})
 
     def post(self):
         parser = reqparse.RequestParser()
@@ -112,36 +115,22 @@ class Join(Resource):
             result=register(user_email,user_pw,user_name,user_major, user_perm)
             if(result==RegisterResult.SUCCESS):
                 msg="register success"
-                return redirect(host_url+ url_for('email',email=user_email))
+                return jsonify({ "registerSuccess" : 1,"msg":msg})
 
             elif(result==RegisterResult.USEREMAIL_EXIST):
                 msg="user email exist"
-                return redirect(host_url + url_for('join', msg=msg))
+                return jsonify({ "registerSuccess" : 0,"msg":msg})
 
             elif(result==RegisterResult.INVALID_PERM):
                 msg="invalid permission"
-                return redirect(host_url + url_for('join', msg=msg))
+                return jsonify({ "registerSuccess" : 0,"msg":msg})
 
             else:
                 msg="bad parameters"
-                return redirect(host_url + url_for('join', msg=msg))
-#
+                return jsonify({ "registerSuccess" : 0,"msg":msg})
         else:
             msg="invalid email"
-            return redirect(host_url + url_for('join', msg=msg))
+            return jsonify({ "registerSuccess" : 0,"msg":msg})
 	
-class LoginRefresh(Resource):#리프래쉬 토큰
-    @jwt_required(refresh=True)
-    def get(self):
-        current_user = get_jwt_identity()
-        if(current_user==None):
-            res=make_response(redirect(host_url+url_for('login')))
-            return res
-        new_access_token = create_access_token(identity=current_user, fresh=False)
-        res=make_response(redirect(host_url+url_for('lecture')))
-        set_access_cookies(res,new_access_token)
-        return res
-
-
 
       

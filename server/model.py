@@ -95,6 +95,7 @@ class Assignment_check(db.Model):
     professor_review= db.Column(db.Text)
     user_trans_result= db.Column(db.Text)
     submit_time=db.Column(db.DateTime, onupdate=datetime.utcnow()+timedelta(hours=9))#테이블 삭제시 오류날수도
+    submit_cnt = db.Column(db.Integer, default=0)
    
     attendee = db.relationship("Attendee", back_populates="assignment_check")
     assignment = db.relationship("Assignment", back_populates="assignment_check")
@@ -156,3 +157,21 @@ class SttJob(db.Model):
     is_seq = db.Column(db.Boolean, default=False, nullable=False)
 
     stt = db.relationship("Stt", back_populates="sttjob")
+
+class Feedback(db.Model):
+    __tablename__="FEEDBACK"
+    feed_no = db.Column(db.Integer, primary_key=True)
+    attendee_no = db.Column(db.Integer, db.ForeignKey("ATTENDEE.attendee_no", ondelete="CASCADE"), nullable=True)
+    check_no= db.Column(db.Integer, db.ForeignKey("ASSIGNMENT_CHECK.check_no", ondelete="CASCADE"), nullable=True)
+    submission_count = db.Column(db.Integer, default=0)
+    translation_error = db.Column(db.Integer, default=0)
+    omission = db.Column(db.Integer, default=0)
+    expression = db.Column(db.Integer, default=0)
+    intonation = db.Column(db.Integer, default=0)
+    grammar_error = db.Column(db.Integer, default=0)
+    silence = db.Column(db.Integer, default=0)
+    filler = db.Column(db.Integer, default=0)
+    backtracking = db.Column(db.Integer, default=0)
+    others = db.Column(db.Integer, default=0)
+
+    

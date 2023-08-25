@@ -1,7 +1,7 @@
 from distutils.command.upload import upload
 from server.apis import assignment, lecture
 from server.services.stt_service import mapping_sst_user
-from ..model import Assignment_feedback, Attendee, SttJob, User, Lecture, Assignment,Prob_region,Assignment_check,Assignment_check_list,Stt,Feedback
+from ..model import Assignment_feedback, Attendee, SttJob, User, Lecture, Assignment,Prob_region,Assignment_check,Assignment_check_list,Stt,Feedback2
 from server import db
 from functools import wraps
 from flask_jwt_extended import create_refresh_token, create_access_token, verify_jwt_in_request, get_jwt, get_jwt_identity
@@ -257,7 +257,12 @@ def  check_assignment(as_no,lecture_no,uuid,user_info,text=""):
     print(submit_cnt)
     if(submit_cnt==None):
         submit_cnt=0
-    acc=Assignment_check(assignment_no=as_no,attendee_no=attend.attendee_no,assignment_check=1,user_trans_result=text,submit_time=(datetime.now()+timedelta(hours=6)),submit_cnt=submit_cnt+1)
+    #acc=Assignment_check(assignment_no=as_no,attendee_no=attend.attendee_no,assignment_check=1,user_trans_result=text,submit_time=(datetime.now()+timedelta(hours=6)),submit_cnt=submit_cnt+1)
+    if text != "":
+        ae_text, ae_denotations, ae_attributes = parse_ae_json(text)
+    else:
+        ae_text, ae_denotations, ae_attributes = "", "", ""
+    acc=Assignment_check(assignment_no=as_no,attendee_no=attend.attendee_no,assignment_check=1,ae_text = ae_text,ae_denotations = ae_denotations,ae_attributes=ae_attributes,submit_time=(datetime.now()+timedelta(hours=6)),submit_cnt=submit_cnt+1)
     db.session.add(acc)
     db.session.commit()
     acc_locale=Assignment.query.filter_by(assignment_no=as_no).first()
@@ -276,7 +281,10 @@ def get_as_name(as_no):
 def get_stt_result(uuid):
     stt_result_list=[]
     stt_feedback_list=[]
+    tmp_idx = 0
+    correction = 1
     for i in uuid:
+        print("uiud",i)
         tmp={}
         stt_acc=Stt.query.filter_by(wav_file=i["uuid"]).first()
         acc=SttJob.query.filter_by(stt_no=stt_acc.stt_no).first()
@@ -286,18 +294,25 @@ def get_stt_result(uuid):
         tmp["startidx"]=acc.startidx
         tmp["endidx"]=acc.endidx
         tmp["silenceidx"]=acc.silenceidx
-        stt_result=acc.stt_result
-        stt_result=stt_result.replace("'",'"')
+        stt_result=acc.stt_result.replace("'",'"')
+        # stt_result=acc.stt_result
+        # stt_result=stt_result.replace("'",'"')
         json_result=json.loads(stt_result)
-        original_text=json_result["textFile"]
-        original_text=original_text.replace("<","&lt")
-        tmp["textFile"]=original_text.replace(">","&gt")
+        tmp["textFile"]=json_result["textFile"].replace("<","&lt").replace(">","&gt")
+        # print(len(tmp["textFile"]))
         tmp["timestamps"]=json_result["timestamps"]
         tmp["annotations"]=json_result["annotations"]
         ann=ast.literal_eval(str(tmp["annotations"]))
+        # print(str(tmp["annotations"]))
+        for i in range(len(ann)):
+            ann[i]["start"]+=tmp_idx #인덱스 보정
+            ann[i]["end"]+=tmp_idx
+        tmp_idx += len(tmp["textFile"]) + correction
         stt_feedback_list.append(ann)
         tmp["is_seq"]=acc.is_seq
         stt_result_list.append(tmp)
+        # print(stt_result_list)
+        # print(stt_feedback_list)
     return stt_result_list,stt_feedback_list
     
 def mod_assignment_listing(lecture_no,assignment_no):
@@ -383,7 +398,8 @@ def get_feedback(as_no,lecture_no,user_no):
     attend=Attendee.query.filter_by(user_no=user_no,lecture_no=lecture_no).first()
     check=Assignment_check.query.filter_by(assignment_no=as_no,attendee_no=attend.attendee_no,assignment_check=1).order_by(Assignment_check.check_no.desc()).first()
     pro_review=check.professor_review
-    utr=check.user_trans_result
+    #utr=check.user_trans_result 
+    utr=make_json(check.text,check.denotations, check.attributes)
     if(pro_review==""):
         pro_review=None
     if(utr==""):
@@ -434,8 +450,8 @@ def get_prob_submit_list(as_no,lecture_no):
 def make_json(text,denotations,attributes):
     data = {
         "text": text,
-        "denotations": denotations,
-        "attributes": attributes,
+        "denotations": ast.literal_eval(denotations) if type(denotations) == str else denotations ,
+        "attributes": ast.literal_eval(attributes) if type(attributes) == str else attributes,
         "config": {
             "boundarydetection": False,
             "non-edge characters": [],
@@ -493,16 +509,17 @@ def make_json_url(text,denotations,attributes,check,flag):
     domain = os.getenv("DOMAIN", "https://edu-trans.ewha.ac.kr:8443")
     filetmp = uuid.uuid4()
     filepath = f"{os.environ['UPLOAD_PATH']}/{filetmp}.json"
+    data=make_json(text,denotations,attributes)
     if(flag):
-        data=make_json(text,denotations,attributes)
-        check.user_trans_result=data
+        # check.user_trans_result=data
+        check.ae_text = text
+        check.ae_denotations = str(denotations)
+        check.ae_attributes = str(attributes)
         db.session.add(check)
         db.session.commit
-    else:
-        data=text
     with open(filepath, 'w') as file:
         file.write(data)
-    url =  domain + "/" + filepath 
+    url =  domain + "/" + filepath
     return url
 
 def get_json_feedback(as_no,lecture_no,user_no):
@@ -511,8 +528,9 @@ def get_json_feedback(as_no,lecture_no,user_no):
     if(check==None):
         return "error:nocheck",""
     pro_review=check.professor_review
-    utr=check.user_trans_result
-    if(utr==""):
+    # utr=check.user_trans_result
+    # utr = check.ae_text + check.ae_denotations + check.ae_attributes
+    if(check.ae_text == "" and check.ae_denotations == "" and check.ae_attributes == ""):
         wav_url,uuid=get_prob_wav_url(as_no,user_no,lecture_no)
         stt_result,stt_feedback=get_stt_result(uuid)
         if(stt_result==None):
@@ -522,20 +540,22 @@ def get_json_feedback(as_no,lecture_no,user_no):
         attributes_json = json.loads(attributes)
         url=make_json_url(text,denotations_json,attributes_json,check,1)
     else:
-        url=make_json_url(utr,"","",check,0)
-        
+        # utr=make_json(check.ae_text, check.ae_denotations, check.ae_attributes)
+        url=make_json_url(check.ae_text,check.ae_denotations, check.ae_attributes, check,0)
     return url, pro_review#json, 교수평가
 
-def save_json_feedback(as_no:int,lecture_no:int,user_no:int,text:str,result:str,dlist:list,clist:list)->None:
+def save_json_feedback(as_no,lecture_no,user_no,ae_attributes,ae_denotations,result,dlist,clist)->None:
     attend=Attendee.query.filter_by(user_no=user_no,lecture_no=lecture_no).first()
     check=Assignment_check.query.filter_by(assignment_no=as_no,attendee_no=attend.attendee_no,assignment_check=1).order_by(Assignment_check.check_no.desc()).first()
-    if(result!=None):
-        check.professor_review=result    
-    if(text!=None):
-        check.user_trans_result=text
+    if(result):
+        check.professor_review=result
+    if(ae_denotations):
+        check.ae_denotations = ae_denotations
+    if(ae_attributes):
+       check.ae_attributes= ae_attributes
     db.session.add(check)
     db.session.commit()
-    acc=Feedback(attendee_no=attend.attendee_no,check_no=check.check_no,submission_count=check.submit_cnt,translation_error=clist[0],omission=clist[1],expression=clist[2],intonation=clist[3],grammar_error=clist[4],silence=dlist[0],filler=dlist[1],backtracking=dlist[2],others=dlist[3])
+    acc=Feedback2(attendee_no=attend.attendee_no,check_no=check.check_no,submission_count=check.submit_cnt,translation_error=clist[0],omission=clist[1],expression=clist[2],intonation=clist[3],grammar_error=clist[4],silence=dlist[0],filler=dlist[1],backtracking=dlist[2],others=dlist[3])
     db.session.add(acc)
     db.session.commit()
 
@@ -556,6 +576,13 @@ def parse_data(stt_result,stt_feedback):
     attributes+="]"
     return text,denotations,attributes
 
+def parse_ae_json(ae_text:str):
+    ae_json = json.loads(ae_text)
+    text = ae_json["text"]
+    denotations = ae_json["denotations"]
+    attributes = ae_json["attributes"]
+    return text, str(denotations), str(attributes)
+
 def get_studentgraph(lecture_no,as_no,user_no):
     attend=Attendee.query.filter_by(user_no=user_no,lecture_no=lecture_no).first()
     check=Assignment_check.query.filter_by(assignment_no=as_no,attendee_no=attend.attendee_no,assignment_check=1).order_by(Assignment_check.submit_cnt.asc())
@@ -565,7 +592,7 @@ def get_studentgraph(lecture_no,as_no,user_no):
     content_data_list = []
 
     for row in check:
-        feed=Feedback.query.filter_by(attendee_no=attend.attendee_no,check_no=row.check_no)
+        feed=Feedback2.query.filter_by(attendee_no=attend.attendee_no,check_no=row.check_no)
         if(feed==None):
             return -1
         deliver_data=[feed.silence, feed.filler, feed.backtracking, feed.others] 

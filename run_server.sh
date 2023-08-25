@@ -8,4 +8,5 @@ if [ ! -e $SCRIPT_DIR ]; then
         mkdir script_files
 fi
 #nohup python3 -u ./application.py 
-nodemon --exec python3 ./application.py
+#nodemon --exec python3 ./application.py
+nodemon --ignore upload/ --exec python3 ./application.py

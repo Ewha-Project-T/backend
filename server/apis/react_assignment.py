@@ -302,8 +302,48 @@ class React_Prob_submit(Resource):
             check_assignment(as_no,lecture_no,uuid,user_info)
             return jsonify({"SubmitSuccess" : 1})
 
-class Feedback(Resource):
-    @jwt_required()
+# class Feedback(Resource):
+#     @jwt_required()
+#     def get(self):
+#         parser = reqparse.RequestParser()
+#         parser.add_argument('lecture_no', type=int)
+#         parser.add_argument('as_no', type=int)
+#         parser.add_argument('user_no', type=int)
+#         args = parser.parse_args()
+#         as_no=args['as_no']
+#         lecture_no = args['lecture_no']
+#         user_no = args['user_no']
+#         url,review=get_json_feedback(as_no,lecture_no,user_no)
+#         if(url=="error:stt"):
+#             return jsonify({"FeedbackStatus":3})
+#         if(url=="error:nocheck"):
+#             return jsonify({"FeedbackStatus":2})
+#         return jsonify({"url":url,"message":review,"FeedbackStatus":1})
+
+#     @jwt_required()
+#     def post(self):
+#         parser = reqparse.RequestParser()
+#         parser.add_argument('lecture_no', type=int)
+#         parser.add_argument('as_no', type=int)
+#         parser.add_argument('user_no', type=int)
+#         parser.add_argument('textAE', type=str)
+#         parser.add_argument('result', type=str) # 총평
+#         parser.add_argument('DeliverIndividualList', type=int, action='append')
+#         parser.add_argument('ContentIndividualList', type=int, action='append')
+#         args = parser.parse_args()
+#         as_no=args['as_no']
+#         lecture_no = args['lecture_no']
+#         user_no = args['user_no']
+#         text=args['textAE']
+#         result=args['result']
+#         dlist=args['DeliverIndividualList']
+#         clist=args['ContentIndividualList']
+#         save_json_feedback(as_no,lecture_no,user_no,text,result,dlist,clist)
+#         return jsonify({"savesuccess" : 1})
+
+class Feedback2(Resource):
+    #TODO: api테스트 완료 후 jwt 적용
+    # @jwt_required()
     def get(self):
         parser = reqparse.RequestParser()
         parser.add_argument('lecture_no', type=int)
@@ -318,15 +358,16 @@ class Feedback(Resource):
             return jsonify({"FeedbackStatus":3})
         if(url=="error:nocheck"):
             return jsonify({"FeedbackStatus":2})
-        return jsonify({"url":url,"result":review,"FeedbackStatus":1})
-
+        return jsonify({"url":url,"review":review,"isSuccess":True})
+    #TODO: api테스트 완료 후 jwt 적용
     @jwt_required()
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('lecture_no', type=int)
         parser.add_argument('as_no', type=int)
         parser.add_argument('user_no', type=int)
-        parser.add_argument('textAE', type=str)
+        parser.add_argument('ae_denotations', type=str,action='append')
+        parser.add_argument('ae_attributes', type=str, action='append')
         parser.add_argument('result', type=str) # 총평
         parser.add_argument('DeliverIndividualList', type=int, action='append')
         parser.add_argument('ContentIndividualList', type=int, action='append')
@@ -334,39 +375,13 @@ class Feedback(Resource):
         as_no=args['as_no']
         lecture_no = args['lecture_no']
         user_no = args['user_no']
-        text=args['textAE']
+        ae_denotations = str(args['ae_denotations']).replace('"',"")
+        ae_attributes = str(args['ae_attributes']).replace('"',"")
         result=args['result']
         dlist=args['DeliverIndividualList']
         clist=args['ContentIndividualList']
-        save_json_feedback(as_no,lecture_no,user_no,text,result,dlist,clist)
-        return jsonify({"savesuccess" : 1})
-
-class Feedback2(Resource):
-    #TODO: api테스트 완료 후 jwt 적용
-    # @jwt_required()
-    def get(self):
-        return jsonify({"msg":"hello"})
-    #TODO: api테스트 완료 후 jwt 적용
-    # @jwt_required()
-    def post(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('lecture_no', type=int)
-        parser.add_argument('as_no', type=int)
-        parser.add_argument('user_no', type=int)
-        parser.add_argument('textAE', type=str)
-        parser.add_argument('result', type=str) # 총평
-        parser.add_argument('DeliverIndividualList', type=int, action='append')
-        parser.add_argument('ContentIndividualList', type=int, action='append')
-        args = parser.parse_args()
-        as_no=args['as_no']
-        lecture_no = args['lecture_no']
-        user_no = args['user_no']
-        text=args['textAE']
-        result=args['result']
-        dlist=args['DeliverIndividualList']
-        clist=args['ContentIndividualList']
-        save_json_feedback(as_no,lecture_no,user_no,text,result,dlist,clist)
-        return jsonify({"msg":"hi"})
+        save_json_feedback(as_no,lecture_no,user_no,ae_attributes,ae_denotations,result,dlist,clist)
+        return jsonify({"isSuccess":True})
 
 class Studentgraphlist(Resource):
     @jwt_required()

@@ -93,7 +93,10 @@ class Assignment_check(db.Model):
     attendee_no = db.Column(db.Integer, db.ForeignKey("ATTENDEE.attendee_no", ondelete="CASCADE"), nullable=True)
     assignment_check = db.Column(db.Integer, default=0)
     professor_review= db.Column(db.Text)
-    user_trans_result= db.Column(db.Text)
+    user_trans_result= db.Column(db.Text) # 추후 삭제 예정
+    ae_text = db.Column(db.Text)
+    ae_denotations = db.Column(db.Text)
+    ae_attributes = db.Column(db.Text)
     submit_time=db.Column(db.DateTime, onupdate=datetime.utcnow()+timedelta(hours=9))#테이블 삭제시 오류날수도
     submit_cnt = db.Column(db.Integer, default=0)
    
@@ -158,7 +161,7 @@ class SttJob(db.Model):
 
     stt = db.relationship("Stt", back_populates="sttjob")
 
-class Feedback(db.Model):
+class Feedback2(db.Model):
     __tablename__="FEEDBACK"
     feed_no = db.Column(db.Integer, primary_key=True)
     attendee_no = db.Column(db.Integer, db.ForeignKey("ATTENDEE.attendee_no", ondelete="CASCADE"), nullable=True)
@@ -174,4 +177,10 @@ class Feedback(db.Model):
     backtracking = db.Column(db.Integer, default=0)
     others = db.Column(db.Integer, default=0)
 
+class Feedback(db.Model):
+    __tablename__="feedbackww"
+    idx = db.Column(db.Integer, primary_key = True)
+    attendee_no = db.Column(db.Integer, db.ForeignKey("ATTENDEE.attendee_no", ondelete="CASCADE"), nullable=True)
+    check_no= db.Column(db.Integer, db.ForeignKey("ASSIGNMENT_CHECK.check_no", ondelete="CASCADE"), nullable=True)
+    
     

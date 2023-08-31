@@ -9,4 +9,4 @@ if [ ! -e $SCRIPT_DIR ]; then
 fi
 #nohup python3 -u ./application.py 
 #nodemon --exec python3 ./application.py
-nodemon --ignore upload/ --exec python3 ./application.py
+nodemon --ignore log/ --ignore upload/ --exec python3 ./application.py

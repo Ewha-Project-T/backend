@@ -456,6 +456,7 @@ def make_json(text,denotations,attributes):
             "boundarydetection": False,
             "non-edge characters": [],
             "function availability": {
+                "logo" : False,
                 "relation": False,
                 "block": False,
                 "simple": False,

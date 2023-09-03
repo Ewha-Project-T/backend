@@ -78,6 +78,7 @@ class Assignment(db.Model):
     original_text= db.Column(db.Text)
     upload_url= db.Column(db.String(100))
     dest_translang= db.Column(db.String(20))
+    assign_count= db.Column(db.Integer, default=1)
     
     user = db.relationship("User",back_populates="assignment")
     lecture = db.relationship("Lecture",back_populates="assignment")
@@ -99,6 +100,7 @@ class Assignment_check(db.Model):
     ae_attributes = db.Column(db.Text)
     submit_time=db.Column(db.DateTime, onupdate=datetime.utcnow()+timedelta(hours=9))#테이블 삭제시 오류날수도
     submit_cnt = db.Column(db.Integer, default=0)
+    end_submission = db.Column(db.Boolean, default = False)
    
     attendee = db.relationship("Attendee", back_populates="assignment_check")
     assignment = db.relationship("Assignment", back_populates="assignment_check")
@@ -182,5 +184,4 @@ class Feedback(db.Model):
     idx = db.Column(db.Integer, primary_key = True)
     attendee_no = db.Column(db.Integer, db.ForeignKey("ATTENDEE.attendee_no", ondelete="CASCADE"), nullable=True)
     check_no= db.Column(db.Integer, db.ForeignKey("ASSIGNMENT_CHECK.check_no", ondelete="CASCADE"), nullable=True)
-    
     

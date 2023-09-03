@@ -274,6 +274,23 @@ def  check_assignment(as_no,lecture_no,uuid,user_info,text=""):
             db.session.commit()
             do_stt_work.delay(filename=uu,locale=major_convert[locale])
 
+def assignment_detail(as_no:int, user_no:int):
+    assignment = Assignment.query.filter_by(assignment_no = as_no).first()
+    attendee = Attendee.query.filter_by(user_no = user_no, lecture_no = assignment.lecture_no).first()
+    assignment_check = Assignment_check.query.filter_by(assignment_no = as_no, attendee_no = attendee.attendee_no).order_by(Assignment_check.check_no.desc()).first()
+    res = {"keyword" : assignment.keyword, "detail" : assignment.description, "limit_time" : assignment.limit_time, "assign_count" : assignment.assign_count}
+    print(assignment_check)
+    if(assignment_check != None):
+        res["feedback"] = assignment_check.professor_review
+        res["end_submission"] = assignment_check.end_submission
+        res["my_count"] = assignment_check.submit_cnt
+    else:
+        res["feedback"] = None
+        res["end_submission"] = None
+        res["my_count"] = None
+
+    return res
+
 def get_as_name(as_no):
     acc=Assignment.query.filter_by(assignment_no=as_no).first()
     return acc.as_name

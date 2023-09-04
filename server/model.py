@@ -79,6 +79,7 @@ class Assignment(db.Model):
     upload_url= db.Column(db.String(100))
     dest_translang= db.Column(db.String(20))
     assign_count= db.Column(db.Integer, default=1)
+    keyword_open= db.Column(db.Boolean, default=0)
     
     user = db.relationship("User",back_populates="assignment")
     lecture = db.relationship("Lecture",back_populates="assignment")

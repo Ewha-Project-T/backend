@@ -288,7 +288,8 @@ def assignment_detail(as_no:int, user_no:int):
         res["feedback"] = None
         res["end_submission"] = None
         res["my_count"] = None
-
+    if assignment.keyword_open == 0:
+        res["keyword"] = "비공개"
     return res
 
 def get_as_name(as_no):

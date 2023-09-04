@@ -270,7 +270,7 @@ class prob_upload(Resource):
 
         uuid_str=str(uuid.uuid4())
         filename = uuid_str
-        path = f'{os.environ["UPLOAD_PATH"]}/{filename}.wav'
+        path = f'{os.environ["UPLOAD_PATH"]}/{filename}.' + file.filename.rsplit('.', 1)[1].lower()
         if file and allowed_file(file.filename):
             #filename = secure_filename(file.filename)
             # file.save('./static/audio/{0}'.format(filename))

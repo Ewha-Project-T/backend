@@ -278,7 +278,7 @@ def assignment_detail(as_no:int, user_no:int):
     assignment = Assignment.query.filter_by(assignment_no = as_no).first()
     attendee = Attendee.query.filter_by(user_no = user_no, lecture_no = assignment.lecture_no).first()
     assignment_check = Assignment_check.query.filter_by(assignment_no = as_no, attendee_no = attendee.attendee_no).order_by(Assignment_check.check_no.desc()).first()
-    res = {"keyword" : assignment.keyword, "detail" : assignment.description, "limit_time" : assignment.limit_time, "assign_count" : assignment.assign_count, "open_time" : assignment.open_time}
+    res = {"keyword" : assignment.keyword, "detail" : assignment.description, "limit_time" : assignment.limit_time, "assign_count" : assignment.assign_count, "open_time" : assignment.open_time, "file_name":assignment.file_name, "file_path":assignment.file_path}
     if(assignment_check != None):
         res["feedback"] = assignment_check.professor_review
         res["end_submission"] = assignment_check.end_submission

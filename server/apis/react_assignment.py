@@ -255,7 +255,9 @@ class React_Prob_detail(Resource):
                     "my_count" : res["my_count"],
                     "feedback" : res["feedback"],
                     "end_submission": res["end_submission"],
-                    "open_time" : res["open_time"]
+                    "open_time" : res["open_time"],
+                    "file_path" : res["file_path"],
+                    "file_name" : res["file_name"]
                 })
 
 class React_Prob_submit_list(Resource):

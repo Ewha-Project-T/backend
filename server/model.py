@@ -81,6 +81,8 @@ class Assignment(db.Model):
     dest_translang= db.Column(db.String(20))
     assign_count= db.Column(db.Integer, default=1)
     keyword_open= db.Column(db.Boolean, default=0)
+    file_path = db.Column(db.String(100))
+    file_name = db.Column(db.String(100))
     
     user = db.relationship("User",back_populates="assignment")
     lecture = db.relationship("Lecture",back_populates="assignment")

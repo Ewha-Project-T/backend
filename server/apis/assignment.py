@@ -255,10 +255,10 @@ class Prob_submit_list(Resource):
 
 
 
-ALLOWED_EXTENSIONS = {'wav','mp3','mp4'}
-def allowed_file(filename):
+ALLOWED_SOUND_EXTENSIONS = {'wav','mp3','mp4'}
+def allowed_sound_file(filename):
     return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_SOUND_EXTENSIONS
 
 class prob_upload(Resource):
     @jwt_required()
@@ -271,7 +271,7 @@ class prob_upload(Resource):
         uuid_str=str(uuid.uuid4())
         filename = uuid_str
         path = f'{os.environ["UPLOAD_PATH"]}/{filename}.' + file.filename.rsplit('.', 1)[1].lower()
-        if file and allowed_file(file.filename):
+        if file and allowed_sound_file(file.filename):
             #filename = secure_filename(file.filename)
             # file.save('./static/audio/{0}'.format(filename))
             file.save(path)
@@ -283,3 +283,29 @@ class prob_upload(Resource):
         }
         return jsonify(res)
 
+ALLOWED_EXTENSIONS = {'hwp','pdf','docx','doc','ppt','pptx','xls','xlsx','txt'}
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+#pdf, docx upload
+class prob_upload_file(Resource):
+    @jwt_required()
+    def post(self):
+        parser = reqparse.RequestParser()      
+        parser.add_argument('prob_file', type=FileStorage, location='files')        
+        args = parser.parse_args()        
+        file= args['prob_file']
+
+        uuid_str=str(uuid.uuid4())
+        filename = uuid_str
+        path = f'{os.environ["UPLOAD_PATH"]}/{filename}.' + file.filename.rsplit('.', 1)[1].lower()
+        if file and allowed_file(file.filename):
+            file.save(path)
+        else:
+            return {"msg":"file upload fail"},400
+        res = {
+            "file_path": path, #추후 파일명에대한 해쉬처리 필요
+            "file_name": file.filename
+        }
+        return jsonify(res)

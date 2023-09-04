@@ -2,7 +2,7 @@ from server.apis.mail import Email, Verify_email
 from server.model import Lecture
 from .login import Login,Join, LoginRefresh, Logout
 from .lecture import Attend, Lecture, Lecture_mod, Lecture_mod_del, Student,Major, Lecture_add
-from .assignment import Prob, Prob_del, Prob_submit, Prob_feedback,Prob_mod,Prob_add, prob_upload, Prob_submit_list
+from .assignment import Prob, Prob_del, Prob_submit, Prob_feedback,Prob_mod,Prob_add, prob_upload, Prob_submit_list, prob_upload_file
 from .admin import Admin,Admin2
 from .stt import Stt, SttJob, SttSeq, SttSeqJob
 from .react_login import Login2,Logout2,CheckToken,Join2
@@ -52,6 +52,7 @@ def load_api(api_module):
     api_module.add_resource(Prob_feedback, '/prob_feedback', endpoint='prob_feedback')
     api_module.add_resource(Prob_add, '/prob_add', endpoint='prob_add')
     api_module.add_resource(prob_upload, '/prob_upload', endpoint='prob_upload')
+    api_module.add_resource(prob_upload_file, '/prob_upload_file', endpoint='prob_upload_file')
     api_module.add_resource(Prob_submit_list,'/prob_submit_list',endpoint='prob_submit_list')
     api_module.add_resource(Prob_mod,'/prob_mod',endpoint='prob_mod')
     api_module.add_resource(Admin2,'/admin2',endpoint='admin2')

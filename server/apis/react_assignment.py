@@ -254,7 +254,8 @@ class React_Prob_detail(Resource):
                     "assign_count" : res["assign_count"],
                     "my_count" : res["my_count"],
                     "feedback" : res["feedback"],
-                    "end_submission": res["end_submission"]
+                    "end_submission": res["end_submission"],
+                    "open_time" : res["open_time"]
                 })
 
 class React_Prob_submit_list(Resource):

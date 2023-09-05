@@ -15,9 +15,15 @@ import os
 import uuid
 import ast
 
-def prob_listing(lecture_no,user_no):
+def prob_listing(lecture_no:int,user_no:int):
     assignments = Assignment.query.filter(Assignment.lecture_no == lecture_no).filter(Assignment.open_time <= datetime.utcnow()+timedelta(hours=9)).all()
     res = [{'as_no': assignment.assignment_no, 'as_name': assignment.as_name, "limit_time": assignment.limit_time} for assignment in assignments]
+    db.session.remove()
+    return res
+
+def prob_listing_pro(lecture_no:int,user_no:int):
+    assignments = Assignment.query.filter(Assignment.lecture_no == lecture_no).all()
+    res = [{'as_no': assignment.assignment_no, 'as_name': assignment.as_name,"open_time":assignment.open_time , "limit_time": assignment.limit_time} for assignment in assignments]
     db.session.remove()
     return res
 

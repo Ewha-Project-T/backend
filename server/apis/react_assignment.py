@@ -23,7 +23,7 @@ perm_list={"학생":1,"조교":2,"교수":3}
 #app = Flask(__name__)
 #CORS(app)  # CORS 확장 추가
 
-class React_Prob(Resource):
+class React_Prob_student(Resource):
     @jwt_required()
     def get(self):#과제리스트
         user_info=get_jwt_identity()

@@ -16,8 +16,12 @@ import uuid
 import ast
 
 def prob_listing(lecture_no:int,user_no:int):
+    attendee = Attendee.query.filter_by(user_no = user_no, lecture_no = lecture_no).first()
     assignments = Assignment.query.filter(Assignment.lecture_no == lecture_no).filter(Assignment.open_time <= datetime.utcnow()+timedelta(hours=9)).all()
-    res = [{'as_no': assignment.assignment_no, 'as_name': assignment.as_name, "limit_time": assignment.limit_time} for assignment in assignments]
+    res = []
+    for assignment in assignments:
+        assignment_check = Assignment_check.query.filter_by(assignment_no = assignment.assignment_no, attendee_no = attendee.attendee_no).order_by(Assignment_check.check_no.desc()).first()
+        res.append({'as_no': assignment.assignment_no, 'as_name': assignment.as_name, "limit_time": assignment.limit_time, "end_submission": assignment_check.end_submission if assignment_check != None else None, "professor_review" : assignment_check.professor_review if assignment_check != None else None})
     db.session.remove()
     return res
 

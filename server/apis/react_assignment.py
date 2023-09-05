@@ -7,7 +7,7 @@ from flask_jwt_extended import (
     jwt_required, get_jwt_identity, create_access_token, get_jwt
 )
 import re
-from ..services.assignment_service import assignment_detail,mod_assignment_listing,check_assignment,make_as,prob_listing, mod_as,delete_assignment,get_as_name,get_prob_wav_url,get_wav_url,get_stt_result,get_original_stt_result,get_as_info,get_feedback,make_json_url,get_json_feedback, prob_listing_pro,save_json_feedback,get_prob_submit_list,get_studentgraph,get_professorgraph
+from ..services.assignment_service import assignment_detail,mod_assignment_listing,check_assignment,make_as, prob_list_professor, prob_list_student, mod_as,delete_assignment,get_as_name,get_prob_wav_url,get_wav_url,get_stt_result,get_original_stt_result,get_as_info,get_feedback,make_json_url,get_json_feedback,save_json_feedback,get_prob_submit_list,get_studentgraph,get_professorgraph
 from ..services.lecture_service import lecture_access_check
 from ..services.login_service import admin_required, professor_required, assistant_required
 from werkzeug.utils import secure_filename
@@ -32,7 +32,7 @@ class React_Prob_student(Resource):
         args = parser.parse_args()
         lecture_no = args['lecture_no']
         return jsonify({
-            "prob_list" : prob_listing(lecture_no,user_info["user_no"])
+            "prob_list" : prob_list_student(lecture_no,user_info["user_no"])
         })
     
 class React_Porb_professor(Resource):
@@ -45,7 +45,7 @@ class React_Porb_professor(Resource):
         lecture_no = args['lecture_no']
 
         return jsonify({
-            "prob_list" : prob_listing_pro(lecture_no,user_info["user_no"])
+            "prob_list" : prob_list_professor(lecture_no,user_info["user_no"])
         })
     
 class React_Prob_add(Resource):
@@ -270,6 +270,45 @@ class React_Prob_submit(Resource):
         else:
             check_assignment(as_no,lecture_no,uuid,user_info)
             return jsonify({"SubmitSuccess" : 1})
+
+# class Feedback(Resource):
+#     @jwt_required()
+#     def get(self):
+#         parser = reqparse.RequestParser()
+#         parser.add_argument('lecture_no', type=int)
+#         parser.add_argument('as_no', type=int)
+#         parser.add_argument('user_no', type=int)
+#         args = parser.parse_args()
+#         as_no=args['as_no']
+#         lecture_no = args['lecture_no']
+#         user_no = args['user_no']
+#         url,review=get_json_feedback(as_no,lecture_no,user_no)
+#         if(url=="error:stt"):
+#             return jsonify({"FeedbackStatus":3})
+#         if(url=="error:nocheck"):
+#             return jsonify({"FeedbackStatus":2})
+#         return jsonify({"url":url,"message":review,"FeedbackStatus":1})
+
+#     @jwt_required()
+#     def post(self):
+#         parser = reqparse.RequestParser()
+#         parser.add_argument('lecture_no', type=int)
+#         parser.add_argument('as_no', type=int)
+#         parser.add_argument('user_no', type=int)
+#         parser.add_argument('textAE', type=str)
+#         parser.add_argument('result', type=str) # 총평
+#         parser.add_argument('DeliverIndividualList', type=int, action='append')
+#         parser.add_argument('ContentIndividualList', type=int, action='append')
+#         args = parser.parse_args()
+#         as_no=args['as_no']
+#         lecture_no = args['lecture_no']
+#         user_no = args['user_no']
+#         text=args['textAE']
+#         result=args['result']
+#         dlist=args['DeliverIndividualList']
+#         clist=args['ContentIndividualList']
+#         save_json_feedback(as_no,lecture_no,user_no,text,result,dlist,clist)
+#         return jsonify({"savesuccess" : 1})
 
 class Feedback2(Resource):
     #TODO: api테스트 완료 후 jwt 적용

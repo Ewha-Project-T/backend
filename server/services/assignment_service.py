@@ -208,7 +208,7 @@ def assignment_detail(as_no:int, user_no:int):
     assignment = Assignment.query.filter_by(assignment_no = as_no).first()
     attendee = Attendee.query.filter_by(user_no = user_no, lecture_no = assignment.lecture_no).first()
     assignment_check = Assignment_check.query.filter_by(assignment_no = as_no, attendee_no = attendee.attendee_no).order_by(Assignment_check.check_no.desc()).first()
-    res = {"keyword" : assignment.keyword, "detail" : assignment.description, "limit_time" : assignment.limit_time, "assign_count" : assignment.assign_count, "open_time" : assignment.open_time, "file_name":assignment.file_name, "file_path":assignment.file_path, "as_name":assignment.as_name}
+    res = {"keyword" : "(없음)" if assignment.keyword == "" else assignment.keyword, "detail" : assignment.description, "limit_time" : assignment.limit_time, "assign_count" : assignment.assign_count, "open_time" : assignment.open_time, "file_name":assignment.file_name, "file_path":assignment.file_path, "as_name":assignment.as_name}
     if(assignment_check != None):
         res["feedback"] = assignment_check.professor_review
         res["end_submission"] = assignment_check.end_submission
@@ -218,7 +218,7 @@ def assignment_detail(as_no:int, user_no:int):
         res["end_submission"] = False
         res["my_count"] = None
     if not assignment.keyword_open and attendee.permission == 3:
-        res["keyword"] = "(비공개)\n" + res["keyword"]
+        res["keyword"] = "(비공개) " + res["keyword"]
     elif not assignment.keyword_open and attendee.permission != 3:
         res["keyword"] = "(비공개)"
     return res

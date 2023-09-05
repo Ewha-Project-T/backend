@@ -65,7 +65,7 @@ class Assignment(db.Model):
     assignment_no = db.Column(db.Integer, primary_key=True)
     user_no = db.Column(db.Integer, db.ForeignKey("USER.user_no", ondelete="CASCADE"), nullable=True)
     lecture_no = db.Column(db.Integer, db.ForeignKey("LECTURE.lecture_no", ondelete="CASCADE"), nullable=True)
-    week = db.Column(db.String(20), nullable=False)
+    week = db.Column(db.String(20), nullable=False) # 추후 삭제 예정
     open_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow()+timedelta(hours=9))
     limit_time = db.Column(db.DateTime, nullable=False)
     as_name = db.Column(db.String(50), nullable=False)
@@ -73,9 +73,9 @@ class Assignment(db.Model):
     keyword = db.Column(db.Text)
     translang= db.Column(db.String(20))
     description = db.Column(db.Text)
-    re_limit = db.Column(db.String(10))
+    re_limit = db.Column(db.String(10)) # 추후 삭제 예정
     speed = db.Column(db.Float)
-    disclosure= db.Column(db.Integer,default=0)
+    disclosure= db.Column(db.Integer,default=0) # 추후 삭제 예정
     original_text= db.Column(db.Text)
     upload_url= db.Column(db.String(100))
     dest_translang= db.Column(db.String(20))

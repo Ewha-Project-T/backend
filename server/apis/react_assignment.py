@@ -31,75 +31,9 @@ class React_Prob(Resource):
         parser.add_argument('lecture_no', type=int, required=True, help="lecture_no is required")
         args = parser.parse_args()
         lecture_no = args['lecture_no']
-        prob_list=prob_listing(lecture_no,user_info["user_no"])
-        return jsonify( 
-            {
-            "number" : 1,
-            "list":prob_list["1"],
-            },
-            {
-            "number" : 2,
-            "list":prob_list["2"],
-            },
-            {
-            "number" : 3,
-            "list":prob_list["3"],
-            },
-            {
-            "number" : 4,
-            "list":prob_list["4"],
-            },
-            {
-            "number" : 5,
-            "list":prob_list["5"],
-            },
-            {
-            "number" : 6,
-            "list":prob_list["6"],
-            },
-            {
-            "number" : 7,
-            "list":prob_list["7"],
-            },
-            {
-            "number" : 8,
-            "list":prob_list["8"],
-            },
-            {
-            "number" : 9,
-            "list":prob_list["9"],
-            },
-            {
-            "number" : 10,
-            "list":prob_list["10"],
-            },
-            {
-            "number" : 11,
-            "list":prob_list["11"],
-            },
-            {
-            "number" : 12,
-            "list":prob_list["12"],
-            },
-            {
-            "number" : 13,
-            "list":prob_list["13"],
-            },
-            {
-            "number" : 14,
-            "list":prob_list["14"],
-            },
-            {
-            "number" : 15,
-            "list":prob_list["15"],
-            },
-            {
-            "number" : 16,
-            "list":prob_list["16"],
-            }, 
-            {
-            "user_no": user_info["user_no"]  # user_no 값을 추가
-            })
+        return jsonify({
+            "prob_list" : prob_listing(lecture_no,user_info["user_no"])
+        })
     
 class React_Prob_add(Resource):
     @jwt_required()#자습용과제 기능에따라 달라질수있으므로 보류

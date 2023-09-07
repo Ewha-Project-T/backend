@@ -137,6 +137,29 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Problem_student'
+  /api/prob/detail:
+    get:
+      tags:
+        - prob
+      summary: 과제 상세 조회
+      operationId: React_Prob_detail
+      parameters:
+        - name: as_no
+          in: query
+          description: 과제 번호
+          required: true
+          schema:
+            type: integer
+            example: 145
+      responses:
+        '200':
+          description: Successful response containing detailed information about a specific assignment/problem.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+
+
 components:
   securityScheme:
     cookieAuth:
@@ -234,3 +257,44 @@ components:
           nullable: true
           description: Review given by the professor for the assignment/problem.
           example: "추후 수정 예정"
+    ProblemDetail:
+      type: object
+      properties:
+        as_name:
+          type: string
+          description: Name of the assignment/problem.
+        assign_count:
+          type: integer
+          description: Assignment count.
+        detail:
+          type: string
+          description: Detailed description of the assignment/problem.
+        end_submission:
+          type: boolean
+          description: Flag indicating if the submission ended or not.
+        feedback:
+          type: boolean
+          description: Indicates if there is feedback or not.
+        file_name:
+          type: string
+          nullable: true
+          description: Name of the related file.
+        file_path:
+          type: string
+          nullable: true
+          description: Path to the related file.
+        keyword:
+          type: string
+          description: Keywords related to the assignment/problem.
+        limit_time:
+          type: string
+          format: date-time
+          description: Time limit for the assignment/problem.
+        my_count:
+          type: integer
+          nullable: true
+          description: Personal count.
+        open_time:
+          type: string
+          format: date-time
+          description: Time when the assignment/problem was opened.

@@ -7,7 +7,7 @@ from flask_jwt_extended import (
     jwt_required, get_jwt_identity, create_access_token, get_jwt
 )
 import re
-from ..services.assignment_service import assignment_detail,mod_assignment_listing,check_assignment,make_as, prob_list_professor, prob_list_student, mod_as,delete_assignment,get_as_name,get_prob_wav_url,get_wav_url,get_stt_result,get_original_stt_result,get_as_info,get_feedback,make_json_url,get_json_feedback,save_json_feedback,get_prob_submit_list,get_studentgraph,get_professorgraph
+from ..services.assignment_service import assignment_detail, get_assignments_manage,mod_assignment_listing,check_assignment,make_as, prob_list_professor, prob_list_student, mod_as,delete_assignment,get_as_name,get_prob_wav_url,get_wav_url,get_stt_result,get_original_stt_result,get_as_info,get_feedback,make_json_url,get_json_feedback,save_json_feedback,get_prob_submit_list,get_studentgraph,get_professorgraph
 from ..services.lecture_service import lecture_access_check
 from ..services.login_service import admin_required, professor_required, assistant_required
 from werkzeug.utils import secure_filename
@@ -215,6 +215,18 @@ class React_Prob_submit_list(Resource):
                     "as_no" : as_no,
                     "lecture_no" : lecture_no,
                     
+                })
+
+class React_Prob_submit_list2(Resource):
+        @jwt_required()
+        def get(self):
+            parser = reqparse.RequestParser()
+            parser.add_argument('as_no', type=int)
+            args = parser.parse_args()
+            as_no=args['as_no']
+            user_info=get_jwt_identity()
+            user_list=get_assignments_manage(user_info, as_no)
+            return jsonify({   "userInfo":user_info,
                 })
 
 class React_Prob_submit(Resource):

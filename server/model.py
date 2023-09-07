@@ -183,9 +183,15 @@ class Feedback2(db.Model):
     backtracking = db.Column(db.Integer, default=0)
     others = db.Column(db.Integer, default=0)
 
-class Feedback(db.Model):
-    __tablename__="feedbackww"
+class Assignment_management(db.Model):
+    __tablename__="assignment_management"
     idx = db.Column(db.Integer, primary_key = True)
     attendee_no = db.Column(db.Integer, db.ForeignKey("ATTENDEE.attendee_no", ondelete="CASCADE"), nullable=True)
-    check_no= db.Column(db.Integer, db.ForeignKey("ASSIGNMENT_CHECK.check_no", ondelete="CASCADE"), nullable=True)
+    assignment_no= db.Column(db.Integer, db.ForeignKey("ASSIGNMENT.assignment_no", ondelete="CASCADE"), nullable=True)
+    submission_count = db.Column(db.Integer, default=0)
+    chance_count = db.Column(db.Integer, default=0)
+    review = db.Column(db.Text, nullable=True)
+    review_open = db.Column(db.Boolean, default=False)
+    end_submission = db.Column(db.Boolean, default=False)
+    end_submission_time = db.Column(db.DateTime, nullable=True)
     

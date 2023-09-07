@@ -7,7 +7,9 @@ tags:
   - name: "login"
     description: "타 api 실행전 로그인을 해야합니다."
   - name: "lecture"
-    description: "강의 목록을 가져오는 api 입니다."
+    description: "강의와 관련된 api 입니다."
+  - name: "prob"
+    description: "과제와 관련된 api 입니다."
 
 paths:
   /api/user/login:
@@ -82,6 +84,32 @@ paths:
                   role:
                     type: integer
                     description: Role of the user.
+  /api/prob/professor:
+    get:
+      tags:
+        - prob
+      summary: 교수 계정으로 과제 목록 조회
+      parameters:
+        - name: lecture_no
+          in: query
+          description: Lecture Number
+          required: true
+          schema:
+            type: integer
+            example: 42
+
+      responses:
+        '200':
+          description: Successful response with a list of problems
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  prob_list:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Problem'
 
 components:
   securityScheme:
@@ -111,8 +139,7 @@ components:
           example: "1분반"
         professor:
           type: string
-          example: "교수"
-    
+          example: "교수" 
     UserInfo:
       type: object
       properties:
@@ -130,3 +157,28 @@ components:
           type: string
         user_perm:
           type: integer
+    Problem:
+      type: object
+      properties:
+        as_name:
+          type: string
+          description: Assignment Name
+          example: "\uc870\ud606\uc2dd"
+        as_no:
+          type: integer
+          description: Assignment Number
+          example: 145
+        limit_time:
+          type: string
+          format: date-time
+          description: Limit Time
+          example: "Thu, 13 Jul 2023 00:26:00 GMT"
+        open_time:
+          type: string
+          format: date-time
+          description: Open Time
+          example: "Mon, 04 Sep 2023 12:54:14 GMT"
+        reveal:
+          type: boolean
+          description: Visibility of the problem
+          example: true

@@ -1,9 +1,0 @@
-회원전체 조회
----
-tags:
-  - 관리자기능
-responses:
-  200:
-    description: Success
-  404:
-    description: user not Found

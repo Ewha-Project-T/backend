@@ -1,7 +1,0 @@
-강의생성 페이지 호출
----
-tags:
-  - 강의
-responses:
-  200:
-    description: lecture_add page

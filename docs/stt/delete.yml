@@ -1,9 +1,0 @@
-녹음파일 삭제
----
-tags:
-  - stt
-responses:
-  200:
-    description: DELETE Success
-  404:
-    description: File not exists

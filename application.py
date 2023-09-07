@@ -16,7 +16,8 @@ app=Flask(__name__, static_folder='./static')
 #cors = CORS(app, resources={r"/*": {"origins": "https://ewaproject-lszyf.run.goorm.site"}},supports_credentials=True)
 app.config['SWAGGER'] = {
     'title': 'API Docs',
-    'doc_dir': './docs/'
+    'doc_dir': './docs/',
+    'openapi': '3.1.0',
 }
 
 """

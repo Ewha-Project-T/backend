@@ -109,8 +109,31 @@ paths:
                   prob_list:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Problem'
-
+                      $ref: '#/components/schemas/Problem_professor'
+  /api/prob/student:
+    get:
+      tags:
+        - prob
+      parameters:
+        - name: lecture_no
+          in: query
+          description: Number of the lecture.
+          required: true
+          schema:
+            type: integer
+            example: 42
+      responses:
+        '200':
+          description: Successful response containing a list of problems for the student.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  prob_list:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Problem_student'
 components:
   securityScheme:
     cookieAuth:
@@ -157,7 +180,7 @@ components:
           type: string
         user_perm:
           type: integer
-    Problem:
+    Problem_professor:
       type: object
       properties:
         as_name:
@@ -182,3 +205,29 @@ components:
           type: boolean
           description: Visibility of the problem
           example: true
+    Problem_student:
+      type: object
+      properties:
+        as_name:
+          type: string
+          description: Name of the assignment/problem.
+          example: "\uc870\ud606\uc2dd"
+        as_no:
+          type: integer
+          description: Number of the assignment/problem.
+          example: 145
+        end_submission:
+          type: boolean
+          nullable: true
+          description: Flag indicating if the submission ended or not.
+          example: true
+        limit_time:
+          type: string
+          format: date-time
+          description: Time limit for the assignment/problem.
+          example: "Thu, 13 Jul 2023 00:26:00 GMT"
+        professor_review:
+          type: string
+          nullable: true
+          description: Review given by the professor for the assignment/problem.
+          example: "추후 수정 예정"

@@ -3,13 +3,18 @@ info:
   title: "API 문서"
   description: "ewha 백엔드 API 문서"
   version: "1.0"
+tags:
+  - name: "login"
+    description: "타 api 실행전 로그인을 해야합니다."
+  - name: "lecture"
+    description: "강의 목록을 가져오는 api 입니다."
 
 paths:
   /api/user/login:
     post:
       tags:
-        - user
-      summary: User login to get an API key
+        - login
+      summary: 교수 로그인
       operationId: loginUser
       requestBody:
         content:
@@ -23,10 +28,19 @@ paths:
                 email:
                   type: string
                   format: email
-                  example: "dev_professor@test.com"
                 pw:
                   type: string
-                  example: "1234"
+                  format: password
+            examples:
+              professor:
+                value:
+                  email: "dev_professor@test.com"
+                  pw: "1234"
+              student:
+                value:
+                  email: "dev_student@test.com"
+                  pw: "1234"
+
       responses:
         '200':
           description: Successful login
@@ -47,6 +61,8 @@ paths:
                     example: 1
   /api/lecture/list:
     get:
+      tags:
+        - lecture
       summary: Retrieve a list of lectures
       operationId: getLectureList
       responses:

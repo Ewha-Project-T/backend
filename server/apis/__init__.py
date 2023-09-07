@@ -29,6 +29,7 @@ def load_api(api_module):
     api_module.add_resource(React_Prob_mod, '/api/prob/modify', endpoint='react_prob_mod')
     api_module.add_resource(React_Prob_detail, '/api/prob/detail', endpoint='react_prob_detail')
     api_module.add_resource(React_Prob_submit_list,'/api/probsubmit/list',endpoint='react_prob_submit_list')
+    api_module.add_resource(React_Prob_submit_list2, '/api/feedback/manage', endpoint='react_prob_submit_list2')
     api_module.add_resource(React_Prob_submit, '/api/prob/submit', endpoint='react_prob_submit')
     api_module.add_resource(Studentgraphlist,'/api/feedback/studentgraphlist',endpoint='studentGraphlist')
     api_module.add_resource(Professorgraphlist,'/api/feedback/professorgraphlist',endpoint='professorgraphlist')

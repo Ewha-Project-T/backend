@@ -60,6 +60,10 @@ def make_as(user_no,lecture_no,week,limit_time,as_name,as_type,keyword,descripti
 major_convert={"ko":"ko-KR","jp":"ja-JP","en":"en-US","cn":"zh-CN","fr":"fr-FR"}
 def create_assignment(lecture_no :int,limit_time,as_name:str,as_type:str,keyword:str,prob_translang_source:str,prob_translang_destination:str,description:str,speed:float,original_text:str,prob_sound_path:str,prob_split_region,assign_count:int,open_time,file_name:str,file_path:str,user_info,keyword_open:int = True):
     #TODO 검증 필요
+    if prob_sound_path and os.path.exists(prob_sound_path) == False:
+        return None
+    if file_path and os.path.exists(file_path) == False:
+        return None
     new_assignment = Assignment(lecture_no = lecture_no, limit_time = limit_time, as_name = as_name, as_type = as_type, keyword = keyword, translang = prob_translang_source, dest_translang = prob_translang_destination, description = description, speed = speed, original_text = original_text, upload_url = prob_sound_path, assign_count = assign_count, keyword_open = keyword_open, open_time = open_time, file_name = file_name, file_path = file_path, user_no = user_info["user_no"])
     db.session.add(new_assignment)
     attendees = Attendee.query.filter_by(lecture_no = lecture_no).all()

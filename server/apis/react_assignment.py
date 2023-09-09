@@ -136,7 +136,11 @@ class React_Prob_add2(Resource):
         file_path=args['file_path']
         
         new_assignmen_no = create_assignment(lecture_no,limit_time,as_name,as_type,keyword,prob_translang_source,prob_translang_destination,description,speed,original_text,prob_sound_path,prob_split_region,assign_count,open_time,file_name,file_path,user_info,keyword_open)
-
+        if new_assignmen_no is None:
+            return jsonify({
+                "msg" : "파일이 존재하지 않습니다.",
+                "isSuccess": False,
+            }), 400
         return jsonify({
             "msg" : "success",
             "isSuccess": True,

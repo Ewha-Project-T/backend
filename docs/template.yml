@@ -158,7 +158,102 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetail'
-
+  /api/prob/add:
+    post:
+      tags:
+        - prob
+      summary: 새로운 과제 추가
+      operationId: React_Prob_add2
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                lecture_no:
+                  type: integer
+                  description: Lecture number
+                  example: 42
+                limit_time:
+                  type: string
+                  format: date-time
+                  description: Assignment limit time
+                  required: true
+                  example: "2023-9-28 00:26:00"
+                as_name:
+                  type: string
+                  description: Assignment name
+                  required: true
+                  example: "\uc870\ud606\uc2dd"
+                as_type:
+                  type: string
+                  description: Assignment type
+                  required: true
+                  example: "순차통역"
+                keyword:
+                  type: string
+                  description: Assignment keyword
+                  example: "룰루"
+                prob_translang_source:
+                  type: string
+                  description: Source language for translation
+                  example: "jp"
+                prob_translang_destination:
+                  type: string
+                  description: Destination language for translation
+                  example: "ko"
+                description:
+                  type: string
+                  description: Assignment description
+                  example: "설명"
+                speed:
+                  type: number
+                  format: float
+                  description: Speed of the assignment
+                  example: 1.0
+                original_text:
+                  type: string
+                  description: Original text of the assignment
+                  example: "원본"
+                prob_sound_path:
+                  type: string
+                  description: Path to the sound file
+                  example: "./upload/9d41ac6c-4c38-4b19-96df-d7ddb10abca9.wav"
+                prob_split_region:
+                  type: array
+                  items:
+                    type: string
+                  description: Regions of the split sound file
+                  example: [{"start":"74","end":"490","index":0},{"start":"538","end":"925","index":1}]
+                assign_count:
+                  type: integer
+                  description: Assignment count
+                  example: 1
+                keyword_open:
+                  type: integer
+                  description: Keyword open status
+                  example: 1
+                open_time:
+                  type: string
+                  format: date-time
+                  description: Assignment open time
+                  example: "2023-9-10 00:26:00"
+                file_name:
+                  type: string
+                  description: Name of the file
+                  example: "test.txt"
+                file_path:
+                  type: string
+                  description: Path to the file
+                  example: "./upload/f3bce525-7160-4b11-95a5-3e623941b8e2.txt"
+      responses:
+        '200':
+          description: Assignment created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProbAddResponse'
 
 components:
   securityScheme:
@@ -298,3 +393,18 @@ components:
           type: string
           format: date-time
           description: Time when the assignment/problem was opened.
+    ProbAddResponse:
+      type: object
+      properties:
+        msg:
+          type: string
+          description: Status message
+          example: "success"
+        isSuccess:
+          type: boolean
+          description: Indicates whether the operation was successful
+          example: true
+        new_assignmen_no:
+          type: integer
+          description: The ID of the newly created assignment
+          example: 123

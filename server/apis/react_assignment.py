@@ -135,13 +135,13 @@ class React_Prob_add2(Resource):
         file_name=args['file_name']
         file_path=args['file_path']
         
-        new_assignmen_no = create_assignment(lecture_no,limit_time,as_name,as_type,keyword,prob_translang_source,prob_translang_destination,description,speed,original_text,prob_sound_path,prob_split_region,assign_count,keyword_open,open_time,file_name,file_path,user_info)
+        new_assignmen_no = create_assignment(lecture_no,limit_time,as_name,as_type,keyword,prob_translang_source,prob_translang_destination,description,speed,original_text,prob_sound_path,prob_split_region,assign_count,open_time,file_name,file_path,user_info,keyword_open)
 
         return jsonify({
             "msg" : "success",
-            "isSuccess":True,
-            "new_assignmen_no":new_assignmen_no
-        }),200
+            "isSuccess": True,
+            "new_assignmen_no": new_assignmen_no,
+        })
 
 class React_Prob_del(Resource):
     @jwt_required()

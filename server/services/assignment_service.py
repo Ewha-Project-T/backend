@@ -58,7 +58,7 @@ def make_as(user_no,lecture_no,week,limit_time,as_name,as_type,keyword,descripti
             db.session.commit
 
 major_convert={"ko":"ko-KR","jp":"ja-JP","en":"en-US","cn":"zh-CN","fr":"fr-FR"}
-def create_assignment(lecture_no,limit_time,as_name,as_type,keyword,prob_translang_source,prob_translang_destination,description,speed,original_text,prob_sound_path,prob_split_region,assign_count,open_time,file_name,file_path,user_info,keyword_open = True):
+def create_assignment(lecture_no :int,limit_time,as_name:str,as_type:str,keyword:str,prob_translang_source:str,prob_translang_destination:str,description:str,speed:float,original_text:str,prob_sound_path:str,prob_split_region,assign_count:int,open_time,file_name:str,file_path:str,user_info,keyword_open:int = True):
     #TODO 검증 필요
     new_assignment = Assignment(lecture_no = lecture_no, limit_time = limit_time, as_name = as_name, as_type = as_type, keyword = keyword, translang = prob_translang_source, dest_translang = prob_translang_destination, description = description, speed = speed, original_text = original_text, upload_url = prob_sound_path, assign_count = assign_count, keyword_open = keyword_open, open_time = open_time, file_name = file_name, file_path = file_path, user_no = user_info["user_no"])
     db.session.add(new_assignment)
@@ -72,6 +72,9 @@ def create_assignment(lecture_no,limit_time,as_name,as_type,keyword,prob_transla
     else:
         prob_translang_source = "ko-KR"
     for region in prob_split_region:
+        #json region을 dict로 변환
+        region = region.replace("'",'"')
+        region = json.loads(region)
         split_url=split_wav_save2(prob_sound_path,int(region["start"]),int(region["end"]))
         mapping_sst_user(new_assignment.assignment_no, split_url,user_info)
         task = do_stt_work.delay(filename=split_url,locale=prob_translang_source)

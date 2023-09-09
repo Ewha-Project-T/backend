@@ -271,7 +271,7 @@ class prob_upload(Resource):
         uuid_str=str(uuid.uuid4())
         filename = uuid_str
         file_extention = os.path.splitext(file.filename)[1].lower()
-        path = f'{os.environ["UPLOAD_PATH"]}/{filename}.' + file_extention
+        path = f'{os.environ["UPLOAD_PATH"]}/{filename}{file_extention}'
         if file and allowed_sound_file(file.filename):
             #filename = secure_filename(file.filename)
             # file.save('./static/audio/{0}'.format(filename))
@@ -301,7 +301,7 @@ class prob_upload_file(Resource):
         uuid_str=str(uuid.uuid4())
         filename = uuid_str
         file_extention = os.path.splitext(file.filename)[1].lower()
-        path = f'{os.environ["UPLOAD_PATH"]}/{filename}.' + file_extention
+        path = f'{os.environ["UPLOAD_PATH"]}/{filename}{file_extention}'
         if file and allowed_file(file.filename):
             file.save(path)
         else:

@@ -270,7 +270,8 @@ class prob_upload(Resource):
 
         uuid_str=str(uuid.uuid4())
         filename = uuid_str
-        path = f'{os.environ["UPLOAD_PATH"]}/{filename}.' + file.filename.rsplit('.', 1)[1].lower()
+        file_extention = os.path.splitext(file.filename)[1].lower()
+        path = f'{os.environ["UPLOAD_PATH"]}/{filename}.' + file_extention
         if file and allowed_sound_file(file.filename):
             #filename = secure_filename(file.filename)
             # file.save('./static/audio/{0}'.format(filename))
@@ -299,13 +300,14 @@ class prob_upload_file(Resource):
 
         uuid_str=str(uuid.uuid4())
         filename = uuid_str
-        path = f'{os.environ["UPLOAD_PATH"]}/{filename}.' + file.filename.rsplit('.', 1)[1].lower()
+        file_extention = os.path.splitext(file.filename)[1].lower()
+        path = f'{os.environ["UPLOAD_PATH"]}/{filename}.' + file_extention
         if file and allowed_file(file.filename):
             file.save(path)
         else:
             return {"msg":"file upload fail"},400
         res = {
             "file_path": path, #추후 파일명에대한 해쉬처리 필요
-            "file_name": file.filename
+            "file_name": secure_filename(file.filename)
         }
         return jsonify(res)

@@ -65,7 +65,7 @@ class Assignment(db.Model):
     assignment_no = db.Column(db.Integer, primary_key=True)
     user_no = db.Column(db.Integer, db.ForeignKey("USER.user_no", ondelete="CASCADE"), nullable=True)
     lecture_no = db.Column(db.Integer, db.ForeignKey("LECTURE.lecture_no", ondelete="CASCADE"), nullable=True)
-    week = db.Column(db.String(20), nullable=False) # 추후 삭제 예정
+    week = db.Column(db.String(20)) # 추후 삭제 예정
     open_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow()+timedelta(hours=9))
     limit_time = db.Column(db.DateTime, nullable=False)
     as_name = db.Column(db.String(50), nullable=False)
@@ -136,7 +136,7 @@ class Stt(db.Model):
     stt_no = db.Column(db.Integer, primary_key=True)
     user_no = db.Column(db.Integer, db.ForeignKey("USER.user_no", ondelete="CASCADE"), nullable=False)
     assignment_no = db.Column(db.Integer, db.ForeignKey("ASSIGNMENT.assignment_no", ondelete="CASCADE"), nullable=False)
-    wav_file = db.Column(db.String(36), nullable=False)
+    wav_file = db.Column(db.String(41), nullable=False)
 
     user=db.relationship("User", back_populates="stt")
     assignment = db.relationship("Assignment", back_populates="stt")

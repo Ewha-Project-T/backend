@@ -7,7 +7,7 @@ from flask_jwt_extended import (
     jwt_required, get_jwt_identity, create_access_token, get_jwt
 )
 import re
-from ..services.assignment_service import assignment_detail, get_assignments_manage,mod_assignment_listing,check_assignment,make_as, prob_list_professor, prob_list_student, mod_as,delete_assignment,get_as_name,get_prob_wav_url,get_wav_url,get_stt_result,get_original_stt_result,get_as_info,get_feedback,make_json_url,get_json_feedback,save_json_feedback,get_prob_submit_list,get_studentgraph,get_professorgraph
+from ..services.assignment_service import assignment_detail, get_assignments_manage,mod_assignment_listing,check_assignment,make_as, create_assignment,prob_list_professor, prob_list_student, mod_as,delete_assignment,get_as_name,get_prob_wav_url,get_wav_url,get_stt_result,get_original_stt_result,get_as_info,get_feedback,make_json_url,get_json_feedback,save_json_feedback,get_prob_submit_list,get_studentgraph,get_professorgraph
 from ..services.lecture_service import lecture_access_check
 from ..services.login_service import admin_required, professor_required, assistant_required
 from werkzeug.utils import secure_filename
@@ -93,6 +93,55 @@ class React_Prob_add(Resource):
         original_text=original_text.replace(">","&gt")
         make_as(user_info["user_no"],lecture_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,original_text,upload_path,prob_region,user_info,prob_translang_source,prob_translang_destination)
         return{"msg" : "success","probcreateSuccess":1},200
+
+class React_Prob_add2(Resource):
+    @jwt_required()
+    def post(self):
+        parser = reqparse.RequestParser()
+        user_info=get_jwt_identity()
+        parser.add_argument('lecture_no', type=int)
+        parser.add_argument('limit_time', type=str,  required=True, help="limit_time is required")
+        parser.add_argument('as_name', type=str, required=True, help="as_name is required")
+        parser.add_argument('as_type', type=str, required=True, help="as_type is required")
+        parser.add_argument('keyword', type=str)
+        parser.add_argument('prob_translang_source',type=str)
+        parser.add_argument('prob_translang_destination',type=str)
+        parser.add_argument('description', type=str)
+        parser.add_argument('speed', type=float)
+        parser.add_argument('original_text', type=str)
+        parser.add_argument('prob_sound_path', type=str)
+        parser.add_argument('prob_split_region', type=str, action='append') # 음성파일 분할된 구간
+        parser.add_argument('assign_count', type=int)
+        parser.add_argument('keyword_open', type=int)
+        parser.add_argument('open_time', type=str)
+        parser.add_argument('file_name', type=str)
+        parser.add_argument('file_path', type=str)
+        args=parser.parse_args()
+        lecture_no = args['lecture_no']
+        limit_time = args['limit_time']
+        as_name = args['as_name']
+        as_type = args['as_type']
+        keyword = args['keyword']
+        prob_translang_source=args['prob_translang_source']
+        prob_translang_destination=args['prob_translang_destination']
+        description = args['description']
+        speed = args['speed']
+        original_text = args['original_text']
+        prob_sound_path = args['prob_sound_path']
+        prob_split_region=args['prob_split_region']
+        assign_count=args['assign_count']
+        keyword_open=args['keyword_open']
+        open_time=args['open_time']
+        file_name=args['file_name']
+        file_path=args['file_path']
+        
+        new_assignmen_no = create_assignment(lecture_no,limit_time,as_name,as_type,keyword,prob_translang_source,prob_translang_destination,description,speed,original_text,prob_sound_path,prob_split_region,assign_count,keyword_open,open_time,file_name,file_path,user_info)
+
+        return jsonify({
+            "msg" : "success",
+            "isSuccess":True,
+            "new_assignmen_no":new_assignmen_no
+        }),200
 
 class React_Prob_del(Resource):
     @jwt_required()

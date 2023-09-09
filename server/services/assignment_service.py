@@ -56,13 +56,41 @@ def make_as(user_no,lecture_no,week,limit_time,as_name,as_type,keyword,descripti
             pr = Prob_region(assignment_no=acc.assignment_no,region_index=reg_index,start=reg_start,end=reg_end,upload_url=split_url, job_id=task.id)
             db.session.add(pr)
             db.session.commit
+
+major_convert={"ko":"ko-KR","jp":"ja-JP","en":"en-US","cn":"zh-CN","fr":"fr-FR"}
+def create_assignment(lecture_no,limit_time,as_name,as_type,keyword,prob_translang_source,prob_translang_destination,description,speed,original_text,prob_sound_path,prob_split_region,assign_count,keyword_open,open_time,file_name,file_path,user_info):
+    #TODO 검증 필요
+    new_assignment = Assignment(lecture_no = lecture_no, limit_time = limit_time, as_name = as_name, as_type = as_type, keyword = keyword, translang = prob_translang_source, dest_translang = prob_translang_destination, description = description, speed = speed, original_text = original_text, upload_url = prob_sound_path, assign_count = assign_count, keyword_open = keyword_open, open_time = open_time, file_name = file_name, file_path = file_path, user_no = user_info["user_no"])
+    db.session.add(new_assignment)
+    db.session.commit()
+    if prob_translang_source in major_convert:
+        prob_translang_source = major_convert[prob_translang_source]
+    else:
+        prob_translang_source = "ko-KR"
+    for region in prob_split_region:
+        split_url=split_wav_save2(prob_sound_path,int(region["start"]),int(region["end"]))
+        mapping_sst_user(new_assignment.assignment_no, split_url,user_info)
+        task = do_stt_work.delay(filename=split_url,locale=prob_translang_source)
+        pr = Prob_region(assignment_no=new_assignment.assignment_no,region_index=region["index"],start=region["start"],end=region["end"],upload_url=split_url, job_id=task.id)
+        db.session.add(pr)
+        db.session.commit()
+    return new_assignment.assignment_no
         
 def split_wav_save(upload_url,start,end):
     uuid_str=str(uuid.uuid4())
     audio: AudioSegment = AudioSegment.from_file(upload_url)
     audio[start * 1000:end * 1000].export(f"{os.environ['UPLOAD_PATH']}/{uuid_str}.wav", format="wav")
     return uuid_str
-    
+
+# 파일 전체 url을 반환
+def split_wav_save2(upload_url,start,end):
+    uuid_str=str(uuid.uuid4())
+    audio: AudioSegment = AudioSegment.from_file(upload_url)
+    file_extension = os.path.splitext(upload_url)[1]
+    audio[start * 1000:end * 1000].export(f"{os.environ['UPLOAD_PATH']}/{uuid_str}{file_extension}", format=file_extension[1:])
+    return uuid_str+file_extension
+    # audio[start * 1000:end * 1000].export(f"{os.environ['UPLOAD_PATH']}/{uuid_str}.wav", format="wav")
+    # return uuid_str
 
 def mod_as(lecture_no,as_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,original_text="",upload_url="",region="",user_info=None,prob_translang_source="ko",prob_translang_destination="ko"):
     acc=Assignment.query.filter_by(assignment_no=as_no).first()

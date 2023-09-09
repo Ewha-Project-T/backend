@@ -1,7 +1,7 @@
 from distutils.command.upload import upload
 from server.apis import assignment, lecture
 from server.services.stt_service import mapping_sst_user
-from ..model import Assignment_feedback, Attendee, SttJob, User, Lecture, Assignment,Prob_region,Assignment_check,Assignment_check_list,Stt,Feedback2
+from ..model import Assignment_feedback, Assignment_management, Attendee, SttJob, User, Lecture, Assignment,Prob_region,Assignment_check,Assignment_check_list,Stt,Feedback2
 from server import db
 from functools import wraps
 from flask_jwt_extended import create_refresh_token, create_access_token, verify_jwt_in_request, get_jwt, get_jwt_identity
@@ -62,6 +62,10 @@ def create_assignment(lecture_no,limit_time,as_name,as_type,keyword,prob_transla
     #TODO 검증 필요
     new_assignment = Assignment(lecture_no = lecture_no, limit_time = limit_time, as_name = as_name, as_type = as_type, keyword = keyword, translang = prob_translang_source, dest_translang = prob_translang_destination, description = description, speed = speed, original_text = original_text, upload_url = prob_sound_path, assign_count = assign_count, keyword_open = keyword_open, open_time = open_time, file_name = file_name, file_path = file_path, user_no = user_info["user_no"])
     db.session.add(new_assignment)
+    attendees = Attendee.query.filter_by(lecture_no = lecture_no).all()
+    for attendee in attendees: # 수강생들에게 과제를 할당
+        assignment_manage = Assignment_management(assignment_no = new_assignment.assignment_no, attendee_no = attendee.attendee_no)
+        db.session.add(assignment_manage)
     db.session.commit()
     if prob_translang_source in major_convert:
         prob_translang_source = major_convert[prob_translang_source]

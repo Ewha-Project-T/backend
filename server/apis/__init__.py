@@ -6,7 +6,7 @@ from .assignment import Prob, Prob_del, Prob_submit, Prob_feedback,Prob_mod,Prob
 from .admin import Admin,Admin2
 from .stt import Stt, SttJob, SttSeq, SttSeqJob
 from .react_login import Login2,Logout2,CheckToken,Join2
-from .react_assignment import  Feedback2, React_Porb_professor, React_Prob_add2, React_Prob_del,React_Prob_add, React_Prob_detail,React_Prob_mod, React_Prob_student,React_Prob_submit_list,React_Prob_submit, React_Prob_submit_list2,Studentgraphlist,Professorgraphlist
+from .react_assignment import  Feedback2, React_Porb_professor, React_Prob_add2, React_Prob_del,React_Prob_add, React_Prob_detail, React_Prob_edit,React_Prob_mod, React_Prob_student,React_Prob_submit_list,React_Prob_submit, React_Prob_submit_list2,Studentgraphlist,Professorgraphlist
 from .react_lecture import React_Lecture,React_Lecture_mod_del,React_Student,React_Lecture_add,React_Lecture_mod
 
 
@@ -27,7 +27,8 @@ def load_api(api_module):
     api_module.add_resource(React_Prob_del, '/api/prob/delete', endpoint='react_prob_del')
     api_module.add_resource(React_Prob_add, '/api/prob/create', endpoint='react_prob_add')
     api_module.add_resource(React_Prob_add2, '/api/prob/add', endpoint='react_prob_add2')
-    api_module.add_resource(React_Prob_mod, '/api/prob/modify', endpoint='react_prob_mod')
+    api_module.add_resource(React_Prob_mod, '/api/prob/modify', endpoint='react_prob_mod') #옛날거
+    api_module.add_resource(React_Prob_edit, '/api/prob/edit', endpoint='react_prob_edit')
     api_module.add_resource(React_Prob_detail, '/api/prob/detail', endpoint='react_prob_detail')
     api_module.add_resource(React_Prob_submit_list,'/api/probsubmit/list',endpoint='react_prob_submit_list')
     api_module.add_resource(React_Prob_submit_list2, '/api/feedback/manage', endpoint='react_prob_submit_list2')

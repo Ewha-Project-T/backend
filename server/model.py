@@ -90,6 +90,9 @@ class Assignment(db.Model):
     assignment_check= db.relationship("Assignment_check",back_populates="assignment",cascade="all, delete",passive_deletes=True,)
     stt= db.relationship("Stt",back_populates="assignment",cascade="all, delete",passive_deletes=True,)
     prob_region=db.relationship("Prob_region",back_populates="assignment",cascade="all, delete",passive_deletes=True,)
+    def to_dict(self):
+        return {x.name: getattr(self, x.name).isoformat() if isinstance(getattr(self, x.name), datetime) else getattr(self, x.name) for x in self.__table__.columns}
+
 
 class Assignment_check(db.Model):
     __tablename__="ASSIGNMENT_CHECK"

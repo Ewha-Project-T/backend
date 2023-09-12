@@ -75,16 +75,17 @@ def create_assignment(lecture_no :int,limit_time,as_name:str,as_type:str,keyword
         prob_translang_source = major_convert[prob_translang_source]
     else:
         prob_translang_source = "ko-KR"
-    for region in prob_split_region:
-        #json region을 dict로 변환
-        region = region.replace("'",'"')
-        region = json.loads(region)
-        split_url=split_wav_save2(prob_sound_path,int(region["start"]),int(region["end"]))
-        mapping_sst_user(new_assignment.assignment_no, split_url,user_info)
-        task = do_stt_work.delay(filename=split_url,locale=prob_translang_source)
-        pr = Prob_region(assignment_no=new_assignment.assignment_no,region_index=region["index"],start=region["start"],end=region["end"],upload_url=split_url, job_id=task.id)
-        db.session.add(pr)
-        db.session.commit()
+    if prob_split_region is not None:
+        for region in prob_split_region:
+            #json region을 dict로 변환
+            region = region.replace("'",'"')
+            region = json.loads(region)
+            split_url=split_wav_save2(prob_sound_path,int(region["start"]),int(region["end"]))
+            mapping_sst_user(new_assignment.assignment_no, split_url,user_info)
+            task = do_stt_work.delay(filename=split_url,locale=prob_translang_source)
+            pr = Prob_region(assignment_no=new_assignment.assignment_no,region_index=region["index"],start=region["start"],end=region["end"],upload_url=split_url, job_id=task.id)
+            db.session.add(pr)
+            db.session.commit()
     return new_assignment.assignment_no
         
 def split_wav_save(upload_url,start,end):
@@ -217,6 +218,20 @@ def delete_assignment(assignment_no):
     db.session.delete(acc)
     db.session.commit
     
+def get_assignment(as_no:int):
+    assignment = Assignment.query.filter_by(assignment_no = as_no).first()
+    audio_region = Prob_region.query.filter_by(assignment_no=as_no).all()
+    audio_region_list = [
+        {
+            "region_index": att.region_index,
+            "start": att.start,
+            "end": att.end,
+            "upload_url": att.upload_url,
+        }
+        for att in audio_region
+    ]
+
+    return assignment, audio_region_list
 def  check_assignment(as_no,lecture_no,uuid,user_info,text=""):
     acc=Prob_region.query.filter_by(assignment_no=as_no).all()
     if(len(acc)!=len(uuid) and text==""):

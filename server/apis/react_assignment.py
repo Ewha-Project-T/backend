@@ -241,6 +241,7 @@ class React_Prob_edit(Resource):
         assignment["prob_split_region"] = prob_split_region
         return jsonify({
             "assignment": assignment,
+            "isSuccess": True,
         })
     @jwt_required()
     def post(self):#강의수정권한관리 만든사람, 관리자

@@ -87,6 +87,66 @@ def create_assignment(lecture_no :int,limit_time,as_name:str,as_type:str,keyword
             db.session.add(pr)
             db.session.commit()
     return new_assignment.assignment_no
+def edit_assignment(as_no,limit_time, as_name, as_type, keyword, prob_translang_source, prob_translang_destination, description, speed, original_text, prob_sound_path, prob_split_region, assign_count, open_time, file_name, file_path, user_info, keyword_open):
+    # TODO 검증 필요
+    if prob_sound_path and os.path.exists(prob_sound_path) == False:
+        return None
+    if file_path and os.path.exists(file_path) == False:
+        return None
+
+    # 과제 검색 및 편집
+    assignment_to_edit = Assignment.query.filter_by(as_no = as_no).first()
+    if not assignment_to_edit:
+        return None
+
+    # 과제 속성 업데이트
+    assignment_to_edit.limit_time = limit_time
+    assignment_to_edit.as_name = as_name
+    assignment_to_edit.as_type = as_type
+    assignment_to_edit.keyword = keyword
+    assignment_to_edit.translang = prob_translang_source
+    assignment_to_edit.dest_translang = prob_translang_destination
+    assignment_to_edit.description = description
+    assignment_to_edit.speed = speed
+    assignment_to_edit.original_text = original_text
+    assignment_to_edit.upload_url = prob_sound_path
+    assignment_to_edit.assign_count = assign_count
+    assignment_to_edit.keyword_open = keyword_open
+    assignment_to_edit.open_time = open_time
+    assignment_to_edit.file_name = file_name
+    assignment_to_edit.file_path = file_path
+
+    #과제 구간 변경
+    Prob_region.query.filter_by(assignment_no=as_no).delete()
+
+    attendees = Attendee.query.filter_by(lecture_no = assignment_to_edit.lecture_no).all()
+    attendees_no = [attendee.attendee_no for attendee in attendees]
+    now_attendees = Assignment_management.query.filter_by(assignment_no = as_no).all()
+    now_attendees_no = [now_attendee.attendee_no for now_attendee in now_attendees]
+    for attendee_no in list(set(now_attendees_no) - set(attendees_no)):
+        assignment_manage = Assignment_management(assignment_no = assignment_to_edit.assignment_no, attendee_no = attendee_no)
+        db.session.add(assignment_manage)
+    if prob_translang_source in major_convert:
+        prob_translang_source = major_convert[prob_translang_source]
+    else:
+        prob_translang_source = "ko-KR"
+    if prob_split_region is not None:
+        for region in prob_split_region:
+            #json region을 dict로 변환
+            region = region.replace("'",'"')
+            region = json.loads(region)
+            split_url=split_wav_save2(prob_sound_path,int(region["start"]),int(region["end"]))
+            mapping_sst_user(assignment_to_edit.assignment_no, split_url,user_info)
+            task = do_stt_work.delay(filename=split_url,locale=prob_translang_source)
+            pr = Prob_region(assignment_no=assignment_to_edit.assignment_no,region_index=region["index"],start=region["start"],end=region["end"],upload_url=split_url, job_id=task.id)
+            db.session.add(pr)
+    # 변경 사항 커밋
+    db.session.commit()
+    
+    # TODO: prob_split_region 처리 및 Prob_region 업데이트 로직 추가
+    
+    return "Assignment successfully updated"
+
         
 def split_wav_save(upload_url,start,end):
     uuid_str=str(uuid.uuid4())

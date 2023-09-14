@@ -7,7 +7,7 @@ from flask_jwt_extended import (
     jwt_required, get_jwt_identity, create_access_token, get_jwt
 )
 import re
-from ..services.assignment_service import assignment_detail, get_assignment, get_assignments_manage,mod_assignment_listing,check_assignment,make_as, create_assignment,prob_list_professor, prob_list_student, mod_as,delete_assignment,get_as_name,get_prob_wav_url,get_wav_url,get_stt_result,get_original_stt_result,get_as_info,get_feedback,make_json_url,get_json_feedback,save_json_feedback,get_prob_submit_list,get_studentgraph,get_professorgraph
+from ..services.assignment_service import assignment_detail, edit_assignment, get_assignment, get_assignments_manage,mod_assignment_listing,check_assignment,make_as, create_assignment,prob_list_professor, prob_list_student, mod_as,delete_assignment,get_as_name,get_prob_wav_url,get_wav_url,get_stt_result,get_original_stt_result,get_as_info,get_feedback,make_json_url,get_json_feedback,save_json_feedback,get_prob_submit_list,get_studentgraph,get_professorgraph
 from ..services.lecture_service import lecture_access_check
 from ..services.login_service import admin_required, professor_required, assistant_required
 from werkzeug.utils import secure_filename
@@ -147,87 +147,87 @@ class React_Prob_add2(Resource):
             "new_assignmen_no": new_assignmen_no,
         })
 
-class React_Prob_del(Resource):
-    @jwt_required()
-    def get(self):#과제 삭제
-        parser = reqparse.RequestParser()
-        parser.add_argument('lecture_no', type=int)
-        parser.add_argument('as_no', type=int)
-        args = parser.parse_args()
-        lecture_no = args['lecture_no']
-        as_no = args['as_no']
-        user_info=get_jwt_identity()
-        if(lecture_access_check(user_info["user_no"],lecture_no) or user_info["user_perm"]==0):
-            delete_assignment(as_no)
-            return{"msg" : "assignment delete success","probdeleteSuccess":1},200
-        else:
-            return{"msg": "access denied"}
+# class React_Prob_del(Resource):
+#     @jwt_required()
+#     def get(self):#과제 삭제
+#         parser = reqparse.RequestParser()
+#         parser.add_argument('lecture_no', type=int)
+#         parser.add_argument('as_no', type=int)
+#         args = parser.parse_args()
+#         lecture_no = args['lecture_no']
+#         as_no = args['as_no']
+#         user_info=get_jwt_identity()
+#         if(lecture_access_check(user_info["user_no"],lecture_no) or user_info["user_perm"]==0):
+#             delete_assignment(as_no)
+#             return{"msg" : "assignment delete success","probdeleteSuccess":1},200
+#         else:
+#             return{"msg": "access denied"}
         
-class React_Prob_mod(Resource):
-    @jwt_required()
-    def get(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('lecture_no', type=int)
-        parser.add_argument('as_no', type=int)
-        args = parser.parse_args()
-        lecture_no = args['lecture_no']
-        as_no = args['as_no']
-        as_list,audio_list=mod_assignment_listing(lecture_no,as_no)
-        user_info=get_jwt_identity()
-        return jsonify({   "userlist":user_info,
-                    "lectureNo": lecture_no,
-                    "as_no" : as_no,
-                    "as_list" : as_list,
-                    "audio_list": audio_list,
-                })
-    @jwt_required()
-    def post(self):#강의수정권한관리 만든사람, 관리자
-        parser = reqparse.RequestParser()
-        parser.add_argument('lecture_no', type=int)
-        parser.add_argument('as_no', type=int)
-        parser.add_argument('prob_week', type=str)
-        parser.add_argument('prob_timeEnd', type=str)
-        parser.add_argument('prob_name', type=str)
-        parser.add_argument('prob_type', type=str)
-        parser.add_argument('prob_keyword', type=str)
-        parser.add_argument('prob_translang_source',type=str)
-        parser.add_argument('prob_translang_destination',type=str)
-        parser.add_argument('prob_exp', type=str)
-        parser.add_argument('prob_replay', type=str)
-        parser.add_argument('prob_play_speed')
-        parser.add_argument('prob_open', type=str)
-        parser.add_argument('prob_region', type=str, action='append')
-        parser.add_argument('original_text', type=str)
-        parser.add_argument('prob_sound_path', type=str)
-        args=parser.parse_args()
-        lecture_no = args['lecture_no']
-        as_no= args['as_no']
-        week = args['prob_week']
-        limit_time = args['prob_timeEnd']
-        as_name = args['prob_name']
-        as_type = args['prob_type']
-        keyword = args['prob_keyword']
-        prob_translang_source=args['prob_translang_source']
-        prob_translang_destination=args['prob_translang_destination']
-        description = args['prob_exp']
-        re_limit = args['prob_replay']
-        speed = args['prob_play_speed']
-        disclosure = args['prob_open']
-        upload_path= args['prob_sound_path']
-        if(disclosure=="on"):
-            disclosure=0
-        else:
-            disclosure=1
-        prob_region=args['prob_region']
-        original_text = args['original_text']
-        original_text=original_text.replace("<","&lt")
-        original_text=original_text.replace(">","&gt")
-        user_info=get_jwt_identity()
-        if(lecture_access_check(user_info["user_no"],lecture_no) or user_info["user_perm"]==0):
-            mod_as(lecture_no,as_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,original_text,upload_path,prob_region,user_info,prob_translang_source,prob_translang_destination)
-            return{"msg" : "assignment modify success","assignmentmodifySuccess" : 1},200
-        else:
-            return{"msg": "access denied"}
+# class React_Prob_mod(Resource):
+#     @jwt_required()
+#     def get(self):
+#         parser = reqparse.RequestParser()
+#         parser.add_argument('lecture_no', type=int)
+#         parser.add_argument('as_no', type=int)
+#         args = parser.parse_args()
+#         lecture_no = args['lecture_no']
+#         as_no = args['as_no']
+#         as_list,audio_list=mod_assignment_listing(lecture_no,as_no)
+#         user_info=get_jwt_identity()
+#         return jsonify({   "userlist":user_info,
+#                     "lectureNo": lecture_no,
+#                     "as_no" : as_no,
+#                     "as_list" : as_list,
+#                     "audio_list": audio_list,
+#                 })
+#     @jwt_required()
+#     def post(self):#강의수정권한관리 만든사람, 관리자
+#         parser = reqparse.RequestParser()
+#         parser.add_argument('lecture_no', type=int)
+#         parser.add_argument('as_no', type=int)
+#         parser.add_argument('prob_week', type=str)
+#         parser.add_argument('prob_timeEnd', type=str)
+#         parser.add_argument('prob_name', type=str)
+#         parser.add_argument('prob_type', type=str)
+#         parser.add_argument('prob_keyword', type=str)
+#         parser.add_argument('prob_translang_source',type=str)
+#         parser.add_argument('prob_translang_destination',type=str)
+#         parser.add_argument('prob_exp', type=str)
+#         parser.add_argument('prob_replay', type=str)
+#         parser.add_argument('prob_play_speed')
+#         parser.add_argument('prob_open', type=str)
+#         parser.add_argument('prob_region', type=str, action='append')
+#         parser.add_argument('original_text', type=str)
+#         parser.add_argument('prob_sound_path', type=str)
+#         args=parser.parse_args()
+#         lecture_no = args['lecture_no']
+#         as_no= args['as_no']
+#         week = args['prob_week']
+#         limit_time = args['prob_timeEnd']
+#         as_name = args['prob_name']
+#         as_type = args['prob_type']
+#         keyword = args['prob_keyword']
+#         prob_translang_source=args['prob_translang_source']
+#         prob_translang_destination=args['prob_translang_destination']
+#         description = args['prob_exp']
+#         re_limit = args['prob_replay']
+#         speed = args['prob_play_speed']
+#         disclosure = args['prob_open']
+#         upload_path= args['prob_sound_path']
+#         if(disclosure=="on"):
+#             disclosure=0
+#         else:
+#             disclosure=1
+#         prob_region=args['prob_region']
+#         original_text = args['original_text']
+#         original_text=original_text.replace("<","&lt")
+#         original_text=original_text.replace(">","&gt")
+#         user_info=get_jwt_identity()
+#         if(lecture_access_check(user_info["user_no"],lecture_no) or user_info["user_perm"]==0):
+#             mod_as(lecture_no,as_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,original_text,upload_path,prob_region,user_info,prob_translang_source,prob_translang_destination)
+#             return{"msg" : "assignment modify success","assignmentmodifySuccess" : 1},200
+#         else:
+#             return{"msg": "access denied"}
 class React_Prob_edit(Resource):
     #TODO: 검증 추가 필요
     # @jwt_required()
@@ -244,7 +244,46 @@ class React_Prob_edit(Resource):
             "isSuccess": True,
         })
     @jwt_required()
-    def post(self):#강의수정권한관리 만든사람, 관리자
+    def put(self):
+        parser = reqparse.RequestParser()
+        user_info=get_jwt_identity()
+        
+        parser.add_argument('as_no', type=int)
+        parser.add_argument('limit_time', type=str,  required=True, help="limit_time is required")
+        parser.add_argument('as_name', type=str, required=True, help="as_name is required")
+        parser.add_argument('as_type', type=str, required=True, help="as_type is required")
+        parser.add_argument('keyword', type=str)
+        parser.add_argument('prob_translang_source',type=str)
+        parser.add_argument('prob_translang_destination',type=str)
+        parser.add_argument('description', type=str)
+        parser.add_argument('speed', type=float)
+        parser.add_argument('original_text', type=str)
+        parser.add_argument('prob_sound_path', type=str)
+        parser.add_argument('prob_split_region', type=str, action='append') # 음성파일 분할된 구간
+        parser.add_argument('assign_count', type=int)
+        parser.add_argument('keyword_open', type=int)
+        parser.add_argument('open_time', type=str)
+        parser.add_argument('file_name', type=str)
+        parser.add_argument('file_path', type=str)
+        args=parser.parse_args()
+        as_no = args['as_no']
+        limit_time = args['limit_time']
+        as_name = args['as_name']
+        as_type = args['as_type']
+        keyword = args['keyword']
+        prob_translang_source=args['prob_translang_source']
+        prob_translang_destination=args['prob_translang_destination']
+        description = args['description']
+        speed = args['speed']
+        original_text = args['original_text']
+        prob_sound_path = args['prob_sound_path']
+        prob_split_region=args['prob_split_region']
+        assign_count=args['assign_count']
+        keyword_open=args['keyword_open']
+        open_time=args['open_time']
+        file_name=args['file_name']
+        file_path=args['file_path']
+        edit_prob = edit_assignment(as_no,limit_time,as_name,as_type,keyword,prob_translang_source,prob_translang_destination,description,speed,original_text,prob_sound_path,prob_split_region,assign_count,open_time,file_name,file_path,user_info,keyword_open)
         return 1
         
 class React_Prob_detail(Resource):

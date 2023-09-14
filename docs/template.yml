@@ -254,6 +254,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProbAddResponse'
+  /prob_upload_file:
+    post: 
+      tags: 
+        - prob
+      summary: 과제 파일 업로드
+      operationId: prob_upload_file
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                prob_file:
+                  type: string
+                  format: binary
+                  description: "The file to upload."
+      responses:
+        '200':
+          description: File uploaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProbUploadFileResponse'
+
 
 components:
   securityScheme:
@@ -408,3 +432,16 @@ components:
           type: integer
           description: The ID of the newly created assignment
           example: 123
+    ProbUploadFileResponse:
+      type: object
+      properties:
+        file_path:
+          type: string
+          description: "The path to the uploaded file."
+        file_name:
+          type: string
+          description: "The name of the uploaded file."
+      required:
+        - file_path
+        - file_name
+    

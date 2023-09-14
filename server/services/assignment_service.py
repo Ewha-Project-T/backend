@@ -70,7 +70,6 @@ def create_assignment(lecture_no :int,limit_time,as_name:str,as_type:str,keyword
     for attendee in attendees: # 수강생들에게 과제를 할당
         assignment_manage = Assignment_management(assignment_no = new_assignment.assignment_no, attendee_no = attendee.attendee_no)
         db.session.add(assignment_manage)
-    db.session.commit()
     if prob_translang_source in major_convert:
         prob_translang_source = major_convert[prob_translang_source]
     else:
@@ -85,7 +84,7 @@ def create_assignment(lecture_no :int,limit_time,as_name:str,as_type:str,keyword
             task = do_stt_work.delay(filename=split_url,locale=prob_translang_source)
             pr = Prob_region(assignment_no=new_assignment.assignment_no,region_index=region["index"],start=region["start"],end=region["end"],upload_url=split_url, job_id=task.id)
             db.session.add(pr)
-            db.session.commit()
+    db.session.commit()
     return new_assignment.assignment_no
 def edit_assignment(as_no,limit_time, as_name, as_type, keyword, prob_translang_source, prob_translang_destination, description, speed, original_text, prob_sound_path, prob_split_region, assign_count, open_time, file_name, file_path, user_info, keyword_open):
     # TODO 검증 필요
@@ -142,10 +141,8 @@ def edit_assignment(as_no,limit_time, as_name, as_type, keyword, prob_translang_
             db.session.add(pr)
     # 변경 사항 커밋
     db.session.commit()
-    
-    # TODO: prob_split_region 처리 및 Prob_region 업데이트 로직 추가
-    
-    return "Assignment successfully updated"
+        
+    return assignment_to_edit.assignment_no
 
         
 def split_wav_save(upload_url,start,end):

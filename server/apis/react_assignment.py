@@ -284,7 +284,16 @@ class React_Prob_edit(Resource):
         file_name=args['file_name']
         file_path=args['file_path']
         edit_prob = edit_assignment(as_no,limit_time,as_name,as_type,keyword,prob_translang_source,prob_translang_destination,description,speed,original_text,prob_sound_path,prob_split_region,assign_count,open_time,file_name,file_path,user_info,keyword_open)
-        return 1
+        if edit_prob is None:
+            return jsonify({
+                "msg" : "과제가 없거나, 파일이 존재하지 않습니다.",
+                "isSuccess": False,
+            }), 400
+        return jsonify({
+            "msg" : "success",
+            "isSuccess": True,
+            "edit_prob": edit_prob,
+        }) 
         
 class React_Prob_detail(Resource):
         @jwt_required()

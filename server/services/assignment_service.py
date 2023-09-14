@@ -271,8 +271,10 @@ def get_prob_wav_url(as_no,user_no,lecture_no):
     return stt_result,stt_uuid
 
 def delete_assignment(assignment_no):
-    acc = Assignment.query.filter_by(assignment_no=assignment_no).first()
-    db.session.delete(acc)
+    assignment = Assignment.query.filter_by(assignment_no=assignment_no).first()
+    attendees = Assignment_management.query.filter_by(assignment_no=assignment_no).all()
+    db.session.delete(assignment)
+    db.session.delete(attendees)
     db.session.commit
     
 def get_assignment(as_no:int):

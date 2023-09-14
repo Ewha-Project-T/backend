@@ -293,7 +293,18 @@ class React_Prob_edit(Resource):
             "msg" : "success",
             "isSuccess": True,
             "edit_prob": edit_prob,
-        }) 
+        })
+    @jwt_required()
+    def delete(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('as_no', type=int)
+        args = parser.parse_args()
+        as_no = args['as_no']
+        delete_assignment(as_no)
+        return jsonify({
+            "msg" : "success",
+            "isSuccess": True,
+        })
         
 class React_Prob_detail(Resource):
         @jwt_required()

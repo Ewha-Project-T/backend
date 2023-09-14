@@ -155,9 +155,8 @@ def split_wav_save(upload_url,start,end):
 def split_wav_save2(upload_url,start,end):
     uuid_str=str(uuid.uuid4())
     audio: AudioSegment = AudioSegment.from_file(upload_url)
-    file_extension = os.path.splitext(upload_url)[1]
-    audio[start * 1000:end * 1000].export(f"{os.environ['UPLOAD_PATH']}/{uuid_str}{file_extension}", format=file_extension[1:])
-    return uuid_str+file_extension
+    audio[start * 1000:end * 1000].export(f"{os.environ['UPLOAD_PATH']}/{uuid_str}.mp3", format="mp3")
+    return uuid_str
     # audio[start * 1000:end * 1000].export(f"{os.environ['UPLOAD_PATH']}/{uuid_str}.wav", format="wav")
     # return uuid_str
 

@@ -300,8 +300,7 @@ class prob_upload_file(Resource):
 
         uuid_str=str(uuid.uuid4())
         filename = uuid_str
-        file_extention = os.path.splitext(file.filename)[1].lower()
-        path = f'{os.environ["UPLOAD_PATH"]}/{filename}{file_extention}'
+        path = f'{os.environ["UPLOAD_PATH"]}/{filename}'
         if file and allowed_file(file.filename):
             file.save(path)
         else:

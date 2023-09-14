@@ -6,7 +6,7 @@ from .assignment import Prob, Prob_del, Prob_submit, Prob_feedback,Prob_mod,Prob
 from .admin import Admin,Admin2
 from .stt import Stt, SttJob, SttSeq, SttSeqJob
 from .react_login import Login2,Logout2,CheckToken,Join2
-from .react_assignment import  Feedback2, React_Porb_professor, React_Prob_add2, React_Prob_del,React_Prob_add, React_Prob_detail, React_Prob_edit,React_Prob_mod, React_Prob_student,React_Prob_submit_list,React_Prob_submit, React_Prob_submit_list2,Studentgraphlist,Professorgraphlist
+from .react_assignment import  Feedback2, React_Porb_professor, React_Prob_add2,React_Prob_add, React_Prob_detail, React_Prob_edit, React_Prob_student,React_Prob_submit_list,React_Prob_submit, React_Prob_submit_list2,Studentgraphlist,Professorgraphlist
 from .react_lecture import React_Lecture,React_Lecture_mod_del,React_Student,React_Lecture_add,React_Lecture_mod
 
 
@@ -18,7 +18,7 @@ def load_api(api_module):
     api_module.add_resource(React_Student,'/api/lecture/studentlist',endpoint='react_student')
     api_module.add_resource(React_Lecture_add,'/api/lecture/create',endpoint='react_lecture_add')
     api_module.add_resource(React_Lecture_mod,'/api/lecture/modify',endpoint='react_lecture_mod')
-    api_module.add_resource(React_Prob_del, '/api/prob/delete', endpoint='react_prob_del')
+    
     api_module.add_resource(React_Prob_submit_list,'/api/probsubmit/list',endpoint='react_prob_submit_list')
     api_module.add_resource(React_Prob_submit, '/api/prob/submit', endpoint='react_prob_submit')
     api_module.add_resource(Studentgraphlist,'/api/feedback/studentgraphlist',endpoint='studentGraphlist')
@@ -52,21 +52,22 @@ def load_api(api_module):
     api_module.add_resource(Verify_email,'/verify_email',endpoint='verify_email')
 
     #신규 추가
-    api_module.add_resource(React_Prob_add2, '/api/prob/add', endpoint='react_prob_add2')
+    api_module.add_resource(React_Prob_add2, '/api/prob/add', endpoint='react_prob_add2') #
     api_module.add_resource(React_Prob_edit, '/api/prob/edit', endpoint='react_prob_edit')
     api_module.add_resource(React_Prob_submit_list2, '/api/feedback/manage', endpoint='react_prob_submit_list2')
     api_module.add_resource(Feedback2,'/api/feedback',endpoint='feedback2')
-    api_module.add_resource(React_Prob_detail, '/api/prob/detail', endpoint='react_prob_detail')
-    api_module.add_resource(React_Prob_student, '/api/prob/student', endpoint='react_prob_student')
-    api_module.add_resource(React_Porb_professor, '/api/prob/professor', endpoint='react_prob_professor')
-    api_module.add_resource(prob_upload_file, '/prob_upload_file', endpoint='prob_upload_file')
+    api_module.add_resource(React_Prob_detail, '/api/prob/detail', endpoint='react_prob_detail') #
+    api_module.add_resource(React_Prob_student, '/api/prob/student', endpoint='react_prob_student') #
+    api_module.add_resource(React_Porb_professor, '/api/prob/professor', endpoint='react_prob_professor') #
+    api_module.add_resource(prob_upload_file, '/prob_upload_file', endpoint='prob_upload_file') #
     #옛날건데 사용중인것들
     api_module.add_resource(Login2,'/api/user/login',endpoint='login2') # GET POST PUT PATCH DELETE
     api_module.add_resource(React_Lecture,'/api/lecture/list',endpoint='react_lecture_list')
     api_module.add_resource(Logout2,'/api/user/logout',endpoint='logout2') # GET POST PUT PATCH DELETE
     api_module.add_resource(prob_upload, '/prob_upload', endpoint='prob_upload')
     #추후 삭제 예정
-    api_module.add_resource(React_Prob_mod, '/api/prob/modify', endpoint='react_prob_mod')
+    #api_module.add_resource(React_Prob_mod, '/api/prob/modify', endpoint='react_prob_mod')
     api_module.add_resource(React_Prob_add, '/api/prob/create', endpoint='react_prob_add')
     # api_module.add_resource(Feedback,'/r_feedback',endpoint='r_feedback')
     api_module.add_resource(Login,'/login',endpoint='login') # GET POST PUT PATCH DELETE
+    #api_module.add_resource(React_Prob_del, '/api/prob/delete', endpoint='react_prob_del')

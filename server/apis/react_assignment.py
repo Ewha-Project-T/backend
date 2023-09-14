@@ -94,59 +94,6 @@ class React_Prob_add(Resource):
         make_as(user_info["user_no"],lecture_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,original_text,upload_path,prob_region,user_info,prob_translang_source,prob_translang_destination)
         return{"msg" : "success","probcreateSuccess":1},200
 
-class React_Prob_add2(Resource):
-    @jwt_required()
-    def post(self):
-        parser = reqparse.RequestParser()
-        user_info=get_jwt_identity()
-        parser.add_argument('lecture_no', type=int)
-        parser.add_argument('limit_time', type=str,  required=True, help="limit_time is required")
-        parser.add_argument('as_name', type=str, required=True, help="as_name is required")
-        parser.add_argument('as_type', type=str, required=True, help="as_type is required")
-        parser.add_argument('keyword', type=str)
-        parser.add_argument('prob_translang_source',type=str)
-        parser.add_argument('prob_translang_destination',type=str)
-        parser.add_argument('description', type=str)
-        parser.add_argument('speed', type=float)
-        parser.add_argument('original_text', type=str)
-        parser.add_argument('prob_sound_path', type=str)
-        parser.add_argument('prob_split_region', type=str, action='append') # 음성파일 분할된 구간
-        parser.add_argument('assign_count', type=int)
-        parser.add_argument('keyword_open', type=int)
-        parser.add_argument('open_time', type=str)
-        parser.add_argument('file_name', type=str)
-        parser.add_argument('file_path', type=str)
-        args=parser.parse_args()
-        lecture_no = args['lecture_no']
-        limit_time = args['limit_time']
-        as_name = args['as_name']
-        as_type = args['as_type']
-        keyword = args['keyword']
-        prob_translang_source=args['prob_translang_source']
-        prob_translang_destination=args['prob_translang_destination']
-        description = args['description']
-        speed = args['speed']
-        original_text = args['original_text']
-        prob_sound_path = args['prob_sound_path']
-        prob_split_region=args['prob_split_region']
-        assign_count=args['assign_count']
-        keyword_open=args['keyword_open']
-        open_time=args['open_time']
-        file_name=args['file_name']
-        file_path=args['file_path']
-        
-        new_assignmen_no = create_assignment(lecture_no,limit_time,as_name,as_type,keyword,prob_translang_source,prob_translang_destination,description,speed,original_text,prob_sound_path,prob_split_region,assign_count,open_time,file_name,file_path,user_info,keyword_open)
-        if new_assignmen_no is None:
-            return jsonify({
-                "msg" : "파일이 존재하지 않습니다.",
-                "isSuccess": False,
-            }), 400
-        return jsonify({
-            "msg" : "success",
-            "isSuccess": True,
-            "new_assignmen_no": new_assignmen_no,
-        })
-
 # class React_Prob_del(Resource):
 #     @jwt_required()
 #     def get(self):#과제 삭제
@@ -228,9 +175,9 @@ class React_Prob_add2(Resource):
 #             return{"msg" : "assignment modify success","assignmentmodifySuccess" : 1},200
 #         else:
 #             return{"msg": "access denied"}
-class React_Prob_edit(Resource):
+class React_prob_handle(Resource):
     #TODO: 검증 추가 필요
-    # @jwt_required()
+    @jwt_required()
     def get(self):
         parser = reqparse.RequestParser()
         parser.add_argument('as_no', type=int)
@@ -242,6 +189,57 @@ class React_Prob_edit(Resource):
         return jsonify({
             "assignment": assignment,
             "isSuccess": True,
+        })
+    @jwt_required()
+    def post(self):
+        parser = reqparse.RequestParser()
+        user_info=get_jwt_identity()
+        parser.add_argument('lecture_no', type=int)
+        parser.add_argument('limit_time', type=str,  required=True, help="limit_time is required")
+        parser.add_argument('as_name', type=str, required=True, help="as_name is required")
+        parser.add_argument('as_type', type=str, required=True, help="as_type is required")
+        parser.add_argument('keyword', type=str)
+        parser.add_argument('prob_translang_source',type=str)
+        parser.add_argument('prob_translang_destination',type=str)
+        parser.add_argument('description', type=str)
+        parser.add_argument('speed', type=float)
+        parser.add_argument('original_text', type=str)
+        parser.add_argument('prob_sound_path', type=str)
+        parser.add_argument('prob_split_region', type=str, action='append') # 음성파일 분할된 구간
+        parser.add_argument('assign_count', type=int)
+        parser.add_argument('keyword_open', type=int)
+        parser.add_argument('open_time', type=str)
+        parser.add_argument('file_name', type=str)
+        parser.add_argument('file_path', type=str)
+        args=parser.parse_args()
+        lecture_no = args['lecture_no']
+        limit_time = args['limit_time']
+        as_name = args['as_name']
+        as_type = args['as_type']
+        keyword = args['keyword']
+        prob_translang_source=args['prob_translang_source']
+        prob_translang_destination=args['prob_translang_destination']
+        description = args['description']
+        speed = args['speed']
+        original_text = args['original_text']
+        prob_sound_path = args['prob_sound_path']
+        prob_split_region=args['prob_split_region']
+        assign_count=args['assign_count']
+        keyword_open=args['keyword_open']
+        open_time=args['open_time']
+        file_name=args['file_name']
+        file_path=args['file_path']
+        
+        new_assignmen_no = create_assignment(lecture_no,limit_time,as_name,as_type,keyword,prob_translang_source,prob_translang_destination,description,speed,original_text,prob_sound_path,prob_split_region,assign_count,open_time,file_name,file_path,user_info,keyword_open)
+        if new_assignmen_no is None:
+            return jsonify({
+                "msg" : "파일이 존재하지 않습니다.",
+                "isSuccess": False,
+            }), 400
+        return jsonify({
+            "msg" : "success",
+            "isSuccess": True,
+            "new_assignmen_no": new_assignmen_no,
         })
     @jwt_required()
     def put(self):

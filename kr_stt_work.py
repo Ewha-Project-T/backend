@@ -1,3 +1,5 @@
+#ver_2023.09 (gpt 사용 버전)
+
 from pydub import AudioSegment, silence
 from nltk.tokenize import sent_tokenize
 
@@ -8,22 +10,18 @@ import fugashi
 import json
 import time
 import uuid
+import openai #openai 라이브러리 install 필요
 
 class KorStt:
     def process_stt_result(self,stt):
         result = stt
-        result = re.sub('니다', '니다. ', result)
-        result = re.sub('까요', '까요. ', result)
-        result = result.split()
-        for i in range(len(result)):
-            if result[i] == '음' or result[i] == '그' or result[i] == '어':
-                result[i] = result[i] + "(filler)"
-            if len(result) > 1 and result[i-1][0] == result[i][0] and result[i-1] in result[i]:
-                result[i] = result[i] + "(backtracking)"
-            elif len(result) > 1 and result[i-1][0] == result[i][0] and len(result[i-1]) <= len(result[i]):
-                result[i] = result[i] + "(backtracking)"
+        openai.api_key = "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" # api key
 
-        result = ' '.join(result)
+        response = openai.ChatCompletion.create(
+            model="gpt-4", messages=[{"role": "user", "content": "Mark '(filler)' on the rigth side of hesitating expressions such as '음', '아', or '그' (example: 음(filler)). And put '(cancellation)' on the rigth side of repeating expressions that can be removed, such as '다릅' in '다릅 틀립니다.', '있었' in '있었 있었습니다' or '학회에서' in '경제학회에서 학회에서도'. (example: 있었(cancellation) 있었습니다 .)  /n" + result}]
+        )
+
+        result = response.choices[0].message.content
         return result
 
     def basic_indexing(self,filename):
@@ -99,7 +97,7 @@ class KorStt:
             stt = re.sub("(\(filler\)|\(backtracking\))", "", stt, 1)
 
         for i in range(len(fidx)):
-            if stt[fidx[i][0]] == '음' or stt[fidx[i][0]] == '그' or stt[fidx[i][0]] == '어':
+            if stt[fidx[i][0]] == '음' or stt[fidx[i][0]] == '그' or stt[fidx[i][0]] == '어'or stt[fidx[i][0]] == '아':
                 result['annotations'].append({'start': fidx[i][0], 'end': fidx[i][0] + 1, 'type': 'FILLER'})
             else:
                 result['annotations'].append({'start': fidx[i][0], 'end': fidx[i][1] - 14, 'type': 'BACKTRACKING'})

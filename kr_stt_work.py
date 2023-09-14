@@ -87,14 +87,14 @@ class KorStt:
         return tmp_text, pause_result, delay_result, pause_idx, startidx, endidx
 
     def basic_annotation_stt(self,result,stt,pause_idx):
-        p = re.compile('(\w\(filler\)|\w+\s\w+\(backtracking\))')
+        p = re.compile('(\w\(filler\)|\w+\s\w+\(cancellation\))')
         fidx = []
         while (True):
             f = p.search(stt)
             if f == None:
                 break
             fidx.append([f.start(), f.end()])
-            stt = re.sub("(\(filler\)|\(backtracking\))", "", stt, 1)
+            stt = re.sub("(\(filler\)|\(cancellation\))", "", stt, 1)
 
         for i in range(len(fidx)):
             if stt[fidx[i][0]] == '음' or stt[fidx[i][0]] == '그' or stt[fidx[i][0]] == '어'or stt[fidx[i][0]] == '아':

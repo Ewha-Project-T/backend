@@ -158,7 +158,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetail'
-  /api/prob/add:
+  /api/prob/handle:
     post:
       tags:
         - prob

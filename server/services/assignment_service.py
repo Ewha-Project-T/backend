@@ -79,10 +79,10 @@ def create_assignment(lecture_no :int,limit_time,as_name:str,as_type:str,keyword
             #json region을 dict로 변환
             region = region.replace("'",'"')
             region = json.loads(region)
-            split_url=split_wav_save2(prob_sound_path,int(region["start"]),int(region["end"]))
+            split_url=split_wav_save2(prob_sound_path,float(region["start"]),float(region["end"]))
             mapping_sst_user(new_assignment.assignment_no, split_url,user_info)
             task = do_stt_work.delay(filename=split_url,locale=prob_translang_source)
-            pr = Prob_region(assignment_no=new_assignment.assignment_no,region_index=region["index"],start=region["start"],end=region["end"],upload_url=split_url, job_id=task.id)
+            pr = Prob_region(assignment_no=new_assignment.assignment_no,region_index=region["index"],start=region["start"][:9],end=region["end"][:9],upload_url=split_url, job_id=task.id)
             db.session.add(pr)
     db.session.commit()
     return new_assignment.assignment_no
@@ -94,7 +94,7 @@ def edit_assignment(as_no,limit_time, as_name, as_type, keyword, prob_translang_
         return None
 
     # 과제 검색 및 편집
-    assignment_to_edit = Assignment.query.filter_by(as_no = as_no).first()
+    assignment_to_edit = Assignment.query.filter_by(assignment_no = as_no).first()
     if not assignment_to_edit:
         return None
 
@@ -285,8 +285,8 @@ def get_assignment(as_no:int):
     audio_region_list = [
         {
             "region_index": int(att.region_index),
-            "start": int(att.start),
-            "end": int(att.end),
+            "start": float(att.start),
+            "end": float(att.end),
             "upload_url": att.upload_url,
         }
         for att in audio_region

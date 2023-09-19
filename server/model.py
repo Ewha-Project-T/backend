@@ -22,6 +22,7 @@ class User(db.Model):
     access_check_admin = db.Column(db.Integer, default=0)
     access_code= db.Column(db.String(150),nullable=True)
     access_code_time=db.Column(db.DateTime, onupdate=datetime.utcnow()+timedelta(hours=9))#테이블 삭제시 오류날수도
+    #user_identifier= db.Column(db.String(255),nullable=False)
 
     assignment= db.relationship("Assignment",back_populates="user",cascade="all, delete",passive_deletes=True,)
     attendee= db.relationship("Attendee",back_populates="user",cascade="all, delete",passive_deletes=True,)

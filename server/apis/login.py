@@ -141,7 +141,3 @@ class LoginRefresh(Resource):#리프래쉬 토큰
         res=make_response(redirect(host_url+url_for('lecture')))
         set_access_cookies(res,new_access_token)
         return res
-
-
-
-      

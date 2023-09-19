@@ -136,4 +136,20 @@ class Join2(Resource):
             return jsonify({ "registerSuccess" : 0,"msg":msg})
 	
 
-      
+class FindPassword(Resource):
+    def get(self):
+        return jsonify({"msg":"findpassword page"})
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('email', type=str, help="Email is required")
+        parser.add_argument('name', type=str, help="name is required")
+        parser.add_argument('major', type=str, help="major id is required")
+
+        args = parser.parse_args()
+        user_email = args['email']
+        user_name=args['name']
+        user_major= args['major']
+
+        #findpassword_send_email(user_email,user_name,user_major)
+        msg="email send success"
+        return jsonify({ "Success" : 0,"msg":msg})

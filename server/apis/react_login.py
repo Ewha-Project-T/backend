@@ -59,18 +59,21 @@ class CheckToken(Resource):
     @jwt_required()
     def get(self):
         current_user = get_jwt_identity()
+        print(current_user)
         if(current_user==None):
             return {"isAuth": 0},400
         if(current_user["user_perm"]==0):
             return {   "email": current_user["user_email"],
                        "name": current_user["user_name"],
                        "role": current_user["user_perm"],
+                       "user_no": current_user["user_no"],
                        "isAuth": 1,
                        "isAdmin": 1},200
         else:
             return {   "email": current_user["user_email"],
                        "name": current_user["user_name"],
                        "role": current_user["user_perm"],
+                       "user_no": current_user["user_no"],
                        "isAuth": 1,
                        "isAdmin": 0},200
                     

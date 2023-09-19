@@ -325,6 +325,7 @@ class React_Prob_detail(Resource):
                     "file_path" : res["file_path"],
                     "file_name" : res["file_name"],
                     "as_name" : res["as_name"],
+                    "as_type" : res["as_type"],
                 })
 
 class React_Prob_submit_list(Resource):

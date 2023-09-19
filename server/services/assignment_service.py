@@ -273,8 +273,10 @@ def delete_assignment(assignment_no):
     #TODO 검증 필요
     assignment = Assignment.query.filter_by(assignment_no=assignment_no).first()
     attendees = Assignment_management.query.filter_by(assignment_no=assignment_no).all()
-    db.session.delete(assignment)
-    db.session.delete(attendees)
+    if assignment:
+        db.session.delete(assignment)
+    for attendee in attendees:
+        db.session.delete(attendee)
     db.session.commit
     
 def get_assignment(as_no:int):

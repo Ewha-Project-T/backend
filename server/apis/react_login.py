@@ -102,6 +102,7 @@ class Join2(Resource):
         parser.add_argument('name', type=str, help="name is required")
         parser.add_argument('major', type=str, help="major id is required")
         parser.add_argument('perm', type=str, help="Permission is required")
+        #parser.add_argument('ident', type=str, help="identify is required")
 
         args = parser.parse_args()
         user_email = args['email']
@@ -109,13 +110,14 @@ class Join2(Resource):
         user_pw2 = args['pw2'] 
         user_name=args['name']
         user_major= args['major']
+        #user_ident=args['ident']
         if args['perm'] not in perm_list:
             user_perm=1
         else:
             user_perm=perm_list[args['perm']]
 
         if re.match("^[A-Za-z0-9]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[A-Za-z0-9])*\.[A-Za-z]{2,3}$", user_email):
-            result=register(user_email,user_pw,user_name,user_major, user_perm)
+            result=register(user_email,user_pw,user_name,user_major, user_perm)#,user_ident)
             if(result==RegisterResult.SUCCESS):
                 msg="register success"
                 return jsonify({ "registerSuccess" : 1,"msg":msg})

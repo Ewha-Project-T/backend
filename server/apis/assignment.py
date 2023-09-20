@@ -308,6 +308,6 @@ class prob_upload_file(Resource):
             return {"msg":"file upload fail"},400
         res = {
             "file_path": path, #추후 파일명에대한 해쉬처리 필요
-            "file_name": file.filename+file_extention
+            "file_name": file.filename
         }
         return jsonify(res)

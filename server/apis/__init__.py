@@ -14,10 +14,8 @@ from .react_lecture import React_Lecture,React_Lecture_mod_del,React_Student,Rea
 def load_api(api_module):
     api_module.add_resource(Join2,'/api/user/join',endpoint='join2') # GET POST PUT PATCH DELETE
     api_module.add_resource(CheckToken,'/api/user/auth',endpoint='checkToken') 
-    api_module.add_resource(React_Lecture_mod_del,'/api/lecture/delete',endpoint='react_lecture_delete')
     api_module.add_resource(React_Student,'/api/lecture/studentlist',endpoint='react_student')
-    api_module.add_resource(React_Lecture_add,'/api/lecture/create',endpoint='react_lecture_add')
-    api_module.add_resource(React_Lecture_mod,'/api/lecture/modify',endpoint='react_lecture_mod')
+
     
     api_module.add_resource(React_Prob_submit_list,'/api/probsubmit/list',endpoint='react_prob_submit_list')
     api_module.add_resource(React_Prob_submit, '/api/prob/submit', endpoint='react_prob_submit')
@@ -70,3 +68,6 @@ def load_api(api_module):
     # api_module.add_resource(Feedback,'/r_feedback',endpoint='r_feedback')
     api_module.add_resource(Login,'/login',endpoint='login') # GET POST PUT PATCH DELETE
     #api_module.add_resource(React_Prob_del, '/api/prob/delete', endpoint='react_prob_del')
+    api_module.add_resource(React_Lecture_add,'/api/lecture/create',endpoint='react_lecture_add')
+    api_module.add_resource(React_Lecture_mod,'/api/lecture/modify',endpoint='react_lecture_mod')
+    api_module.add_resource(React_Lecture_mod_del,'/api/lecture/delete',endpoint='react_lecture_delete')

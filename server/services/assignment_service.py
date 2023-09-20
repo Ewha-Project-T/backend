@@ -336,6 +336,27 @@ def assignment_detail(as_no:int, user_no:int):
         res["keyword"] = "(비공개)"
     return res
 
+def assignment_detail_record(as_no:int, user_no:int):
+    assignment = Assignment.query.filter_by(assignment_no = as_no).first()
+    if assignment == None:
+        return {"message" : "과제가 존재하지 않습니다."}
+    attendee = Attendee.query.filter_by(user_no = user_no, lecture_no = assignment.lecture_no).first()
+    if attendee == None:
+        return {"message" : "수강생이 아닙니다."}
+    assignment_management = Assignment_management.query.filter_by(assignment_no = as_no, attendee_no = attendee.attendee_no).first()
+    if assignment.assign_count + assignment_management.chance_count <= assignment_management.submission_count:
+        return {"message" : "제출 횟수를 초과하였습니다."}
+
+    audio_region = Prob_region.query.filter_by(assignment_no=as_no).all()
+    audio_region_list = [att.upload_url + ".mp3" for att in audio_region]
+    res = dict()
+    res["keyword"] = assignment.keyword
+    res["assignment_audios"] = audio_region_list
+    assignment_management.submission_count += 1
+    db.session.commit()
+
+    return res
+
 def get_as_name(as_no):
     acc=Assignment.query.filter_by(assignment_no=as_no).first()
     return acc.as_name

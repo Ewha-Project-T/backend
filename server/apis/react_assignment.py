@@ -320,7 +320,7 @@ class React_Prob_detail(Resource):
                 }), 400
             return jsonify(res)
         
-class React_Prob_simultaneous(Resource):
+class React_Prob_record(Resource):
     @jwt_required()
     def get(self):
         user_info=get_jwt_identity()

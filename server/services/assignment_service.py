@@ -342,7 +342,7 @@ def assignment_detail_record(as_no:int, user_no:int):
         return {"message" : "과제가 존재하지 않습니다."}
     if assignment.open_time > datetime.utcnow()+timedelta(hours=9):
         return {"message" : "아직 과제가 공개되지 않았습니다."}
-    if assignment.end_submission < datetime.utcnow()+timedelta(hours=9):
+    if assignment.limit_time < datetime.utcnow()+timedelta(hours=9):
         return {"message" : "제출 기간이 지났습니다."}
     attendee = Attendee.query.filter_by(user_no = user_no, lecture_no = assignment.lecture_no).first()
     if attendee == None:
@@ -375,7 +375,7 @@ def assignment_record(as_no:int, user_no:int, prob_submits:list):
         return {"message" : "과제가 존재하지 않습니다."}
     if assignment.open_time > datetime.utcnow()+timedelta(hours=9):
         return {"message" : "아직 과제가 공개되지 않았습니다."}
-    if assignment.end_submission < datetime.utcnow()+timedelta(hours=9):
+    if assignment.limit_time < datetime.utcnow()+timedelta(hours=9):
         return {"message" : "제출 기간이 지났습니다."}
     attendee = Attendee.query.filter_by(user_no = user_no, lecture_no = assignment.lecture_no).first()
     if attendee == None:
@@ -400,7 +400,7 @@ def assignment_end_submission(as_no:int, user_no:int):
         return {"message" : "과제가 존재하지 않습니다."}
     if assignment.open_time > datetime.utcnow()+timedelta(hours=9):
         return {"message" : "아직 과제가 공개되지 않았습니다."}
-    if assignment.end_submission < datetime.utcnow()+timedelta(hours=9):
+    if assignment.limit_time < datetime.utcnow()+timedelta(hours=9):
         return {"message" : "제출 기간이 지났습니다."}
     attendee = Attendee.query.filter_by(user_no = user_no, lecture_no = assignment.lecture_no).first()
     if attendee == None:

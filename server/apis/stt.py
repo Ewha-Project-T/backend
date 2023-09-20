@@ -77,16 +77,16 @@ class Stt(Resource):
     @jwt_required()
     def put(self):
         file = str(uuid.uuid4())
-        filename = f"{file}.wav"
+        filename = f"{file}.mp3"
         parser = reqparse.RequestParser(argument_class=APIArgument, bundle_errors=True)
         parser.add_argument('assignment', type=int, required=True, help="assignment is required")
-        parser.add_argument("wav", type=werkzeug.datastructures.FileStorage, location="files", required=True, help="wav is required")
+        parser.add_argument("mp3", type=werkzeug.datastructures.FileStorage, location="files", required=True, help="mp3 is required")
         
         args = parser.parse_args()
         assignment = args['assignment']
-        wav = args['wav']
+        mp3 = args['mp3']
         
-        wav.save(f"{os.environ['UPLOAD_PATH']}/{filename}")
+        mp3.save(f"{os.environ['UPLOAD_PATH']}/{filename}")
         user_info=get_jwt_identity()
         mapping_sst_user(assignment, file,user_info)
         return jsonify(file=file)

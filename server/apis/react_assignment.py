@@ -318,20 +318,7 @@ class React_Prob_detail(Resource):
                     "msg" : "수강하지 않은 학생입니다.",
                     "isSuccess": False,
                 }), 400
-            return jsonify({   
-                    "keyword" : res["keyword"],
-                    "detail" : res["detail"],
-                    "limit_time" : res["limit_time"],
-                    "assign_count" : res["assign_count"],
-                    "my_count" : res["my_count"],
-                    "feedback" : res["feedback"],
-                    "end_submission": res["end_submission"],
-                    "open_time" : res["open_time"],
-                    "file_path" : res["file_path"],
-                    "file_name" : res["file_name"],
-                    "as_name" : res["as_name"],
-                    "as_type" : res["as_type"],
-                })
+            return jsonify(res)
 
 class React_Prob_submit_list(Resource):
         @jwt_required()

@@ -328,7 +328,7 @@ def assignment_detail(as_no:int, user_no:int):
         return None
     res["feedback"] = assignment_management.review_open
     res["end_submission"] = assignment_management.end_submission
-    res["my_count"] = assignment_management.submit_cnt
+    res["my_count"] = assignment_management.submission_count
     res["chance_count"] = assignment_management.chance_count
     if not assignment.keyword_open and attendee.permission == 3:
         res["keyword"] = "(비공개)\n" + res["keyword"]

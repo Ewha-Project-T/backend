@@ -329,7 +329,8 @@ class React_Prob_record(Resource):
         args = parser.parse_args()
         as_no = args['as_no']
         res = assignment_detail_record(as_no, user_info["user_no"])
-        if not res.get("audio_regions") :
+
+        if not res.get("audio_regions_url") :
             return jsonify(res), 401
         return jsonify(res)
     @jwt_required()
@@ -346,7 +347,7 @@ class React_Prob_record(Resource):
             return jsonify(res), 401
         return jsonify(res)
     
-def React_Prob_end_submission(Resource):
+class React_Prob_end_submission(Resource):
     @jwt_required()
     def put(self):
         user_info=get_jwt_identity()

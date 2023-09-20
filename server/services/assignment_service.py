@@ -352,18 +352,18 @@ def assignment_detail_record(as_no:int, user_no:int):
         return {"message" : "제출 횟수를 초과하였습니다."}
 
     audio_region = Prob_region.query.filter_by(assignment_no=as_no).all()
-    audio_regions = [
+    audio_regions_url = [
         {
             "id": int(att.region_index),
             "start": float(att.start),
             "end": float(att.end),
-            "upload_url": att.upload_url,
+            "upload_url": str(att.upload_url),
         }
         for att in audio_region
     ]
     res = dict()
     res["keyword"] = assignment.keyword
-    res["audio_regions"] = audio_regions
+    res["audio_regions_url"] = audio_regions_url
     assignment_management.submission_count += 1
     db.session.commit()
 

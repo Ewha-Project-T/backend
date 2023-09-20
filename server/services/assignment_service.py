@@ -340,6 +340,10 @@ def assignment_detail_record(as_no:int, user_no:int):
     assignment = Assignment.query.filter_by(assignment_no = as_no).first()
     if assignment == None:
         return {"message" : "과제가 존재하지 않습니다."}
+    if assignment.open_time > datetime.utcnow()+timedelta(hours=9):
+        return {"message" : "아직 과제가 공개되지 않았습니다."}
+    if assignment.end_submission < datetime.utcnow()+timedelta(hours=9):
+        return {"message" : "제출 기간이 지났습니다."}
     attendee = Attendee.query.filter_by(user_no = user_no, lecture_no = assignment.lecture_no).first()
     if attendee == None:
         return {"message" : "수강생이 아닙니다."}
@@ -348,14 +352,48 @@ def assignment_detail_record(as_no:int, user_no:int):
         return {"message" : "제출 횟수를 초과하였습니다."}
 
     audio_region = Prob_region.query.filter_by(assignment_no=as_no).all()
-    audio_region_list = [att.upload_url + ".mp3" for att in audio_region]
+    audio_regions = [
+        {
+            "id": int(att.region_index),
+            "start": float(att.start),
+            "end": float(att.end),
+            "upload_url": att.upload_url,
+        }
+        for att in audio_region
+    ]
     res = dict()
     res["keyword"] = assignment.keyword
-    res["assignment_audios"] = audio_region_list
+    res["audio_regions"] = audio_regions
     assignment_management.submission_count += 1
     db.session.commit()
 
     return res
+
+def assignment_record(as_no:int, user_no:int, prob_submits:list):
+    assignment = Assignment.query.filter_by(assignment_no = as_no).first()
+    if assignment == None:
+        return {"message" : "과제가 존재하지 않습니다."}
+    if assignment.open_time > datetime.utcnow()+timedelta(hours=9):
+        return {"message" : "아직 과제가 공개되지 않았습니다."}
+    if assignment.end_submission < datetime.utcnow()+timedelta(hours=9):
+        return {"message" : "제출 기간이 지났습니다."}
+    attendee = Attendee.query.filter_by(user_no = user_no, lecture_no = assignment.lecture_no).first()
+    if attendee == None:
+        return {"message" : "수강생이 아닙니다."}
+    assignment_management = Assignment_management.query.filter_by(assignment_no = as_no, attendee_no = attendee.attendee_no).first()
+    if assignment.assign_count + assignment_management.chance_count <= assignment_management.submission_count:
+        return {"message" : "제출 횟수를 초과하였습니다."}
+    
+    assignment_check = Assignment_check(assignment_no = as_no, attendee_no = attendee.attendee_no, submit_time = datetime.utcnow()+timedelta(hours=9))
+    db.session.add(assignment_check)
+
+    for prob_submit in prob_submits:
+        assignment_check_list = Assignment_check_list(check_no = assignment_check.check_no, acl_uuid = prob_submit)
+        db.session.add(assignment_check_list)
+    db.session.commit()
+    return {"message" : "제출 완료",
+            "submission_count" : assignment_management.submission_count
+            }
 
 def get_as_name(as_no):
     acc=Assignment.query.filter_by(assignment_no=as_no).first()

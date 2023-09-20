@@ -284,7 +284,7 @@ def get_assignment(as_no:int):
     audio_region = Prob_region.query.filter_by(assignment_no=as_no).all()
     audio_region_list = [
         {
-            "region_index": int(att.region_index),
+            "index": int(att.region_index),
             "start": float(att.start),
             "end": float(att.end),
             "upload_url": att.upload_url,

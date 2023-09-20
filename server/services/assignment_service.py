@@ -322,16 +322,14 @@ def  check_assignment(as_no,lecture_no,uuid,user_info,text=""):
 def assignment_detail(as_no:int, user_no:int):
     assignment = Assignment.query.filter_by(assignment_no = as_no).first()
     attendee = Attendee.query.filter_by(user_no = user_no, lecture_no = assignment.lecture_no).first()
-    assignment_check = Assignment_check.query.filter_by(assignment_no = as_no, attendee_no = attendee.attendee_no).order_by(Assignment_check.check_no.desc()).first()
+    assignment_management = Assignment_management.query.filter_by(assignment_no = as_no, attendee_no = attendee.attendee_no).first()
     res = {"keyword" : assignment.keyword, "detail" : assignment.description, "limit_time" : assignment.limit_time, "assign_count" : assignment.assign_count, "open_time" : assignment.open_time, "file_name":assignment.file_name, "file_path":assignment.file_path, "as_name":assignment.as_name, "as_type":assignment.as_type}
-    if(assignment_check != None):
-        res["feedback"] = assignment_check.professor_review
-        res["end_submission"] = assignment_check.end_submission
-        res["my_count"] = assignment_check.submit_cnt
-    else:
-        res["feedback"] = False
-        res["end_submission"] = False
-        res["my_count"] = None
+    if assignment_management == None:
+        return None
+    res["feedback"] = assignment_management.review_open
+    res["end_submission"] = assignment_management.end_submission
+    res["my_count"] = assignment_management.submit_cnt
+    res["chance_count"] = assignment_management.chance_count
     if not assignment.keyword_open and attendee.permission == 3:
         res["keyword"] = "(비공개)\n" + res["keyword"]
     elif not assignment.keyword_open and attendee.permission != 3:

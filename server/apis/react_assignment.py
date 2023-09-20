@@ -313,6 +313,11 @@ class React_Prob_detail(Resource):
             args = parser.parse_args()
             as_no = args['as_no']
             res = assignment_detail(as_no, user_info["user_no"])
+            if res is None:
+                return jsonify({
+                    "msg" : "수강하지 않은 학생입니다.",
+                    "isSuccess": False,
+                }), 400
             return jsonify({   
                     "keyword" : res["keyword"],
                     "detail" : res["detail"],

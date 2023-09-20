@@ -394,6 +394,36 @@ def assignment_record(as_no:int, user_no:int, prob_submits:list):
     return {"message" : "제출 완료",
             "submission_count" : assignment_management.submission_count
             }
+def assignment_end_submission(as_no:int, user_no:int):
+    assignment = Assignment.query.filter_by(assignment_no = as_no).first()
+    if assignment == None:
+        return {"message" : "과제가 존재하지 않습니다."}
+    if assignment.open_time > datetime.utcnow()+timedelta(hours=9):
+        return {"message" : "아직 과제가 공개되지 않았습니다."}
+    if assignment.end_submission < datetime.utcnow()+timedelta(hours=9):
+        return {"message" : "제출 기간이 지났습니다."}
+    attendee = Attendee.query.filter_by(user_no = user_no, lecture_no = assignment.lecture_no).first()
+    if attendee == None:
+        return {"message" : "수강생이 아닙니다."}
+    assignment_check = Assignment_check.query.filter_by(assignment_no = as_no, attendee_no = attendee.attendee_no).order_by(Assignment_check.check_no.desc()).first()
+    if assignment_check == None:
+        return {"message" : "제출하지 않았습니다."}
+    assignment_management = Assignment_management.query.filter_by(assignment_no = as_no, attendee_no = attendee.attendee_no).first()
+    if assignment_management.end_submission is True:
+        return {"message" : "이미 최종 제출하였습니다."}
+    assignment_management.end_submission = True
+    assignment_management.end_submission_time = assignment_check.submit_time
+    db.session.commit()
+
+    # do_stt_work
+    assignment_check_list = Assignment_check_list.query.filter_by(check_no = assignment_check.check_no).all()
+    for assignment_check_list_one in assignment_check_list:
+        # mapping_sst_user(acc.assignment_no, split_url,user_info)
+        mapping_sst_user(assignment_check_list_one.assignment_no, assignment_check_list_one.acl_uuid, {"user_no" : user_no})
+        do_stt_work.delay(filename = assignment_check_list_one.acl_uuid, locale = assignment.translang)
+    return {"message" : "최종 제출 완료",
+            "submission_count" : assignment_management.submission_count
+            }
 
 def get_as_name(as_no):
     acc=Assignment.query.filter_by(assignment_no=as_no).first()

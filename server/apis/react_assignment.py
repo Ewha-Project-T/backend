@@ -7,7 +7,7 @@ from flask_jwt_extended import (
     jwt_required, get_jwt_identity, create_access_token, get_jwt
 )
 import re
-from ..services.assignment_service import assignment_detail, assignment_detail_record, assignment_record, edit_assignment, get_assignment, get_assignments_manage,mod_assignment_listing,check_assignment,make_as, create_assignment,prob_list_professor, prob_list_student, mod_as,delete_assignment,get_as_name,get_prob_wav_url,get_wav_url,get_stt_result,get_original_stt_result,get_as_info,get_feedback,make_json_url,get_json_feedback,save_json_feedback,get_prob_submit_list,get_studentgraph,get_professorgraph
+from ..services.assignment_service import assignment_detail, assignment_detail_record, assignment_end_submission, assignment_record, edit_assignment, get_assignment, get_assignments_manage,mod_assignment_listing,check_assignment,make_as, create_assignment,prob_list_professor, prob_list_student, mod_as,delete_assignment,get_as_name,get_prob_wav_url,get_wav_url,get_stt_result,get_original_stt_result,get_as_info,get_feedback,make_json_url,get_json_feedback,save_json_feedback,get_prob_submit_list,get_studentgraph,get_professorgraph
 from ..services.lecture_service import lecture_access_check
 from ..services.login_service import admin_required, professor_required, assistant_required
 from werkzeug.utils import secure_filename
@@ -342,6 +342,19 @@ class React_Prob_record(Resource):
         as_no = args['as_no']
         prob_submit_list = args['prob_submit_list']
         res = assignment_record(as_no, user_info["user_no"], prob_submit_list)
+        if not res.get("submission_count") :
+            return jsonify(res), 401
+        return jsonify(res)
+    
+def React_Prob_end_submission(Resource):
+    @jwt_required()
+    def put(self):
+        user_info=get_jwt_identity()
+        parser = reqparse.RequestParser()
+        parser.add_argument('as_no', type=int)
+        args = parser.parse_args()
+        as_no = args['as_no']
+        res = assignment_end_submission(as_no, user_info["user_no"])
         if not res.get("submission_count") :
             return jsonify(res), 401
         return jsonify(res)

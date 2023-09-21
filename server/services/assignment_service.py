@@ -363,6 +363,7 @@ def assignment_detail_record(as_no:int, user_no:int):
     ]
     res = dict()
     res["keyword"] = assignment.keyword
+    res["as_name"] = assignment.as_name
     res["audio_regions_url"] = audio_regions_url
     assignment_management.submission_count += 1
     db.session.commit()

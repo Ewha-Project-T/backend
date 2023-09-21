@@ -5,7 +5,10 @@ from flask_jwt_extended import (
 )
 import re
 from ..services.login_service import (
-    login, register, LoginResult, RegisterResult, create_tokens, admin_required, professor_required, assistant_required,real_time_email_check
+    login, register, LoginResult, RegisterResult, create_tokens, admin_required, professor_required, assistant_required,real_time_email_check,findpassword_email_check
+)
+from ..services.mail_service import (
+    gen_verify_email_code,get_access_code,access_check_success,signup_email_validate
 )
 
 from os import environ as env
@@ -152,6 +155,14 @@ class FindPassword(Resource):
         user_name=args['name']
         user_major= args['major']
 
-        #findpassword_send_email(user_email,user_name,user_major)
-        msg="email send success"
-        return jsonify({ "Success" : 0,"msg":msg})
+        if(findpassword_email_check(user_email,user_name,user_major)):
+            signup_email_validate(user_email,gen_verify_email_code(user_email),"")#email, code, func->url/[func]
+
+            msg="email send success"
+            return jsonify({ "Success" : 1,"msg":msg})
+        msg="invalid email"
+        return jsonify({"success": 0, "msg":msg})
+    
+class FindPassword_Check(Resource):
+    def get(self):
+        return jsonify({"msg":"findpassword page"})

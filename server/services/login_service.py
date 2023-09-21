@@ -127,3 +127,9 @@ def assistant_required():#조교권한
 
     return wrapper
 
+def findpassword_email_check(user_email,user_name,user_major):
+    acc = User.query.filter_by(email=user_email,name=user_name,major=user_major).first()
+    if acc ==None:
+        return 0
+    return 1
+

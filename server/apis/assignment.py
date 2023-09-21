@@ -255,34 +255,60 @@ class Prob_submit_list(Resource):
 
 
 
-ALLOWED_SOUND_EXTENSIONS = {'wav','mp3','mp4'}
+ALLOWED_SOUND_EXTENSIONS = {'mp3'}
 def allowed_sound_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_SOUND_EXTENSIONS
 
+# class prob_upload(Resource):
+#     @jwt_required()
+#     def post(self):
+#         parser = reqparse.RequestParser()      
+#         parser.add_argument('prob_sound', type=FileStorage, location='files')        
+#         args = parser.parse_args()        
+#         file= args['prob_sound']
+
+#         uuid_str=str(uuid.uuid4())
+#         filename = uuid_str
+#         file_extention = os.path.splitext(file.filename)[1].lower()
+#         path = f'{os.environ["UPLOAD_PATH"]}/{filename}{file_extention}'
+#         if file and allowed_sound_file(file.filename):
+#             if(not is_mp3(file)):
+#                 return {"msg":"mp3 file upload fail"},400
+#             file.save(path)
+#         else :
+#             return {"msg":"mp3 file upload fail"},400
+#         res = {
+#             "file_path": path, #추후 파일명에대한 해쉬처리 필요
+#         }
+#         return jsonify(res)
+
 class prob_upload(Resource):
+
+    parser = reqparse.RequestParser()
+    parser.add_argument('prob_sound', type=FileStorage, location='files')
+
     @jwt_required()
     def post(self):
-        parser = reqparse.RequestParser()      
-        parser.add_argument('prob_sound', type=FileStorage, location='files')        
-        args = parser.parse_args()        
-        file= args['prob_sound']
+        args = self.parser.parse_args()        
+        file = args['prob_sound']
 
-        uuid_str=str(uuid.uuid4())
-        filename = uuid_str
-        file_extention = os.path.splitext(file.filename)[1].lower()
-        path = f'{os.environ["UPLOAD_PATH"]}/{filename}{file_extention}'
-        if file and allowed_sound_file(file.filename):
-            #filename = secure_filename(file.filename)
-            # file.save('./static/audio/{0}'.format(filename))
-            file.save(path)
-        
-        # task = do_stt_work.delay(filename)
-        res = {
-            "file_path": path, #추후 파일명에대한 해쉬처리 필요
-            # "job": task.id
-        }
-        return jsonify(res)
+        if not file or not allowed_sound_file(file.filename) or not self.is_mp3(file):
+            return {"msg": "mp3 file upload fail"}, 400
+
+        filename = str(uuid.uuid4())
+        path = f'{os.environ["UPLOAD_PATH"]}/{filename}.mp3'
+        file.save(path)
+        return jsonify({
+            "file_path": path  # 추후 파일명에 대한 해쉬처리 필요
+        })
+
+    @staticmethod
+    def is_mp3(f):
+        """Check if the file has an MP3 signature."""
+        f.seek(0)  # Ensure we're reading from the beginning
+        header = f.read(3)
+        return header == b'ID3' or header[:2] == b'\xff\xfb'
 
 ALLOWED_EXTENSIONS = {'hwp','pdf','docx','doc','ppt','pptx','xls','xlsx','txt'}
 def allowed_file(filename):

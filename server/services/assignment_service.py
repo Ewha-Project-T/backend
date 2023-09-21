@@ -20,8 +20,8 @@ def prob_list_student(lecture_no:int,user_no:int):
     assignments = Assignment.query.filter(Assignment.lecture_no == lecture_no).filter(Assignment.open_time <= datetime.utcnow()+timedelta(hours=9)).all()
     res = []
     for assignment in assignments:
-        assignment_check = Assignment_check.query.filter_by(assignment_no = assignment.assignment_no, attendee_no = attendee.attendee_no).order_by(Assignment_check.check_no.desc()).first()
-        res.append({'as_no': assignment.assignment_no, 'as_name': assignment.as_name, "limit_time": assignment.limit_time, "end_submission": assignment_check.end_submission if assignment_check != None else None, "professor_review" : "나중에 공개 여부로 수정" if assignment_check != None else None})
+        assignment_management = Assignment_management.query.filter_by(assignment_no = assignment.assignment_no, attendee_no = attendee.attendee_no).first()
+        res.append({'as_no': assignment.assignment_no, 'as_name': assignment.as_name, "limit_time": assignment.limit_time, "end_submission": assignment_management.end_submission, "professor_review" : assignment_management.review})
     db.session.remove()
     return res
 

@@ -16,17 +16,15 @@ def load_api(api_module):
     api_module.add_resource(CheckToken,'/api/user/auth',endpoint='checkToken') 
     api_module.add_resource(React_Student,'/api/lecture/studentlist',endpoint='react_student')
 
-    
     api_module.add_resource(React_Prob_submit_list,'/api/probsubmit/list',endpoint='react_prob_submit_list')
-    api_module.add_resource(React_Prob_submit, '/api/prob/submit', endpoint='react_prob_submit')
+    
     api_module.add_resource(Studentgraphlist,'/api/feedback/studentgraphlist',endpoint='studentGraphlist')
     api_module.add_resource(Professorgraphlist,'/api/feedback/professorgraphlist',endpoint='professorgraphlist')
-    
     
     api_module.add_resource(LoginRefresh,'/login-refresh',endpoint='login_refresh') 
     api_module.add_resource(Lecture,'/lecture',endpoint='lecture')
     api_module.add_resource(Admin,'/admin',endpoint='admin')
-    api_module.add_resource(Stt, '/stt',endpoint='stt')
+    
     api_module.add_resource(SttJob, '/stt/<jobid>',endpoint='stt_job')
     api_module.add_resource(SttSeq, '/stt/seq', endpoint='stt_seq')
     api_module.add_resource(SttSeqJob, '/stt/seq/<jobid>', endpoint='stt_seq_job')
@@ -59,11 +57,14 @@ def load_api(api_module):
     api_module.add_resource(prob_upload_file, '/prob_upload_file', endpoint='prob_upload_file') #
     api_module.add_resource(React_Prob_record, '/api/prob/record', endpoint='react_Prob_record') #
     api_module.add_resource(React_Prob_end_submission, '/api/prob/end', endpoint='React_Prob_end_submission') #
+
+    api_module.add_resource(React_Prob_submit, '/api/prob/submit', endpoint='react_prob_submit')
     #옛날건데 사용중인것들
     api_module.add_resource(Login2,'/api/user/login',endpoint='login2') # GET POST PUT PATCH DELETE
     api_module.add_resource(React_Lecture,'/api/lecture/list',endpoint='react_lecture_list')
     api_module.add_resource(Logout2,'/api/user/logout',endpoint='logout2') # GET POST PUT PATCH DELETE
     api_module.add_resource(prob_upload, '/prob_upload', endpoint='prob_upload')
+    api_module.add_resource(Stt, '/stt',endpoint='stt')
     #추후 삭제 예정
     #api_module.add_resource(React_Prob_mod, '/api/prob/modify', endpoint='react_prob_mod')
     api_module.add_resource(React_Prob_add, '/api/prob/create', endpoint='react_prob_add')

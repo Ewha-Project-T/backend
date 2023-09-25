@@ -1,4 +1,5 @@
 import json
+from server import db
 from .assignment_service import get_prob_wav_url, get_stt_result, make_json_url, parse_data
 from ..model import Assignment_check, Assignment_check_list, Attendee, Assignment, Assignment_management, Prob_region, User
 
@@ -31,6 +32,27 @@ def get_json_textae(as_no,user_no):
         url=make_json_url(check.ae_text,check.ae_denotations, check.ae_attributes, check,0)
     return url, assignment_management.review#json, 교수평가
 
+def put_json_textae(as_no,user_no,ae_denotations,ae_attributes):
+    assignment = Assignment.query.filter_by(assignment_no=as_no).first()
+    if not assignment:
+        return "과제가 존재하지 않습니다.", False
+    attend=Attendee.query.filter_by(user_no=user_no,lecture_no=assignment.lecture_no).first()
+    if not attend:
+        return "수강생이 아닙니다.", False
+    check=Assignment_check.query.filter_by(assignment_no=as_no,attendee_no=attend.attendee_no,assignment_check=1).order_by(Assignment_check.check_no.desc()).first()
+    if not check:
+        return "과제를 제출하지 않았습니다.", False
+    assignment_management = Assignment_management.query.filter_by(assignment_no = as_no, attendee_no = attend.attendee_no).first()
+    if(assignment_management==None):
+        return "학생 정보가 존재하지 않습니다.", False
+    if assignment_management.end_submission is False:
+        return "학생이 최종 제출하지 않았습니다.", False
+    if ae_denotations:
+        check.ae_denotations = ae_denotations
+    if ae_attributes:
+        check.ae_attributes = ae_attributes
+    db.session.commit()
+    return "success", True
 
 def get_feedback_info(as_no: int, student_no: int, user_no: int):
     assignment = Assignment.query.filter_by(assignment_no=as_no).first()

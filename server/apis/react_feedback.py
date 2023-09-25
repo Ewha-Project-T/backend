@@ -2,21 +2,34 @@ from flask import jsonify, Flask, request, make_response
 from flask_restful import reqparse, Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from ..services.feedback_service import get_feedback_info, get_json_textae
+from ..services.feedback_service import get_feedback_info, get_json_textae, put_json_textae
 
 class Feedback_textae(Resource):
+    parser = reqparse.RequestParser()
+    parser.add_argument('as_no', type=int)
+    parser.add_argument('user_no', type=int)
     @jwt_required()
     def get(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('as_no', type=int)
-        parser.add_argument('user_no', type=int)
-        args = parser.parse_args()
+        args = self.parser.parse_args()
         as_no=args['as_no']
         user_no = args['user_no']
         url,review=get_json_textae(as_no,user_no)
         if review is False:
             return jsonify({"msg": url, "isSuccess":False})
         return jsonify({"url":url,"isSuccess":True})
+    @jwt_required()
+    def put(self):
+        self.parser.add_argument('ae_denotations', type=str, action='append')
+        self.parser.add_argument('ae_attributes', type=str, action='append')
+        args = self.parser.parse_args()
+        as_no=args['as_no']
+        user_no = args['user_no']
+        ae_denotations = str(args['ae_denotations']).replace('"',"")
+        ae_attributes = str(args['ae_attributes']).replace('"',"")
+        msg, status= put_json_textae(as_no,user_no,ae_denotations,ae_attributes)
+        if status is False:
+            return jsonify({"msg": msg, "isSuccess":False})
+        return jsonify({"msg": msg, "isSuccess":True})
     #TODO: api테스트 완료 후 jwt 적용
     # @jwt_required()
     # def post(self):

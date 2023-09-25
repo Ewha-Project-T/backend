@@ -14,9 +14,7 @@ class Feedback_textae(Resource):
         as_no=args['as_no']
         user_no = args['user_no']
         url,review=get_json_textae(as_no,user_no)
-        if review is -1:
-            return jsonify({"msg": url, "isSuccess":False})
-        if review is -2:
+        if review is False:
             return jsonify({"msg": url, "isSuccess":False})
         return jsonify({"url":url,"isSuccess":True})
     #TODO: api테스트 완료 후 jwt 적용

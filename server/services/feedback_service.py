@@ -4,18 +4,24 @@ from ..model import Assignment_check, Assignment_check_list, Attendee, Assignmen
 
 def get_json_textae(as_no,user_no):
     assignment = Assignment.query.filter_by(assignment_no=as_no).first()
+    if not assignment:
+        return "과제가 존재하지 않습니다.", False
     attend=Attendee.query.filter_by(user_no=user_no,lecture_no=assignment.lecture_no).first()
+    if not attend:
+        return "수강생이 아닙니다.", False
     check=Assignment_check.query.filter_by(assignment_no=as_no,attendee_no=attend.attendee_no,assignment_check=1).order_by(Assignment_check.check_no.desc()).first()
+    if not check:
+        return "과제를 제출하지 않았습니다.", False
     assignment_management = Assignment_management.query.filter_by(assignment_no = as_no, attendee_no = attend.attendee_no).first()
     if(assignment_management==None):
-        return "학생 정보가 존재하지 않습니다.", -1
+        return "학생 정보가 존재하지 않습니다.", False
     if assignment_management.end_submission is False:
-        return "학생이 최종 제출하지 않았습니다.", -2
+        return "학생이 최종 제출하지 않았습니다.", False
     if(check.ae_text == "" and check.ae_denotations == "" and check.ae_attributes == ""):
         wav_url,uuid=get_prob_wav_url(as_no,user_no,assignment.lecture_no)
         stt_result,stt_feedback=get_stt_result(uuid)
         if(stt_result==None):
-            return "error:stt",""
+            return "error:stt", False
         text,denotations,attributes=parse_data(stt_result,stt_feedback)
         denotations_json = json.loads(denotations)
         attributes_json = json.loads(attributes)

@@ -375,7 +375,6 @@ class React_Prob_submit_list(Resource):
                     "userList": user_list,
                     "as_no" : as_no,
                     "lecture_no" : lecture_no,
-                    
                 })
 
 class React_Prob_submit_list2(Resource):
@@ -449,11 +448,11 @@ class Feedback2(Resource):
         lecture_no = args['lecture_no']
         user_no = args['user_no']
         url,review=get_json_feedback(as_no,lecture_no,user_no)
-        if(url=="error:stt"):
-            return jsonify({"FeedbackStatus":3})
-        if(url=="error:nocheck"):
-            return jsonify({"FeedbackStatus":2})
-        return jsonify({"url":url,"review":review,"isSuccess":True})
+        if review is -1:
+            return jsonify({"msg": url, "isSuccess":False})
+        if review is -2:
+            return jsonify({"msg": url, "isSuccess":False})
+        return jsonify({"url":url,"isSuccess":True})
     #TODO: api테스트 완료 후 jwt 적용
     @jwt_required()
     def post(self):

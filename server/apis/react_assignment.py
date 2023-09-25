@@ -7,7 +7,7 @@ from flask_jwt_extended import (
     jwt_required, get_jwt_identity, create_access_token, get_jwt
 )
 import re
-from ..services.assignment_service import assignment_detail, assignment_detail_record, assignment_end_submission, assignment_record, edit_assignment, get_assignment, get_assignments_manage,mod_assignment_listing,check_assignment,make_as, create_assignment,prob_list_professor, prob_list_student, mod_as,delete_assignment,get_as_name,get_prob_wav_url,get_wav_url,get_stt_result,get_original_stt_result,get_as_info,get_feedback,make_json_url,get_json_feedback,save_json_feedback,get_prob_submit_list,get_studentgraph,get_professorgraph
+from ..services.assignment_service import assignment_detail, assignment_detail_record, assignment_end_submission, assignment_record, edit_assignment, get_assignment, get_assignments_manage,mod_assignment_listing,check_assignment,make_as, create_assignment,prob_list_professor, prob_list_student, mod_as,delete_assignment,get_as_name,get_prob_wav_url,get_wav_url,get_stt_result,get_original_stt_result,get_as_info,get_feedback,make_json_url,save_json_feedback,get_prob_submit_list,get_studentgraph,get_professorgraph
 from ..services.lecture_service import lecture_access_check
 from ..services.login_service import admin_required, professor_required, assistant_required
 from werkzeug.utils import secure_filename
@@ -436,46 +436,46 @@ class React_Prob_submit(Resource):
             return jsonify({"SubmitSuccess" : 1})
 
 
-class Feedback2(Resource):
-    @jwt_required()
-    def get(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('lecture_no', type=int)
-        parser.add_argument('as_no', type=int)
-        parser.add_argument('user_no', type=int)
-        args = parser.parse_args()
-        as_no=args['as_no']
-        lecture_no = args['lecture_no']
-        user_no = args['user_no']
-        url,review=get_json_feedback(as_no,lecture_no,user_no)
-        if review is -1:
-            return jsonify({"msg": url, "isSuccess":False})
-        if review is -2:
-            return jsonify({"msg": url, "isSuccess":False})
-        return jsonify({"url":url,"isSuccess":True})
-    #TODO: api테스트 완료 후 jwt 적용
-    @jwt_required()
-    def post(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('lecture_no', type=int)
-        parser.add_argument('as_no', type=int)
-        parser.add_argument('user_no', type=int)
-        parser.add_argument('ae_denotations', type=str,action='append')
-        parser.add_argument('ae_attributes', type=str, action='append')
-        parser.add_argument('result', type=str) # 총평
-        parser.add_argument('DeliverIndividualList', type=int, action='append')
-        parser.add_argument('ContentIndividualList', type=int, action='append')
-        args = parser.parse_args()
-        as_no=args['as_no']
-        lecture_no = args['lecture_no']
-        user_no = args['user_no']
-        ae_denotations = str(args['ae_denotations']).replace('"',"")
-        ae_attributes = str(args['ae_attributes']).replace('"',"")
-        result=args['result']
-        dlist=args['DeliverIndividualList']
-        clist=args['ContentIndividualList']
-        save_json_feedback(as_no,lecture_no,user_no,ae_attributes,ae_denotations,result,dlist,clist)
-        return jsonify({"isSuccess":True})
+# class Feedback2(Resource):
+#     @jwt_required()
+#     def get(self):
+#         parser = reqparse.RequestParser()
+#         parser.add_argument('lecture_no', type=int)
+#         parser.add_argument('as_no', type=int)
+#         parser.add_argument('user_no', type=int)
+#         args = parser.parse_args()
+#         as_no=args['as_no']
+#         lecture_no = args['lecture_no']
+#         user_no = args['user_no']
+#         url,review=get_json_feedback(as_no,lecture_no,user_no)
+#         if review is -1:
+#             return jsonify({"msg": url, "isSuccess":False})
+#         if review is -2:
+#             return jsonify({"msg": url, "isSuccess":False})
+#         return jsonify({"url":url,"isSuccess":True})
+#     #TODO: api테스트 완료 후 jwt 적용
+#     @jwt_required()
+#     def post(self):
+#         parser = reqparse.RequestParser()
+#         parser.add_argument('lecture_no', type=int)
+#         parser.add_argument('as_no', type=int)
+#         parser.add_argument('user_no', type=int)
+#         parser.add_argument('ae_denotations', type=str,action='append')
+#         parser.add_argument('ae_attributes', type=str, action='append')
+#         parser.add_argument('result', type=str) # 총평
+#         parser.add_argument('DeliverIndividualList', type=int, action='append')
+#         parser.add_argument('ContentIndividualList', type=int, action='append')
+#         args = parser.parse_args()
+#         as_no=args['as_no']
+#         lecture_no = args['lecture_no']
+#         user_no = args['user_no']
+#         ae_denotations = str(args['ae_denotations']).replace('"',"")
+#         ae_attributes = str(args['ae_attributes']).replace('"',"")
+#         result=args['result']
+#         dlist=args['DeliverIndividualList']
+#         clist=args['ContentIndividualList']
+#         save_json_feedback(as_no,lecture_no,user_no,ae_attributes,ae_denotations,result,dlist,clist)
+#         return jsonify({"isSuccess":True})
 
 class Studentgraphlist(Resource):
     @jwt_required()

@@ -1,11 +1,11 @@
 from server.apis.mail import Email, Verify_email
-from .react_feedback import Feedback_info
+from .react_feedback import Feedback_info, Feedback_textae
 from .login import Login,Join, LoginRefresh, Logout
 from .lecture import Attend, Lecture, Lecture_mod, Lecture_mod_del, Student,Major, Lecture_add
 from .assignment import Prob, Prob_del, Prob_submit, Prob_feedback,Prob_mod,Prob_add, prob_upload, Prob_submit_list, prob_upload_file
 from .admin import Admin,Admin2
 from .stt import Stt, SttJob, SttSeq, SttSeqJob
-from .react_login import Login2,Logout2,CheckToken,Join2
+from .react_login import Login2,Logout2,CheckToken,Join2,FindPassword,FindPassword_Check
 from .react_assignment import React_Porb_professor,React_Prob_add, React_Prob_detail, React_Prob_end_submission, React_Prob_record, React_Prob_student,React_Prob_submit_list,React_Prob_submit, React_Prob_submit_list2, React_prob_handle,Studentgraphlist,Professorgraphlist
 from .react_lecture import React_Lecture,React_Lecture_mod_del,React_Student,React_Lecture_add,React_Lecture_mod
 
@@ -15,7 +15,7 @@ def load_api(api_module):
     api_module.add_resource(Join2,'/api/user/join',endpoint='join2') # GET POST PUT PATCH DELETE
     api_module.add_resource(CheckToken,'/api/user/auth',endpoint='checkToken') 
     api_module.add_resource(React_Student,'/api/lecture/studentlist',endpoint='react_student')
-
+    
     api_module.add_resource(React_Prob_submit_list,'/api/probsubmit/list',endpoint='react_prob_submit_list')
     
     api_module.add_resource(Studentgraphlist,'/api/feedback/studentgraphlist',endpoint='studentGraphlist')
@@ -50,7 +50,7 @@ def load_api(api_module):
     #신규 추가
     api_module.add_resource(React_prob_handle, '/api/prob/handle', endpoint='react_prob_handle') 
     api_module.add_resource(React_Prob_submit_list2, '/api/feedback/manage', endpoint='react_prob_submit_list2')
-    api_module.add_resource(Feedback2,'/api/feedback',endpoint='feedback2')
+    api_module.add_resource(Feedback_textae,'/api/feedback/textae',endpoint='Feedback_textae')
     api_module.add_resource(Feedback_info,'/api/feedback/info', endpoint='Feedback_info') # 과제 피드백 과제 및 학생 정보
     api_module.add_resource(React_Prob_detail, '/api/prob/detail', endpoint='react_prob_detail') #
     api_module.add_resource(React_Prob_student, '/api/prob/student', endpoint='react_prob_student') #
@@ -75,3 +75,7 @@ def load_api(api_module):
     api_module.add_resource(React_Lecture_add,'/api/lecture/create',endpoint='react_lecture_add')
     api_module.add_resource(React_Lecture_mod,'/api/lecture/modify',endpoint='react_lecture_mod')
     api_module.add_resource(React_Lecture_mod_del,'/api/lecture/delete',endpoint='react_lecture_delete')
+
+    #비밀번호변경
+    api_module.add_resource(FindPassword,'/api/user/findpass',endpoint='findpassword') # GET POST PUT PATCH DELETE
+    api_module.add_resource(FindPassword_Check,'/api/user/findpass_check',endpoint='findpassword_check') 

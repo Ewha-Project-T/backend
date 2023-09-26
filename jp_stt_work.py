@@ -197,7 +197,7 @@ class JpStt:
 
         result["json_output"] = json_output
 
-        return result
+        return json_output
 
     def request_api(self,length,myaudio,startidx,endidx):
         domain = os.getenv("DOMAIN", "https://edu-trans.ewha.ac.kr:8443")

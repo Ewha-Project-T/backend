@@ -16,8 +16,6 @@ def load_api(api_module):
     api_module.add_resource(CheckToken,'/api/user/auth',endpoint='checkToken') 
     api_module.add_resource(React_Lecture_mod_del,'/api/lecture/delete',endpoint='react_lecture_delete')
     api_module.add_resource(React_Student,'/api/lecture/studentlist',endpoint='react_student')
-    api_module.add_resource(React_Lecture_add,'/api/lecture/create',endpoint='react_lecture_add')
-    api_module.add_resource(React_Lecture_mod,'/api/lecture/modify',endpoint='react_lecture_mod')
     
     api_module.add_resource(React_Prob_submit_list,'/api/probsubmit/list',endpoint='react_prob_submit_list')
     

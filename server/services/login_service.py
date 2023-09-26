@@ -145,5 +145,3 @@ def change_pass(email,password):
     acc = User.query.filter_by(email=email).first()
     acc.password=password
     db.session.commit()
-    
-    

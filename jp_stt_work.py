@@ -53,7 +53,6 @@ def make_json(text, denotations, attributes):
         },
     }
 
-    # Save the JSON to a file
     with open("output.json", "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=4)
 
@@ -69,13 +68,11 @@ def parse_data(stt_result, stt_feedback):
     for i in range(len(stt_result)):
         text += stt_result[i]["textFile"] + "\n"
 
-        # Check if current stt_feedback[i] is a list and contains the expected data
         if not isinstance(stt_feedback[i], list):
             print(f"Error: stt_feedback[{i}] is not a list.")
             continue
 
         for j in range(len(stt_feedback[i])):
-            # Check if current stt_feedback[i][j] is a dictionary and has the keys "start", "end", and "type"
             if not isinstance(stt_feedback[i][j], dict):
                 print(f"Error: stt_feedback[{i}][{j}] is not a dictionary.")
                 continue
@@ -127,8 +124,6 @@ def simultaneous_stt(filename):
             text += word
             prev_word_end = word_end
 
-    # print(text)
-    # More explicit prompting for GPT model
     prompt_message = (
         "Please annotate hesitating expressions such as 'え', 'あの', or 'えと' by marking them with '<...>(filler)'. "
         "For instance, convert 'え' to '<え>(filler)'"
@@ -170,8 +165,8 @@ def simultaneous_stt(filename):
 
     # Extract and adjust fillers
     for match in filler_pattern.finditer(annotated_text):
-        word_start = match.start(1)  # Start of the word inside angle brackets
-        word_end = match.end(1)  # End of the word inside angle brackets
+        word_start = match.start(1)
+        word_end = match.end(1)
         annotations.append(
             {
                 "start": word_start,
@@ -183,8 +178,8 @@ def simultaneous_stt(filename):
 
     # Extract and adjust cancellations
     for match in cancellation_pattern.finditer(annotated_text):
-        word_start = match.start(1)  # Start of the word inside dashes
-        word_end = match.end(1)  # End of the word inside dashes
+        word_start = match.start(1)
+        word_end = match.end(1) 
         annotations.append(
             {
                 "start": word_start,
@@ -194,22 +189,18 @@ def simultaneous_stt(filename):
             }
         )
 
-    # Create the result dictionary to store the transcribed and annotated text and annotations
     result = {"textFile": annotated_text, "timestamps": [], "annotations": annotations}
 
-    # Calling parse_data function
     text, denotations, attributes = parse_data(
         [result], [annotations]
-    )  # wrapped annotations in a list to match expected structure
+    ) 
 
     result["denotations"] = denotations
     result["attributes"] = attributes
 
     json_output = make_json(text, denotations, attributes)
 
-    # Appending the JSON output to the result dictionary
     result["json_output"] = json_output
-    print("JSON saved to output.json")
 
     return result
 
@@ -241,7 +232,3 @@ def req_upload(file, completion, fullText=True):
         headers=headers, url=invoke_url + "/recognizer/upload", files=files
     )
     return response
-
-
-if __name__ == "__main__":
-    stt_result = simultaneous_stt("C:/Users/kken1/OneDrive/바탕 화면/Ewha/답지/한일음성샘플.wav")

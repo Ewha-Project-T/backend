@@ -6,7 +6,7 @@ from .assignment import Prob, Prob_del, Prob_submit, Prob_feedback,Prob_mod,Prob
 from .admin import Admin,Admin2
 from .stt import Stt, SttJob, SttSeq, SttSeqJob
 from .react_login import Login2,Logout2,CheckToken,Join2
-from .react_assignment import Feedback2, React_Porb_professor,React_Prob_add, React_Prob_detail, React_Prob_end_submission, React_Prob_record, React_Prob_student,React_Prob_submit_list,React_Prob_submit, React_Prob_submit_list2, React_prob_handle,Studentgraphlist,Professorgraphlist
+from .react_assignment import React_Porb_professor,React_Prob_add, React_Prob_detail, React_Prob_end_submission, React_Prob_record, React_Prob_student,React_Prob_submit_list,React_Prob_submit, React_Prob_submit_list2, React_prob_handle,Studentgraphlist,Professorgraphlist
 from .react_lecture import React_Lecture,React_Lecture_mod_del,React_Student,React_Lecture_add,React_Lecture_mod
 
 

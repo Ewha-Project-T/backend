@@ -48,7 +48,7 @@ def load_api(api_module):
     api_module.add_resource(Email,'/email',endpoint='email')
     api_module.add_resource(Verify_email,'/verify_email',endpoint='verify_email')
 
-    #신규 추가
+    #신규 추가 
     api_module.add_resource(React_prob_handle, '/api/prob/handle', endpoint='react_prob_handle') 
     api_module.add_resource(React_Prob_submit_list2, '/api/feedback/manage', endpoint='react_prob_submit_list2')
     api_module.add_resource(Feedback_textae,'/api/feedback/textae',endpoint='Feedback_textae')

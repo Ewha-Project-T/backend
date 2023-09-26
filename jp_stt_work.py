@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-
+from pydub import AudioSegment, silence
+from nltk.tokenize import sent_tokenize
 import json
 import requests
 import os
@@ -7,6 +8,7 @@ import openai
 from dotenv import load_dotenv
 import re
 import ast
+import uuid
 
 load_dotenv()
 

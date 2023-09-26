@@ -90,7 +90,6 @@ class JpStt:
             'Accept': 'application/json;UTF-8',
             'X-CLOVASPEECH-API-KEY': os.environ['CLOVASPEECH_STT_KEY']
         }
-    #     print(json.dumps(request_body, ensure_ascii=False).encode('UTF-8'))
         files = {
             'media': open(file, 'rb'),
             'params': (None, json.dumps(request_body, ensure_ascii=False).encode('UTF-8'), 'application/json')
@@ -143,7 +142,7 @@ class JpStt:
     def basic_annotation_stt(self,result,stt,pause_idx):
         # Annotation Logic
         annotations = []
-        # Simplified regular expressions for pauses, fillers, and cancellations
+        # Regular expressions for pauses, fillers, and cancellations
         pause_pattern = re.compile(r"\((\d+) ms\)")
         filler_pattern = re.compile(r"<(.*?)>\(filler\)")
         cancellation_pattern = re.compile(r"-([^-\[]*?)-\(cancellation\)")
@@ -188,16 +187,14 @@ class JpStt:
         # Create the result dictionary
         result = {"textFile": stt, "annotations": annotations}
 
-        # Calling parse_data function
-        text, denotations, attributes = parse_data([result], [annotations])
+        text, denotations, attributes = self.parse_data([result], [annotations])
 
         result["denotations"] = denotations
         result["attributes"] = attributes
-        json_output = make_json(text, denotations, attributes)
+        json_output = self.make_json(text, denotations, attributes)
 
-        # Appending the JSON output to the result dictionary
         result["json_output"] = json_output
-        print("JSON saved to output.json")
+
         return result
 
     def request_api(self,length,myaudio,startidx,endidx):
@@ -220,7 +217,6 @@ class JpStt:
         for i in range(len(local_file)):
                 response=self.req_upload(file=local_file[i], completion='sync')
                 if response.status_code != 200:
-                    # raise RuntimeError("API server does not response correctly")
                     try:
                         response.raise_for_status()
                         text = response.text.strip()
@@ -265,13 +261,11 @@ class JpStt:
         for i in range(len(stt_result)):
             text += stt_result[i]["textFile"] + "\n"
 
-            # Check if current stt_feedback[i] is a list and contains the expected data
             if not isinstance(stt_feedback[i], list):
                 print(f"Error: stt_feedback[{i}] is not a list.")
                 continue
 
             for j in range(len(stt_feedback[i])):
-                # Check if current stt_feedback[i][j] is a dictionary and has the keys "start", "end", and "type"
                 if not isinstance(stt_feedback[i][j], dict):
                     print(f"Error: stt_feedback[{i}][{j}] is not a dictionary.")
                     continue
@@ -311,4 +305,4 @@ class JpStt:
             "attributes": ast.literal_eval(attributes) if type(attributes) == str else attributes,
         }
         
-        return data    
+        return json.dumps(data, indent=4,ensure_ascii=False)

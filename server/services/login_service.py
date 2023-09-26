@@ -133,3 +133,17 @@ def findpassword_email_check(user_email,user_name,user_major):
         return 0
     return 1
 
+def findpassword_code_check(email,code):
+    acc = User.query.filter_by(email=email).first()
+    if acc ==None:
+        return 0
+    if(acc.access_code!=code):
+        return 0
+    return 1
+
+def change_pass(email,password):
+    acc = User.query.filter_by(email=email).first()
+    acc.password=password
+    db.session.commit()
+    
+    

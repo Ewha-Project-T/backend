@@ -5,7 +5,7 @@ from flask_jwt_extended import (
 )
 import re
 from ..services.login_service import (
-    login, register, LoginResult, RegisterResult, create_tokens, admin_required, professor_required, assistant_required,real_time_email_check,findpassword_email_check
+    login, register, LoginResult, RegisterResult, create_tokens, admin_required, professor_required, assistant_required,real_time_email_check,findpassword_email_check,findpassword_code_check,change_pass
 )
 from ..services.mail_service import (
     gen_verify_email_code,get_access_code,access_check_success,signup_email_validate
@@ -156,13 +156,30 @@ class FindPassword(Resource):
         user_major= args['major']
 
         if(findpassword_email_check(user_email,user_name,user_major)):
-            signup_email_validate(user_email,gen_verify_email_code(user_email),"")#email, code, func->url/[func]
+            signup_email_validate(user_email,gen_verify_email_code(user_email),"findpass_check")#email, code, func->url/[func] 추후현식이 경로로 바꾸기 [func]부분
 
             msg="email send success"
             return jsonify({ "Success" : 1,"msg":msg})
         msg="invalid email"
-        return jsonify({"success": 0, "msg":msg})
+        return jsonify({"Success": 0, "msg":msg})
     
 class FindPassword_Check(Resource):
     def get(self):
         return jsonify({"msg":"findpassword page"})
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('email', type=str, help="Email is required")
+        parser.add_argument('code', type=str, help="code is required")
+        parser.add_argument('password', type=str, help="password id is required")
+
+        args = parser.parse_args()
+        email = args['email']
+        code=args['code']
+        password= args['password']
+        if(findpassword_code_check(email,code)):
+            change_pass(email,password)
+            msg="password change success"
+            return jsonify({"Success": 1, "msg":msg})
+        msg="invalid code"
+        return jsonify({"Success": 0, "msg":msg})
+    

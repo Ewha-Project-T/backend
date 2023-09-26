@@ -14,7 +14,6 @@ from .react_lecture import React_Lecture,React_Lecture_mod_del,React_Student,Rea
 def load_api(api_module):
     api_module.add_resource(Join2,'/api/user/join',endpoint='join2') # GET POST PUT PATCH DELETE
     api_module.add_resource(CheckToken,'/api/user/auth',endpoint='checkToken') 
-    api_module.add_resource(React_Lecture_mod_del,'/api/lecture/delete',endpoint='react_lecture_delete')
     api_module.add_resource(React_Student,'/api/lecture/studentlist',endpoint='react_student')
     
     api_module.add_resource(React_Prob_submit_list,'/api/probsubmit/list',endpoint='react_prob_submit_list')

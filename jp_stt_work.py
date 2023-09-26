@@ -1,215 +1,247 @@
-from pydub import AudioSegment, silence
-from nltk.tokenize import sent_tokenize
+# -*- coding: utf-8 -*-
 
-import os
-import requests
-import re
-import fugashi
 import json
-import uuid
+import requests
+import os
+import openai
+from dotenv import load_dotenv
+import re
 
-#일본어버전 시작
-class JpStt:
-    def process_stt_result(self,stt):
-        result = stt
-        for i in range(len(result)):
-            if result[i] == 'え' or result[i] == 'ま' or result[i] == 'あの' or result[i] == 'えと' or result[i] == 'その':
-                result[i] = result[i] + "(filler)"
-            if len(result) > 1 and result[i-1][0] == result[i][0] and result[i-1] in result[i]:
-                result[i] = result[i] + "(backtracking)"
-            # elif len(result) > 1 and result[i-1][0] == result[i][0] and len(result[i-1]) <= len(result[i]):
-            #     result[i] = result[i] + "(backtracking)" #앞뒤단어의 첫글자가 같을때
-        result = ' '.join(result)
-        return result
+load_dotenv()
 
-    def basic_indexing(self,filename):
-        filepath = f"{os.environ['UPLOAD_PATH']}/{filename}.wav"
-        myaudio = AudioSegment.from_file(filepath)
-        dBFS = myaudio.dBFS
-        sound = silence.detect_nonsilent(
-            myaudio, min_silence_len=1000, silence_thresh=dBFS - 16, seek_step=100)  # 1초 이상의 silence
-        sound = [[(start), (stop)] for start, stop in sound]
-        length = len(sound)
-        startidx = []
-        endidx = []
-        silenceidx = []
-        duration = 0
-        i=0
-        print("indexing")
-        while i < len(sound):
-            duration = sound[i][1] - sound[i][0]
-            if duration < 2000:
-                if i == 0:
-                    length = length - 1
-                    startidx.append(sound[i][0])
-                    endidx.append(sound[i+1][1] + 200)
-                    if len(sound) > 2:
-                        silenceidx.append(sound[i+2][0] - sound[i+1][1])
-                    i = i+1
-                else:
-                    length = length - 1
-                    endidx[-1] = sound[i][1] + 200
-                    if i < len(sound) - 1:
-                        silenceidx[-1] = sound[i + 1][0] - sound[i][1]
-            else: 
-                startidx.append(sound[i][0])
-                endidx.append(sound[i][1] + 200)
-                if i < len(sound) - 1:
-                    silenceidx.append(sound[i + 1][0] - sound[i][1])
-            i = i+1  
-        return length, sound, startidx, endidx, silenceidx, myaudio
-
-    # worker.py 로 이동 필요
-    def req_upload(self,file, completion,fullText=True):
-
-        invoke_url = os.environ['CLOVASPEECH_STT_URL']
-
-        request_body = {
-            'language': 'ja',
-            'completion': completion,
-            'fullText': fullText,
-            'noiseFiltering' : False
-        }
-        headers = {
-            'Accept': 'application/json;UTF-8',
-            'X-CLOVASPEECH-API-KEY': os.environ['CLOVASPEECH_STT_KEY']
-        }
-    #     print(json.dumps(request_body, ensure_ascii=False).encode('UTF-8'))
-        files = {
-            'media': open(file, 'rb'),
-            'params': (None, json.dumps(request_body, ensure_ascii=False).encode('UTF-8'), 'application/json')
-        }
-        response = requests.post(headers=headers, url=invoke_url + '/recognizer/upload', files=files)
-        return response
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
+def make_json(text, denotations, attributes):
+    data = {
+        "text": text,
+        "denotations": denotations,
+        "attributes": attributes,
+        "config": {
+            "boundarydetection": False,
+            "non-edge characters": [],
+            "function availability": {
+                "logo": False,
+                "relation": False,
+                "block": False,
+                "simple": False,
+                "replicate": False,
+                "replicate-auto": False,
+                "setting": False,
+                "read": False,
+                "write": False,
+                "write-auto": False,
+                "line-height": False,
+                "line-height-auto": False,
+                "help": False,
+            },
+            "entity types": [
+                {"id": "Cancellation", "color": "#ff5050"},
+                {"id": "Filler", "color": "#ffff50", "default": True},
+                {"id": "Pause", "color": "#404040"},
+            ],
+            "attribute types": [
+                {
+                    "pred": "Unsure",
+                    "value type": "flag",
+                    "default": True,
+                    "label": "?",
+                    "color": "#fa94c0",
+                },
+                {"pred": "Note", "value type": "string", "default": "", "values": []},
+            ],
+        },
+    }
 
-    def basic_do_stt(self,length,res, sound, startidx, endidx, silenceidx):
+    # Save the JSON to a file
+    with open("output.json", "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=4)
 
-        
-        flag = True
-        text = ''
-        delay_result = 0
-        pause_result = 0
-        pause_idx = []
-        start_idx = []
-        end_idx = []
-        for i in range(len(res)):
-            dic = res[i]
-            # print(dic)
-            if dic.get("result") == "COMPLETED":
-                # tmp = dic.get("segments")
-                tagger = fugashi.Tagger()
-                words= [word.surface for word in tagger(dic['text'])]
-                stt = self.process_stt_result(words)
-                # print(stt)
-                text = text + stt
-                if len(stt)>0:
-                    start_idx.append(startidx[i])
-                    end_idx.append(endidx[i])
-                sentences = sent_tokenize(stt)
-                for sentence in sentences:
-                    print(sentence)
-                    if sentence.endswith('.'):
-                        flag = True
-                    else:
-                        flag = False
-                if i < length - 1:
-                    if flag == False:
-                        print("(pause: " + str(silenceidx[i])+"sec)")  # 침묵
-                        text = text+'\n'
-                        pause_result += silenceidx[i]
-                        pause_idx.append(silenceidx[i])
-                    else:
-                        # 통역 개시 지연구간
-                        print("(delay: " + str(silenceidx[i]) + "sec)")
-                        text = text+'\n'
-                        delay_result += silenceidx[i]
-        return text, pause_result, delay_result, pause_idx, start_idx, end_idx
+    return data
 
-    def basic_annotation_stt(self,result,stt,pause_idx):
-        p = re.compile('(\w+\(filler\)|\w+\s\w+\(backtracking\))')
 
-        fidx = []
-        while (True):
-            f = p.search(stt)
-            if f == None:
-                break
-            fidx.append([f.start(), f.end()])
-            stt = re.sub("(\(filler\)|\(backtracking\))", "", stt, 1)
+def parse_data(stt_result, stt_feedback):
+    cnt = 1
+    text = ""
+    denotations = []
+    attributes = []
 
-        for i in range(len(fidx)):
-            if stt[fidx[i][0]] == 'え' or stt[fidx[i][0]] == 'ま':
-                result['annotations'].append(
-                    {'start': fidx[i][0], 'end': fidx[i][0] + 1, 'type': 'FILLER'})
-            elif stt[fidx[i][0]:fidx[i][0]+2] == 'あの' or stt[fidx[i][0]:fidx[i][0]+2] == 'えと' or stt[fidx[i][0]:fidx[i][0]+2] == 'その':
-                result['annotations'].append(
-                    {'start': fidx[i][0], 'end': fidx[i][0] + 2, 'type': 'FILLER'})
-            else:
-                result['annotations'].append(
-                    {'start': fidx[i][0], 'end': fidx[i][1] - 14, 'type': 'BACKTRACKING'})
-        pidx = [m.start(0) + 1 for m in re.finditer('[^\.^\n]\n', stt)]
-        for i in range(len(pidx)):  # pause, delay 구분 없이 pause 로 통일
-            result['annotations'].append(
-                {'start': pidx[i], 'end': pidx[i] + 1, 'type': 'PAUSE', 'duration': pause_idx[i]})
+    for i in range(len(stt_result)):
+        text += stt_result[i]["textFile"] + "\n"
 
-        if stt.endswith("\n"):
-            stt = stt[:-1]
-        result['textFile'] = stt
-        return result
+        # Check if current stt_feedback[i] is a list and contains the expected data
+        if not isinstance(stt_feedback[i], list):
+            print(f"Error: stt_feedback[{i}] is not a list.")
+            continue
 
-    def request_api(self,length,myaudio,startidx,endidx):
-        domain = os.getenv("DOMAIN", "https://edu-trans.ewha.ac.kr:8443")
-        files = []
-        local_file = []
-        
-        for i in range(length):
-            filetmp = uuid.uuid4()
-            filepath = f"{os.environ['UPLOAD_PATH']}/{filetmp}.wav"
-            myaudio[startidx[i]:endidx[i]].export(filepath, format="wav")
-            files += [ domain + "/" + filepath ]
-            local_file += [ filepath ]
+        for j in range(len(stt_feedback[i])):
+            # Check if current stt_feedback[i][j] is a dictionary and has the keys "start", "end", and "type"
+            if not isinstance(stt_feedback[i][j], dict):
+                print(f"Error: stt_feedback[{i}][{j}] is not a dictionary.")
+                continue
 
-        if not len(files) > 0:  
-            return None   
-        
-        res=[0 for i in range(length)]
+            if not all(key in stt_feedback[i][j] for key in ["start", "end", "type"]):
+                print(
+                    f"Error: stt_feedback[{i}][{j}] does not have all the required keys ('start', 'end', 'type')."
+                )
+                continue
 
-        for i in range(len(local_file)):
-                response=self.req_upload(file=local_file[i], completion='sync')
-                if response.status_code != 200:
-                    # raise RuntimeError("API server does not response correctly")
-                    try:
-                        response.raise_for_status()
-                        text = response.text.strip()
-                        if len(text) > 0:
-                            print("Recognized text: ", text)
-                        else:
-                            print("No speech detected")
-                    except requests.exceptions.HTTPError as e:
-                        print("HTTP error: ", e)
-                    except requests.exceptions.ConnectionError as e:
-                        print("Error connecting to server: ", e)
-                    except requests.exceptions.Timeout as e:
-                        print("Timeout error: ", e)
-                    except requests.exceptions.RequestException as e:
-                        print("Error: ", e)
-                res[i] = json.loads(response.text)
+            denotation = {
+                "id": "T" + str(cnt),
+                "span": {
+                    "begin": stt_feedback[i][j]["start"],
+                    "end": stt_feedback[i][j]["end"],
+                },
+                "obj": stt_feedback[i][j]["type"],
+            }
+            denotations.append(denotation)
 
-        for file in local_file:
-            os.unlink(file)
-        return res
+            attribute = {
+                "id": "A" + str(cnt),
+                "subj": "T" + str(cnt),
+                "pred": "Unsure",
+                "obj": True,
+            }
+            attributes.append(attribute)
 
-    def execute(self,filename):
-            result = {'textFile': '', 'timestamps': [], 'annotations': []}
-            length,sound,startidx,endidx,silenceidx,myaudio=self.basic_indexing(filename)
-            res=self.request_api(length,myaudio,startidx,endidx)
-            if res==None:  
-                raise Exception("INVALID-FILE")        
+            cnt += 1
 
-            for i in range(length):
-                result['timestamps'].append({'start': startidx[i], 'end': endidx[i]})
+    return text, denotations, attributes
 
-            stt_text, pause_result, delay_result, pause_idx, startidx, endidx=self.basic_do_stt(length,res,sound,startidx,endidx,silenceidx)
-            result=self.basic_annotation_stt(result,stt_text,pause_idx)
-            return result,sound,startidx,endidx,silenceidx
+
+def simultaneous_stt(filename):
+    res = req_upload(file=filename, completion="sync")
+    dic = json.loads(res.text)
+
+    pause_threshold = 1000  # in milliseconds
+    text = ""
+    prev_word_end = 0
+
+    for segment in dic["segments"]:
+        for i, (word_start, word_end, word) in enumerate(segment["words"]):
+            # Add pause duration if applicable
+            if text != "" and word_start - prev_word_end > pause_threshold:
+                # text += f" ({word_start - prev_word_end} ms)"
+                text += f" (pause)"
+
+            text += word
+            prev_word_end = word_end
+
+    # print(text)
+    # More explicit prompting for GPT model
+    prompt_message = (
+        "Please annotate hesitating expressions such as 'え', 'あの', or 'えと' by marking them with '<...>(filler)'. "
+        "For instance, convert 'え' to '<え>(filler)'"
+        "When you encounter repeated expressions, mark the first occurrence with '-...-(cancellation)'."
+        "For example, if '考える考えると' appears, it should be converted to '-考える-(cancellation)考えると'. Another example is -少なく-(cancellation)とも (pause)少なくて  "
+        "If there are no such expressions, return the original sentence. \n\n" + text
+    )
+
+    response = openai.ChatCompletion.create(
+        model="gpt-4",
+        messages=[{"role": "user", "content": prompt_message}],
+        temperature=0,
+        top_p=1,
+        frequency_penalty=0,
+        presence_penalty=0,
+    )
+    print(response.choices[0].message.content)
+    # Extract annotations directly here
+    annotated_text = response.choices[0].message.content
+
+    # Extract annotations (pauses, fillers, cancellations) from the annotated_text
+    annotations = []
+
+    # Regular expressions for pauses, fillers, and cancellations
+    pause_pattern = re.compile(r"\\((\\d+) ms\\)")
+    filler_pattern = re.compile(r"<(.*?)>\(filler\)")
+    cancellation_pattern = re.compile(r"-([^-\[]*?)-\(cancellation\)")
+
+    # Extract pauses
+    for match in pause_pattern.finditer(annotated_text):
+        annotations.append(
+            {
+                "start": match.start(),
+                "end": match.end(),
+                "type": "Pause",
+                "value": match.group(1),
+            }
+        )
+
+    # Extract and adjust fillers
+    for match in filler_pattern.finditer(annotated_text):
+        word_start = match.start(1)  # Start of the word inside angle brackets
+        word_end = match.end(1)  # End of the word inside angle brackets
+        annotations.append(
+            {
+                "start": word_start,
+                "end": word_end,
+                "type": "Filler",
+                "value": match.group(1),
+            }
+        )
+
+    # Extract and adjust cancellations
+    for match in cancellation_pattern.finditer(annotated_text):
+        word_start = match.start(1)  # Start of the word inside dashes
+        word_end = match.end(1)  # End of the word inside dashes
+        annotations.append(
+            {
+                "start": word_start,
+                "end": word_end,
+                "type": "Cancellation",
+                "value": match.group(1),
+            }
+        )
+
+    # Create the result dictionary to store the transcribed and annotated text and annotations
+    result = {"textFile": annotated_text, "timestamps": [], "annotations": annotations}
+
+    # Calling parse_data function
+    text, denotations, attributes = parse_data(
+        [result], [annotations]
+    )  # wrapped annotations in a list to match expected structure
+
+    result["denotations"] = denotations
+    result["attributes"] = attributes
+
+    json_output = make_json(text, denotations, attributes)
+
+    # Appending the JSON output to the result dictionary
+    result["json_output"] = json_output
+    print("JSON saved to output.json")
+
+    return result
+
+
+def req_upload(file, completion, fullText=True):
+    invoke_url = "https://clovaspeech-gw.ncloud.com/external/v1/4257/c2761d7a201319106f45d6557ef2a076e6285af96da7e4da3fce4c910a2e7174"
+
+    request_body = {
+        "language": "ja",
+        "completion": completion,
+        "fullText": fullText,
+        "noiseFiltering": False,
+    }
+    headers = {
+        "Accept": "application/json;UTF-8",
+        "X-CLOVASPEECH-API-KEY": "3edd2f729d7544d9b77f157fd6256ab9",
+    }
+
+    files = {
+        "media": open(file, "rb"),
+        "params": (
+            None,
+            json.dumps(request_body, ensure_ascii=False).encode("UTF-8"),
+            "application/json",
+        ),
+    }
+
+    response = requests.post(
+        headers=headers, url=invoke_url + "/recognizer/upload", files=files
+    )
+    return response
+
+
+if __name__ == "__main__":
+    stt_result = simultaneous_stt("C:/Users/kken1/OneDrive/바탕 화면/Ewha/답지/한일음성샘플.wav")

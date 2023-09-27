@@ -1,4 +1,4 @@
-#new_(gpt 사용+json output)
+#new_(json output+함수명변경)
 
 from pydub import AudioSegment, silence
 from nltk.tokenize import sent_tokenize
@@ -13,6 +13,7 @@ import uuid
 import openai #openai 라이브러리 install 필요
 import ast 
 
+
 class KorStt:
     def process_stt_result(self,stt):
         result = stt
@@ -25,7 +26,9 @@ class KorStt:
         result = response.choices[0].message.content
         return result
 
-    def indexing(self, myaudio):
+    def basic_indexing(self,filename):
+        filepath = f"{os.environ['UPLOAD_PATH']}/{filename}.mp3"
+        myaudio = AudioSegment.from_file(filepath)
         dBFS = myaudio.dBFS
         sound = silence.detect_nonsilent(
             myaudio, min_silence_len=1000, silence_thresh=dBFS - 16, seek_step=100)  # 1초 이상의 silence
@@ -39,10 +42,9 @@ class KorStt:
             endidx.append(sound[i][1] + 200)
             if i < len(sound) - 1:
                 silenceidx.append(sound[i + 1][0] - sound[i][1])
-        return sound, startidx, endidx, silenceidx
+        return length, sound, startidx, endidx, silenceidx, myaudio
 
-
-    def do_stt(self, sound, myaudio, startidx, endidx, silenceidx):
+    def basic_do_stt(self, sound, myaudio, startidx, endidx, silenceidx):
         url = os.environ["STT_URL"]
 
         headers = {
@@ -90,6 +92,7 @@ class KorStt:
         return pause_final, text, pause_result, delay_result, pause_idx, start_idx, end_idx
 
     def basic_annotation_stt(self, result,stt,pause_final,pause_idx):
+
         p = re.compile('(\w\(filler\)|\w+\s\w+\(cancellation\))')
         aidx = []
 
@@ -122,26 +125,53 @@ class KorStt:
 
         return result
 
-    
-    def stt_json(self, myaudio):
-        sound, startidx, endidx, silenceidx = self.indexing(myaudio)
-        pause_final, stt_t, pause_result, delay_result, pause_idx, start_idx, end_idx = self.do_stt(
-            sound, myaudio, startidx, endidx, silenceidx)
+    def request_api(self,length,myaudio,startidx,endidx):
+        domain = os.getenv("DOMAIN", "https://edu-trans.ewha.ac.kr:8443")
 
-        stt_t = stt_t.replace('\n', '') #stt_t
-        stt = self.process_stt_result(stt_t)
+        files = []
+        local_file = []
+        
+        for i in range(length):
+            filetmp = uuid.uuid4()
+            filepath = f"{os.environ['UPLOAD_PATH']}/{filetmp}.wav"
+            myaudio[startidx[i]:endidx[i]].export(filepath, format="wav")
+            files += [ domain + "/" + filepath ]
+            local_file += [ filepath ]
 
-        result = {'textFile': '', 'timestamps': [], 'annotations': []}
-        for i in range(len(start_idx)):
-            result['timestamps'].append({'start': start_idx[i], 'end': end_idx[i]})
+        if not len(files) > 0:  
+            return None  
+        res={'values':[]}
 
-        result = self.basic_annotation_stt(result,stt,pause_final,pause_idx)
+        webhook_res = requests.post(
+            os.environ["STT_URL"],
+            headers={
+                "Content-Type": "application/json",
+                "Ocp-Apim-Subscription-Key": os.environ["STT_KEY"]
+            },
+            json={
+                "contentUrls": files,
+                "properties": {
+                    "diarizationEnabled": False,
+                    "wordLevelTimestampsEnabled": True,
+                    "punctuationMode": "DictatedAndAutomatic",
+                    "profanityFilterMode": "Masked"
+                },
+                "locale": "ko-KR",
+                "displayName": "Transcription of file using default model for en-US"
+            }
+        ).json()
+        url = webhook_res["links"]["files"]
+        while len(res["values"]) == 0:
+            res = requests.get(
+                url,
+                headers={ "Ocp-Apim-Subscription-Key": os.environ['STT_KEY'] }
+            ).json()
 
-        result['textFile'] = stt_t
+            time.sleep(1)
+        for file in local_file:
+            os.unlink(file)          
+        return res
 
-        return result
-
-    
     def parse_data(self, stt_result,stt_feedback):
         cnt=1
         text=""
@@ -161,24 +191,86 @@ class KorStt:
     
     def make_json(self, text,denotations,attributes):
         data = {
-            "text": text,
-            "denotations": ast.literal_eval(denotations) if type(denotations) == str else denotations ,
-            "attributes": ast.literal_eval(attributes) if type(attributes) == str else attributes,
+        "text": text,
+        "denotations": ast.literal_eval(denotations) if type(denotations) == str else denotations ,
+        "attributes": ast.literal_eval(attributes) if type(attributes) == str else attributes,
+        "config": {
+            "boundarydetection": False,
+            "non-edge characters": [],
+            "function availability": {
+                "logo" : False,
+                "relation": False,
+                "block": False,
+                "simple": False,
+                "replicate": False,
+                "replicate-auto": False,
+                "setting": False,
+                "read": False,
+                "write": False,
+                "write-auto": False,
+                "line-height": False,
+                "line-height-auto": False,
+                "help": False
+            },
+            "entity types": [
+                {
+                    "id": "Cancellation",
+                    "color": "#ff5050"
+                },
+                {
+                    "id": "Filler",
+                    "color": "#ffff50",
+                    "default": True
+                },
+                {
+                    "id": "Pause",
+                    "color": "#404040"
+                }
+            ],
+            "attribute types": [
+                {
+                    "pred": "Unsure",
+                    "value type": "flag",
+                    "default": True,
+                    "label": "?",
+                    "color": "#fa94c0"
+                },
+                {
+                    "pred": "Note",
+                    "value type": "string",
+                    "default": "",
+                    "values": []
+                }
+            ]
+          }
         }
         
         return data
+    
 
+    #마지막 실행 함수
 
-    # 마지막 실행 함수
-    def last_output(self, filename):
-        filepath = f"{os.environ['UPLOAD_PATH']}/{filename}.mp3" #파일형태 변경
-        myaudio = AudioSegment.from_file(filepath)
-        stt_result = self.stt_json(myaudio)
-        stt_feedback = stt_result['annotations']
-        text,denotations,attributes = self.parse_data(stt_result,stt_feedback)
+    def execute(self,filename):
+        result = {'textFile': '', 'timestamps': [], 'annotations': []}
+        length, sound, startidx, endidx, silenceidx, myaudio = self.basic_indexing(filename)
+        res=self.request_api(length,myaudio,startidx,endidx)
+        if res==None:  
+            raise Exception("INVALID-FILE")        
+
+        pause_final, stt_t, pause_result, delay_result, pause_idx, start_idx, end_idx = self.basic_do_stt(sound, myaudio, startidx, endidx, silenceidx)
+        stt_t = stt_t.replace('\n', '') #stt_t
+        stt = self.process_stt_result(stt_t)
+
+        result = {'textFile': '', 'timestamps': [], 'annotations': []}
+        for i in range(len(start_idx)):
+            result['timestamps'].append({'start': start_idx[i], 'end': end_idx[i]})
+
+        result = self.basic_annotation_stt(result,stt,pause_final,pause_idx)
+        result['textFile'] = stt_t
+        stt_feedback = result['annotations']
+        text,denotations,attributes = self.parse_data(result,stt_feedback)
         data = self.make_json(text,denotations,attributes)
 
         return json.dumps(data, indent=4,ensure_ascii=False)
-
 
     #한국어버전 끝

@@ -154,7 +154,7 @@ def split_wav_save(upload_url,start,end):
 def split_wav_save2(upload_url,start,end):
     uuid_str=str(uuid.uuid4())
     audio: AudioSegment = AudioSegment.from_file(upload_url)
-    audio[start * 1000:end * 1000].export(f"{os.environ['UPLOAD_PATH']}/{uuid_str}", format="mp3")
+    audio[start * 1000:end * 1000].export(f"{os.environ['UPLOAD_PATH']}/{uuid_str}.mp3", format="mp3")
     return uuid_str
     # audio[start * 1000:end * 1000].export(f"{os.environ['UPLOAD_PATH']}/{uuid_str}.wav", format="wav")
     # return uuid_str
@@ -408,7 +408,7 @@ def assignment_end_submission(as_no:int, user_no:int):
         return {"message" : "수강생이 아닙니다."}
     assignment_check = Assignment_check.query.filter_by(assignment_no = as_no, attendee_no = attendee.attendee_no).order_by(Assignment_check.check_no.desc()).first()
     if assignment_check == None:
-        return {"message" : "제출하지 않았습니다."}
+        return {"message" : "제출할 과제가 없습니다."}
     assignment_management = Assignment_management.query.filter_by(assignment_no = as_no, attendee_no = attendee.attendee_no).first()
     if assignment_management.end_submission is True:
         return {"message" : "이미 최종 제출하였습니다."}

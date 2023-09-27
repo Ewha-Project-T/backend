@@ -93,7 +93,7 @@ def do_stt_work(self, filename, locale="ko-KR"):
     self.update_state(state='STT')
 
     try:
-        result,sound,startidx,endidx,silenceidx=stt.execute(filename)
+        result_stt_json=stt.execute(filename)
     except Exception as e:
         print(e)
         self.update_state(state=e.args[0])
@@ -105,16 +105,16 @@ def do_stt_work(self, filename, locale="ko-KR"):
     job = SttJob(
         job_id=self.request.id,
         stt_no=stt_db.stt_no,
-        sound=repr(sound),
-        startidx=repr(startidx),
-        endidx=repr(endidx),
-        silenceidx=repr(silenceidx),
+        sound="",
+        startidx="",
+        endidx="",
+        silenceidx="",
     )
 
-    job.stt_result = repr(result)
+    job.stt_result = repr(result_stt_json)
     session.add(job)
     session.commit()
-    return result
+    return result_stt_json
 
 @celery.task(base=DBTask, bind=True)
 def do_sequential_stt_work(self, filename, index, locale="ko-KR"):

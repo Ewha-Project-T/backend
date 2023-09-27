@@ -408,7 +408,7 @@ def assignment_end_submission(as_no:int, user_no:int):
         return {"message" : "수강생이 아닙니다."}
     assignment_check = Assignment_check.query.filter_by(assignment_no = as_no, attendee_no = attendee.attendee_no).order_by(Assignment_check.check_no.desc()).first()
     if assignment_check == None:
-        return {"message" : "제출하지 않았습니다."}
+        return {"message" : "제출할 과제가 없습니다."}
     assignment_management = Assignment_management.query.filter_by(assignment_no = as_no, attendee_no = attendee.attendee_no).first()
     if assignment_management.end_submission is True:
         return {"message" : "이미 최종 제출하였습니다."}

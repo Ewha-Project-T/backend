@@ -41,7 +41,7 @@ class JpStt:
         return response.choices[0].message.content
 
     def basic_indexing(self,filename):
-        filepath = f"{os.environ['UPLOAD_PATH']}/{filename}.wav"
+        filepath = f"{os.environ['UPLOAD_PATH']}/{filename}.mp3"
         myaudio = AudioSegment.from_file(filepath)
         dBFS = myaudio.dBFS
         sound = silence.detect_nonsilent(
@@ -206,8 +206,8 @@ class JpStt:
 
         for i in range(length):
             filetmp = uuid.uuid4()
-            filepath = f"{os.environ['UPLOAD_PATH']}/{filetmp}.wav"
-            myaudio[startidx[i]:endidx[i]].export(filepath, format="wav")
+            filepath = f"{os.environ['UPLOAD_PATH']}/{filetmp}.mp3"
+            myaudio[startidx[i]:endidx[i]].export(filepath, format="mp3")
             files += [ domain + "/" + filepath ]
             local_file += [ filepath ]
 

@@ -93,6 +93,6 @@ def get_feedback_info(as_no: int, student_no: int, user_no: int):
 def make_audio_format(prob_region, id=0):
     url = prob_region.upload_url if hasattr(prob_region, "upload_url") else prob_region.acl_uuid + ".mp3"
     return {
-            "id": int(prob_region.region_index) if hasattr(prob_region, "region_index") else id,
-            "upload_url": "./upload/" + url,
+            "label": int(prob_region.region_index) if hasattr(prob_region, "region_index") else id,
+            "value": "./upload/" + url,
     }

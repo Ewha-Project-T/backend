@@ -1,3 +1,4 @@
+import ast
 import json
 from server import db
 from .assignment_service import get_prob_wav_url, get_stt_result, make_json_url, parse_data
@@ -47,12 +48,17 @@ def put_json_textae(as_no,user_no,ae_denotations,ae_attributes):
         return "학생 정보가 존재하지 않습니다.", False
     if assignment_management.end_submission is False:
         return "학생이 최종 제출하지 않았습니다.", False
-    if ae_denotations:
+
+    if ae_denotations != "None":
+        ae_denotations = str(sorted(ast.literal_eval(ae_denotations), key=donotations_sort_key)) # sort by begin, end
         check.ae_denotations = ae_denotations
-    if ae_attributes:
+    if ae_attributes != "None":
         check.ae_attributes = ae_attributes
     db.session.commit()
     return "success", True
+
+def donotations_sort_key(item):
+    return (item['span']['begin'], item['span']['end'])
 
 def get_feedback_info(as_no: int, student_no: int, user_no: int):
     assignment = Assignment.query.filter_by(assignment_no=as_no).first()
@@ -91,9 +97,9 @@ def get_feedback_info(as_no: int, student_no: int, user_no: int):
     return res
 
 def make_audio_format(prob_region, id=0):
-    url = prob_region.upload_url if hasattr(prob_region, "upload_url") else prob_region.acl_uuid + ".mp3"
+    url = prob_region.upload_url if hasattr(prob_region, "upload_url") else prob_region.acl_uuid
     return {
             "label": "원문 구간 " + str(prob_region.region_index)  if hasattr(prob_region, "region_index") else "학생 구간" + str(id),
             # "label": int(prob_region.region_index) if hasattr(prob_region, "region_index") else id,
-            "value": "./upload/" + url,
+            "value": "./upload/" + url + ".mp3",
     }

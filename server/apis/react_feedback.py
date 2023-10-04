@@ -1,3 +1,4 @@
+import json
 from flask import jsonify, Flask, request, make_response
 from flask_restful import reqparse, Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity
@@ -13,10 +14,10 @@ class Feedback_textae(Resource):
         args = self.parser.parse_args()
         as_no=args['as_no']
         user_no = args['user_no']
-        url,review=get_json_textae(as_no,user_no)
+        textae,review=get_json_textae(as_no,user_no)
         if review is False:
-            return jsonify({"msg": url, "isSuccess":False})
-        return jsonify({"url":url,"isSuccess":True})
+            return jsonify({"textae": json.loads(textae), "isSuccess":False})
+        return jsonify({"textae": json.loads(textae),"isSuccess":True})
     @jwt_required()
     def put(self):
         self.parser.add_argument('ae_denotations', type=str, action='append')

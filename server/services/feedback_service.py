@@ -1,7 +1,7 @@
 import ast
 import json
 from server import db
-from .assignment_service import get_prob_wav_url, get_stt_result, make_json_url, parse_data
+from .assignment_service import get_prob_wav_url, get_stt_result, make_json, make_json_url, parse_data
 from ..model import Assignment_check, Assignment_check_list, Attendee, Assignment, Assignment_management, Prob_region, User
 
 def get_json_textae(as_no,user_no):
@@ -27,10 +27,11 @@ def get_json_textae(as_no,user_no):
         text,denotations,attributes=parse_data(stt_result,stt_feedback)
         denotations_json = json.loads(denotations)
         attributes_json = json.loads(attributes)
-        url=make_json_url(text,denotations_json,attributes_json,check,1)
+        # url=make_json_url(text,denotations_json,attributes_json,check,1)
+        url = make_json(text,denotations_json,attributes_json)
     else:
-        # utr=make_json(check.ae_text, check.ae_denotations, check.ae_attributes)
-        url=make_json_url(check.ae_text,check.ae_denotations, check.ae_attributes, check,0)
+        # url=make_json_url(check.ae_text,check.ae_denotations, check.ae_attributes, check,0)
+        url = make_json(check.ae_text,check.ae_denotations, check.ae_attributes)
     return url, assignment_management.review#json, 교수평가
 
 def put_json_textae(as_no,user_no,ae_denotations,ae_attributes):

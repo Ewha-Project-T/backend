@@ -204,8 +204,8 @@ class JpStt:
 
         for i in range(length):
             filetmp = uuid.uuid4()
-            filepath = f"{os.environ['UPLOAD_PATH']}/{filetmp}.mp3"
-            myaudio[startidx[i]:endidx[i]].export(filepath, format="mp3")
+            filepath = f"{os.environ['UPLOAD_PATH']}/{filetmp}.wav"
+            myaudio[startidx[i]:endidx[i]].export(filepath, format="wav")
             files += [ domain + "/" + filepath ]
             local_file += [ filepath ]
 
@@ -250,7 +250,10 @@ class JpStt:
 
             stt_text, pause_result, delay_result, pause_idx, startidx, endidx=self.basic_do_stt(length,res,sound,startidx,endidx,silenceidx)
             result=self.basic_annotation_stt(result,stt_text,pause_idx)
-            return result,sound,startidx,endidx,silenceidx
+            stt_feedback = result['annotations']
+            text,denotations,attributes = self.parse_data(result,stt_feedback)
+            data = self.make_json(text,denotations,attributes)
+            return json.dumps(data, indent=4,ensure_ascii=False)
     
     def parse_data(self, stt_result, stt_feedback):
         cnt = 1
@@ -354,4 +357,4 @@ class JpStt:
             }
         }
         
-        return json.dumps(data, indent=4,ensure_ascii=False)
+        return data

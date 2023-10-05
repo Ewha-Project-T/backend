@@ -20,10 +20,10 @@ class JpStt:
         openai.api_key = os.getenv("OPENAI_API_KEY")
 
         prompt_message = (
-            "Please annotate hesitating expressions such as 'え', 'あの', or 'えと' by marking them with '<...>(filler)'. "
-            "For instance, convert 'え' to '<え>(filler)'"
-            "When you encounter repeated expressions, mark the first occurrence with '-...-(cancellation)'."
-            "For example, if '考える考えると' appears, it should be converted to '-考える-(cancellation)考えると'. Another example is -少なく-(cancellation)とも (pause)少なくて  "
+            "Please annotate hesitating expressions such as 'え', 'あの', or 'えと' by marking them with '<...>'. "
+            "For instance, convert 'え' to '<え>'"
+            "When you encounter repeated expressions, mark the first occurrence with '-...-'."
+            "For example, if '考える考えると' appears, it should be converted to '-考える-考えると'. Another example is -少なく-とも (pause)少なくて  "
             "If there are no such expressions, return the original sentence. \n\n" + result
         )
 
@@ -142,8 +142,8 @@ class JpStt:
         annotations = []
         # Regular expressions for pauses, fillers, and cancellations
         pause_pattern = re.compile(r"\((\d+) ms\)")
-        filler_pattern = re.compile(r"<(.*?)>\(filler\)")
-        cancellation_pattern = re.compile(r"-([^-\[]*?)-\(cancellation\)")
+        filler_pattern = re.compile(r"<(.*?)>")
+        cancellation_pattern = re.compile(r"-([^-\[]*?)-")
 
         # Extract pauses
         for match in pause_pattern.finditer(stt):

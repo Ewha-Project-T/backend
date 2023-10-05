@@ -235,21 +235,7 @@ class JpStt:
         for i in range(len(stt_result)):
             text += stt_result[i]["textFile"] + "\n"
 
-            if not isinstance(stt_feedback[i], list):
-                print(f"Error: stt_feedback[{i}] is not a list.")
-                continue
-
             for j in range(len(stt_feedback[i])):
-                if not isinstance(stt_feedback[i][j], dict):
-                    print(f"Error: stt_feedback[{i}][{j}] is not a dictionary.")
-                    continue
-
-                if not all(key in stt_feedback[i][j] for key in ["start", "end", "type"]):
-                    print(
-                        f"Error: stt_feedback[{i}][{j}] does not have all the required keys ('start', 'end', 'type')."
-                    )
-                    continue
-
                 denotation = {
                     "id": "T" + str(cnt),
                     "span": {

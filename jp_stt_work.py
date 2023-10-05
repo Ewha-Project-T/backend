@@ -36,7 +36,8 @@ class JpStt:
             presence_penalty=0,
         )
 
-        return response.choices[0].message.content
+        result = response.choices[0].message.content
+        return result
 
     def basic_indexing(self,filename):
         filepath = f"{os.environ['UPLOAD_PATH']}/{filename}.mp3"
@@ -75,32 +76,7 @@ class JpStt:
             i = i+1  
         return length, sound, startidx, endidx, silenceidx, myaudio
 
-    # worker.py 로 이동 필요
-    def req_upload(self,file, completion,fullText=True):
-
-        invoke_url = os.environ['CLOVASPEECH_STT_URL']
-
-        request_body = {
-            'language': 'ja',
-            'completion': completion,
-            'fullText': fullText,
-            'noiseFiltering' : False
-        }
-        headers = {
-            'Accept': 'application/json;UTF-8',
-            'X-CLOVASPEECH-API-KEY': os.environ['CLOVASPEECH_STT_KEY']
-        }
-        files = {
-            'media': open(file, 'rb'),
-            'params': (None, json.dumps(request_body, ensure_ascii=False).encode('UTF-8'), 'application/json')
-        }
-        response = requests.post(headers=headers, url=invoke_url + '/recognizer/upload', files=files)
-        return response
-
-
-
     def basic_do_stt(self,length,res, sound, startidx, endidx, silenceidx):
-
 
         flag = True
         text = ''
@@ -138,6 +114,28 @@ class JpStt:
                         text = text+'\n'
                         delay_result += silenceidx[i]
         return text, pause_result, delay_result, pause_idx, start_idx, end_idx
+    
+    # worker.py 로 이동 필요
+    def req_upload(self,file, completion,fullText=True):
+
+        invoke_url = os.environ['CLOVASPEECH_STT_URL']
+
+        request_body = {
+            'language': 'ja',
+            'completion': completion,
+            'fullText': fullText,
+            'noiseFiltering' : False
+        }
+        headers = {
+            'Accept': 'application/json;UTF-8',
+            'X-CLOVASPEECH-API-KEY': os.environ['CLOVASPEECH_STT_KEY']
+        }
+        files = {
+            'media': open(file, 'rb'),
+            'params': (None, json.dumps(request_body, ensure_ascii=False).encode('UTF-8'), 'application/json')
+        }
+        response = requests.post(headers=headers, url=invoke_url + '/recognizer/upload', files=files)
+        return response
 
     def basic_annotation_stt(self,result,stt,pause_idx):
         # Annotation Logic
@@ -183,19 +181,9 @@ class JpStt:
                     "value": match.group(1),
                 }
             )
+        result['textFile']=stt
 
-        # Create the result dictionary
-        result = {"textFile": stt, "annotations": annotations}
-
-        text, denotations, attributes = self.parse_data([result], [annotations])
-
-        result["denotations"] = denotations
-        result["attributes"] = attributes
-        json_output = self.make_json(text, denotations, attributes)
-
-        result["json_output"] = json_output
-
-        return json_output
+        return result, annotations
 
     def request_api(self,length,myaudio,startidx,endidx):
         domain = os.getenv("DOMAIN", "https://edu-trans.ewha.ac.kr:8443")
@@ -237,25 +225,8 @@ class JpStt:
         for file in local_file:
             os.unlink(file)
         return res
-
-    def execute(self,filename):
-            result = {'textFile': '', 'timestamps': [], 'annotations': []}
-            length,sound,startidx,endidx,silenceidx,myaudio=self.basic_indexing(filename)
-            res=self.request_api(length,myaudio,startidx,endidx)
-            if res==None:  
-                raise Exception("INVALID-FILE")        
-
-            for i in range(length):
-                result['timestamps'].append({'start': startidx[i], 'end': endidx[i]})
-
-            stt_text, pause_result, delay_result, pause_idx, startidx, endidx=self.basic_do_stt(length,res,sound,startidx,endidx,silenceidx)
-            result=self.basic_annotation_stt(result,stt_text,pause_idx)
-            stt_feedback = result['annotations']
-            text,denotations,attributes = self.parse_data(result,stt_feedback)
-            data = self.make_json(text,denotations,attributes)
-            return json.dumps(data, indent=4,ensure_ascii=False)
     
-    def parse_data(self, stt_result, stt_feedback):
+    def parse_data(self, stt_result,stt_feedback):
         cnt = 1
         text = ""
         denotations = []
@@ -358,3 +329,21 @@ class JpStt:
         }
         
         return data
+    
+    def execute(self,filename):
+            result = {'textFile': '', 'timestamps': [], 'annotations': []}
+            length,sound,startidx,endidx,silenceidx,myaudio=self.basic_indexing(filename)
+            res=self.request_api(length,myaudio,startidx,endidx)
+            if res==None:  
+                raise Exception("INVALID-FILE")        
+            for i in range(length):
+                result['timestamps'].append({'start': startidx[i], 'end': endidx[i]})
+
+            stt_text, pause_result, delay_result, pause_idx, startidx, endidx=self.basic_do_stt(length,res,sound,startidx,endidx,silenceidx)
+            result, annotations=self.basic_annotation_stt(result,stt_text,pause_idx)
+            text, denotations, attributes = self.parse_data([result], [annotations])
+            result["denotations"] = denotations
+            result["attributes"] = attributes
+            data = self.make_json(text,denotations,attributes)
+
+            return json.dumps(data, indent=4,ensure_ascii=False)

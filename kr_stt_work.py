@@ -1,4 +1,4 @@
-#new_(json output+함수명변경)
+#new_(annotation detection 변경)
 
 from pydub import AudioSegment, silence
 from nltk.tokenize import sent_tokenize
@@ -6,13 +6,11 @@ from nltk.tokenize import sent_tokenize
 import os
 import requests
 import re
-import fugashi
 import json
 import time
 import uuid
 import openai #openai 라이브러리 install 필요
-import ast 
-
+import ast
 
 class KorStt:
     def process_stt_result(self,stt):
@@ -28,7 +26,7 @@ class KorStt:
 
     def basic_indexing(self,filename):
         filepath = f"{os.environ['UPLOAD_PATH']}/{filename}.mp3"
-        myaudio = AudioSegment.from_file(filepath)
+        myaudio = AudioSegment.from_file(filepath) # 잠깐 수정
         dBFS = myaudio.dBFS
         sound = silence.detect_nonsilent(
             myaudio, min_silence_len=1000, silence_thresh=dBFS - 16, seek_step=100)  # 1초 이상의 silence
@@ -49,7 +47,7 @@ class KorStt:
 
         headers = {
         'Content-type': 'audio/wav;codec="audio/pcm";',
-        'Ocp-Apim-Subscription-Key': os.environ["STT_KEY"],
+        'Ocp-Apim-Subscription-Key': os.environ["STT_KEY"]
         #   'Authorization': Bearer ACCESS_TOKEN'
         }
 
@@ -91,23 +89,27 @@ class KorStt:
             os.remove("temp.wav")
         return pause_final, text, pause_result, delay_result, pause_idx, start_idx, end_idx
 
-    def basic_annotation_stt(self, result,stt,pause_final,pause_idx):
+    def basic_annotation_stt(self, result, stt, pause_final, pause_idx):
 
-        p = re.compile('(\w\(filler\)|\w+\s\w+\(cancellation\))')
-        aidx = []
+        a = re.compile('(\w\(filler\)|\w+\s\w+\(cancellation\))')
+        fidx = []
+        cidx = []
 
         while (True):
-            f = p.search(stt)
+            f = a.search(stt)
             if f == None:
                 break
-            aidx.append([f.start(), f.end()])
+            if f.group(1)[-8:] == '(filler)':
+                fidx.append([f.start(), f.end()])
+            elif f.group(1)[-14:] == '(cancellation)':
+                cidx.append([f.start(), f.end()])
             stt = re.sub("(\(filler\)|\(cancellation\))", "", stt, 1)
 
-        for i in range(len(aidx)):
-            if stt[aidx[i][0]] == '음' or stt[aidx[i][0]] == '그' or stt[aidx[i][0]] == '어'or stt[aidx[i][0]] == '아':
-                result['annotations'].append({'start': aidx[i][0], 'end': aidx[i][0] + 1, 'type': 'FILLER'})
-            else :
-                result['annotations'].append({'start': aidx[i][0], 'end': aidx[i][1] - 14, 'type': 'CANCELLATION'})
+        for i in range(len(fidx)):
+            result['annotations'].append({'start': fidx[i][0], 'end': fidx[i][1] - 8, 'type': 'FILLER'})
+
+        for i in range(len(cidx)):
+            result['annotations'].append({'start': cidx[i][0], 'end': cidx[i][1] -14, 'type': 'CANCELLATION'})
 
         p = [m.start(0) for m in re.finditer('\(pause\)', pause_final)]
 
@@ -130,16 +132,16 @@ class KorStt:
 
         files = []
         local_file = []
-        
+
         for i in range(length):
             filetmp = uuid.uuid4()
-            filepath = f"{os.environ['UPLOAD_PATH']}/{filetmp}.wav"
+            filepath = f"{os.environ['UPLOAD_PATH']}/{filetmp}.mp3"
             myaudio[startidx[i]:endidx[i]].export(filepath, format="wav")
             files += [ domain + "/" + filepath ]
             local_file += [ filepath ]
 
-        if not len(files) > 0:  
-            return None  
+        if not len(files) > 0:
+            return None
         res={'values':[]}
 
         webhook_res = requests.post(
@@ -169,7 +171,7 @@ class KorStt:
 
             time.sleep(1)
         for file in local_file:
-            os.unlink(file)          
+            os.unlink(file)
         return res
 
     def parse_data(self, stt_result,stt_feedback):
@@ -186,67 +188,18 @@ class KorStt:
         attributes=attributes[:-1]
         denotations+="]"
         attributes+="]"
-        return text,denotations,attributes
+        return text, denotations, attributes
 
-    
+
     def make_json(self, text,denotations,attributes):
         data = {
-        "text": text,
-        "denotations": ast.literal_eval(denotations) if type(denotations) == str else denotations ,
-        "attributes": ast.literal_eval(attributes) if type(attributes) == str else attributes,
-        "config": {
-            "boundarydetection": False,
-            "non-edge characters": [],
-            "function availability": {
-                "logo" : False,
-                "relation": False,
-                "block": False,
-                "simple": False,
-                "replicate": False,
-                "replicate-auto": False,
-                "setting": False,
-                "read": False,
-                "write": False,
-                "write-auto": False,
-                "line-height": False,
-                "line-height-auto": False,
-                "help": False
-            },
-            "entity types": [
-                {
-                    "id": "Cancellation",
-                    "color": "#ff5050"
-                },
-                {
-                    "id": "Filler",
-                    "color": "#ffff50",
-                    "default": True
-                },
-                {
-                    "id": "Pause",
-                    "color": "#404040"
-                }
-            ],
-            "attribute types": [
-                {
-                    "pred": "Unsure",
-                    "value type": "flag",
-                    "default": True,
-                    "label": "?",
-                    "color": "#fa94c0"
-                },
-                {
-                    "pred": "Note",
-                    "value type": "string",
-                    "default": "",
-                    "values": []
-                }
-            ]
-          }
+            "text": text,
+            "denotations": ast.literal_eval(denotations) if type(denotations) == str else denotations,
+            "attributes": ast.literal_eval(attributes) if type(attributes) == str else attributes
         }
-        
+
         return data
-    
+
 
     #마지막 실행 함수
 
@@ -254,10 +207,11 @@ class KorStt:
         result = {'textFile': '', 'timestamps': [], 'annotations': []}
         length, sound, startidx, endidx, silenceidx, myaudio = self.basic_indexing(filename)
         res=self.request_api(length,myaudio,startidx,endidx)
-        if res==None:  
-            raise Exception("INVALID-FILE")        
+        if res==None:
+            raise Exception("INVALID-FILE")
 
         pause_final, stt_t, pause_result, delay_result, pause_idx, start_idx, end_idx = self.basic_do_stt(sound, myaudio, startidx, endidx, silenceidx)
+
         stt_t = stt_t.replace('\n', '') #stt_t
         stt = self.process_stt_result(stt_t)
 
@@ -271,6 +225,6 @@ class KorStt:
         text,denotations,attributes = self.parse_data(result,stt_feedback)
         data = self.make_json(text,denotations,attributes)
 
-        return json.dumps(data, indent=4,ensure_ascii=False)
+        return json.dumps(data, indent=4, ensure_ascii=False)
 
     #한국어버전 끝

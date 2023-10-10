@@ -129,6 +129,10 @@ def edit_assignment(as_no,limit_time, as_name, as_type, keyword, prob_translang_
     else:
         prob_translang_source = "ko-KR"
     if prob_split_region is not None:
+        old_stt = Stt.query.filter_by(assignment_no=as_no, user_no = user_info["user_no"]).all()
+        print(as_no, user_info["user_no"])
+        for old in old_stt:
+            db.session.delete(old)
         for region in prob_split_region:
             #json region을 dict로 변환
             region = region.replace("'",'"')
@@ -215,7 +219,7 @@ def mod_as(lecture_no,as_no,week,limit_time,as_name,as_type,keyword,description,
             task = do_stt_work.delay(split_url,lecture_major)
             pr = Prob_region(assignment_no=acc.assignment_no,region_index=reg_index,start=reg_start,end=reg_end,upload_url=split_url, job_id=task.id)
             db.session.add(pr)
-            db.session.commit()
+        db.session.commit()
 
 
 def get_wav_url(as_no):

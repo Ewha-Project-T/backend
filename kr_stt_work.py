@@ -1,4 +1,4 @@
-#new_(annotation detection 변경)
+#new_(api_mp3 + config)
 
 from pydub import AudioSegment, silence
 from nltk.tokenize import sent_tokenize
@@ -136,7 +136,7 @@ class KorStt:
         for i in range(length):
             filetmp = uuid.uuid4()
             filepath = f"{os.environ['UPLOAD_PATH']}/{filetmp}.mp3"
-            myaudio[startidx[i]:endidx[i]].export(filepath, format="wav")
+            myaudio[startidx[i]:endidx[i]].export(filepath, format="mp3")
             files += [ domain + "/" + filepath ]
             local_file += [ filepath ]
 
@@ -194,10 +194,59 @@ class KorStt:
     def make_json(self, text,denotations,attributes):
         data = {
             "text": text,
-            "denotations": ast.literal_eval(denotations) if type(denotations) == str else denotations,
-            "attributes": ast.literal_eval(attributes) if type(attributes) == str else attributes
+            "denotations": ast.literal_eval(denotations) if type(denotations) == str else denotations ,
+            "attributes": ast.literal_eval(attributes) if type(attributes) == str else attributes,
+            "config": {
+                "boundarydetection": False,
+                "non-edge characters": [],
+                "function availability": {
+                    "logo": False,
+                    "relation": False,
+                    "block": False,
+                    "simple": False,
+                    "replicate": False,
+                    "replicate-auto": False,
+                    "setting": False,
+                    "read": False,
+                    "write": False,
+                    "write-auto": False,
+                    "line-height": False,
+                    "line-height-auto": False,
+                    "help": False
+                },
+                "entity types": [
+                    {
+                        "id": "Cancellation",
+                        "color": "#ff5050"
+                    },
+                    {
+                        "id": "Filler",
+                        "color": "#ffff50",
+                        "default": True
+                    },
+                    {
+                        "id": "Pause",
+                        "color": "#404040"
+                    }
+                ],
+                "attribute types": [
+                    {
+                        "pred": "Unsure",
+                        "value type": "flag",
+                        "default": True,
+                        "label": "?",
+                        "color": "#fa94c0"
+                    },
+                    {
+                        "pred": "Note",
+                        "value type": "string",
+                        "default": "",
+                        "values": []
+                    }
+                ]
+            }
         }
-
+        
         return data
 
 

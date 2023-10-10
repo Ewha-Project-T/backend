@@ -91,7 +91,7 @@ class KorStt:
 
     def basic_annotation_stt(self, result, stt, pause_final, pause_idx):
 
-        a = re.compile('(\w\(filler\)|\w+\(cancellation\))')
+        a = re.compile('(\w+\(filler\)|\w+\(cancellation\))')
         fidx = []
         cidx = []
 
@@ -142,36 +142,51 @@ class KorStt:
 
         if not len(files) > 0:
             return None
-        res={'values':[]}
 
-        webhook_res = requests.post(
-            os.environ["STT_URL"],
-            headers={
-                "Content-Type": "application/json",
-                "Ocp-Apim-Subscription-Key": os.environ["STT_KEY"]
-            },
-            json={
-                "contentUrls": files,
-                "properties": {
-                    "diarizationEnabled": False,
-                    "wordLevelTimestampsEnabled": True,
-                    "punctuationMode": "DictatedAndAutomatic",
-                    "profanityFilterMode": "Masked"
-                },
-                "locale": "ko-KR",
-                "displayName": "Transcription of file using default model for en-US"
-            }
-        ).json()
-        url = webhook_res["links"]["files"]
-        while len(res["values"]) == 0:
-            res = requests.get(
-                url,
-                headers={ "Ocp-Apim-Subscription-Key": os.environ['STT_KEY'] }
-            ).json()
+        res=[0 for i in range(length)]
 
-            time.sleep(1)
-        for file in local_file:
-            os.unlink(file)
+        for f in local_file:
+            with open(f, 'rb') as payload:
+                url = "https://koreacentral.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=ko-KR"
+                headers = {
+                    "Content-Type": "application/json",
+                    "Ocp-Apim-Subscription-Key": "18c20da6bd3447238718e3a5738a5ea1" #os.environ["STT_KEY"]
+                }
+                json={
+                    "contentUrls": files,
+                    "properties": {
+                          "diarizationEnabled": False,
+                          "wordLevelTimestampsEnabled": True,
+                          "punctuationMode": "DictatedAndAutomatic",
+                          "profanityFilterMode": "Masked"
+                    },
+                    "locale": "ko-KR",
+                    "displayName": "Transcription of file using default model for en-US"
+                }
+                response = requests.request("POST", url, headers=headers, data=payload, json=json)
+                
+                if response.status_code != 200:
+                    try:
+                        response.raise_for_status()
+                        text = response.text.strip()
+                        if len(text) > 0:
+                            print("Recognized text: ", text)
+                        else:
+                            print("No speech detected")
+                    except requests.exceptions.HTTPError as e:
+                        print("HTTP error: ", e)
+                    except requests.exceptions.ConnectionError as e:
+                        print("Error connecting to server: ", e)
+                    except requests.exceptions.Timeout as e:
+                        print("Timeout error: ", e)
+                    except requests.exceptions.RequestException as e:
+                        print("Error: ", e)
+                res[i] = response.text
+                print(res[i])
+
+        for f in local_file:
+            os.unlink(f)
+
         return res
 
     def parse_data(self, stt_result,stt_feedback):

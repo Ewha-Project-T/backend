@@ -182,7 +182,6 @@ class KorStt:
                     except requests.exceptions.RequestException as e:
                         print("Error: ", e)
                 res[i] = response.text
-                print(res[i])
 
         for f in local_file:
             os.unlink(f)

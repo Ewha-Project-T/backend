@@ -2,7 +2,7 @@ import ast
 import json
 from server import db
 from .assignment_service import get_prob_wav_url, get_stt_result, make_json, make_json_url, parse_data
-from ..model import Assignment_check, Assignment_check_list, Attendee, Assignment, Assignment_management, Prob_region, User
+from ..model import Assignment_check, Assignment_check_list, Attendee, Assignment, Assignment_management, Prob_region, Stt, SttJob, User
 
 def get_json_textae(as_no,user_no):
     assignment = Assignment.query.filter_by(assignment_no=as_no).first()
@@ -84,8 +84,18 @@ def get_feedback_info(as_no: int, student_no: int, user_no: int):
     assignment_check_list = Assignment_check_list.query.filter_by(check_no=assignment_check.check_no).all()
     if not assignment_check_list:
         return {"message": "해당 학생의 오디오 파일이 존재하지 않습니다.", "isSuccess": False}
-    
+    stt = Stt.query.filter_by(assignment_no=as_no, user_no = user_no).all()
+    text,denotations_json,attributes_json ="",[],[]
+    for st in stt:
+        stt_job = SttJob.query.filter_by(stt_no=st.stt_no).first()
+        result = json.loads(stt_job.stt_result)
+        text += result["text"]
+        # denotations_json += result["denotations"]
+        # attributes_json += result["attributes"]
+
     res = dict()
+    # res["original_ae"] = json.loads(make_json(text, denotations_json, attributes_json))
+    res["original_tts"] = text
     res["original_text"] = assignment.original_text
     res["student_name"] = user.name
     res["submit_time"] = assignment_manage.end_submission_time

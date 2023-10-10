@@ -1,4 +1,4 @@
-#new_(api_mp3 + config)
+#new_stt 
 
 from pydub import AudioSegment, silence
 from nltk.tokenize import sent_tokenize
@@ -9,7 +9,7 @@ import re
 import json
 import time
 import uuid
-import openai #openai 라이브러리 install 필요
+import openai
 import ast
 
 class KorStt:
@@ -80,7 +80,7 @@ class KorStt:
                         pause_final += ' '
 
                     if i < len(sound) - 1:
-                        pause_final += "(pause)" #"(pause: " + str(silenceidx[i]/1000)+"sec) "
+                        pause_final += "(pause)"  #"(pause: " + str(silenceidx[i]/1000)+"sec) "
                         text = text+' '
                         pause_result += silenceidx[i]
                         pause_idx.append(silenceidx[i])
@@ -91,7 +91,7 @@ class KorStt:
 
     def basic_annotation_stt(self, result, stt, pause_final, pause_idx):
 
-        a = re.compile('(\w\(filler\)|\w+\s\w+\(cancellation\))')
+        a = re.compile('(\w\(filler\)|\w+\(cancellation\))')
         fidx = []
         cidx = []
 
@@ -136,7 +136,7 @@ class KorStt:
         for i in range(length):
             filetmp = uuid.uuid4()
             filepath = f"{os.environ['UPLOAD_PATH']}/{filetmp}.mp3"
-            myaudio[startidx[i]:endidx[i]].export(filepath, format="mp3")
+            myaudio[startidx[i]:endidx[i]].export(filepath, format="wav")
             files += [ domain + "/" + filepath ]
             local_file += [ filepath ]
 

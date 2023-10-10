@@ -356,15 +356,19 @@ def assignment_detail_record(as_no:int, user_no:int):
             "region_index": int(att.region_index),
             "start": float(att.start),
             "end": float(att.end),
-            "upload_url": "./upload/"+str(att.upload_url),
+            "upload_url": "./upload/"+str(att.upload_url)+".mp3",
         }
         for att in audio_region
     ]
-    res = dict()
-    res["keyword"] = assignment.keyword
-    res["as_name"] = assignment.as_name
-    res["as_type"] = assignment.as_type
-    res["audio_regions_url"] = audio_regions_url
+
+    res = {
+        "tes": "set",
+        # "keyword": assignment.keyword,
+        # "as_name": assignment.as_name,
+        # "as_type": assignment.as_type,
+        # "audio_regions_url": audio_regions_url,
+    }
+
     assignment_management.submission_count += 1
     db.session.commit()
 

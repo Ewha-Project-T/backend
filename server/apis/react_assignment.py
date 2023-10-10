@@ -329,10 +329,12 @@ class React_Prob_record(Resource):
         args = parser.parse_args()
         as_no = args['as_no']
         res = assignment_detail_record(as_no, user_info["user_no"])
-
+        print(res)
         if not res.get("audio_regions_url") :
             return jsonify(res), 401
-        return jsonify(res)
+        if not res.get("message") :
+            return jsonify(res), 401
+        return json.dumps(res)
     @jwt_required()
     def post(self):
         user_info=get_jwt_identity()

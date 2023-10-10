@@ -112,8 +112,7 @@ def do_stt_work(self, filename, locale="ko-KR"):
         endidx="",
         silenceidx="",
     )
-
-    job.stt_result = repr(result_stt_json)
+    job.stt_result = result_stt_json
     session.add(job)
     session.commit()
     return result_stt_json

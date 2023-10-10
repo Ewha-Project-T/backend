@@ -595,6 +595,8 @@ def get_prob_submit_list(as_no,lecture_no):
         check=Assignment_management.query.filter_by(assignment_no=as_no,attendee_no=i.attendee_no).first()
         tmp["check"] = check.end_submission
         tmp["submit_time"] = check.end_submission_time
+        tmp["submit_count"] = check.submission_count
+        tmp["chance_count"] = check.chance_count
         submit_list.append(tmp)
 
     return submit_list

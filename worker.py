@@ -84,6 +84,7 @@ class DBTask(Task):
 
 @celery.task(base=DBTask, bind=True)
 def do_stt_work(self, filename, locale="ko-KR"):
+    result_stt_json = None
     session = self.session
     self.update_state(state='INDEXING')
     if(locale=="ja-JP"):
@@ -102,6 +103,7 @@ def do_stt_work(self, filename, locale="ko-KR"):
     if not stt_db:
         return False
 
+    print("request id = ",self.request.id, "stt_no = ", stt_db.stt_no)
     job = SttJob(
         job_id=self.request.id,
         stt_no=stt_db.stt_no,

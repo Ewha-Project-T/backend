@@ -27,12 +27,12 @@ def get_json_textae(as_no,user_no):
         text,denotations,attributes=parse_data(stt_result,stt_feedback)
         denotations_json = json.loads(denotations)
         attributes_json = json.loads(attributes)
-        # url=make_json_url(text,denotations_json,attributes_json,check,1)
-        url = make_json(text,denotations_json,attributes_json)
+        url=make_json_url(text,denotations_json,attributes_json,check,1)
+        textae = make_json(text,denotations_json,attributes_json)
     else:
-        # url=make_json_url(check.ae_text,check.ae_denotations, check.ae_attributes, check,0)
-        url = make_json(check.ae_text,check.ae_denotations, check.ae_attributes)
-    return url, assignment_management.review#json, 교수평가
+        url=make_json_url(check.ae_text,check.ae_denotations, check.ae_attributes, check,0)
+        textae = make_json(check.ae_text,check.ae_denotations, check.ae_attributes)
+    return textae,url, assignment_management.review#json, 교수평가
 
 def put_json_textae(as_no,user_no,ae_denotations,ae_attributes):
     assignment = Assignment.query.filter_by(assignment_no=as_no).first()

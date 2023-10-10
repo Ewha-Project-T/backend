@@ -14,10 +14,10 @@ class Feedback_textae(Resource):
         args = self.parser.parse_args()
         as_no=args['as_no']
         user_no = args['user_no']
-        textae,review=get_json_textae(as_no,user_no)
+        textae, url,review=get_json_textae(as_no,user_no)
         if review is False:
-            return jsonify({"textae": json.loads(textae), "isSuccess":False})
-        return jsonify({"textae": json.loads(textae),"isSuccess":True})
+            return jsonify({"textae": json.loads(textae), "url":url,"isSuccess":False})
+        return jsonify({"textae": json.loads(textae),"url":url,"isSuccess":True})
     @jwt_required()
     def put(self):
         self.parser.add_argument('ae_denotations', type=str, action='append')

@@ -68,7 +68,7 @@ class KorStt:
                 response = requests.request(
                     "POST", url, headers=headers, data=payload)
                 if response.status_code != 200:
-                    raise RuntimeError("API server does not response correctly")
+                    raise RuntimeError("API server does not response correctly", response.status_code, response.text)
                 dic = json.loads(response.text)
                 if dic.get("RecognitionStatus") == "Success":
                     stt = dic.get("DisplayText")

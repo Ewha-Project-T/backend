@@ -142,7 +142,6 @@ def get_feedback_review(as_no:int, student_no:int,user_no:int):
         return {"message": "교수의 피드백이 아직 제출되지 않았습니다.", "isSuccess": False}
     res = dict()
     res["review"] = assignment_manage.review
-
     return res
 
 def save_feedback_review(as_no:int, student_no:int, user_no:int,review:str):

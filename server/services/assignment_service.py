@@ -427,7 +427,7 @@ def assignment_end_submission(as_no:int, user_no:int):
     assignment_check_list = Assignment_check_list.query.filter_by(check_no = assignment_check.check_no).all()
     for assignment_check_list_one in assignment_check_list:
         # mapping_sst_user(acc.assignment_no, split_url,user_info)
-        mapping_sst_user(assignment_check_list_one.assignment_no, assignment_check_list_one.acl_uuid, {"user_no" : user_no})
+        mapping_sst_user(assignment_check_list_one.acl_no, assignment_check_list_one.acl_uuid, {"user_no" : user_no})
         do_stt_work.delay(filename = assignment_check_list_one.acl_uuid, locale = assignment.translang)
     return {"message" : "최종 제출 완료",
             "submission_count" : assignment_management.submission_count

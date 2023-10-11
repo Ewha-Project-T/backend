@@ -320,7 +320,7 @@ def  check_assignment(as_no,lecture_no,uuid,user_info,text=""):
             acc2=Assignment_check_list(check_no=acc.check_no,acl_uuid=uu)
             db.session.add(acc2)
             db.session.commit()
-            do_stt_work.delay(filename=uu,locale=major_convert[locale])
+            # do_stt_work.delay(filename=uu,locale=major_convert[locale])
 
 def assignment_detail(as_no:int, user_no:int):
     assignment = Assignment.query.filter_by(assignment_no = as_no).first()
@@ -444,42 +444,25 @@ def get_as_name(as_no):
     return acc.as_name
 
 def get_stt_result(uuid):
-    stt_result_list=[]
-    stt_feedback_list=[]
-    tmp_idx = 0
-    correction = 1
+    text,denotations,attributes = "", [], []
+
     for i in uuid:
         print("uiud",i)
-        tmp={}
-        stt_acc=Stt.query.filter_by(wav_file=i["uuid"]).first()
-        acc=SttJob.query.filter_by(stt_no=stt_acc.stt_no).first()
-        if acc==None:
-            return None,None
-        tmp["sound"]=acc.sound
-        tmp["startidx"]=acc.startidx
-        tmp["endidx"]=acc.endidx
-        tmp["silenceidx"]=acc.silenceidx
-        print("acc stt_result",acc.stt_result)
-        stt_result=acc.stt_result.replace("'",'"')
-        # stt_result=acc.stt_result
-        # stt_result=stt_result.replace("'",'"')
-        json_result=json.loads(stt_result)
-        tmp["textFile"]=json_result["textFile"].replace("<","&lt").replace(">","&gt")
-        # print(len(tmp["textFile"]))
-        tmp["timestamps"]=json_result["timestamps"]
-        tmp["annotations"]=json_result["annotations"]
-        ann=ast.literal_eval(str(tmp["annotations"]))
-        # print(str(tmp["annotations"]))
-        for i in range(len(ann)):
-            ann[i]["start"]+=tmp_idx #인덱스 보정
-            ann[i]["end"]+=tmp_idx
-        tmp_idx += len(tmp["textFile"]) + correction
-        stt_feedback_list.append(ann)
-        tmp["is_seq"]=acc.is_seq
-        stt_result_list.append(tmp)
-        # print(stt_result_list)
-        # print(stt_feedback_list)
-    return stt_result_list,stt_feedback_list
+        index = len(text)
+        stt=Stt.query.filter_by(wav_file=i["uuid"]).first()
+        stt_job=SttJob.query.filter_by(stt_no=stt.stt_no).first()
+        if stt_job==None:
+            return None, None, None
+        stt_result=json.loads(stt_job.stt_result)
+        text += stt_result["text"]
+        for denotation in stt_result["denotations"]:
+            denotation["span"]["begin"] += index
+            denotation["span"]["end"] += index
+            denotations.append(denotation)
+        attributes += stt_result["attributes"]
+        text += "---------------------------\n"
+
+    return text,str(denotations),str(attributes)
     
 def mod_assignment_listing(lecture_no,assignment_no):
     as_list_result={}

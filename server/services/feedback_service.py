@@ -20,11 +20,14 @@ def get_json_textae(as_no,user_no):
     if assignment_management.end_submission is False:
         return "학생이 최종 제출하지 않았습니다.", False
     if(check.ae_text == "" and check.ae_denotations == "" and check.ae_attributes == ""):
-        wav_url,uuid=get_prob_wav_url(as_no,user_no,assignment.lecture_no)
-        stt_result,stt_feedback=get_stt_result(uuid)
-        if(stt_result==None):
+        _,uuid=get_prob_wav_url(as_no,user_no,assignment.lecture_no)
+        # stt_result,stt_feedback=get_stt_result(uuid)
+        text,denotations,attributes = get_stt_result(uuid)
+        if(text==None):
             return "error:stt", False
-        text,denotations,attributes=parse_data(stt_result,stt_feedback)
+        check.ae_text,check.ae_denotations,check.ae_attributes=text,denotations,attributes
+        db.session.commit()
+        # text,denotations,attributes=parse_data(stt_result,stt_feedback)
         # url=make_json_url(text,denotations_json,attributes_json,check,1)
         # textae = make_json(text,denotations_json,attributes_json)
     else:

@@ -366,11 +366,10 @@ def assignment_detail_record(as_no:int, user_no:int):
     ]
 
     res = {
-        "tes": "set",
-        # "keyword": assignment.keyword,
-        # "as_name": assignment.as_name,
-        # "as_type": assignment.as_type,
-        # "audio_regions_url": audio_regions_url,
+        "keyword": assignment.keyword,
+        "as_name": assignment.as_name,
+        "as_type": assignment.as_type,
+        "audio_regions_url": audio_regions_url,
     }
 
     assignment_management.submission_count += 1

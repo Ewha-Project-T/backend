@@ -65,7 +65,7 @@ def load_api(api_module):
     api_module.add_resource(React_Lecture,'/api/lecture/list',endpoint='react_lecture_list')
     api_module.add_resource(Logout2,'/api/user/logout',endpoint='logout2') # GET POST PUT PATCH DELETE
     api_module.add_resource(prob_upload, '/api/prob_upload', endpoint='prob_upload')
-    api_module.add_resource(Stt, '/stt',endpoint='stt')
+    api_module.add_resource(Stt, '/api/stt',endpoint='stt')
     #추후 삭제 예정
     #api_module.add_resource(React_Prob_mod, '/api/prob/modify', endpoint='react_prob_mod')
     api_module.add_resource(React_Prob_add, '/api/prob/create', endpoint='react_prob_add')

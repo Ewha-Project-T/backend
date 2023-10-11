@@ -25,14 +25,22 @@ def get_json_textae(as_no,user_no):
         if(stt_result==None):
             return "error:stt", False
         text,denotations,attributes=parse_data(stt_result,stt_feedback)
-        denotations_json = json.loads(denotations)
-        attributes_json = json.loads(attributes)
-        url=make_json_url(text,denotations_json,attributes_json,check,1)
-        textae = make_json(text,denotations_json,attributes_json)
+        # url=make_json_url(text,denotations_json,attributes_json,check,1)
+        # textae = make_json(text,denotations_json,attributes_json)
     else:
-        url=make_json_url(check.ae_text,check.ae_denotations, check.ae_attributes, check,0)
-        textae = make_json(check.ae_text,check.ae_denotations, check.ae_attributes)
-    return textae,url, assignment_management.review#json, 교수평가
+        text,denotations,attributes = check.ae_text,check.ae_denotations,check.ae_attributes
+        # url=make_json_url(check.ae_text,check.ae_denotations, check.ae_attributes, check,0)
+    textae = make_json(text,denotations, attributes)
+    new_attribute = "A"+ str(find_max_attribute_number(ast.literal_eval(attributes))+1)
+
+    return textae, new_attribute,assignment_management.review#json, 교수평가
+# attribute = [{'id': 'A1', 'subj': 'T1', 'pred': 'Unsure', 'obj': True}, {'id': 'A10', 'subj': 'T10', 'pred': 'Unsure', 'obj': True}, {'id': 'A11', 'subj': 'T11', 'pred': 'Unsure', 'obj': True}, {'id': 'A12', 'subj': 'T12', 'pred': 'Unsure', 'obj': True}, {'id': 'A13', 'subj': 'T13', 'pred': 'Unsure', 'obj': True}, {'id': 'A16', 'subj': 'T43', 'pred': 'Note', 'obj': 'asdfasdfasdfasdf'}, {'id': 'A2', 'subj': 'T2', 'pred': 'Unsure', 'obj': True}, {'id': 'A3', 'subj': 'T3', 'pred': 'Unsure', 'obj': True}, {'id': 'A4', 'subj': 'T4', 'pred': 'Unsure', 'obj': True}, {'id': 'A5', 'subj': 'T5', 'pred': 'Unsure', 'obj': True}, {'id': 'A6', 'subj': 'T6', 'pred': 'Unsure', 'obj': True}, {'id': 'A7', 'subj': 'T7', 'pred': 'Unsure', 'obj': True}, {'id': 'A8', 'subj': 'T8', 'pred': 'Unsure', 'obj': True}, {'id': 'A9', 'subj': 'T9', 'pred': 'Unsure', 'obj': True}]
+def find_max_attribute_number(attributes):
+    max_attribute = 0
+    for attribute in attributes:
+        if int(attribute['id'][1:]) > max_attribute:
+            max_attribute = int(attribute['id'][1:])
+    return max_attribute
 
 def put_json_textae(as_no,user_no,ae_denotations,ae_attributes):
     assignment = Assignment.query.filter_by(assignment_no=as_no).first()

@@ -123,7 +123,7 @@ class KorStt:
 
         for i in range(length):
             filetmp = uuid.uuid4()
-            filepath = f"{os.environ['UPLOAD_PATH']}/{filetmp}.mp3"
+            filepath = f"{os.environ['UPLOAD_PATH']}/{filetmp}.wav"
             myaudio[startidx[i]:endidx[i]].export(filepath, format="wav")
             files += [ domain + "/" + filepath ]
             local_file += [filepath]

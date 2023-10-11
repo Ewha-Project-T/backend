@@ -358,7 +358,7 @@ class React_Prob_end_submission(Resource):
         as_no = args['as_no']
         res = assignment_end_submission(as_no, user_info["user_no"])
         if not res.get("submission_count") :
-            return jsonify(res), 401
+            return res, 200
         return jsonify(res)
 
 class React_Prob_submit_list(Resource):

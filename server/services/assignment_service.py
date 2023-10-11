@@ -405,32 +405,38 @@ def assignment_record(as_no:int, user_no:int, prob_submits:list):
 def assignment_end_submission(as_no:int, user_no:int):
     assignment = Assignment.query.filter_by(assignment_no = as_no).first()
     if assignment == None:
-        return {"message" : "과제가 존재하지 않습니다."}
+        return {"message" : "과제가 존재하지 않습니다.", "isSuccess" : False}
     if assignment.open_time > datetime.utcnow()+timedelta(hours=9):
-        return {"message" : "아직 과제가 공개되지 않았습니다."}
+        return {"message" : "아직 과제가 공개되지 않았습니다.", "isSuccess" : False}
     if assignment.limit_time < datetime.utcnow()+timedelta(hours=9):
-        return {"message" : "제출 기간이 지났습니다."}
+        return {"message" : "제출 기간이 지났습니다.", "isSuccess" : False}
     attendee = Attendee.query.filter_by(user_no = user_no, lecture_no = assignment.lecture_no).first()
     if attendee == None:
-        return {"message" : "수강생이 아닙니다."}
+        return {"message" : "수강생이 아닙니다.", "isSuccess" : False}
     assignment_check = Assignment_check.query.filter_by(assignment_no = as_no, attendee_no = attendee.attendee_no).order_by(Assignment_check.check_no.desc()).first()
     if assignment_check == None:
-        return {"message" : "제출할 과제가 없습니다."}
+        return {"message" : "제출할 과제가 없습니다.", "isSuccess" : False}
     assignment_management = Assignment_management.query.filter_by(assignment_no = as_no, attendee_no = attendee.attendee_no).first()
     if assignment_management.end_submission is True:
-        return {"message" : "이미 최종 제출하였습니다."}
+        return {"message" : "이미 최종 제출하였습니다.", "isSuccess" : False}
     assignment_management.end_submission = True
     assignment_management.end_submission_time = assignment_check.submit_time
-    db.session.commit()
+    
 
     # do_stt_work
     assignment_check_list = Assignment_check_list.query.filter_by(check_no = assignment_check.check_no).all()
     for assignment_check_list_one in assignment_check_list:
         # mapping_sst_user(acc.assignment_no, split_url,user_info)
-        mapping_sst_user(assignment_check_list_one.acl_no, assignment_check_list_one.acl_uuid, {"user_no" : user_no})
-        do_stt_work.delay(filename = assignment_check_list_one.acl_uuid, locale = assignment.translang)
+        mapping_sst_user(as_no, assignment_check_list_one.acl_uuid, {"user_no" : user_no})
+        #major_convert={"ko":"ko-KR","jp":"ja-JP","en":"en-US","cn":"zh-CN","fr":"fr-FR"}
+        translang = assignment.translang
+        if translang in major_convert:
+            translang = major_convert[translang]
+        do_stt_work.delay(filename = assignment_check_list_one.acl_uuid, locale = translang)
+    db.session.commit()
     return {"message" : "최종 제출 완료",
-            "submission_count" : assignment_management.submission_count
+            "submission_count" : assignment_management.submission_count,
+            "isSuccess" : True
             }
 
 def get_as_name(as_no):
@@ -453,6 +459,7 @@ def get_stt_result(uuid):
         tmp["startidx"]=acc.startidx
         tmp["endidx"]=acc.endidx
         tmp["silenceidx"]=acc.silenceidx
+        print("acc stt_result",acc.stt_result)
         stt_result=acc.stt_result.replace("'",'"')
         # stt_result=acc.stt_result
         # stt_result=stt_result.replace("'",'"')

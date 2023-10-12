@@ -118,7 +118,7 @@ def get_feedback_info(as_no: int, student_no: int, user_no: int):
 
     res["assignment_audio"] = [make_audio_format(assignment_audio) for assignment_audio in assignment_audio]
     res["student_audio"] = [make_audio_format(assignment_check_list, index) for index, assignment_check_list in enumerate(assignment_check_list)]
-
+    res["isSuccess"] = True
     
     return res
 

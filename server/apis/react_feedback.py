@@ -16,7 +16,7 @@ class Feedback_textae(Resource):
         user_no = args['user_no']
         textae, new_attribute, review=get_json_textae(as_no,user_no)
         if review is False:
-            return jsonify({"msg": textae,"isSuccess":False})
+            return jsonify({"message": textae,"isSuccess":False})
         return jsonify({"textae": json.loads(textae), "new_attribute": new_attribute,"isSuccess":True})
     @jwt_required()
     def put(self):

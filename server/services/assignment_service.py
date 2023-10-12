@@ -126,10 +126,12 @@ def edit_assignment(as_no,limit_time, as_name, as_type, keyword, prob_translang_
     for attendee_no in list(set(now_attendees_no) - set(attendees_no)):
         assignment_manage = Assignment_management(assignment_no = assignment_to_edit.assignment_no, attendee_no = attendee_no)
         db.session.add(assignment_manage)
-    if prob_translang_source in major_convert:
-        prob_translang_source = major_convert[prob_translang_source]
-    else:
-        prob_translang_source = "ko-KR"
+    # if prob_translang_source in major_convert:
+    #     prob_translang_source = major_convert[prob_translang_source]
+    # else:
+    #     prob_translang_source = "ko-KR"
+    if prob_translang_source == None:
+        prob_translang_source = "ko"
     if prob_split_region is not None:
         old_stt = Stt.query.filter_by(assignment_no=as_no, user_no = user_info["user_no"]).all()
         print(as_no, user_info["user_no"])

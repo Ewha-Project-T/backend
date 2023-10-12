@@ -83,11 +83,11 @@ class DBTask(Task):
         return self._session
 
 @celery.task(base=DBTask, bind=True)
-def do_stt_work(self, filename, locale="ko-KR"):
+def do_stt_work(self, filename, locale="ko"):
     result_stt_json = None
     session = self.session
     self.update_state(state='INDEXING')
-    if(locale=="ja-JP"):
+    if(locale=="jp"):
         stt=JpStt()
     else:
         stt=KorStt()

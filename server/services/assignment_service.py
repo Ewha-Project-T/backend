@@ -56,7 +56,7 @@ def make_as(user_no,lecture_no,week,limit_time,as_name,as_type,keyword,descripti
             db.session.add(pr)
             db.session.commit
 
-major_convert={"ko":"ko-KR","jp":"ja-JP","en":"en-US","cn":"zh-CN","fr":"fr-FR"}
+# major_convert={"ko":"ko-KR","jp":"ja-JP","en":"en-US","cn":"zh-CN","fr":"fr-FR"}
 def create_assignment(lecture_no :int,limit_time,as_name:str,as_type:str,keyword:str,prob_translang_source:str,prob_translang_destination:str,description:str,speed:float,original_text:str,prob_sound_path:str,prob_split_region,assign_count:int,open_time,file_name:str,file_path:str,user_info,keyword_open:int = True):
     #TODO 검증 필요
     if prob_sound_path and os.path.exists(prob_sound_path) == False:
@@ -69,10 +69,12 @@ def create_assignment(lecture_no :int,limit_time,as_name:str,as_type:str,keyword
     for attendee in attendees: # 수강생들에게 과제를 할당
         assignment_manage = Assignment_management(assignment_no = new_assignment.assignment_no, attendee_no = attendee.attendee_no)
         db.session.add(assignment_manage)
-    if prob_translang_source in major_convert:
-        prob_translang_source = major_convert[prob_translang_source]
-    else:
-        prob_translang_source = "ko-KR"
+    # if prob_translang_source in major_convert:
+    #     prob_translang_source = major_convert[prob_translang_source]
+    # else:
+    #     prob_translang_source = "ko-KR"
+    if prob_translang_source == None:
+        prob_translang_source = "ko"
     if prob_split_region is not None:
         for region in prob_split_region:
             #json region을 dict로 변환
@@ -428,11 +430,9 @@ def assignment_end_submission(as_no:int, user_no:int):
     for assignment_check_list_one in assignment_check_list:
         # mapping_sst_user(acc.assignment_no, split_url,user_info)
         mapping_sst_user(as_no, assignment_check_list_one.acl_uuid, {"user_no" : user_no})
-        #major_convert={"ko":"ko-KR","jp":"ja-JP","en":"en-US","cn":"zh-CN","fr":"fr-FR"}
-        translang = assignment.translang
-        if translang in major_convert:
-            translang = major_convert[translang]
-        do_stt_work.delay(filename = assignment_check_list_one.acl_uuid, locale = translang)
+        if assignment.dest_translang == None:
+            assignment.dest_translang = "ko"
+        do_stt_work.delay(filename = assignment_check_list_one.acl_uuid, locale = assignment.dest_translang)
     db.session.commit()
     return {"message" : "최종 제출 완료",
             "submission_count" : assignment_management.submission_count,

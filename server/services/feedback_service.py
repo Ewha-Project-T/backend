@@ -24,9 +24,9 @@ def get_json_textae(as_no,user_no):
         # stt_result,stt_feedback=get_stt_result(uuid)
         text,denotations,attributes = get_stt_result(uuid)
         if(text==None):
-            return "error:stt", False
+            return "STT 작업중 입니다.", False
         if(text==-1):
-            return "STT 작업중입니다.", False
+            return "STT 오류!!", False
         check.ae_text,check.ae_denotations,check.ae_attributes=text,denotations,attributes
         db.session.commit()
         # text,denotations,attributes=parse_data(stt_result,stt_feedback)

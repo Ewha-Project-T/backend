@@ -456,7 +456,7 @@ def get_stt_result(uuid):
         if stt_job==None:
             return None, None, None
         if stt_job.stt_result==None:
-            return -1, "STT 작업 중 입니다.", -1
+            return -1, "STT 오류", -1
         stt_result=json.loads(stt_job.stt_result)
         text += stt_result["text"]
         for denotation in stt_result["denotations"]:

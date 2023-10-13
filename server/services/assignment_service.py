@@ -622,7 +622,7 @@ def make_json(text,denotations,attributes):
                 "simple": False,
                 "replicate": False,
                 "replicate-auto": False,
-                "setting": False,
+                "setting": True,
                 "read": False,
                 "write": False,
                 "write-auto": False,

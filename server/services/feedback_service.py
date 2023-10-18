@@ -175,6 +175,8 @@ def get_all_graphs(as_no:int, user_no:int):
     res = {
         "Delivery" : avg_delivery(lecture.lecture_no, assignment.assignment_no),
         "Accuracy" : avg_accuracy(lecture.lecture_no, assignment.assignment_no),
+        "DeliveryDetail" : detail_delivery(lecture.lecture_no, assignment.assignment_no),
+        "AccuracyDetail" : detail_accuracy(lecture.lecture_no, assignment.assignment_no),
         "isSuccess": True,
     }
     return res
@@ -186,7 +188,6 @@ def avg_delivery(lecture_no:int, assingment_no:int):
         data = dict()
         data["name"] = attendee.user.name
         data["data"] = []
-        print(attendee.user.name)
         for i in ["silence", "filler", "backtracking", "others"]:
             value = Feedback2.query.filter_by(
                 lecture_no=lecture_no, 
@@ -217,3 +218,54 @@ def avg_accuracy(lecture_no:int, assingment_no:int):
             data["data"].append(float(value))
         res.append(data)
     return res
+
+def detail_delivery(lecture_no:int, assignment_no:int):
+    attendees = Attendee.query.filter_by(lecture_no=lecture_no).all()[1:]
+    assignments = Assignment.query.filter_by(lecture_no=lecture_no).filter(Assignment.assignment_no <= assignment_no).all()
+
+    res = []
+    for attendee in attendees:
+        data = dict()
+        data["name"] = attendee.user.name
+        data["data"] = {}
+        for index, assignment in enumerate(assignments, start=1):  # start=1로 설정하여 1부터 시작
+            data["data"]["name"] = str(index) + "회차"
+            data["data"]["data"] = []
+            for i in ["silence", "filler", "backtracking", "others"]:
+                value = Feedback2.query.filter_by(
+                    lecture_no=lecture_no, 
+                    attendee_no=attendee.attendee_no,
+                    assignment_no=assignment.assignment_no
+                ).with_entities(getattr(Feedback2, i)).scalar()
+                value = 0.0 if value is None else float(value)
+                data["data"]["data"].append(float(value))
+        
+        res.append(data)
+
+    #뒤에서 3번째까지만 보여주기
+    return res[-3:]
+
+def detail_accuracy(lecture_no:int, assignment_no:int):
+    attendees = Attendee.query.filter_by(lecture_no=lecture_no).all()[1:]
+    assignments = Assignment.query.filter_by(lecture_no=lecture_no).filter(Assignment.assignment_no <= assignment_no).all()
+
+    res = []
+    for attendee in attendees:
+        data = dict()
+        data["name"] = attendee.user.name
+        data["data"] = {}
+        for assignment in assignments:
+            data["data"]["name"] = assignment.as_name
+            data["data"]["data"] = []
+            for i in ["translation_error", "omission", "expression", "intonation", "grammar_error", "others"]:
+                value = Feedback2.query.filter_by(
+                    lecture_no=lecture_no, 
+                    attendee_no=attendee.attendee_no,
+                    assignment_no=assignment.assignment_no
+                ).with_entities(getattr(Feedback2, i)).scalar()
+                value = 0.0 if value is None else float(value)
+                data["data"]["data"].append(float(value))
+        
+        res.append(data)
+
+    return res[-3:]

@@ -160,26 +160,27 @@ def save_feedback_review(as_no:int, student_no:int, user_no:int,review:str):
         return {"message": "해당 강의를 수강한 학생이 아닙니다.", "isSuccess": False}
     assignment_manage = Assignment_management.query.filter_by(assignment_no=as_no, attendee_no = attendee.attendee_no).first()
     assignment_manage.review = review
+    save_feedback(assignment,attendee)
     db.session.commit()
     return {"message": "피드백이 저장되었습니다.", "isSuccess": True}
 
-def get_all_graphs(as_no:int, user_no:int):
-    assignment = Assignment.query.filter_by(assignment_no=as_no).first()
-    if not assignment:
-        return {"message": "과제가 존재하지 않습니다.", "isSuccess": False}
-    # if not assignment.user_no == user_no:
-    #     return {"message": "과제를 열람할 권한이 없습니다.", "isSuccess": False}
-    lecture = Lecture.query.filter_by(lecture_no=assignment.lecture_no).first()
-    if not lecture:
-        return {"message": "해당 강의가 존재하지 않습니다.", "isSuccess": False}
-    res = {
-        "Delivery" : avg_delivery(lecture.lecture_no, assignment.assignment_no),
-        "Accuracy" : avg_accuracy(lecture.lecture_no, assignment.assignment_no),
-        "DeliveryDetail" : detail_delivery(lecture.lecture_no, assignment.assignment_no),
-        "AccuracyDetail" : detail_accuracy(lecture.lecture_no, assignment.assignment_no),
-        "isSuccess": True,
-    }
-    return res
+def save_feedback(assignment:Assignment,attendee:Attendee):
+    feedback = Feedback2.query.filter_by(assignment_no=assignment.assignment_no, attendee_no=attendee.attendee_no).first()
+    if not feedback:
+        feedback = Feedback2(assignment_no=assignment.assignment_no, attendee_no=attendee.attendee_no, lecture_no=assignment.lecture_no)
+        db.session.add(feedback)    
+    assignment_check = Assignment_check.query.filter_by(assignment_no=assignment.assignment_no, attendee_no=attendee.attendee_no).order_by(Assignment_check.check_no.desc()).first()
+    value = { "translation_error":0,"omission":0,"expression":0,"intonation":0,"grammar_error":0,"silence":0,"filler":0,"backtracking":0,"others":0}
+    for denotation in ast.literal_eval(assignment_check.ae_denotations):
+        objs = [obj.strip() for obj in denotation["obj"].lower().split(",")]
+        for obj in objs:
+            if obj in value.keys():
+                value[obj]+=1
+            else:
+                value["others"]+=1
+    for key, val in value.items():
+        setattr(feedback, key, val)
+    return
 
 def avg_delivery(lecture_no:int, assingment_no:int):
     attendees = Attendee.query.filter_by(lecture_no=lecture_no).all()[1:]

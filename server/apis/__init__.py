@@ -1,5 +1,5 @@
 from server.apis.mail import Email, Verify_email
-from .react_feedback import Feedback_info, Feedback_review, Feedback_textae
+from .react_feedback import Feedback_info, Feedback_professor_graph, Feedback_review, Feedback_textae
 from .login import Login,Join, LoginRefresh, Logout
 from .lecture import Attend, Lecture, Lecture_mod, Lecture_mod_del, Student,Major, Lecture_add
 from .assignment import Prob, Prob_del, Prob_submit, Prob_feedback,Prob_mod,Prob_add, prob_upload, Prob_submit_list, prob_upload_file
@@ -35,6 +35,7 @@ def load_api(api_module):
     api_module.add_resource(Feedback_review, '/api/feedback/review', endpoint='react_prob_review')
 
     api_module.add_resource(React_Prob_submit, '/api/prob/submit', endpoint='react_prob_submit')
+    api_module.add_resource(Feedback_professor_graph, '/api/feedback/professor/graph', endpoint='feedback_professor_graph')
     ############################
     ######옛날 것인데 사용중########
     ############################

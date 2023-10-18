@@ -3,7 +3,7 @@ from flask import jsonify, Flask, request, make_response
 from flask_restful import reqparse, Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from ..services.feedback_service import get_feedback_info, get_feedback_review, get_json_textae, put_json_textae, save_feedback_review
+from ..services.feedback_service import get_all_graphs, get_feedback_info, get_feedback_review, get_json_textae, put_json_textae, save_feedback_review
 
 class Feedback_textae(Resource):
     parser = reqparse.RequestParser()
@@ -98,4 +98,18 @@ class Feedback_review(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('review', type=str, required=True)
         return parser.parse_args().get('review')
+
+class Feedback_professor_graph(Resource):
+
+    def _parse_args(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('as_no', type=int, required=True)
+        return parser.parse_args()
+    
+    @jwt_required()
+    def get(self):
+        args = self._parse_args()
+        user_info = get_jwt_identity()
+        res = get_all_graphs(args['as_no'], user_info['user_no'])
+        return jsonify(res)
 

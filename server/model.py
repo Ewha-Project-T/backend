@@ -175,8 +175,8 @@ class Feedback2(db.Model):
     __tablename__="FEEDBACK"
     feed_no = db.Column(db.Integer, primary_key=True)
     attendee_no = db.Column(db.Integer, db.ForeignKey("ATTENDEE.attendee_no", ondelete="CASCADE"), nullable=True)
-    check_no= db.Column(db.Integer, db.ForeignKey("ASSIGNMENT_CHECK.check_no", ondelete="CASCADE"), nullable=True)
-    submission_count = db.Column(db.Integer, default=0)
+    assignment_no= db.Column(db.Integer, db.ForeignKey("ASSIGNMENT.assignment_no", ondelete="CASCADE"), nullable=True)
+    lecture_no = db.Column(db.Integer, db.ForeignKey("LECTURE.lecture_no", ondelete="CASCADE"), nullable=True)
     translation_error = db.Column(db.Integer, default=0)
     omission = db.Column(db.Integer, default=0)
     expression = db.Column(db.Integer, default=0)

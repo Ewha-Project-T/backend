@@ -8,26 +8,26 @@ from sqlalchemy import func
 def get_json_textae(as_no,user_no):
     assignment = Assignment.query.filter_by(assignment_no=as_no).first()
     if not assignment:
-        return "과제가 존재하지 않습니다.", False
+        return "과제가 존재하지 않습니다.", False, False
     attend=Attendee.query.filter_by(user_no=user_no,lecture_no=assignment.lecture_no).first()
     if not attend:
-        return "수강생이 아닙니다.", False
+        return "수강생이 아닙니다.", False, False
     check=Assignment_check.query.filter_by(assignment_no=as_no,attendee_no=attend.attendee_no,assignment_check=1).order_by(Assignment_check.check_no.desc()).first()
     if not check:
-        return "과제를 제출하지 않았습니다.", False
+        return "과제를 제출하지 않았습니다.", False, False
     assignment_management = Assignment_management.query.filter_by(assignment_no = as_no, attendee_no = attend.attendee_no).first()
     if(assignment_management==None):
-        return "학생 정보가 존재하지 않습니다.", False
+        return "학생 정보가 존재하지 않습니다.", False, False
     if assignment_management.end_submission is False:
-        return "학생이 최종 제출하지 않았습니다.", False
+        return "학생이 최종 제출하지 않았습니다.", False, False
     if(check.ae_text == "" and check.ae_denotations == "" and check.ae_attributes == ""):
         _,uuid=get_prob_wav_url(as_no,user_no,assignment.lecture_no)
         # stt_result,stt_feedback=get_stt_result(uuid)
         text,denotations,attributes = get_stt_result(uuid)
         if(text==None):
-            return "STT 작업중 입니다.", False
+            return "STT 작업중 입니다.", False, False
         if(text==-1):
-            return "STT 오류!!", False
+            return "STT 오류!!", False, False
         check.ae_text,check.ae_denotations,check.ae_attributes=text,denotations,attributes
         db.session.commit()
         # text,denotations,attributes=parse_data(stt_result,stt_feedback)

@@ -181,6 +181,23 @@ def save_feedback(assignment:Assignment,attendee:Attendee):
     for key, val in value.items():
         setattr(feedback, key, val)
     return
+def get_all_graphs(as_no:int, user_no:int):
+    assignment = Assignment.query.filter_by(assignment_no=as_no).first()
+    if not assignment:
+        return {"message": "과제가 존재하지 않습니다.", "isSuccess": False}
+    # if not assignment.user_no == user_no:
+    #     return {"message": "과제를 열람할 권한이 없습니다.", "isSuccess": False}
+    lecture = Lecture.query.filter_by(lecture_no=assignment.lecture_no).first()
+    if not lecture:
+        return {"message": "해당 강의가 존재하지 않습니다.", "isSuccess": False}
+    res = {
+        "Delivery" : avg_delivery(lecture.lecture_no, assignment.assignment_no),
+        "Accuracy" : avg_accuracy(lecture.lecture_no, assignment.assignment_no),
+        "DeliveryDetail" : detail_delivery(lecture.lecture_no, assignment.assignment_no),
+        "AccuracyDetail" : detail_accuracy(lecture.lecture_no, assignment.assignment_no),
+        "isSuccess": True,
+    }
+    return res
 
 def avg_delivery(lecture_no:int, assingment_no:int):
     attendees = Attendee.query.filter_by(lecture_no=lecture_no).all()[1:]
@@ -228,10 +245,11 @@ def detail_delivery(lecture_no:int, assignment_no:int):
     for attendee in attendees:
         data = dict()
         data["name"] = attendee.user.name
-        data["data"] = {}
+        data["data"] = []
         for index, assignment in enumerate(assignments, start=1):  # start=1로 설정하여 1부터 시작
-            data["data"]["name"] = str(index) + "회차"
-            data["data"]["data"] = []
+            tmp = dict()
+            tmp["name"] = str(index) + "회차"
+            tmp["data"] = []
             for i in ["silence", "filler", "backtracking", "others"]:
                 value = Feedback2.query.filter_by(
                     lecture_no=lecture_no, 
@@ -239,12 +257,13 @@ def detail_delivery(lecture_no:int, assignment_no:int):
                     assignment_no=assignment.assignment_no
                 ).with_entities(getattr(Feedback2, i)).scalar()
                 value = 0.0 if value is None else float(value)
-                data["data"]["data"].append(float(value))
-        
+                tmp["data"].append(float(value))
+            data["data"].append(tmp)
+        data["data"] = data["data"][-3:]
         res.append(data)
 
     #뒤에서 3번째까지만 보여주기
-    return res[-3:]
+    return res
 
 def detail_accuracy(lecture_no:int, assignment_no:int):
     attendees = Attendee.query.filter_by(lecture_no=lecture_no).all()[1:]
@@ -254,10 +273,11 @@ def detail_accuracy(lecture_no:int, assignment_no:int):
     for attendee in attendees:
         data = dict()
         data["name"] = attendee.user.name
-        data["data"] = {}
-        for assignment in assignments:
-            data["data"]["name"] = assignment.as_name
-            data["data"]["data"] = []
+        data["data"] = []
+        for index, assignment in enumerate(assignments, start=1):  # start=1로 설정하여 1부터 시작
+            tmp = dict()
+            tmp["name"] = str(index) + "회차"
+            tmp["data"] = []
             for i in ["translation_error", "omission", "expression", "intonation", "grammar_error", "others"]:
                 value = Feedback2.query.filter_by(
                     lecture_no=lecture_no, 
@@ -265,8 +285,9 @@ def detail_accuracy(lecture_no:int, assignment_no:int):
                     assignment_no=assignment.assignment_no
                 ).with_entities(getattr(Feedback2, i)).scalar()
                 value = 0.0 if value is None else float(value)
-                data["data"]["data"].append(float(value))
-        
+                tmp["data"].append(float(value))
+            data["data"].append(tmp)
+        data["data"] = data["data"][-3:]
         res.append(data)
 
-    return res[-3:]
+    return res

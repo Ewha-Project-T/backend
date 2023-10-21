@@ -1,5 +1,7 @@
 import ast
 import json
+import os
+import zipfile
 from server import db
 from .assignment_service import get_prob_wav_url, get_stt_result, make_json, make_json_url, parse_data
 from ..model import Assignment_check, Assignment_check_list, Attendee, Assignment, Assignment_management, Feedback2, Lecture, Prob_region, Stt, SttJob, User
@@ -291,3 +293,26 @@ def detail_accuracy(lecture_no:int, assignment_no:int):
         res.append(data)
 
     return res
+
+def get_zip_url(lecutre_no:int, user_no:int):
+    attendee_no = Attendee.query.filter_by(lecture_no=lecutre_no, user_no=user_no).first().attendee_no
+    user_name = User.query.filter_by(user_no=user_no).first().name
+    assignments = Assignment.query.filter_by(lecture_no=lecutre_no).all()
+    files = []
+    for assignment in assignments:
+        assignment_check = Assignment_check.query.filter_by(assignment_no=assignment.assignment_no, attendee_no=attendee_no).order_by(Assignment_check.check_no.desc()).first()
+        if assignment_check is None:
+            continue
+        if assignment_check.ae_text != "" and assignment_check.ae_denotations != "" and assignment_check.ae_attributes != "":
+            text_ae = make_json(assignment_check.ae_text, assignment_check.ae_denotations, assignment_check.ae_attributes)
+            path = os.environ["UPLOAD_PATH"] + "/" + str(assignment.assignment_no) + "_" + str(user_name) + ".json"
+            files.append(path)
+            #json 파일 만들기
+            with open(path, "w") as f:
+                f.write(text_ae)
+    #zip 파일 만들기
+    zip_path = os.environ["UPLOAD_PATH"] + "/" + str(lecutre_no) + "_" + str(user_name) + ".zip"
+    with zipfile.ZipFile(zip_path, "w") as f:
+        for file in files:
+            f.write(file, os.path.basename(file))
+    return zip_path

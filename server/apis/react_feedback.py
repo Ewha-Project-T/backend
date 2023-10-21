@@ -3,7 +3,7 @@ from flask import jsonify, Flask, request, make_response
 from flask_restful import reqparse, Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from ..services.feedback_service import get_all_graphs, get_feedback_info, get_feedback_review, get_json_textae, put_json_textae, save_feedback_review
+from ..services.feedback_service import get_all_graphs, get_feedback_info, get_feedback_review, get_json_textae, get_zip_url, put_json_textae, save_feedback_review
 
 class Feedback_textae(Resource):
     parser = reqparse.RequestParser()
@@ -113,3 +113,13 @@ class Feedback_professor_graph(Resource):
         res = get_all_graphs(args['as_no'], user_info['user_no'])
         return jsonify(res)
 
+class assignment_zip_down(Resource): # 과제 압축파일 다운로드 개발 후 삭제
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('lecture_no', type=int, required=True)
+        parser.add_argument('user_no', type=int, required=True)
+        args=parser.parse_args()
+        path = get_zip_url(args['lecture_no'],args['user_no'])
+        return jsonify({"url":path,
+                        "isSucces":True,
+                        })

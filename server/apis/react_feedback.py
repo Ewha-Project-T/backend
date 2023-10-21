@@ -3,7 +3,7 @@ from flask import jsonify, Flask, request, make_response
 from flask_restful import reqparse, Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from ..services.feedback_service import get_feedback_info, get_json_textae, put_json_textae
+from ..services.feedback_service import get_all_graphs, get_feedback_info, get_feedback_review, get_json_textae, put_json_textae, save_feedback_review
 
 class Feedback_textae(Resource):
     parser = reqparse.RequestParser()
@@ -14,10 +14,10 @@ class Feedback_textae(Resource):
         args = self.parser.parse_args()
         as_no=args['as_no']
         user_no = args['user_no']
-        textae,review=get_json_textae(as_no,user_no)
+        textae, new_attribute, review=get_json_textae(as_no,user_no)
         if review is False:
-            return jsonify({"textae": json.loads(textae), "isSuccess":False})
-        return jsonify({"textae": json.loads(textae),"isSuccess":True})
+            return jsonify({"message": textae,"isSuccess":False})
+        return jsonify({"textae": json.loads(textae), "new_attribute": new_attribute,"isSuccess":True})
     @jwt_required()
     def put(self):
         self.parser.add_argument('ae_denotations', type=str, action='append')
@@ -67,3 +67,49 @@ class Feedback_info(Resource):
         user_info = get_jwt_identity()
         res = get_feedback_info(as_no, student_no, user_info['user_no'])
         return jsonify(res)
+
+class Feedback_review(Resource):
+
+    def _parse_args(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('as_no', type=int, required=True)
+        parser.add_argument('student_no', type=int, required=True)
+        return parser.parse_args()
+
+    def _get_user_info(self):
+        return get_jwt_identity()
+
+    @jwt_required()
+    def get(self):
+        args = self._parse_args()
+        user_info = self._get_user_info()
+        res = get_feedback_review(args['as_no'], args['student_no'], user_info['user_no'])
+        return jsonify(res)
+
+    @jwt_required()
+    def post(self):
+        args = self._parse_args()
+        args.update({'review': self._parse_review()})
+        user_info = self._get_user_info()
+        res = save_feedback_review(args['as_no'], args['student_no'], user_info['user_no'], args['review'])
+        return jsonify(res)
+
+    def _parse_review(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('review', type=str, required=True)
+        return parser.parse_args().get('review')
+
+class Feedback_professor_graph(Resource):
+
+    def _parse_args(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('as_no', type=int, required=True)
+        return parser.parse_args()
+    
+    @jwt_required()
+    def get(self):
+        args = self._parse_args()
+        user_info = get_jwt_identity()
+        res = get_all_graphs(args['as_no'], user_info['user_no'])
+        return jsonify(res)
+

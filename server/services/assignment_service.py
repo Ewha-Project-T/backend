@@ -56,7 +56,7 @@ def make_as(user_no,lecture_no,week,limit_time,as_name,as_type,keyword,descripti
             db.session.add(pr)
             db.session.commit
 
-major_convert={"ko":"ko-KR","jp":"ja-JP","en":"en-US","cn":"zh-CN","fr":"fr-FR"}
+# major_convert={"ko":"ko-KR","jp":"ja-JP","en":"en-US","cn":"zh-CN","fr":"fr-FR"}
 def create_assignment(lecture_no :int,limit_time,as_name:str,as_type:str,keyword:str,prob_translang_source:str,prob_translang_destination:str,description:str,speed:float,original_text:str,prob_sound_path:str,prob_split_region,assign_count:int,open_time,file_name:str,file_path:str,user_info,keyword_open:int = True):
     #TODO 검증 필요
     if prob_sound_path and os.path.exists(prob_sound_path) == False:
@@ -69,10 +69,12 @@ def create_assignment(lecture_no :int,limit_time,as_name:str,as_type:str,keyword
     for attendee in attendees: # 수강생들에게 과제를 할당
         assignment_manage = Assignment_management(assignment_no = new_assignment.assignment_no, attendee_no = attendee.attendee_no)
         db.session.add(assignment_manage)
-    if prob_translang_source in major_convert:
-        prob_translang_source = major_convert[prob_translang_source]
-    else:
-        prob_translang_source = "ko-KR"
+    # if prob_translang_source in major_convert:
+    #     prob_translang_source = major_convert[prob_translang_source]
+    # else:
+    #     prob_translang_source = "ko-KR"
+    if prob_translang_source == None:
+        prob_translang_source = "ko"
     if prob_split_region is not None:
         for region in prob_split_region:
             #json region을 dict로 변환
@@ -124,11 +126,17 @@ def edit_assignment(as_no,limit_time, as_name, as_type, keyword, prob_translang_
     for attendee_no in list(set(now_attendees_no) - set(attendees_no)):
         assignment_manage = Assignment_management(assignment_no = assignment_to_edit.assignment_no, attendee_no = attendee_no)
         db.session.add(assignment_manage)
-    if prob_translang_source in major_convert:
-        prob_translang_source = major_convert[prob_translang_source]
-    else:
-        prob_translang_source = "ko-KR"
+    # if prob_translang_source in major_convert:
+    #     prob_translang_source = major_convert[prob_translang_source]
+    # else:
+    #     prob_translang_source = "ko-KR"
+    if prob_translang_source == None:
+        prob_translang_source = "ko"
     if prob_split_region is not None:
+        old_stt = Stt.query.filter_by(assignment_no=as_no, user_no = user_info["user_no"]).all()
+        print(as_no, user_info["user_no"])
+        for old in old_stt:
+            db.session.delete(old)
         for region in prob_split_region:
             #json region을 dict로 변환
             region = region.replace("'",'"')
@@ -215,7 +223,7 @@ def mod_as(lecture_no,as_no,week,limit_time,as_name,as_type,keyword,description,
             task = do_stt_work.delay(split_url,lecture_major)
             pr = Prob_region(assignment_no=acc.assignment_no,region_index=reg_index,start=reg_start,end=reg_end,upload_url=split_url, job_id=task.id)
             db.session.add(pr)
-            db.session.commit()
+        db.session.commit()
 
 
 def get_wav_url(as_no):
@@ -316,7 +324,7 @@ def  check_assignment(as_no,lecture_no,uuid,user_info,text=""):
             acc2=Assignment_check_list(check_no=acc.check_no,acl_uuid=uu)
             db.session.add(acc2)
             db.session.commit()
-            do_stt_work.delay(filename=uu,locale=major_convert[locale])
+            # do_stt_work.delay(filename=uu,locale=major_convert[locale])
 
 def assignment_detail(as_no:int, user_no:int):
     assignment = Assignment.query.filter_by(assignment_no = as_no).first()
@@ -356,15 +364,18 @@ def assignment_detail_record(as_no:int, user_no:int):
             "region_index": int(att.region_index),
             "start": float(att.start),
             "end": float(att.end),
-            "upload_url": "./upload/"+str(att.upload_url),
+            "upload_url": "./upload/"+str(att.upload_url)+".mp3",
         }
         for att in audio_region
     ]
-    res = dict()
-    res["keyword"] = assignment.keyword
-    res["as_name"] = assignment.as_name
-    res["as_type"] = assignment.as_type
-    res["audio_regions_url"] = audio_regions_url
+
+    res = {
+        "keyword": assignment.keyword,
+        "as_name": assignment.as_name,
+        "as_type": assignment.as_type,
+        "audio_regions_url": audio_regions_url,
+    }
+
     assignment_management.submission_count += 1
     db.session.commit()
 
@@ -398,32 +409,36 @@ def assignment_record(as_no:int, user_no:int, prob_submits:list):
 def assignment_end_submission(as_no:int, user_no:int):
     assignment = Assignment.query.filter_by(assignment_no = as_no).first()
     if assignment == None:
-        return {"message" : "과제가 존재하지 않습니다."}
+        return {"message" : "과제가 존재하지 않습니다.", "isSuccess" : False}
     if assignment.open_time > datetime.utcnow()+timedelta(hours=9):
-        return {"message" : "아직 과제가 공개되지 않았습니다."}
+        return {"message" : "아직 과제가 공개되지 않았습니다.", "isSuccess" : False}
     if assignment.limit_time < datetime.utcnow()+timedelta(hours=9):
-        return {"message" : "제출 기간이 지났습니다."}
+        return {"message" : "제출 기간이 지났습니다.", "isSuccess" : False}
     attendee = Attendee.query.filter_by(user_no = user_no, lecture_no = assignment.lecture_no).first()
     if attendee == None:
-        return {"message" : "수강생이 아닙니다."}
+        return {"message" : "수강생이 아닙니다.", "isSuccess" : False}
     assignment_check = Assignment_check.query.filter_by(assignment_no = as_no, attendee_no = attendee.attendee_no).order_by(Assignment_check.check_no.desc()).first()
     if assignment_check == None:
-        return {"message" : "제출할 과제가 없습니다."}
+        return {"message" : "제출할 과제가 없습니다.", "isSuccess" : False}
     assignment_management = Assignment_management.query.filter_by(assignment_no = as_no, attendee_no = attendee.attendee_no).first()
     if assignment_management.end_submission is True:
-        return {"message" : "이미 최종 제출하였습니다."}
+        return {"message" : "이미 최종 제출하였습니다.", "isSuccess" : False}
     assignment_management.end_submission = True
     assignment_management.end_submission_time = assignment_check.submit_time
-    db.session.commit()
+    
 
     # do_stt_work
     assignment_check_list = Assignment_check_list.query.filter_by(check_no = assignment_check.check_no).all()
     for assignment_check_list_one in assignment_check_list:
         # mapping_sst_user(acc.assignment_no, split_url,user_info)
-        mapping_sst_user(assignment_check_list_one.assignment_no, assignment_check_list_one.acl_uuid, {"user_no" : user_no})
-        do_stt_work.delay(filename = assignment_check_list_one.acl_uuid, locale = assignment.translang)
+        mapping_sst_user(as_no, assignment_check_list_one.acl_uuid, {"user_no" : user_no})
+        if assignment.dest_translang == None:
+            assignment.dest_translang = "ko"
+        do_stt_work.delay(filename = assignment_check_list_one.acl_uuid, locale = assignment.dest_translang)
+    db.session.commit()
     return {"message" : "최종 제출 완료",
-            "submission_count" : assignment_management.submission_count
+            "submission_count" : assignment_management.submission_count,
+            "isSuccess" : True
             }
 
 def get_as_name(as_no):
@@ -431,41 +446,27 @@ def get_as_name(as_no):
     return acc.as_name
 
 def get_stt_result(uuid):
-    stt_result_list=[]
-    stt_feedback_list=[]
-    tmp_idx = 0
-    correction = 1
+    text,denotations,attributes = "", [], []
+
     for i in uuid:
         print("uiud",i)
-        tmp={}
-        stt_acc=Stt.query.filter_by(wav_file=i["uuid"]).first()
-        acc=SttJob.query.filter_by(stt_no=stt_acc.stt_no).first()
-        if acc==None:
-            return None,None
-        tmp["sound"]=acc.sound
-        tmp["startidx"]=acc.startidx
-        tmp["endidx"]=acc.endidx
-        tmp["silenceidx"]=acc.silenceidx
-        stt_result=acc.stt_result.replace("'",'"')
-        # stt_result=acc.stt_result
-        # stt_result=stt_result.replace("'",'"')
-        json_result=json.loads(stt_result)
-        tmp["textFile"]=json_result["textFile"].replace("<","&lt").replace(">","&gt")
-        # print(len(tmp["textFile"]))
-        tmp["timestamps"]=json_result["timestamps"]
-        tmp["annotations"]=json_result["annotations"]
-        ann=ast.literal_eval(str(tmp["annotations"]))
-        # print(str(tmp["annotations"]))
-        for i in range(len(ann)):
-            ann[i]["start"]+=tmp_idx #인덱스 보정
-            ann[i]["end"]+=tmp_idx
-        tmp_idx += len(tmp["textFile"]) + correction
-        stt_feedback_list.append(ann)
-        tmp["is_seq"]=acc.is_seq
-        stt_result_list.append(tmp)
-        # print(stt_result_list)
-        # print(stt_feedback_list)
-    return stt_result_list,stt_feedback_list
+        index = len(text)
+        stt=Stt.query.filter_by(wav_file=i["uuid"]).first()
+        stt_job=SttJob.query.filter_by(stt_no=stt.stt_no).first()
+        if stt_job==None:
+            return None, None, None
+        if stt_job.stt_result==None:
+            return -1, "STT 오류", -1
+        stt_result=json.loads(stt_job.stt_result)
+        text += stt_result["text"]
+        for denotation in stt_result["denotations"]:
+            denotation["span"]["begin"] += index
+            denotation["span"]["end"] += index
+            denotations.append(denotation)
+        attributes += stt_result["attributes"]
+        text += "---------------------------\n"
+
+    return text,str(denotations),str(attributes)
     
 def mod_assignment_listing(lecture_no,assignment_no):
     as_list_result={}
@@ -591,6 +592,8 @@ def get_prob_submit_list(as_no,lecture_no):
         check=Assignment_management.query.filter_by(assignment_no=as_no,attendee_no=i.attendee_no).first()
         tmp["check"] = check.end_submission
         tmp["submit_time"] = check.end_submission_time
+        tmp["submit_count"] = check.submission_count
+        tmp["chance_count"] = check.chance_count
         submit_list.append(tmp)
 
     return submit_list
@@ -619,7 +622,7 @@ def make_json(text,denotations,attributes):
                 "simple": False,
                 "replicate": False,
                 "replicate-auto": False,
-                "setting": False,
+                "setting": True,
                 "read": False,
                 "write": False,
                 "write-auto": False,

@@ -138,14 +138,14 @@ class JpStt:
         return response
 
     def basic_annotation_stt(self,result,stt,pause_idx):
-        # Annotation Logic
+
         annotations = []
-        # Regular expressions for pauses, fillers, and cancellations
+
         pause_pattern = re.compile(r"\((\d+) ms\)")
         filler_pattern = re.compile(r"<(.*?)>")
         cancellation_pattern = re.compile(r"-([^-\[]*?)-")
 
-        # Extract pauses
+
         for match in pause_pattern.finditer(stt):
             annotations.append(
                 {
@@ -156,7 +156,7 @@ class JpStt:
                 }
             )
 
-        # Extract fillers
+
         for match in filler_pattern.finditer(stt):
             word_start = match.start(1)
             word_end = match.end(1)
@@ -169,7 +169,7 @@ class JpStt:
                 }
             )
 
-        # Extract cancellations
+
         for match in cancellation_pattern.finditer(stt):
             word_start = match.start(1)
             word_end = match.end(1)
@@ -256,6 +256,24 @@ class JpStt:
 
                 cnt += 1
 
+        angle_brackets_positions = [
+            pos for pos, char in enumerate(text) if char in ["<", ">", "-"]
+        ]
+
+        for denotation in denotations:
+
+            denotation["span"]["begin"] = denotation["span"]["begin"] - sum(
+                1 for pos in angle_brackets_positions if pos < denotation["span"]["begin"]
+            )
+
+            denotation["span"]["end"] = denotation["span"]["end"] - sum(
+                1 for pos in angle_brackets_positions if pos < denotation["span"]["end"]
+            )
+
+        text = "".join(
+            [char for idx, char in enumerate(text) if idx not in angle_brackets_positions]
+        )
+    
         return text, denotations, attributes
     
     def make_json(self, text,denotations,attributes):

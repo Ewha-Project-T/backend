@@ -310,6 +310,34 @@ def get_zip_url(lecutre_no:int, user_no:int):
             #json 파일 만들기
             with open(path, "w") as f:
                 f.write(text_ae)
+        _,uuid=get_prob_wav_url(assignment.assignment_no,user_no,assignment.lecture_no)
+        for index,i in enumerate(uuid):
+            stt=Stt.query.filter_by(wav_file=i["uuid"]).first()
+            if stt is None:
+                continue
+            stt_job=SttJob.query.filter_by(stt_no=stt.stt_no).first()
+            if stt_job is None:
+                continue
+            result=stt_job.stt_result
+            path = os.environ["UPLOAD_PATH"] + "/" + str(assignment.assignment_no) + "_" + str(user_name) + "_원본stt" + str(index) + ".json"
+            files.append(path)
+            #json 파일 만들기
+            with open(path, "w") as f:
+                f.write(result)
+                
+        # file_count = len(Assignment_check_list.query.filter_by(check_no=assignment_check.check_no).all())
+        # stts = Stt.query.filter_by(assignment_no=assignment.assignment_no, user_no=user_no).order_by(Stt.stt_no.desc()).all()[:file_count]
+        # for index, stt in enumerate(stts[::-1]):
+        #     stt_job = SttJob.query.filter_by(stt_no=stt.stt_no).first()
+        #     if stt_job is None:
+        #         continue
+        #     result = stt_job.stt_result
+        #     path = os.environ["UPLOAD_PATH"] + "/" + str(stt.stt_no) + "_" + str(user_name) + "_원본 stt" + str(index) + ".json"
+        #     files.append(path)
+        #     #json 파일 만들기
+        #     with open(path, "w") as f:
+        #         f.write(result)
+
     #zip 파일 만들기
     zip_path = os.environ["UPLOAD_PATH"] + "/" + str(lecutre_no) + "_" + str(user_name) + ".zip"
     with zipfile.ZipFile(zip_path, "w") as f:

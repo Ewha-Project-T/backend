@@ -1,4 +1,4 @@
-#new_1011
+#new_1023
 
 from pydub import AudioSegment, silence
 from nltk.tokenize import sent_tokenize
@@ -19,7 +19,7 @@ class KorStt:
         openai.api_key = "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" # api key
 
         response = openai.ChatCompletion.create(
-            model="gpt-4", messages=[{"role": "user", "content": "Mark '(filler)' on the rigth side of hesitating expressions such as '음', '아', or '그' (example: 음(filler)). And put '(cancellation)' on the rigth side of repeating expressions that can be removed, such as '다릅' in '다릅 틀립니다.', '있었' in '있었 있었습니다' or '학회에서' in '경제학회에서 학회에서도'. (example: 있었(cancellation) 있었습니다 .)  /n" + result}]
+            model="gpt-4", messages=[{"role": "user", "content": "Mark '<f>' on the before hesitating expressions and mark '</f>' after hesitating expressions such as '음', '아', or '그' (example: <f>음</f>). And mark '<c>' before repeating expressions that can be removed and mark '</c>' after  repeating expressions that can be removed, such as '다릅' in '다릅 틀립니다.', '있었' in '있었 있었습니다'. (example: <c>다릅</c> 틀립니다.). At this time, maintain spacing. (example input:차장님. 어 / example output:차장님. <f>어</f>). However if there is no space, do not make space./n" + result}]
         )
 
         result = response.choices[0].message.content
@@ -77,8 +77,8 @@ class KorStt:
             
         return pause_final, text, pause_result, pause_idx, start_idx, end_idx
 
-    def basic_annotation_stt(self, result,stt,pause_final,pause_idx):
-        a = re.compile('(\w\(filler\)|\w+\(cancellation\))')
+    def basic_annotation_stt(self, result, stt, pause_final, pause_idx):
+        a = re.compile('(\<f\>.*?\<\/f\>|\<c\>.*?\<\/c\>)')
         fidx = []
         cidx = []
 
@@ -86,17 +86,22 @@ class KorStt:
             f = a.search(stt)
             if f == None:
                 break
-            if f.group(1)[-8:] == '(filler)':
+            if f.group(1)[:3] == '<f>':
+                stt = re.sub("(\<f\>)", "", stt, 1)
+                stt = re.sub("(\<\/f\>)", "", stt, 1))
                 fidx.append([f.start(), f.end()])
-            elif f.group(1)[-14:] == '(cancellation)':
+                
+            elif f.group(1)[:3] == '<c>':
+                stt = re.sub("(\<c\>)", "", stt, 1)
+                stt = re.sub("(\<\/c\>)", "", stt, 1)
                 cidx.append([f.start(), f.end()])
-            stt = re.sub("(\(filler\)|\(cancellation\))", "", stt, 1)
 
         for i in range(len(fidx)):
-            result['annotations'].append({'start': fidx[i][0], 'end': fidx[i][1] - 8, 'type': 'FILLER'})
+            result['annotations'].append({'start': fidx[i][0], 'end': fidx[i][1] - 7, 'type': 'FILLER'})
 
         for i in range(len(cidx)):
-            result['annotations'].append({'start': cidx[i][0] , 'end': cidx[i][1] -14, 'type': 'CANCELLATION'})
+            result['annotations'].append({'start': cidx[i][0], 'end': cidx[i][1] - 7, 'type': 'CANCELLATION'})
+
 
         p = [m.start(0) for m in re.finditer('\(pause\)', pause_final)]
 

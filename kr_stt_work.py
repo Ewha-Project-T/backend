@@ -88,7 +88,7 @@ class KorStt:
                 break
             if f.group(1)[:3] == '<f>':
                 stt = re.sub("(\<f\>)", "", stt, 1)
-                stt = re.sub("(\<\/f\>)", "", stt, 1))
+                stt = re.sub("(\<\/f\>)", "", stt, 1)
                 fidx.append([f.start(), f.end()])
                 
             elif f.group(1)[:3] == '<c>':

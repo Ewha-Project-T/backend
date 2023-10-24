@@ -111,6 +111,8 @@ class KorStt:
           pidx.append(tmp)
 
         for i in range(len(pidx)):  # pause, delay 구분 없이 pause 로 통일
+            if pidx[i] == 0:
+                continue
             result['annotations'].append({'start': pidx[i]-1, 'end': pidx[i], 'type': 'PAUSE', 'duration': pause_idx[i]})
 
         if stt.endswith("\n"):

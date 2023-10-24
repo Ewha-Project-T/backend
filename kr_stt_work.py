@@ -107,8 +107,8 @@ class KorStt:
 
         pidx = []
         for i in range(len(p)):
-          tmp = p[i] - i*7
-          pidx.append(tmp)
+            tmp = p[i] - i*7
+            pidx.append(tmp)
 
         for i in range(len(pidx)):  # pause, delay 구분 없이 pause 로 통일
             if pidx[i] == 0:

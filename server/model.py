@@ -22,7 +22,7 @@ class User(db.Model):
     access_check_admin = db.Column(db.Integer, default=0)
     access_code= db.Column(db.String(150),nullable=True)
     access_code_time=db.Column(db.DateTime, onupdate=datetime.utcnow()+timedelta(hours=9))#테이블 삭제시 오류날수도
-    #user_identifier= db.Column(db.String(255),nullable=False)
+    user_identifier= db.Column(db.String(255),nullable=True)
 
     assignment= db.relationship("Assignment",back_populates="user",cascade="all, delete",passive_deletes=True,)
     attendee= db.relationship("Attendee",back_populates="user",cascade="all, delete",passive_deletes=True,)
@@ -175,8 +175,8 @@ class Feedback2(db.Model):
     __tablename__="FEEDBACK"
     feed_no = db.Column(db.Integer, primary_key=True)
     attendee_no = db.Column(db.Integer, db.ForeignKey("ATTENDEE.attendee_no", ondelete="CASCADE"), nullable=True)
-    check_no= db.Column(db.Integer, db.ForeignKey("ASSIGNMENT_CHECK.check_no", ondelete="CASCADE"), nullable=True)
-    submission_count = db.Column(db.Integer, default=0)
+    assignment_no= db.Column(db.Integer, db.ForeignKey("ASSIGNMENT.assignment_no", ondelete="CASCADE"), nullable=True)
+    lecture_no = db.Column(db.Integer, db.ForeignKey("LECTURE.lecture_no", ondelete="CASCADE"), nullable=True)
     translation_error = db.Column(db.Integer, default=0)
     omission = db.Column(db.Integer, default=0)
     expression = db.Column(db.Integer, default=0)

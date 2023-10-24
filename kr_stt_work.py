@@ -1,4 +1,4 @@
-#new_(json output+함수명변경)
+#new_1023
 
 from pydub import AudioSegment, silence
 from nltk.tokenize import sent_tokenize
@@ -6,12 +6,11 @@ from nltk.tokenize import sent_tokenize
 import os
 import requests
 import re
-import fugashi
 import json
 import time
 import uuid
-import openai #openai 라이브러리 install 필요
-import ast 
+import openai
+import ast
 
 
 class KorStt:
@@ -20,11 +19,12 @@ class KorStt:
         openai.api_key = "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" # api key
 
         response = openai.ChatCompletion.create(
-            model="gpt-4", messages=[{"role": "user", "content": "Mark '(filler)' on the rigth side of hesitating expressions such as '음', '아', or '그' (example: 음(filler)). And put '(cancellation)' on the rigth side of repeating expressions that can be removed, such as '다릅' in '다릅 틀립니다.', '있었' in '있었 있었습니다' or '학회에서' in '경제학회에서 학회에서도'. (example: 있었(cancellation) 있었습니다 .)  /n" + result}]
+            model="gpt-4", messages=[{"role": "user", "content": "Mark '<f>' on the before hesitating expressions and mark '</f>' after hesitating expressions such as '음', '아', or '그' (example: <f>음</f>). And mark '<c>' before repeating expressions that can be removed and mark '</c>' after  repeating expressions that can be removed, such as '다릅' in '다릅 틀립니다.', '있었' in '있었 있었습니다'. (example: <c>다릅</c> 틀립니다.). At this time, maintain spacing. (example input:차장님. 어 / example output:차장님. <f>어</f>). However if there is no space, do not make space./n" + result}]
         )
 
         result = response.choices[0].message.content
         return result
+
 
     def basic_indexing(self,filename):
         filepath = f"{os.environ['UPLOAD_PATH']}/{filename}.mp3"
@@ -44,16 +44,8 @@ class KorStt:
                 silenceidx.append(sound[i + 1][0] - sound[i][1])
         return length, sound, startidx, endidx, silenceidx, myaudio
 
-    def basic_do_stt(self, sound, myaudio, startidx, endidx, silenceidx):
-        url = os.environ["STT_URL"]
 
-        headers = {
-        'Content-type': 'audio/wav;codec="audio/pcm";',
-        'Ocp-Apim-Subscription-Key': os.environ["STT_KEY"],
-        #   'Authorization': Bearer ACCESS_TOKEN'
-        }
-
-        flag = True
+    def basic_do_stt(self, res, sound, myaudio, startidx, endidx, silenceidx):
         text = ''
         delay_result = 0
         pause_result = 0
@@ -61,53 +53,55 @@ class KorStt:
         start_idx = []
         end_idx = []
         pause_final = ''
-        for i in range(len(sound)):
-            myaudio[startidx[i]:endidx[i]].export("temp.wav", format="wav")
-            # To recognize speech from an audio file, use `filename` instead of `use_default_microphone`:
-            with open('temp.wav', 'rb') as payload:
-                response = requests.request(
-                    "POST", url, headers=headers, data=payload)
-                if response.status_code != 200:
-                    raise RuntimeError("API server does not response correctly")
-                dic = json.loads(response.text)
-                if dic.get("RecognitionStatus") == "Success":
-                    stt = dic.get("DisplayText")
-                    text = text + stt
-                    if len(stt)>0:
-                        start_idx.append(startidx[i])
-                        end_idx.append(endidx[i])
-                    sentences = sent_tokenize(stt)
-                    for sentence in sentences:
-                        pause_final += sentence
-                        pause_final += ' '
 
-                    if i < len(sound) - 1:
-                        pause_final += "(pause)" #"(pause: " + str(silenceidx[i]/1000)+"sec) "
-                        text = text+' '
-                        pause_result += silenceidx[i]
-                        pause_idx.append(silenceidx[i])
-                else:
-                    continue
-            os.remove("temp.wav")
-        return pause_final, text, pause_result, delay_result, pause_idx, start_idx, end_idx
+        i = -1
 
-    def basic_annotation_stt(self, result,stt,pause_final,pause_idx):
+        for dic in res:
+            i += 1
+            if dic.get("RecognitionStatus") == "Success":
+                stt = dic.get("DisplayText")
+                text = text + stt
+                if len(stt)>0:
+                    start_idx.append(startidx[i])
+                    end_idx.append(endidx[i])
+                sentences = sent_tokenize(stt)
+                for sentence in sentences:
+                    pause_final += sentence
+                    pause_final += ' '
 
-        p = re.compile('(\w\(filler\)|\w+\s\w+\(cancellation\))')
-        aidx = []
+                if i < len(sound) - 1:
+                    pause_final += "(pause)"
+                    text = text+' '
+                    pause_result += silenceidx[i]
+                    pause_idx.append(silenceidx[i])
+            
+        return pause_final, text, pause_result, pause_idx, start_idx, end_idx
+
+    def basic_annotation_stt(self, result, stt, pause_final, pause_idx):
+        a = re.compile('(\<f\>.*?\<\/f\>|\<c\>.*?\<\/c\>)')
+        fidx = []
+        cidx = []
 
         while (True):
-            f = p.search(stt)
+            f = a.search(stt)
             if f == None:
                 break
-            aidx.append([f.start(), f.end()])
-            stt = re.sub("(\(filler\)|\(cancellation\))", "", stt, 1)
+            if f.group(1)[:3] == '<f>':
+                stt = re.sub("(\<f\>)", "", stt, 1)
+                stt = re.sub("(\<\/f\>)", "", stt, 1)
+                fidx.append([f.start(), f.end()])
+                
+            elif f.group(1)[:3] == '<c>':
+                stt = re.sub("(\<c\>)", "", stt, 1)
+                stt = re.sub("(\<\/c\>)", "", stt, 1)
+                cidx.append([f.start(), f.end()])
 
-        for i in range(len(aidx)):
-            if stt[aidx[i][0]] == '음' or stt[aidx[i][0]] == '그' or stt[aidx[i][0]] == '어'or stt[aidx[i][0]] == '아':
-                result['annotations'].append({'start': aidx[i][0], 'end': aidx[i][0] + 1, 'type': 'FILLER'})
-            else :
-                result['annotations'].append({'start': aidx[i][0], 'end': aidx[i][1] - 14, 'type': 'CANCELLATION'})
+        for i in range(len(fidx)):
+            result['annotations'].append({'start': fidx[i][0], 'end': fidx[i][1] - 7, 'type': 'FILLER'})
+
+        for i in range(len(cidx)):
+            result['annotations'].append({'start': cidx[i][0], 'end': cidx[i][1] - 7, 'type': 'CANCELLATION'})
+
 
         p = [m.start(0) for m in re.finditer('\(pause\)', pause_final)]
 
@@ -125,51 +119,58 @@ class KorStt:
 
         return result
 
+
     def request_api(self,length,myaudio,startidx,endidx):
         domain = os.getenv("DOMAIN", "https://edu-trans.ewha.ac.kr:8443")
 
         files = []
         local_file = []
-        
+
         for i in range(length):
             filetmp = uuid.uuid4()
             filepath = f"{os.environ['UPLOAD_PATH']}/{filetmp}.wav"
             myaudio[startidx[i]:endidx[i]].export(filepath, format="wav")
             files += [ domain + "/" + filepath ]
-            local_file += [ filepath ]
+            local_file += [filepath]
 
-        if not len(files) > 0:  
-            return None  
-        res={'values':[]}
+        if not len(files) > 0:
+            return None
 
-        webhook_res = requests.post(
-            os.environ["STT_URL"],
-            headers={
-                "Content-Type": "application/json",
-                "Ocp-Apim-Subscription-Key": os.environ["STT_KEY"]
-            },
-            json={
-                "contentUrls": files,
-                "properties": {
-                    "diarizationEnabled": False,
-                    "wordLevelTimestampsEnabled": True,
-                    "punctuationMode": "DictatedAndAutomatic",
-                    "profanityFilterMode": "Masked"
-                },
-                "locale": "ko-KR",
-                "displayName": "Transcription of file using default model for en-US"
-            }
-        ).json()
-        url = webhook_res["links"]["files"]
-        while len(res["values"]) == 0:
-            res = requests.get(
-                url,
-                headers={ "Ocp-Apim-Subscription-Key": os.environ['STT_KEY'] }
-            ).json()
+        res=[0 for i in range(length)]
+        
+        k = -1
+        for f in local_file:
+            k += 1
+            with open(f, 'rb') as payload:
+                url = "https://koreacentral.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=ko-KR"
+                headers = {
+                    "Content-Type": "application/json",
+                    "Ocp-Apim-Subscription-Key": os.environ["STT_KEY"]
+                }
+                
+                response = requests.request("POST", url, headers=headers, data=payload)
+              
+                if response.status_code != 200:
+                    try:
+                        response.raise_for_status()
+                        text = response.text.strip()
+                        if len(text) > 0:
+                            print("Recognized text: ", text)
+                        else:
+                            print("No speech detected")
+                    except requests.exceptions.HTTPError as e:
+                        print("HTTP error: ", e)
+                    except requests.exceptions.ConnectionError as e:
+                        print("Error connecting to server: ", e)
+                    except requests.exceptions.Timeout as e:
+                        print("Timeout error: ", e)
+                    except requests.exceptions.RequestException as e:
+                        print("Error: ", e)
+                res[k] = json.loads(response.text)
 
-            time.sleep(1)
-        for file in local_file:
-            os.unlink(file)          
+        for f in local_file:
+            os.unlink(f)
+
         return res
 
     def parse_data(self, stt_result,stt_feedback):
@@ -186,67 +187,67 @@ class KorStt:
         attributes=attributes[:-1]
         denotations+="]"
         attributes+="]"
-        return text,denotations,attributes
+        return text, denotations, attributes
 
-    
+
     def make_json(self, text,denotations,attributes):
         data = {
-        "text": text,
-        "denotations": ast.literal_eval(denotations) if type(denotations) == str else denotations ,
-        "attributes": ast.literal_eval(attributes) if type(attributes) == str else attributes,
-        "config": {
-            "boundarydetection": False,
-            "non-edge characters": [],
-            "function availability": {
-                "logo" : False,
-                "relation": False,
-                "block": False,
-                "simple": False,
-                "replicate": False,
-                "replicate-auto": False,
-                "setting": False,
-                "read": False,
-                "write": False,
-                "write-auto": False,
-                "line-height": False,
-                "line-height-auto": False,
-                "help": False
-            },
-            "entity types": [
-                {
-                    "id": "Cancellation",
-                    "color": "#ff5050"
+            "text": text,
+            "denotations": ast.literal_eval(denotations) if type(denotations) == str else denotations ,
+            "attributes": ast.literal_eval(attributes) if type(attributes) == str else attributes,
+            "config": {
+                "boundarydetection": False,
+                "non-edge characters": [],
+                "function availability": {
+                    "logo" : False,
+                    "relation": False,
+                    "block": False,
+                    "simple": False,
+                    "replicate": False,
+                    "replicate-auto": False,
+                    "setting": False,
+                    "read": False,
+                    "write": False,
+                    "write-auto": False,
+                    "line-height": False,
+                    "line-height-auto": False,
+                    "help": False
                 },
-                {
-                    "id": "Filler",
-                    "color": "#ffff50",
-                    "default": True
-                },
-                {
-                    "id": "Pause",
-                    "color": "#404040"
-                }
-            ],
-            "attribute types": [
-                {
-                    "pred": "Unsure",
-                    "value type": "flag",
-                    "default": True,
-                    "label": "?",
-                    "color": "#fa94c0"
-                },
-                {
-                    "pred": "Note",
-                    "value type": "string",
-                    "default": "",
-                    "values": []
-                }
-            ]
-          }
+                "entity types": [
+                    {
+                        "id": "Cancellation",
+                        "color": "#ff5050"
+                    },
+                    {
+                        "id": "Filler",
+                        "color": "#ffff50",
+                        "default": True
+                    },
+                    {
+                        "id": "Pause",
+                        "color": "#404040"
+                    }
+                ],
+                "attribute types": [
+                    {
+                        "pred": "Unsure",
+                        "value type": "flag",
+                        "default": True,
+                        "label": "?",
+                        "color": "#fa94c0"
+                    },
+                    {
+                        "pred": "Note",
+                        "value type": "string",
+                        "default": "",
+                        "values": []
+                    }
+                ]
+            }
         }
         
         return data
-    
+
 
     #마지막 실행 함수
 
@@ -254,10 +255,11 @@ class KorStt:
         result = {'textFile': '', 'timestamps': [], 'annotations': []}
         length, sound, startidx, endidx, silenceidx, myaudio = self.basic_indexing(filename)
         res=self.request_api(length,myaudio,startidx,endidx)
-        if res==None:  
-            raise Exception("INVALID-FILE")        
+        if res==None:
+            raise Exception("INVALID-FILE")
 
-        pause_final, stt_t, pause_result, delay_result, pause_idx, start_idx, end_idx = self.basic_do_stt(sound, myaudio, startidx, endidx, silenceidx)
+        pause_final, stt_t, pause_result, pause_idx, start_idx, end_idx = self.basic_do_stt(res, sound, myaudio, startidx, endidx, silenceidx)
+
         stt_t = stt_t.replace('\n', '') #stt_t
         stt = self.process_stt_result(stt_t)
 
@@ -271,6 +273,6 @@ class KorStt:
         text,denotations,attributes = self.parse_data(result,stt_feedback)
         data = self.make_json(text,denotations,attributes)
 
-        return json.dumps(data, indent=4,ensure_ascii=False)
+        return json.dumps(data, indent=4, ensure_ascii=False)
 
     #한국어버전 끝

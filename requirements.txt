@@ -21,3 +21,5 @@ celery
 redis
 librosa
 openai
+fugashi
+python-dotenv

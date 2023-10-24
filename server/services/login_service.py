@@ -58,7 +58,7 @@ def register(user_email,user_pw,user_name,user_major, user_perm,user_ident):
         return RegisterResult.USEREMAIL_EXIST
     if(user_perm>3 or user_perm<0):
         return RegisterResult.INVALID_PERM
-    acc=User(email=user_email,password=user_pw,name=user_name,major=user_major,permission=user_perm)#,user_identifier=user_ident)
+    acc=User(email=user_email,password=user_pw,name=user_name,major=user_major,permission=user_perm)#,user_identifier=user_ident) 학번이나 자신만의 문자를 입력하라 해야할듯(아이디찾기용)
     db.session.add(acc)
     db.session.commit
     return RegisterResult.SUCCESS
@@ -145,3 +145,8 @@ def change_pass(email,password):
     acc = User.query.filter_by(email=email).first()
     acc.password=password
     db.session.commit()
+def find_id(ident):
+    acc = User.query.filter_by( user_identifier=ident).first()
+    if(acc==None):
+        return 0
+    return acc.email

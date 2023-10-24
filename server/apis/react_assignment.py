@@ -329,9 +329,10 @@ class React_Prob_record(Resource):
         args = parser.parse_args()
         as_no = args['as_no']
         res = assignment_detail_record(as_no, user_info["user_no"])
-
-        if not res.get("audio_regions_url") :
-            return jsonify(res), 401
+        if res.get("message") :
+            print("error",res)
+            print(type(res))
+            return res, 401
         return jsonify(res)
     @jwt_required()
     def post(self):
@@ -357,7 +358,7 @@ class React_Prob_end_submission(Resource):
         as_no = args['as_no']
         res = assignment_end_submission(as_no, user_info["user_no"])
         if not res.get("submission_count") :
-            return jsonify(res), 401
+            return res, 200
         return jsonify(res)
 
 class React_Prob_submit_list(Resource):

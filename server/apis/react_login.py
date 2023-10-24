@@ -5,7 +5,7 @@ from flask_jwt_extended import (
 )
 import re
 from ..services.login_service import (
-    login, register, LoginResult, RegisterResult, create_tokens, admin_required, professor_required, assistant_required,real_time_email_check,findpassword_email_check,findpassword_code_check,change_pass
+    login, register, LoginResult, RegisterResult, create_tokens, admin_required, professor_required, assistant_required,real_time_email_check,findpassword_email_check,findpassword_code_check,change_pass,find_id
 )
 from ..services.mail_service import (
     gen_verify_email_code,get_access_code,access_check_success,signup_email_validate
@@ -62,7 +62,6 @@ class CheckToken(Resource):
     @jwt_required()
     def get(self):
         current_user = get_jwt_identity()
-        print(current_user)
         if(current_user==None):
             return {"isAuth": 0},400
         if(current_user["user_perm"]==0):
@@ -183,3 +182,19 @@ class FindPassword_Check(Resource):
         msg="invalid code"
         return jsonify({"Success": 0, "msg":msg})
 
+class Find_id(Resource):
+    def get(self):
+        return jsonify({"msg":"find id page"})
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('ident', type=str, help="ident is required")
+
+        args = parser.parse_args()
+        ident = args['ident']
+        user_id=find_id(ident)
+        if(user_id):
+            msg="id find Success"
+            return jsonify({"Success":1,"msg":msg,"user_id":user_id})
+
+        msg="id not found"
+        return jsonify({"Success":0,"msg":msg})

@@ -20,10 +20,10 @@ class JpStt:
         openai.api_key = os.getenv("OPENAI_API_KEY")
 
         prompt_message = (
-            "Please annotate hesitating expressions such as 'え', 'あの', or 'えと' by marking them with '<...>(filler)'. "
-            "For instance, convert 'え' to '<え>(filler)'"
-            "When you encounter repeated expressions, mark the first occurrence with '-...-(cancellation)'."
-            "For example, if '考える考えると' appears, it should be converted to '-考える-(cancellation)考えると'. Another example is -少なく-(cancellation)とも (pause)少なくて  "
+            "Please annotate hesitating expressions such as 'え', 'あの', or 'えと' by marking them with '<...>'. "
+            "For instance, convert 'え' to '<え>'"
+            "When you encounter repeated expressions, mark the first occurrence with '-...-'."
+            "For example, if '考える考えると' appears, it should be converted to '-考える-考えると'. Another example is -少なく-とも (pause)少なくて  "
             "If there are no such expressions, return the original sentence. \n\n" + result
         )
 
@@ -36,7 +36,8 @@ class JpStt:
             presence_penalty=0,
         )
 
-        return response.choices[0].message.content
+        result = response.choices[0].message.content
+        return result
 
     def basic_indexing(self,filename):
         filepath = f"{os.environ['UPLOAD_PATH']}/{filename}.mp3"
@@ -75,32 +76,7 @@ class JpStt:
             i = i+1  
         return length, sound, startidx, endidx, silenceidx, myaudio
 
-    # worker.py 로 이동 필요
-    def req_upload(self,file, completion,fullText=True):
-
-        invoke_url = os.environ['CLOVASPEECH_STT_URL']
-
-        request_body = {
-            'language': 'ja',
-            'completion': completion,
-            'fullText': fullText,
-            'noiseFiltering' : False
-        }
-        headers = {
-            'Accept': 'application/json;UTF-8',
-            'X-CLOVASPEECH-API-KEY': os.environ['CLOVASPEECH_STT_KEY']
-        }
-        files = {
-            'media': open(file, 'rb'),
-            'params': (None, json.dumps(request_body, ensure_ascii=False).encode('UTF-8'), 'application/json')
-        }
-        response = requests.post(headers=headers, url=invoke_url + '/recognizer/upload', files=files)
-        return response
-
-
-
     def basic_do_stt(self,length,res, sound, startidx, endidx, silenceidx):
-
 
         flag = True
         text = ''
@@ -138,16 +114,38 @@ class JpStt:
                         text = text+'\n'
                         delay_result += silenceidx[i]
         return text, pause_result, delay_result, pause_idx, start_idx, end_idx
+    
+    # worker.py 로 이동 필요
+    def req_upload(self,file, completion,fullText=True):
+
+        invoke_url = os.environ['CLOVASPEECH_STT_URL']
+
+        request_body = {
+            'language': 'ja',
+            'completion': completion,
+            'fullText': fullText,
+            'noiseFiltering' : False
+        }
+        headers = {
+            'Accept': 'application/json;UTF-8',
+            'X-CLOVASPEECH-API-KEY': os.environ['CLOVASPEECH_STT_KEY']
+        }
+        files = {
+            'media': open(file, 'rb'),
+            'params': (None, json.dumps(request_body, ensure_ascii=False).encode('UTF-8'), 'application/json')
+        }
+        response = requests.post(headers=headers, url=invoke_url + '/recognizer/upload', files=files)
+        return response
 
     def basic_annotation_stt(self,result,stt,pause_idx):
-        # Annotation Logic
-        annotations = []
-        # Regular expressions for pauses, fillers, and cancellations
-        pause_pattern = re.compile(r"\((\d+) ms\)")
-        filler_pattern = re.compile(r"<(.*?)>\(filler\)")
-        cancellation_pattern = re.compile(r"-([^-\[]*?)-\(cancellation\)")
 
-        # Extract pauses
+        annotations = []
+
+        pause_pattern = re.compile(r"\((\d+) ms\)")
+        filler_pattern = re.compile(r"<(.*?)>")
+        cancellation_pattern = re.compile(r"-([^-\[]*?)-")
+
+
         for match in pause_pattern.finditer(stt):
             annotations.append(
                 {
@@ -158,7 +156,7 @@ class JpStt:
                 }
             )
 
-        # Extract fillers
+
         for match in filler_pattern.finditer(stt):
             word_start = match.start(1)
             word_end = match.end(1)
@@ -171,7 +169,7 @@ class JpStt:
                 }
             )
 
-        # Extract cancellations
+
         for match in cancellation_pattern.finditer(stt):
             word_start = match.start(1)
             word_end = match.end(1)
@@ -183,19 +181,9 @@ class JpStt:
                     "value": match.group(1),
                 }
             )
+        result['textFile']=stt
 
-        # Create the result dictionary
-        result = {"textFile": stt, "annotations": annotations}
-
-        text, denotations, attributes = self.parse_data([result], [annotations])
-
-        result["denotations"] = denotations
-        result["attributes"] = attributes
-        json_output = self.make_json(text, denotations, attributes)
-
-        result["json_output"] = json_output
-
-        return json_output
+        return result, annotations
 
     def request_api(self,length,myaudio,startidx,endidx):
         domain = os.getenv("DOMAIN", "https://edu-trans.ewha.ac.kr:8443")
@@ -204,8 +192,8 @@ class JpStt:
 
         for i in range(length):
             filetmp = uuid.uuid4()
-            filepath = f"{os.environ['UPLOAD_PATH']}/{filetmp}.mp3"
-            myaudio[startidx[i]:endidx[i]].export(filepath, format="mp3")
+            filepath = f"{os.environ['UPLOAD_PATH']}/{filetmp}.wav"
+            myaudio[startidx[i]:endidx[i]].export(filepath, format="wav")
             files += [ domain + "/" + filepath ]
             local_file += [ filepath ]
 
@@ -237,22 +225,8 @@ class JpStt:
         for file in local_file:
             os.unlink(file)
         return res
-
-    def execute(self,filename):
-            result = {'textFile': '', 'timestamps': [], 'annotations': []}
-            length,sound,startidx,endidx,silenceidx,myaudio=self.basic_indexing(filename)
-            res=self.request_api(length,myaudio,startidx,endidx)
-            if res==None:  
-                raise Exception("INVALID-FILE")        
-
-            for i in range(length):
-                result['timestamps'].append({'start': startidx[i], 'end': endidx[i]})
-
-            stt_text, pause_result, delay_result, pause_idx, startidx, endidx=self.basic_do_stt(length,res,sound,startidx,endidx,silenceidx)
-            result=self.basic_annotation_stt(result,stt_text,pause_idx)
-            return result,sound,startidx,endidx,silenceidx
     
-    def parse_data(self, stt_result, stt_feedback):
+    def parse_data(self, stt_result,stt_feedback):
         cnt = 1
         text = ""
         denotations = []
@@ -261,21 +235,7 @@ class JpStt:
         for i in range(len(stt_result)):
             text += stt_result[i]["textFile"] + "\n"
 
-            if not isinstance(stt_feedback[i], list):
-                print(f"Error: stt_feedback[{i}] is not a list.")
-                continue
-
             for j in range(len(stt_feedback[i])):
-                if not isinstance(stt_feedback[i][j], dict):
-                    print(f"Error: stt_feedback[{i}][{j}] is not a dictionary.")
-                    continue
-
-                if not all(key in stt_feedback[i][j] for key in ["start", "end", "type"]):
-                    print(
-                        f"Error: stt_feedback[{i}][{j}] does not have all the required keys ('start', 'end', 'type')."
-                    )
-                    continue
-
                 denotation = {
                     "id": "T" + str(cnt),
                     "span": {
@@ -296,6 +256,24 @@ class JpStt:
 
                 cnt += 1
 
+        angle_brackets_positions = [
+            pos for pos, char in enumerate(text) if char in ["<", ">", "-"]
+        ]
+
+        for denotation in denotations:
+
+            denotation["span"]["begin"] = denotation["span"]["begin"] - sum(
+                1 for pos in angle_brackets_positions if pos < denotation["span"]["begin"]
+            )
+
+            denotation["span"]["end"] = denotation["span"]["end"] - sum(
+                1 for pos in angle_brackets_positions if pos < denotation["span"]["end"]
+            )
+
+        text = "".join(
+            [char for idx, char in enumerate(text) if idx not in angle_brackets_positions]
+        )
+    
         return text, denotations, attributes
     
     def make_json(self, text,denotations,attributes):
@@ -354,4 +332,22 @@ class JpStt:
             }
         }
         
-        return json.dumps(data, indent=4,ensure_ascii=False)
+        return data
+    
+    def execute(self,filename):
+            result = {'textFile': '', 'timestamps': [], 'annotations': []}
+            length,sound,startidx,endidx,silenceidx,myaudio=self.basic_indexing(filename)
+            res=self.request_api(length,myaudio,startidx,endidx)
+            if res==None:  
+                raise Exception("INVALID-FILE")        
+            for i in range(length):
+                result['timestamps'].append({'start': startidx[i], 'end': endidx[i]})
+
+            stt_text, pause_result, delay_result, pause_idx, startidx, endidx=self.basic_do_stt(length,res,sound,startidx,endidx,silenceidx)
+            result, annotations=self.basic_annotation_stt(result,stt_text,pause_idx)
+            text, denotations, attributes = self.parse_data([result], [annotations])
+            result["denotations"] = denotations
+            result["attributes"] = attributes
+            data = self.make_json(text,denotations,attributes)
+
+            return json.dumps(data, indent=4,ensure_ascii=False)

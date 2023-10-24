@@ -112,12 +112,7 @@ def do_stt_work(self, filename, locale="ko"):
         endidx="",
         silenceidx="",
     )
-<<<<<<< HEAD
-
-    job.stt_result = repr(result_stt_json)
-=======
     job.stt_result = result_stt_json
->>>>>>> dba0296b033d5f51e5599c6580d59f6864b324b2
     session.add(job)
     session.commit()
     return result_stt_json

@@ -323,6 +323,8 @@ def get_zip_url(lecutre_no:int, user_no:int):
             files.append(path)
             #json 파일 만들기
             with open(path, "w") as f:
+                if result == None:
+                    result = ""
                 f.write(result)
                 
         # file_count = len(Assignment_check_list.query.filter_by(check_no=assignment_check.check_no).all())

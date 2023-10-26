@@ -121,5 +121,6 @@ class assignment_zip_down(Resource): # 과제 압축파일 다운로드 개발 �
         args=parser.parse_args()
         path = get_zip_url(args['lecture_no'],args['user_no'])
         return jsonify({"url":path,
-                        "isSucces":True,
+                        "file_name":path.split('/')[-1],
+                        "isSuccess":True,
                         })

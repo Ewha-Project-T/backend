@@ -92,27 +92,33 @@ class JpStt:
                 words = dic["text"]
                 stt = self.process_stt_result(words)
                 text = text + stt
-                if len(stt)>0:
+                if len(stt) > 0:
                     start_idx.append(startidx[i])
                     end_idx.append(endidx[i])
                 sentences = sent_tokenize(stt)
                 for sentence in sentences:
                     print(sentence.replace(" ", ""))
-                    if sentence.endswith("."):
-                        flag = True
-                    else:
-                        flag = False
+                #     if sentence.endswith("."):
+                #         flag = True
+                #     else:
+                #         flag = False
                 if i < length - 1:
-                    if flag == False:
-                        print("(pause: " + str(silenceidx[i])+"sec)")  # 침묵
-                        text = text+'\n'
-                        pause_result += silenceidx[i]
-                        pause_idx.append(silenceidx[i])
-                    else:
-                        # 통역 개시 지연구간
-                        print("(delay: " + str(silenceidx[i]) + "sec)")
-                        text = text+'\n'
-                        delay_result += silenceidx[i]
+                    pause_duration = silenceidx[i]  # in milliseconds
+                    print("(pause: " + str(silenceidx[i]) + "sec)") 
+                    pause_placeholder = " "
+                    text += pause_placeholder + "\n"
+                    pause_result += pause_duration
+                    pause_idx.append(pause_duration)
+                    # if flag == False:
+                    # print("(pause: " + str(silenceidx[i]) + "sec)")  # 침묵
+                    # text = text + "\n"
+                    # pause_result += silenceidx[i]
+                    # pause_idx.append(silenceidx[i])
+                    # else:
+                    #     # 통역 개시 지연구간
+                    #     print("(delay: " + str(silenceidx[i]) + "sec)")
+                    #     text = text + "\n"
+                    #     delay_result += silenceidx[i]
         return text, pause_result, delay_result, pause_idx, start_idx, end_idx
     
     # worker.py 로 이동 필요
@@ -145,6 +151,16 @@ class JpStt:
         filler_pattern = re.compile(r"<(.*?)>")
         cancellation_pattern = re.compile(r"-([^-\[]*?)-")
 
+        for i, char in enumerate(stt):
+            if char == " " and i + 1 < len(stt) and stt[i + 1] == "\n":
+                annotations.append(
+                    {
+                        "start": i,
+                        "end": i + 1,
+                        "type": "Pause",
+                        "value": str(pause_idx.pop(0)) if pause_idx else "Unknown",
+                    }
+                )
 
         for match in pause_pattern.finditer(stt):
             annotations.append(

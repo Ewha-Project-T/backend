@@ -295,6 +295,7 @@ def detail_accuracy(lecture_no:int, assignment_no:int):
     return res
 
 def get_zip_url(lecutre_no:int, user_no:int):
+    lecutre = Lecture.query.filter_by(lecture_no=lecutre_no).first()
     attendee_no = Attendee.query.filter_by(lecture_no=lecutre_no, user_no=user_no).first().attendee_no
     user_name = User.query.filter_by(user_no=user_no).first().name
     assignments = Assignment.query.filter_by(lecture_no=lecutre_no).all()
@@ -305,7 +306,7 @@ def get_zip_url(lecutre_no:int, user_no:int):
             continue
         if assignment_check.ae_text != "" and assignment_check.ae_denotations != "" and assignment_check.ae_attributes != "":
             text_ae = make_json(assignment_check.ae_text, assignment_check.ae_denotations, assignment_check.ae_attributes)
-            path = os.environ["UPLOAD_PATH"] + "/" + str(assignment.assignment_no) + "_" + str(user_name) + ".json"
+            path = os.environ["UPLOAD_PATH"] + "/" + str(assignment.assignment_no) + "_" + assignment.as_name + "_" + str(user_name) + ".json"
             files.append(path)
             #json 파일 만들기
             with open(path, "w") as f:
@@ -319,7 +320,7 @@ def get_zip_url(lecutre_no:int, user_no:int):
             if stt_job is None:
                 continue
             result=stt_job.stt_result
-            path = os.environ["UPLOAD_PATH"] + "/" + str(assignment.assignment_no) + "_" + str(user_name) + "_원본stt" + str(index) + ".json"
+            path = os.environ["UPLOAD_PATH"] + "/" + str(assignment.assignment_no) + "_" + assignment.as_name+ "_" + str(user_name) + "_원본stt" + str(index) + ".json"
             files.append(path)
             #json 파일 만들기
             with open(path, "w") as f:
@@ -341,7 +342,7 @@ def get_zip_url(lecutre_no:int, user_no:int):
         #         f.write(result)
 
     #zip 파일 만들기
-    zip_path = os.environ["UPLOAD_PATH"] + "/" + str(lecutre_no) + "_" + str(user_name) + ".zip"
+    zip_path = os.environ["UPLOAD_PATH"] + "/" + str(lecutre_no) + "_" + lecutre.lecture_name  + "_" + str(user_name) + ".zip"
     with zipfile.ZipFile(zip_path, "w") as f:
         for file in files:
             f.write(file, os.path.basename(file))

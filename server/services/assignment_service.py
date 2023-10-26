@@ -612,53 +612,32 @@ def make_json(text,denotations,attributes):
         "text": text,
         "denotations": ast.literal_eval(denotations) if type(denotations) == str else denotations ,
         "attributes": ast.literal_eval(attributes) if type(attributes) == str else attributes,
-        "config": {
-            "boundarydetection": False,
-            "non-edge characters": [],
-            "function availability": {
-                "logo" : False,
+        "config": { 
+            "boundarydetection": False, 
+            "non-edge characters": [], 
+            "function availability": { 
+                "logo": False, 
                 "relation": False,
-                "block": False,
-                "simple": False,
-                "replicate": False,
-                "replicate-auto": False,
-                "setting": True,
+                "block": False, 
+                "simple": False, 
+                "replicate": False, 
+                "replicate-auto": False, 
+                "setting": True, 
                 "read": False,
-                "write": False,
-                "write-auto": False,
-                "line-height": False,
-                "line-height-auto": False,
-                "help": False
-            },
+                "write": False, 
+                "write-auto": False, 
+                "line-height-auto": False, 
+                "help": False 
+            }, 
             "entity types": [
-                {
-                    "id": "Cancellation",
-                    "color": "#ff5050"
-                },
-                {
-                    "id": "Filler",
-                    "color": "#ffff50",
-                    "default": True
-                },
-                {
-                    "id": "Pause",
-                    "color": "#404040"
-                }
-            ],
+                 { "id": "Cancel", "color": "#ff5050" }, 
+                 { "id": "Filler", "color": "#ffff50", "default": True }, 
+                 { "id": "Pause", "color": "#404040" }, 
+                 { "id": "Bad", "color": "#dc78dc" } 
+                 ], 
             "attribute types": [
-                {
-                    "pred": "Unsure",
-                    "value type": "flag",
-                    "default": True,
-                    "label": "?",
-                    "color": "#fa94c0"
-                },
-                {
-                    "pred": "Note",
-                    "value type": "string",
-                    "default": "",
-                    "values": []
-                }
+                 { "pred":"Note", "value type":"string", "default":"", "values":[] }, 
+                 { "pred":"Correction", "value type":"string", "default":"", "values":[] } 
             ]
         }
     }

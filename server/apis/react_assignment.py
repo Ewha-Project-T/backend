@@ -331,8 +331,7 @@ class React_Prob_record(Resource):
         res = assignment_detail_record(as_no, user_info["user_no"])
         if res.get("message") :
             print("error",res)
-            print(type(res))
-            return res, 401
+            return res
         return jsonify(res)
     @jwt_required()
     def post(self):

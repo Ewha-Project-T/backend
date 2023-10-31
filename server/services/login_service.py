@@ -34,8 +34,6 @@ def login(user_email, user_pw):
         db.session.commit
         if(acc.access_check==0):
             return LoginResult.NEED_EMAIL_CHECK, acc
-        if(acc.access_check_admin==0):
-            return LoginResult.NEED_ADMIN_CHECK, acc
         return LoginResult.SUCCESS, acc
     acc.login_fail_limit+=1
     db.session.commit
@@ -58,7 +56,7 @@ def register(user_email,user_pw,user_name,user_major, user_perm,user_ident):
         return RegisterResult.USEREMAIL_EXIST
     if(user_perm>3 or user_perm<0):
         return RegisterResult.INVALID_PERM
-    acc=User(email=user_email,password=user_pw,name=user_name,major=user_major,permission=user_perm,access_check_admin=1)#,user_identifier=user_ident) 학번이나 자신만의 문자를 입력하라 해야할듯(아이디찾기용)
+    acc=User(email=user_email,password=user_pw,name=user_name,major=user_major,permission=user_perm)#,user_identifier=user_ident) 학번이나 자신만의 문자를 입력하라 해야할듯(아이디찾기용)
     db.session.add(acc)
     db.session.commit
     return RegisterResult.SUCCESS

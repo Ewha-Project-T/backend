@@ -27,16 +27,10 @@ def login(user_email, user_pw):
     passwd = base64.b64decode(acc.password)
     salt = passwd[:32]
     encrypt_pw = hashlib.pbkdf2_hmac('sha256', user_pw.encode('utf-8'), salt, 100000, dklen=128)
-    if(acc.login_fail_limit>=5):
-        return LoginResult.LOGIN_COUNT_EXCEEDED, acc
-    if(acc!=None and encrypt_pw==passwd[32:]):
-        acc.login_fail_limit=0
-        db.session.commit
+    if(encrypt_pw==passwd[32:]):
         if(acc.access_check==0):
             return LoginResult.NEED_EMAIL_CHECK, acc
         return LoginResult.SUCCESS, acc
-    acc.login_fail_limit+=1
-    db.session.commit
     return LoginResult.INVALID_EMAILPW, acc
 
 def create_tokens(user: User, **kwargs):

@@ -768,3 +768,59 @@ def get_professorgraph(lecture_no,as_no,user_no):
         "result":nam
     }
     return response
+
+def assignment_detail_translate(as_no, user_no):
+    assignment = Assignment.query.filter_by(assignment_no = as_no).first()
+    if assignment == None:
+        return {"message" : "과제가 존재하지 않습니다.", "isSuccess" : False}
+    if assignment.open_time > datetime.utcnow()+timedelta(hours=9):
+        return {"message" : "아직 과제가 공개되지 않았습니다.", "isSuccess" : False}
+    if assignment.limit_time < datetime.utcnow()+timedelta(hours=9):
+        return {"message" : "제출 기간이 지났습니다.", "isSuccess" : False}
+    attendee = Attendee.query.filter_by(user_no = user_no, lecture_no = assignment.lecture_no).first()
+    if attendee == None:
+        return {"message" : "수강생이 아닙니다.", "isSuccess" : False}
+    assignment_management = Assignment_management.query.filter_by(assignment_no = as_no, attendee_no = attendee.attendee_no).first()
+    if assignment.assign_count + assignment_management.chance_count <= assignment_management.submission_count:
+        return {"message" : "제출 횟수를 초과하였습니다.", "isSuccess" : False}
+
+    res = {
+        "keyword": assignment.keyword,
+        "as_name": assignment.as_name,
+        "as_type": assignment.as_type,
+        "original_text": assignment.original_text,
+        "isSuccess": True,
+    }
+
+    assignment_management.submission_count += 1
+    db.session.commit()
+
+    return res
+
+def assignment_translate(as_no:int, user_no:int, translate_text:str):
+    assignment = Assignment.query.filter_by(assignment_no = as_no).first()
+    if assignment == None:
+        return {"message" : "과제가 존재하지 않습니다.", "isSuccess" : False}
+    if assignment.open_time > datetime.utcnow()+timedelta(hours=9):
+        return {"message" : "아직 과제가 공개되지 않았습니다.", "isSuccess" : False}
+    if assignment.limit_time < datetime.utcnow()+timedelta(hours=9):
+        return {"message" : "제출 기간이 지났습니다.", "isSuccess" : False}
+    attendee = Attendee.query.filter_by(user_no = user_no, lecture_no = assignment.lecture_no).first()
+    if attendee == None:
+        return {"message" : "수강생이 아닙니다.", "isSuccess" : False}
+    assignment_management = Assignment_management.query.filter_by(assignment_no = as_no, attendee_no = attendee.attendee_no).first()
+    if assignment.assign_count + assignment_management.chance_count <= assignment_management.submission_count:
+        return {"message" : "제출 횟수를 초과하였습니다.", "isSuccess" : False}
+    
+    assignment_check = Assignment_check.query.filter_by(assignment_no = as_no, attendee_no = attendee.attendee_no).order_by(Assignment_check.check_no.desc()).first()
+    if assignment_check == None:
+        assignment_check = Assignment_check(assignment_no = as_no, attendee_no = attendee.attendee_no, submit_time = datetime.utcnow()+timedelta(hours=9), user_trans_result = translate_text)
+        db.session.add(assignment_check)
+    else:
+        assignment_check.user_trans_result = translate_text
+    
+    db.session.commit()
+    return {"message" : "제출 완료",
+            "submission_count" : assignment_management.submission_count,
+            "isSuccess" : True
+            }

@@ -14,15 +14,18 @@ def get_json_textae(as_no,user_no):
     attend=Attendee.query.filter_by(user_no=user_no,lecture_no=assignment.lecture_no).first()
     if not attend:
         return "수강생이 아닙니다.", False, False
-    check=Assignment_check.query.filter_by(assignment_no=as_no,attendee_no=attend.attendee_no,assignment_check=1).order_by(Assignment_check.check_no.desc()).first()
+    check=Assignment_check.query.filter_by(assignment_no=as_no,attendee_no=attend.attendee_no).order_by(Assignment_check.check_no.desc()).first()
     if not check:
-        return "과제를 제출하지 않았습니다.", False, False
+        return "제출한 과제가 없습니다.", False, False
     assignment_management = Assignment_management.query.filter_by(assignment_no = as_no, attendee_no = attend.attendee_no).first()
-    if(assignment_management==None):
+    if assignment_management==None:
         return "학생 정보가 존재하지 않습니다.", False, False
     if assignment_management.end_submission is False:
         return "학생이 최종 제출하지 않았습니다.", False, False
-    if(check.ae_text == "" and check.ae_denotations == "" and check.ae_attributes == ""):
+    
+    if assignment.as_type == "번역":
+        text,denotations,attributes = check.user_trans_result,check.ae_denotations,check.ae_attributes
+    elif(check.ae_text == "" and check.ae_denotations == "" and check.ae_attributes == ""):
         _,uuid=get_prob_wav_url(as_no,user_no,assignment.lecture_no)
         # stt_result,stt_feedback=get_stt_result(uuid)
         text,denotations,attributes = get_stt_result(uuid)
@@ -57,11 +60,11 @@ def put_json_textae(as_no,user_no,ae_denotations,ae_attributes):
     attend=Attendee.query.filter_by(user_no=user_no,lecture_no=assignment.lecture_no).first()
     if not attend:
         return "수강생이 아닙니다.", False
-    check=Assignment_check.query.filter_by(assignment_no=as_no,attendee_no=attend.attendee_no,assignment_check=1).order_by(Assignment_check.check_no.desc()).first()
+    check=Assignment_check.query.filter_by(assignment_no=as_no,attendee_no=attend.attendee_no).order_by(Assignment_check.check_no.desc()).first()
     if not check:
         return "과제를 제출하지 않았습니다.", False
     assignment_management = Assignment_management.query.filter_by(assignment_no = as_no, attendee_no = attend.attendee_no).first()
-    if(assignment_management==None):
+    if assignment_management==None:
         return "학생 정보가 존재하지 않습니다.", False
     if assignment_management.end_submission is False:
         return "학생이 최종 제출하지 않았습니다.", False
@@ -95,6 +98,16 @@ def get_feedback_info(as_no: int, student_no: int, user_no: int):
     if not assignment_check:
         return {"message": "해당 과제를 제출한 학생이 아닙니다.", "isSuccess": False}
     assignment_audio = Prob_region.query.filter_by(assignment_no=as_no).all()
+    res = dict()
+    res["as_type"] = assignment.as_type
+    if assignment.as_type == "번역":
+        res["student_name"] = user.name
+        res["submit_time"] = assignment_manage.end_submission_time
+        res["limit_time"] = assignment.limit_time
+        res["original_text"] = assignment.original_text
+        res["isSuccess"] = True
+        return res
+
     if not assignment_audio:
         return {"message": "해당 과제의 오디오 파일이 존재하지 않습니다.", "isSuccess": False}
     assignment_check_list = Assignment_check_list.query.filter_by(check_no=assignment_check.check_no).all()
@@ -111,7 +124,7 @@ def get_feedback_info(as_no: int, student_no: int, user_no: int):
         # denotations_json += result["denotations"]
         # attributes_json += result["attributes"]
 
-    res = dict()
+    
     # res["original_ae"] = json.loads(make_json(text, denotations_json, attributes_json))
     res["original_tts"] = text
     res["original_text"] = assignment.original_text

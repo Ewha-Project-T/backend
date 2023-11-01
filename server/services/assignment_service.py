@@ -333,7 +333,7 @@ def assignment_detail(as_no:int, user_no:int):
     res = {"keyword" : assignment.keyword, "detail" : assignment.description, "limit_time" : assignment.limit_time, "assign_count" : assignment.assign_count, "open_time" : assignment.open_time, "file_name":assignment.file_name, "file_path":assignment.file_path, "as_name":assignment.as_name, "as_type":assignment.as_type}
     if assignment_management == None:
         return None
-    res["feedback"] = assignment_management.review_open
+    res["feedback"] = res["feedback"] = True if assignment_management.review else False #assignment_management.review_open
     res["end_submission"] = assignment_management.end_submission
     res["my_count"] = assignment_management.submission_count
     res["chance_count"] = assignment_management.chance_count
@@ -820,7 +820,7 @@ def assignment_translate(as_no:int, user_no:int, translate_text:str):
     
     assignment_check = Assignment_check.query.filter_by(assignment_no = as_no, attendee_no = attendee.attendee_no).order_by(Assignment_check.check_no.desc()).first()
     if assignment_check == None:
-        assignment_check = Assignment_check(assignment_no = as_no, attendee_no = attendee.attendee_no, submit_time = datetime.utcnow()+timedelta(hours=9), user_trans_result = translate_text)
+        assignment_check = Assignment_check(assignment_no = as_no, attendee_no = attendee.attendee_no, submit_time = datetime.utcnow()+timedelta(hours=9), user_trans_result = translate_text, ae_denotations = "[]", ae_attributes = "[]")
         db.session.add(assignment_check)
     else:
         assignment_check.user_trans_result = translate_text

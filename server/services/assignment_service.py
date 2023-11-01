@@ -426,15 +426,16 @@ def assignment_end_submission(as_no:int, user_no:int):
     assignment_management.end_submission = True
     assignment_management.end_submission_time = assignment_check.submit_time
     
-
-    # do_stt_work
-    assignment_check_list = Assignment_check_list.query.filter_by(check_no = assignment_check.check_no).all()
-    for assignment_check_list_one in assignment_check_list:
-        # mapping_sst_user(acc.assignment_no, split_url,user_info)
-        mapping_sst_user(as_no, assignment_check_list_one.acl_uuid, {"user_no" : user_no})
-        if assignment.dest_translang == None:
-            assignment.dest_translang = "ko"
-        do_stt_work.delay(filename = assignment_check_list_one.acl_uuid, locale = assignment.dest_translang)
+    if assignment.as_type != "번역":
+        # do_stt_work
+        assignment_check_list = Assignment_check_list.query.filter_by(check_no = assignment_check.check_no).all()
+        for assignment_check_list_one in assignment_check_list:
+            # mapping_sst_user(acc.assignment_no, split_url,user_info)
+            mapping_sst_user(as_no, assignment_check_list_one.acl_uuid, {"user_no" : user_no})
+            if assignment.dest_translang == None:
+                assignment.dest_translang = "ko"
+            do_stt_work.delay(filename = assignment_check_list_one.acl_uuid, locale = assignment.dest_translang)
+    
     db.session.commit()
     return {"message" : "최종 제출 완료",
             "submission_count" : assignment_management.submission_count,
@@ -784,11 +785,16 @@ def assignment_detail_translate(as_no, user_no):
     if assignment.assign_count + assignment_management.chance_count <= assignment_management.submission_count:
         return {"message" : "제출 횟수를 초과하였습니다.", "isSuccess" : False}
 
+    translate_text = None
+    assignment_check = Assignment_check.query.filter_by(assignment_no = as_no, attendee_no = attendee.attendee_no).order_by(Assignment_check.check_no.desc()).first()
+    if assignment_check:
+        translate_text = assignment_check.user_trans_result
     res = {
         "keyword": assignment.keyword,
         "as_name": assignment.as_name,
         "as_type": assignment.as_type,
         "original_text": assignment.original_text,
+        "translate_text" : translate_text,
         "isSuccess": True,
     }
 

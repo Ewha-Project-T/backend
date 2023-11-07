@@ -9,7 +9,6 @@ from flask_jwt_extended import (
 import re
 from ..services.assignment_service import assignment_detail, assignment_detail_record, assignment_detail_translate, assignment_end_submission, assignment_record, assignment_translate, edit_assignment, get_assignment, get_assignments_manage,mod_assignment_listing,check_assignment,make_as, create_assignment,prob_list_professor, prob_list_student, mod_as,delete_assignment,get_as_name,get_prob_wav_url,get_wav_url,get_stt_result,get_original_stt_result,get_as_info,get_feedback,make_json_url,save_json_feedback,get_prob_submit_list,get_studentgraph,get_professorgraph
 from ..services.lecture_service import lecture_access_check
-from ..services.login_service import admin_required, professor_required, assistant_required
 from werkzeug.utils import secure_filename
 from os import environ as env
 import os

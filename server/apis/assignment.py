@@ -10,7 +10,6 @@ from flask_jwt_extended import (
 import re
 from ..services.assignment_service import make_as,mod_as,get_wav_url,delete_assignment,check_assignment,get_as_name,get_prob_wav_url,get_stt_result,get_original_stt_result,mod_assignment_listing,get_as_info,set_feedback,get_feedback,get_prob_submit_list
 from ..services.lecture_service import lecture_access_check
-from ..services.login_service import admin_required, professor_required, assistant_required
 from werkzeug.utils import secure_filename
 from os import environ as env
 from werkzeug.datastructures import FileStorage

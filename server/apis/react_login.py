@@ -5,7 +5,7 @@ from flask_jwt_extended import (
 )
 import re
 from ..services.login_service import (
-    login, register, LoginResult, RegisterResult, create_tokens, admin_required, professor_required, assistant_required,real_time_email_check,findpassword_email_check,findpassword_code_check,change_pass,find_id
+    login, register, LoginResult, RegisterResult, create_tokens,real_time_email_check,findpassword_email_check,findpassword_code_check,change_pass,find_id
 )
 from ..services.mail_service import (
     gen_verify_email_code,get_access_code,access_check_success,signup_email_validate

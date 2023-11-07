@@ -89,36 +89,6 @@ def admin_required(): #관리자 권한
 
     return wrapper
 
-def professor_required():#교수권한
-    def wrapper(fn):
-        @wraps(fn)
-        def decorator(*args, **kwargs):
-            verify_jwt_in_request()
-            claims = get_jwt()
-            if(claims["sub"]["user_perm"]>=3 or claims["sub"]["user_perm"]==0):
-                return fn(*args, **kwargs)
-            else:
-                return {"msg":"professor only"}, 403
-
-        return decorator
-
-    return wrapper
-
-def assistant_required():#조교권한
-    def wrapper(fn):
-        @wraps(fn)
-        def decorator(*args, **kwargs):
-            verify_jwt_in_request()
-            claims = get_jwt()
-            if(claims["sub"]["user_perm"]>=2 or claims["sub"]["user_perm"]==0):
-                return fn(*args, **kwargs)
-            else:
-                return {"msg":"assistant only"}, 403
-
-        return decorator
-
-    return wrapper
-
 def findpassword_email_check(user_email,user_name,user_major):
     acc = User.query.filter_by(email=user_email,name=user_name,major=user_major).first()
     if acc ==None:

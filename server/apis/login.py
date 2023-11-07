@@ -5,7 +5,7 @@ from flask_jwt_extended import (
 )
 import re
 from ..services.login_service import (
-    login, register, LoginResult, RegisterResult, create_tokens, admin_required, professor_required, assistant_required,real_time_email_check
+    login, register, LoginResult, RegisterResult, create_tokens,real_time_email_check
 )
 from flask_cors import cross_origin
 from os import environ as env

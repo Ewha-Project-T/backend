@@ -9,9 +9,8 @@ from flask_jwt_extended import (
 )
 import re
 from ..services.lecture_service import lecture_listing, make_lecture,modify_lecture,delete_lecture, search_student,major_listing,attendee_add,attendee_listing,lecture_access_check,mod_lecutre_listing
-from ..services.login_service import (
-     admin_required, professor_required, assistant_required,get_all_user
-)
+from ..services.login_service import get_all_user
+
 from os import environ as env
 host_url=env["HOST"]
 perm_list={"학생":1,"조교":2,"교수":3}

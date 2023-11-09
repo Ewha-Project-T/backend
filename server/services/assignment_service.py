@@ -333,7 +333,7 @@ def assignment_detail(as_no:int, user_no:int):
     res = {"keyword" : assignment.keyword, "detail" : assignment.description, "limit_time" : assignment.limit_time, "assign_count" : assignment.assign_count, "open_time" : assignment.open_time, "file_name":assignment.file_name, "file_path":assignment.file_path, "as_name":assignment.as_name, "as_type":assignment.as_type}
     if assignment_management == None:
         return None
-    res["feedback"] = assignment_management.review_open
+    res["feedback"] = res["feedback"] = True if assignment_management.review else False #assignment_management.review_open
     res["end_submission"] = assignment_management.end_submission
     res["my_count"] = assignment_management.submission_count
     res["chance_count"] = assignment_management.chance_count
@@ -426,15 +426,16 @@ def assignment_end_submission(as_no:int, user_no:int):
     assignment_management.end_submission = True
     assignment_management.end_submission_time = assignment_check.submit_time
     
-
-    # do_stt_work
-    assignment_check_list = Assignment_check_list.query.filter_by(check_no = assignment_check.check_no).all()
-    for assignment_check_list_one in assignment_check_list:
-        # mapping_sst_user(acc.assignment_no, split_url,user_info)
-        mapping_sst_user(as_no, assignment_check_list_one.acl_uuid, {"user_no" : user_no})
-        if assignment.dest_translang == None:
-            assignment.dest_translang = "ko"
-        do_stt_work.delay(filename = assignment_check_list_one.acl_uuid, locale = assignment.dest_translang)
+    if assignment.as_type != "번역":
+        # do_stt_work
+        assignment_check_list = Assignment_check_list.query.filter_by(check_no = assignment_check.check_no).all()
+        for assignment_check_list_one in assignment_check_list:
+            # mapping_sst_user(acc.assignment_no, split_url,user_info)
+            mapping_sst_user(as_no, assignment_check_list_one.acl_uuid, {"user_no" : user_no})
+            if assignment.dest_translang == None:
+                assignment.dest_translang = "ko"
+            do_stt_work.delay(filename = assignment_check_list_one.acl_uuid, locale = assignment.dest_translang)
+    
     db.session.commit()
     return {"message" : "최종 제출 완료",
             "submission_count" : assignment_management.submission_count,
@@ -768,3 +769,64 @@ def get_professorgraph(lecture_no,as_no,user_no):
         "result":nam
     }
     return response
+
+def assignment_detail_translate(as_no, user_no):
+    assignment = Assignment.query.filter_by(assignment_no = as_no).first()
+    if assignment == None:
+        return {"message" : "과제가 존재하지 않습니다.", "isSuccess" : False}
+    if assignment.open_time > datetime.utcnow()+timedelta(hours=9):
+        return {"message" : "아직 과제가 공개되지 않았습니다.", "isSuccess" : False}
+    if assignment.limit_time < datetime.utcnow()+timedelta(hours=9):
+        return {"message" : "제출 기간이 지났습니다.", "isSuccess" : False}
+    attendee = Attendee.query.filter_by(user_no = user_no, lecture_no = assignment.lecture_no).first()
+    if attendee == None:
+        return {"message" : "수강생이 아닙니다.", "isSuccess" : False}
+    assignment_management = Assignment_management.query.filter_by(assignment_no = as_no, attendee_no = attendee.attendee_no).first()
+    if assignment.assign_count + assignment_management.chance_count <= assignment_management.submission_count:
+        return {"message" : "제출 횟수를 초과하였습니다.", "isSuccess" : False}
+
+    translate_text = None
+    assignment_check = Assignment_check.query.filter_by(assignment_no = as_no, attendee_no = attendee.attendee_no).order_by(Assignment_check.check_no.desc()).first()
+    if assignment_check:
+        translate_text = assignment_check.user_trans_result
+    res = {
+        "keyword": assignment.keyword,
+        "as_name": assignment.as_name,
+        "as_type": assignment.as_type,
+        "original_text": assignment.original_text,
+        "translate_text" : translate_text,
+        "isSuccess": True,
+    }
+
+    assignment_management.submission_count += 1
+    db.session.commit()
+
+    return res
+
+def assignment_translate(as_no:int, user_no:int, translate_text:str):
+    assignment = Assignment.query.filter_by(assignment_no = as_no).first()
+    if assignment == None:
+        return {"message" : "과제가 존재하지 않습니다.", "isSuccess" : False}
+    if assignment.open_time > datetime.utcnow()+timedelta(hours=9):
+        return {"message" : "아직 과제가 공개되지 않았습니다.", "isSuccess" : False}
+    if assignment.limit_time < datetime.utcnow()+timedelta(hours=9):
+        return {"message" : "제출 기간이 지났습니다.", "isSuccess" : False}
+    attendee = Attendee.query.filter_by(user_no = user_no, lecture_no = assignment.lecture_no).first()
+    if attendee == None:
+        return {"message" : "수강생이 아닙니다.", "isSuccess" : False}
+    assignment_management = Assignment_management.query.filter_by(assignment_no = as_no, attendee_no = attendee.attendee_no).first()
+    if assignment.assign_count + assignment_management.chance_count <= assignment_management.submission_count:
+        return {"message" : "제출 횟수를 초과하였습니다.", "isSuccess" : False}
+    
+    assignment_check = Assignment_check.query.filter_by(assignment_no = as_no, attendee_no = attendee.attendee_no).order_by(Assignment_check.check_no.desc()).first()
+    if assignment_check == None:
+        assignment_check = Assignment_check(assignment_no = as_no, attendee_no = attendee.attendee_no, submit_time = datetime.utcnow()+timedelta(hours=9), user_trans_result = translate_text, ae_denotations = "[]", ae_attributes = "[]")
+        db.session.add(assignment_check)
+    else:
+        assignment_check.user_trans_result = translate_text
+    
+    db.session.commit()
+    return {"message" : "제출 완료",
+            "submission_count" : assignment_management.submission_count,
+            "isSuccess" : True
+            }

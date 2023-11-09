@@ -27,18 +27,10 @@ def login(user_email, user_pw):
     passwd = base64.b64decode(acc.password)
     salt = passwd[:32]
     encrypt_pw = hashlib.pbkdf2_hmac('sha256', user_pw.encode('utf-8'), salt, 100000, dklen=128)
-    if(acc.login_fail_limit>=5):
-        return LoginResult.LOGIN_COUNT_EXCEEDED, acc
-    if(acc!=None and encrypt_pw==passwd[32:]):
-        acc.login_fail_limit=0
-        db.session.commit
+    if(encrypt_pw==passwd[32:]):
         if(acc.access_check==0):
             return LoginResult.NEED_EMAIL_CHECK, acc
-        if(acc.access_check_admin==0):
-            return LoginResult.NEED_ADMIN_CHECK, acc
         return LoginResult.SUCCESS, acc
-    acc.login_fail_limit+=1
-    db.session.commit
     return LoginResult.INVALID_EMAILPW, acc
 
 def create_tokens(user: User, **kwargs):
@@ -92,36 +84,6 @@ def admin_required(): #관리자 권한
                 return fn(*args, **kwargs)
             else:
                 return {"msg":"admin only"}, 403
-
-        return decorator
-
-    return wrapper
-
-def professor_required():#교수권한
-    def wrapper(fn):
-        @wraps(fn)
-        def decorator(*args, **kwargs):
-            verify_jwt_in_request()
-            claims = get_jwt()
-            if(claims["sub"]["user_perm"]>=3 or claims["sub"]["user_perm"]==0):
-                return fn(*args, **kwargs)
-            else:
-                return {"msg":"professor only"}, 403
-
-        return decorator
-
-    return wrapper
-
-def assistant_required():#조교권한
-    def wrapper(fn):
-        @wraps(fn)
-        def decorator(*args, **kwargs):
-            verify_jwt_in_request()
-            claims = get_jwt()
-            if(claims["sub"]["user_perm"]>=2 or claims["sub"]["user_perm"]==0):
-                return fn(*args, **kwargs)
-            else:
-                return {"msg":"assistant only"}, 403
 
         return decorator
 

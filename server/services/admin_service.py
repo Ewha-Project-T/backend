@@ -8,10 +8,7 @@ class AdminResult:
     NOT_FOUND= 1
 
 def user_listing(mode=None):#mode none일시 전체검색, 1일시 가입승인필요한 사람만 검색
-    if(mode==None):
-        acc_list = User.query.all()
-    else:
-        acc_list = User.query.filter_by(access_check_admin=0).all()
+    acc_list = User.query.all()
     user_list = []
     for user in acc_list:
         tmp_uesr = {}
@@ -22,17 +19,10 @@ def user_listing(mode=None):#mode none일시 전체검색, 1일시 가입승인�
         tmp_uesr["permission"] = user.permission
         tmp_uesr["login_fail"] = user.login_fail_limit
         tmp_uesr["access_check"] = user.access_check
-        tmp_uesr["access_check_admin"] = user.access_check_admin
         user_list.append(tmp_uesr)
     if not user_list:
         return AdminResult.NOT_FOUND,user_list
     return AdminResult.SUCCESS,user_list
-
-def activating_user(email):#일단기능만 에러처리는 나중에~
-    acc= User.query.filter_by(email=email).first()
-    acc.access_check_admin=1
-    db.session.add(acc)
-    db.session.commit
 
 def del_user(email):
     acc = User.query.filter_by(email=email).first()

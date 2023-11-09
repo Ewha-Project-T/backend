@@ -10,7 +10,6 @@ from flask_jwt_extended import (
 import re
 from ..services.assignment_service import make_as,mod_as,get_wav_url,delete_assignment,check_assignment,get_as_name,get_prob_wav_url,get_stt_result,get_original_stt_result,mod_assignment_listing,get_as_info,set_feedback,get_feedback,get_prob_submit_list
 from ..services.lecture_service import lecture_access_check
-from ..services.login_service import admin_required, professor_required, assistant_required
 from werkzeug.utils import secure_filename
 from os import environ as env
 from werkzeug.datastructures import FileStorage
@@ -222,8 +221,6 @@ class Prob_feedback(Resource):
         user_trans_result,professor_review,feedback_list=get_feedback(as_no,lecture_no,user_no)
         return make_response(render_template("prob_feedback.html",user_info=user_info,as_name=as_name,wav_url=wav_url,wav_url_example=wav_url_example,stt_result=stt_result,original_stt_result=original_stt_result,as_info=as_info,lecture_no=lecture_no,as_no=as_no,professor_review=professor_review,feedback_list=feedback_list,user_trans_result=user_trans_result,stt_feedback=stt_feedback,user_no=user_no))
 
-
-    @assistant_required()
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('lecture_no', type=int)

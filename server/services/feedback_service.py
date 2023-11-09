@@ -84,9 +84,6 @@ def get_feedback_info(as_no: int, student_no: int, user_no: int):
     assignment = Assignment.query.filter_by(assignment_no=as_no).first()
     if not assignment:
         return {"message": "과제가 존재하지 않습니다.", "isSuccess": False}
-    if assignment.user_no != user_no:
-        return {"message": "과제를 열람할 권한이 없습니다.", "isSuccess": False}
-    
     user = User.query.filter_by(user_no=student_no).first()
     attendee = Attendee.query.filter_by(lecture_no=assignment.lecture_no, user_no=student_no).first()
     if not attendee:
@@ -97,6 +94,10 @@ def get_feedback_info(as_no: int, student_no: int, user_no: int):
     assignment_check = Assignment_check.query.filter_by(assignment_no=as_no, attendee_no = attendee.attendee_no).order_by(Assignment_check.check_no.desc()).first()
     if not assignment_check:
         return {"message": "해당 과제를 제출한 학생이 아닙니다.", "isSuccess": False}
+    if assignment.user_no != user_no:
+        if assignment_manage.attendee_no != attendee.attendee_no or assignment_manage.review is False:
+            return {"message": "과제를 열람할 권한이 없습니다.", "isSuccess": False}
+    professor_no = assignment.user_no
     assignment_audio = Prob_region.query.filter_by(assignment_no=as_no).all()
     res = dict()
     res["as_type"] = assignment.as_type
@@ -113,7 +114,7 @@ def get_feedback_info(as_no: int, student_no: int, user_no: int):
     assignment_check_list = Assignment_check_list.query.filter_by(check_no=assignment_check.check_no).all()
     if not assignment_check_list:
         return {"message": "해당 학생의 오디오 파일이 존재하지 않습니다.", "isSuccess": False}
-    stt = Stt.query.filter_by(assignment_no=as_no, user_no = user_no).all()
+    stt = Stt.query.filter_by(assignment_no=as_no, user_no = professor_no).all()
     text,denotations_json,attributes_json ="",[],[]
     for st in stt:
         stt_job = SttJob.query.filter_by(stt_no=st.stt_no).first()

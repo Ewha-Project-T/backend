@@ -155,7 +155,8 @@ def get_feedback_review(as_no:int, student_no:int,user_no:int):
     if not attendee:
         return {"message": "해당 강의를 수강한 학생이 아닙니다.", "isSuccess": False}
     assignment_manage = Assignment_management.query.filter_by(assignment_no=as_no, attendee_no = attendee.attendee_no).first()
-    if assignment.user_no != user_no or assignment_manage.attendee_no != attendee.attendee_no:
+    if assignment.user_no != user_no and assignment_manage.attendee_no != attendee.attendee_no:
+        print(assignment.user_no, user_no, assignment_manage.attendee_no, attendee.attendee_no)
         return {"message": "과제를 열람할 권한이 없습니다.", "isSuccess": False}
     if assignment_manage.end_submission is False:
         return {"message": "아직 과제가 제출되지 않았습니다.", "isSuccess": False}

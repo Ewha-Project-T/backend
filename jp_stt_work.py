@@ -20,10 +20,10 @@ class JpStt:
         openai.api_key = os.getenv("OPENAI_API_KEY")
 
         prompt_message = (
-            "Please annotate hesitating expressions such as 'え', 'あの', or 'えと' by marking them with '<...>'. "
-            "For instance, convert 'え' to '<え>'"
-            "When you encounter repeated expressions, mark the first occurrence with '-...-'."
-            "For example, if '考える考えると' appears, it should be converted to '-考える-考えると'. Another example is -少なく-とも (pause)少なくて  "
+            "Please annotate hesitating expressions such as 'え', 'あの', or 'えと' by marking them with '<f>...</f>'. "
+            "For instance, convert 'え' to '<f>え</f>'"
+            "When you encounter repeated expressions, mark the first occurrence with '<c>...</c>'."
+            "For example, if '考える考えると' appears, it should be converted to '<c>考える</c>考えると'. Another example is <c>少なく</c>とも少なくて  "
             "If there are no such expressions, return the original sentence. \n\n" + result
         )
 
@@ -97,10 +97,6 @@ class JpStt:
                 sentences = sent_tokenize(stt)
                 for sentence in sentences:
                     print(sentence.replace(" ", ""))
-                #     if sentence.endswith("."):
-                #         flag = True
-                #     else:
-                #         flag = False
                 if i < length - 1:
                     pause_duration = silenceidx[i]  # in milliseconds
                     print("(pause: " + str(silenceidx[i]) + "sec)") 
@@ -108,16 +104,7 @@ class JpStt:
                     text += pause_placeholder + "\n"
                     pause_result += pause_duration
                     pause_idx.append(pause_duration)
-                    # if flag == False:
-                    # print("(pause: " + str(silenceidx[i]) + "sec)")  # 침묵
-                    # text = text + "\n"
-                    # pause_result += silenceidx[i]
-                    # pause_idx.append(silenceidx[i])
-                    # else:
-                    #     # 통역 개시 지연구간
-                    #     print("(delay: " + str(silenceidx[i]) + "sec)")
-                    #     text = text + "\n"
-                    #     delay_result += silenceidx[i]
+
         return text, pause_result, delay_result, pause_idx, start_idx, end_idx
     
     # worker.py 로 이동 필요
@@ -146,9 +133,8 @@ class JpStt:
 
         annotations = []
 
-        pause_pattern = re.compile(r"\((\d+) ms\)")
-        filler_pattern = re.compile(r"<(.*?)>")
-        cancellation_pattern = re.compile(r"-([^-\[]*?)-")
+        filler_pattern = re.compile(r"<f>(.*?)</f>")
+        cancellation_pattern = re.compile(r"<c>(.*?)</c>")
 
         for i, char in enumerate(stt):
             if char == " " and i + 1 < len(stt) and stt[i + 1] == "\n":
@@ -160,17 +146,6 @@ class JpStt:
                         "value": str(pause_idx.pop(0)) if pause_idx else "Unknown",
                     }
                 )
-
-        for match in pause_pattern.finditer(stt):
-            annotations.append(
-                {
-                    "start": match.start(),
-                    "end": match.end(),
-                    "type": "Pause",
-                    "value": match.group(1),
-                }
-            )
-
 
         for match in filler_pattern.finditer(stt):
             word_start = match.start(1)
@@ -271,23 +246,17 @@ class JpStt:
 
                 cnt += 1
 
-        angle_brackets_positions = [
-            pos for pos, char in enumerate(text) if char in ["<", ">", "-"]
-        ]
+        # Find all instances of filler and cancellation tags
+        tag_positions = [(m.start(), m.end()) for m in re.finditer(r"</?f>|</?c>", text)]
 
+        # Calculate the adjustment for each denotation index
         for denotation in denotations:
+            adjustment = sum(end - start for start, end in tag_positions if start < denotation['span']['begin'])
+            denotation['span']['begin'] -= adjustment
+            denotation['span']['end'] -= adjustment
 
-            denotation["span"]["begin"] = denotation["span"]["begin"] - sum(
-                1 for pos in angle_brackets_positions if pos < denotation["span"]["begin"]
-            )
-
-            denotation["span"]["end"] = denotation["span"]["end"] - sum(
-                1 for pos in angle_brackets_positions if pos < denotation["span"]["end"]
-            )
-
-        text = "".join(
-            [char for idx, char in enumerate(text) if idx not in angle_brackets_positions]
-        )
+        # Update the text by removing the tags
+        text = re.sub(r"</?f>|</?c>", "", text)
     
         return text, denotations, attributes
     

@@ -179,75 +179,21 @@ class KorStt:
         cnt=1
         text=""
         denotations="["
-        attributes="["
         text=text+stt_result['textFile']+"\n"
         for j in range(len(stt_feedback)):
             denotations +='{ "id": "T'+str(cnt)+'", "span": { "begin": '+str(stt_feedback[j]['start'])+', "end": '+str(stt_feedback[j]['end'])+' }, "obj": "'+str(stt_feedback[j]['type'])+'" },'
-            attributes +='{ "id": "A'+str(cnt)+'", "subj": "T'+str(cnt)+'", "pred": "Unsure", "obj": True },'
             cnt+=1
         denotations=denotations[:-1]
-        attributes=attributes[:-1]
         denotations+="]"
-        attributes+="]"
-        return text, denotations, attributes
+        return text, denotations
 
 
-    def make_json(self, text,denotations,attributes):
+    def make_json(self, text, denotations):
         data = {
             "text": text,
-            "denotations": ast.literal_eval(denotations) if type(denotations) == str else denotations ,
-            "attributes": ast.literal_eval(attributes) if type(attributes) == str else attributes,
-            "config": {
-                "boundarydetection": False,
-                "non-edge characters": [],
-                "function availability": {
-                    "logo" : False,
-                    "relation": False,
-                    "block": False,
-                    "simple": False,
-                    "replicate": False,
-                    "replicate-auto": False,
-                    "setting": False,
-                    "read": False,
-                    "write": False,
-                    "write-auto": False,
-                    "line-height": False,
-                    "line-height-auto": False,
-                    "help": False
-                },
-                "entity types": [
-                    {
-                        "id": "Cancellation",
-                        "color": "#ff5050"
-                    },
-                    {
-                        "id": "Filler",
-                        "color": "#ffff50",
-                        "default": True
-                    },
-                    {
-                        "id": "Pause",
-                        "color": "#404040"
-                    }
-                ],
-                "attribute types": [
-                    {
-                        "pred": "Unsure",
-                        "value type": "flag",
-                        "default": True,
-                        "label": "?",
-                        "color": "#fa94c0"
-                    },
-                    {
-                        "pred": "Note",
-                        "value type": "string",
-                        "default": "",
-                        "values": []
-                    }
-                ]
-            }
+            "denotations": ast.literal_eval(denotations) if type(denotations) == str else denotations
         }
-        
+
         return data
 
 
@@ -272,8 +218,8 @@ class KorStt:
         result = self.basic_annotation_stt(result,stt,pause_final,pause_idx)
         result['textFile'] = stt_t
         stt_feedback = result['annotations']
-        text,denotations,attributes = self.parse_data(result,stt_feedback)
-        data = self.make_json(text,denotations,attributes)
+        text,denotations = self.parse_data(result,stt_feedback)
+        data = self.make_json(text,denotations)
 
         return json.dumps(data, indent=4, ensure_ascii=False)
 

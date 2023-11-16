@@ -11,7 +11,7 @@ from sqlalchemy.ext.declarative import DeclarativeMeta
 import werkzeug
 import json
 
-from ..services.stt_service import seqstt_getJobResult, sequential_stt, simultaneous_stt, get_userfile, is_stt_userfile, mapping_sst_user, remove_userfile, stt_getJobResult
+from ..services.stt_service import simultaneous_stt, get_userfile, is_stt_userfile, mapping_sst_user, remove_userfile, stt_getJobResult
 import azure.cognitiveservices.speech as speechsdk
 
 class APIArgument(Argument):

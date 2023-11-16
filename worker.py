@@ -10,6 +10,7 @@ from kr_stt_work import (
     KorStt
 )
 from jp_stt_work import JpStt
+from original_text import Original_stt
 
 import os
 import uuid
@@ -118,5 +119,33 @@ def do_stt_work(self, filename, locale="ko"):
     return result_stt_json
 
 @celery.task(base=DBTask, bind=True)
-def do_sequential_stt_work(self, filename, index, locale="ko-KR"):
-    return 0
+def do_original_text_stt_work(self, filename, locale="ko"):
+    result_stt_json = None
+    session = self.session
+    self.update_state(state='INDEXING')
+    stt=Original_stt()
+    self.update_state(state='STT')
+
+    try:
+        result_stt_json=stt.execute(filename)
+    except Exception as e:
+        print(e)
+        self.update_state(state=e.args[0])
+
+    stt_db = session.query(Stt).filter_by(wav_file=filename).first()
+    if not stt_db:
+        return False
+
+    print("request id = ",self.request.id, "stt_no = ", stt_db.stt_no)
+    job = SttJob(
+        job_id=self.request.id,
+        stt_no=stt_db.stt_no,
+        sound="",
+        startidx="",
+        endidx="",
+        silenceidx="",
+    )
+    job.stt_result = result_stt_json
+    session.add(job)
+    session.commit()
+    return result_stt_json

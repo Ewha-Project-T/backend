@@ -9,7 +9,7 @@ from pydub import AudioSegment, silence
 
 from server import db
 from ..model import Stt, SttJob
-from worker import do_stt_work, do_sequential_stt_work
+from worker import do_stt_work#, do_sequential_stt_work
 
 def simultaneous_stt(filename, locale):
     task = do_stt_work.delay(filename, locale)
@@ -26,7 +26,7 @@ def stt_getJobResult(jobid):
     
     result = task.get()
     return result
-
+"""
 def sequential_stt(filename, index, locale):
     task = do_sequential_stt_work.delay(filename, index, locale)
     return task.id
@@ -42,7 +42,7 @@ def seqstt_getJobResult(jobid):
     
     result = task.get()
     return result
-
+"""
 def mapping_sst_user(assignment, file,userinfo):
     stt = Stt(user_no=userinfo["user_no"], assignment_no=assignment, wav_file=file)
     db.session.add(stt)

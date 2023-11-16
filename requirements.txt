@@ -23,3 +23,5 @@ librosa
 openai
 fugashi
 python-dotenv
+openai
+importlib-metadata==4.13.0

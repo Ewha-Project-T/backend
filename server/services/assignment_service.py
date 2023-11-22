@@ -830,3 +830,20 @@ def assignment_translate(as_no:int, user_no:int, translate_text:str):
             "submission_count" : assignment_management.submission_count,
             "isSuccess" : True
             }
+
+def assignment_cancel(as_no:int, user_no:int,student_no:int):
+    assignment = Assignment.query.filter_by(assignment_no = as_no).first()
+    if assignment == None:
+        return {"message" : "과제가 존재하지 않습니다.", "isSuccess" : False}
+    if assignment.user_no != user_no:
+        return {"message" : "과제를 생성한 교수가 아닙니다.", "isSuccess" : False}
+    attendee = Attendee.query.filter_by(user_no = student_no, lecture_no = assignment.lecture_no).first()
+    if attendee == None:
+        return {"message" : "수강생이 아닙니다.", "isSuccess" : False}
+    assignment_management = Assignment_management.query.filter_by(assignment_no = as_no, attendee_no = attendee.attendee_no).first()
+    if assignment_management == None:
+        return {"message" : "과제를 제출한 기록이 없습니다.", "isSuccess" : False}
+    assignment_management.end_submission = False
+    db.session.commit()
+
+    return {"message" : "과제 취소 완료"}

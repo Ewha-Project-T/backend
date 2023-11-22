@@ -1,4 +1,4 @@
-#new_1023
+#new_1122
 
 from pydub import AudioSegment, silence
 from nltk.tokenize import sent_tokenize
@@ -16,9 +16,11 @@ import ast
 class KorStt:
     def process_stt_result(self,stt):
         result = stt
-        openai.api_key = "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" # api key
+        client = openai.OpenAI(
+            api_key="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",
+        )
 
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-4", messages=[{"role": "user", "content": "Mark '<f>' on the before hesitating expressions and mark '</f>' after hesitating expressions such as '음', '아', or '그' (example: <f>음</f>). And mark '<c>' before repeating expressions that can be removed and mark '</c>' after  repeating expressions that can be removed, such as '다릅' in '다릅 틀립니다.', '있었' in '있었 있었습니다'. (example: <c>다릅</c> 틀립니다.). At this time, maintain spacing. (example input:차장님. 어 / example output:차장님. <f>어</f>). However if there is no space, do not make space./n" + result}]
         )
 

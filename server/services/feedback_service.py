@@ -120,6 +120,8 @@ def get_feedback_info(as_no: int, student_no: int, user_no: int):
         stt_job = SttJob.query.filter_by(stt_no=st.stt_no).first()
         if stt_job is None:
             return {"message": "교수님의 음원 STT 작업 진행중입니다.", "isSuccess": False}
+        if stt_job.stt_result is None:
+            return {"message": "STT 오류 STT를 다시 진행해 주세요.", "isSuccess": False}
         result = json.loads(stt_job.stt_result)
         text += result["text"]
         # denotations_json += result["denotations"]

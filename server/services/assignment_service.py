@@ -464,7 +464,7 @@ def get_stt_result(uuid):
             denotation["span"]["begin"] += index
             denotation["span"]["end"] += index
             denotations.append(denotation)
-        attributes += stt_result["attributes"]
+        # attributes += stt_result["attributes"]
         text += "---------------------------\n"
 
     return text,str(denotations),str(attributes)

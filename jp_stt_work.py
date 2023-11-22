@@ -10,9 +10,10 @@ from dotenv import load_dotenv
 import re
 import ast
 import uuid
-client = OpenAI()
 
 load_dotenv()
+
+client = OpenAI()
 
 
 #일본어버전 시작
@@ -238,14 +239,6 @@ class JpStt:
                 }
                 denotations.append(denotation)
 
-                attribute = {
-                    "id": "A" + str(cnt),
-                    "subj": "T" + str(cnt),
-                    "pred": "Unsure",
-                    "obj": True,
-                }
-                attributes.append(attribute)
-
                 cnt += 1
 
         # Find all instances of filler and cancellation tags
@@ -266,7 +259,6 @@ class JpStt:
         data = {
             "text": text,
             "denotations": ast.literal_eval(denotations) if type(denotations) == str else denotations ,
-            "attributes": ast.literal_eval(attributes) if type(attributes) == str else attributes,
         }
         
         return data

@@ -5,10 +5,12 @@ import json
 import requests
 import os
 import openai
+from openai import OpenAI
 from dotenv import load_dotenv
 import re
 import ast
 import uuid
+client = OpenAI()
 
 load_dotenv()
 
@@ -27,7 +29,7 @@ class JpStt:
             "If there are no such expressions, return the original sentence. \n\n" + result
         )
 
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-4",
             messages=[{"role": "user", "content": prompt_message}],
             temperature=0,

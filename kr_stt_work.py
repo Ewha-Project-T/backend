@@ -1,4 +1,4 @@
-#new_1122
+#error handling / annotation 변경
 
 from pydub import AudioSegment, silence
 from nltk.tokenize import sent_tokenize
@@ -20,9 +20,48 @@ class KorStt:
             api_key="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",
         )
 
-        response = client.chat.completions.create(
-            model="gpt-4", messages=[{"role": "user", "content": "Mark '<f>' on the before hesitating expressions and mark '</f>' after hesitating expressions such as '음', '아', or '그' (example: <f>음</f>). And mark '<c>' before repeating expressions that can be removed and mark '</c>' after  repeating expressions that can be removed, such as '다릅' in '다릅 틀립니다.', '있었' in '있었 있었습니다'. (example: <c>다릅</c> 틀립니다.). At this time, maintain spacing. (example input:차장님. 어 / example output:차장님. <f>어</f>). However if there is no space, do not make space./n" + result}]
-        )
+        try:
+            response = client.chat.completions.create(
+                model="gpt-4", messages=[{"role": "user", "content": "Mark '<f>' on the before hesitating expressions and mark '</f>' after hesitating expressions such as '음', '아', or '그' (example: <f>음</f>). And mark '<c>' before repeating expressions that can be removed and mark '</c>' after  repeating expressions that can be removed, such as '다릅' in '다릅 틀립니다.', '있었' in '있었 있었습니다'. (example: <c>다릅</c> 틀립니다.). At this time, maintain spacing. (example input:차장님. 어 / example output:차장님. <f>어</f>). Keep spacing and punctuation the same as the input sentence./n" + result}]
+            )
+
+        #에러 핸들링
+        except openai.APIError as e: #에러 발생 여부 알려줌
+            #Handle API error here, e.g. retry or log
+            print(f"OpenAI API returned an API Error: {e}")
+            pass
+        except openai.APIConnectionError as e: #서비스에 연결하지 못함
+            #Handle connection error here
+            print(f"Failed to connect to OpenAI API: {e}")
+            pass
+        except openai.RateLimitError as e: 
+            #Handle rate limit error (we recommend using exponential backoff)
+            print(f"OpenAI API request exceeded rate limit: {e}")
+            pass
+        except openai.AuthenticationError as e: 
+            #Your API key or token was invalid, expired, or revoked.
+            print(f"API key or token was invalid: {e}")
+            pass
+        except openai.BadRequestError as e: 
+            #잘못된 request
+            print(f"BadRequestError : {e}")
+            pass
+        except openai.ConflictError as e: 
+            #The resource was updated by another request.
+            print(f"resource was updated by another request : {e}")
+            pass
+        except openai.InternalServerError as e: 
+            #The resource was updated by another request.
+            print(f"InternalServerError : {e}")
+            pass
+        except openai.NotFoundError as e: 
+            #Requested resource does not exist.
+            print(f"Requested resource does not exist. : {e}")
+            pass
+        except openai.UnprocessableEntityError as e: 
+            #Unable to process the request despite the format being correct
+            print(f"Unable to process the request despite the format being correct. : {e}")
+            pass
 
         result = response.choices[0].message.content
         return result
@@ -80,30 +119,25 @@ class KorStt:
         return pause_final, text, pause_result, pause_idx, start_idx, end_idx
 
     def basic_annotation_stt(self, result, stt, pause_final, pause_idx):
-        a = re.compile('(\<f\>.*?\<\/f\>|\<c\>.*?\<\/c\>)')
-        fidx = []
-        cidx = []
+        f_s = [m.start(0) for m in re.finditer('\<f\>', stt)]
+        f_e = [m.start(0) for m in re.finditer('\<\/f\>', stt)]
 
-        while (True):
-            f = a.search(stt)
-            if f == None:
-                break
-            if f.group(1)[:3] == '<f>':
-                stt = re.sub("(\<f\>)", "", stt, 1)
-                stt = re.sub("(\<\/f\>)", "", stt, 1)
-                fidx.append([f.start(), f.end()])
-                
-            elif f.group(1)[:3] == '<c>':
-                stt = re.sub("(\<c\>)", "", stt, 1)
-                stt = re.sub("(\<\/c\>)", "", stt, 1)
-                cidx.append([f.start(), f.end()])
+        c_s = [m.start(0) for m in re.finditer('\<c\>', stt)]
+        c_e = [m.start(0) for m in re.finditer('\<\/c\>', stt)]
 
-        for i in range(len(fidx)):
-            result['annotations'].append({'start': fidx[i][0], 'end': fidx[i][1] - 7, 'type': 'FILLER'})
+        f_cnt = 0
+        c_cnt = 0
 
-        for i in range(len(cidx)):
-            result['annotations'].append({'start': cidx[i][0], 'end': cidx[i][1] - 7, 'type': 'CANCELLATION'})
-
+        for i in range(len(f_s)+len(c_s)):
+            target = f_s + c_s
+            target.sort()
+            if stt[(target[i]+1)] == 'f':
+                result['annotations'].append({'start': f_s[f_cnt] - i*7, 'end': f_e[f_cnt] -3 - i*7, 'type': 'FILLER'})
+                f_cnt += 1
+              
+            else:
+                result['annotations'].append({'start': c_s[c_cnt] - i*7, 'end': c_e[c_cnt] -3 - i*7, 'type': 'CANCELLATION'})
+                c_cnt += 1 
 
         p = [m.start(0) for m in re.finditer('\(pause\)', pause_final)]
 

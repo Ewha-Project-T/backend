@@ -2,6 +2,7 @@ from openai import OpenAI
 from pydub import AudioSegment
 import os
 from dotenv import load_dotenv
+import json
 
 load_dotenv()
 client = OpenAI()
@@ -38,7 +39,7 @@ class Original_stt:
 
     def execute(self,filename):
         # Need to add path
-        file_path = filename
+        file_path = f"{os.environ['UPLOAD_PATH']}/{filename}.mp3"
 
         # Check if the file is larger than 25 MB
         if os.path.getsize(file_path) > 25 * 1024 * 1024:
@@ -50,4 +51,9 @@ class Original_stt:
                     model="whisper-1", file=audio_file, response_format="text"
                 )
 
-        return transcription
+        data = {
+            "text": transcription,
+            "denotations": []
+        }
+
+        return json.dumps(data, indent=4, ensure_ascii=False)

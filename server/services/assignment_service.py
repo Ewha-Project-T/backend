@@ -5,7 +5,7 @@ from server import db
 from functools import wraps
 from flask_jwt_extended import create_refresh_token, create_access_token, verify_jwt_in_request, get_jwt, get_jwt_identity
 from pydub import AudioSegment, silence
-from worker import do_stt_work
+from worker import do_stt_work, do_original_text_stt_work
 from datetime import datetime,timedelta
 
 import json
@@ -82,7 +82,7 @@ def create_assignment(lecture_no :int,limit_time,as_name:str,as_type:str,keyword
             region = json.loads(region)
             split_url=split_wav_save2(prob_sound_path,float(region["start"]),float(region["end"]))
             mapping_sst_user(new_assignment.assignment_no, split_url,user_info)
-            task = do_stt_work.delay(filename=split_url,locale=prob_translang_source)
+            task = do_original_text_stt_work.delay(filename=split_url,locale=prob_translang_source)
             pr = Prob_region(assignment_no=new_assignment.assignment_no,region_index=region["id"],start=region["start"][:9],end=region["end"][:9],upload_url=split_url, job_id=task.id)
             db.session.add(pr)
     db.session.commit()
@@ -143,7 +143,7 @@ def edit_assignment(as_no,limit_time, as_name, as_type, keyword, prob_translang_
             region = json.loads(region)
             split_url=split_wav_save2(prob_sound_path,float(region["start"][:9]),float(region["end"][:9]))
             mapping_sst_user(assignment_to_edit.assignment_no, split_url,user_info)
-            task = do_stt_work.delay(filename=split_url,locale=prob_translang_source)
+            task = do_original_text_stt_work.delay(filename=split_url,locale=prob_translang_source)
             pr = Prob_region(assignment_no=assignment_to_edit.assignment_no,region_index=region["id"],start=region["start"][:9],end=region["end"][:9],upload_url=split_url, job_id=task.id)
             db.session.add(pr)
     # 변경 사항 커밋

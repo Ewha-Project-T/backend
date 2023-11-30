@@ -35,8 +35,6 @@ def load_api(api_module):
     api_module.add_resource(Feedback_review, '/api/feedback/review', endpoint='react_prob_review')
     api_module.add_resource(React_Cancel_prob, '/api/prob/cancel', endpoint='react_prob_cancel')
     api_module.add_resource(React_Chance_prob, '/api/prob/chance', endpoint='react_prob_chance')
-    React_Chance_prob
-
 
     api_module.add_resource(TranslateAssignment, '/api/prob/translate', endpoint='react_Prob_translate')
     api_module.add_resource(React_Prob_submit, '/api/prob/submit', endpoint='react_prob_submit')

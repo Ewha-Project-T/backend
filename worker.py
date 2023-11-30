@@ -125,7 +125,6 @@ def do_original_text_stt_work(self, filename, locale="ko"):
     self.update_state(state='INDEXING')
     stt=Original_stt()
     self.update_state(state='STT')
-
     try:
         result_stt_json=stt.execute(filename)
     except Exception as e:

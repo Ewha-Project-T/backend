@@ -34,7 +34,6 @@ class Original_stt:
                 )
                 combined_text.append(transcript)
             os.remove(chunk_path)
-
         return " ".join(combined_text)
 
     def execute(self,filename):
@@ -50,7 +49,7 @@ class Original_stt:
                 transcription = client.audio.transcriptions.create(
                     model="whisper-1", file=audio_file, response_format="text"
                 )
-
+        transcription=transcription.replace(" ","。") #온점 누락 임시방편
         data = {
             "text": transcription,
             "denotations": []

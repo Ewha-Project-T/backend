@@ -107,6 +107,7 @@ def get_feedback_info(as_no: int, student_no: int, user_no: int):
     assignment_audio = Prob_region.query.filter_by(assignment_no=as_no).all()
     res = dict()
     res["as_type"] = assignment.as_type
+    res["assignment_name"] = assignment.as_name
     if assignment.as_type == "번역":
         res["student_name"] = user.name
         res["submit_time"] = assignment_manage.end_submission_time

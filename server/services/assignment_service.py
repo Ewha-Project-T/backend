@@ -582,17 +582,18 @@ def get_feedback(as_no,lecture_no,user_no):
 def get_prob_submit_list(as_no,lecture_no):
     submit_list=[]
     attend=Attendee.query.filter_by(lecture_no=lecture_no).all()
-    for i in attend:
+    for idx, value in enumerate(attend, start=0):
         tmp={}
-        tmp["attendee_no"]=i.attendee_no
-        tmp["user_no"]=i.user_no
-        user=User.query.filter_by(user_no=i.user_no).first()
+        tmp["key"] = idx
+        tmp["attendee_no"]=value.attendee_no
+        tmp["user_no"]=value.user_no
+        user=User.query.filter_by(user_no=value.user_no).first()
         if(user.permission!=1 and user.permission!=2):#조교권한 학생급으로 변경
             continue
         tmp["major"]=user.major
         tmp["email"]=user.email
         tmp["name"]=user.name
-        check=Assignment_management.query.filter_by(assignment_no=as_no,attendee_no=i.attendee_no).first()
+        check=Assignment_management.query.filter_by(assignment_no=as_no,attendee_no=value.attendee_no).first()
         tmp["check"] = check.end_submission
         tmp["submit_time"] = check.end_submission_time
         tmp["submit_count"] = check.submission_count

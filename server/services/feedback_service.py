@@ -42,6 +42,8 @@ def get_json_textae(as_no,user_no):
     else:
         text,denotations,attributes = check.ae_text,check.ae_denotations,check.ae_attributes
         # url=make_json_url(check.ae_text,check.ae_denotations, check.ae_attributes, check,0)
+    if denotations != "None":
+        denotations = str(sorted(ast.literal_eval(denotations), key=donotations_sort_key)) # sort by begin, end
     textae = make_json(text,denotations, attributes)
     textae = json.loads(textae)
     for attribute in textae["attributes"]:

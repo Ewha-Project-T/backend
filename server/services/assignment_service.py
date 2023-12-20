@@ -330,6 +330,7 @@ def assignment_detail(as_no:int, user_no:int):
     assignment = Assignment.query.filter_by(assignment_no = as_no).first()
     attendee = Attendee.query.filter_by(user_no = user_no, lecture_no = assignment.lecture_no).first()
     assignment_management = Assignment_management.query.filter_by(assignment_no = as_no, attendee_no = attendee.attendee_no).first()
+    lecture = Lecture.query.filter_by(lecture_no = assignment.lecture_no).first()
     res = {"keyword" : assignment.keyword, "detail" : assignment.description, "limit_time" : assignment.limit_time, "assign_count" : assignment.assign_count, "open_time" : assignment.open_time, "file_name":assignment.file_name, "file_path":assignment.file_path, "as_name":assignment.as_name, "as_type":assignment.as_type}
     if assignment_management == None:
         return None
@@ -337,6 +338,7 @@ def assignment_detail(as_no:int, user_no:int):
     res["end_submission"] = assignment_management.end_submission
     res["my_count"] = assignment_management.submission_count
     res["chance_count"] = assignment_management.chance_count
+    res["lecture_name"] = lecture.lecture_name  
     if not assignment.keyword_open and attendee.permission == 3:
         res["keyword"] = "(비공개)\n" + res["keyword"]
     elif not assignment.keyword_open and attendee.permission != 3:

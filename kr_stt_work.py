@@ -16,55 +16,29 @@ import ast
 class KorStt:
     def process_stt_result(self,stt):
         result = stt
-        client = openai.OpenAI(
-            api_key="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",
+
+        response = requests.post(
+            "https://api.openai.com/v1/chat/completions",
+            headers={"Authorization": "Bearer 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"},
+            json = {"model": "gpt-4", "messages": [{"role": "user",
+                                                    "content": """Mark '<f>' on the before hesitating expressions and mark '</f>' after that expressions such as '음', '아', or '그' (example: <f>음</f>).
+                                                     However, do not mark '어' or '그' included in words such as '어떻게', '그리고', '그러나', etc.
+                                                     And mark '<c>' before stuttering and repeated expressions that can be deleted because they are not needed in the sentence and mark '</c>' after that expressions, such as '다릅' in '다릅 틀립니다.', '있었' in '있었 있었습니다'. (example: <c>다릅</c> 틀립니다.).
+                                                     Except for marking, the results must be output identically to the input sentence. Keep spacing and punctuation the same as the input sentence./n""" + result}]}
         )
 
-        try:
-            response = client.chat.completions.create(
-                model="gpt-4", messages=[{"role": "user", "content": "Mark '<f>' on the before hesitating expressions and mark '</f>' after hesitating expressions such as '음', '아', or '그' (example: <f>음</f>). And mark '<c>' before repeating expressions that can be removed and mark '</c>' after  repeating expressions that can be removed, such as '다릅' in '다릅 틀립니다.', '있었' in '있었 있었습니다'. (example: <c>다릅</c> 틀립니다.). At this time, maintain spacing. (example input:차장님. 어 / example output:차장님. <f>어</f>). Keep spacing and punctuation the same as the input sentence./n" + result}]
-            )
+        response_dict =  response.json()
 
-        #에러 핸들링
-        except openai.APIError as e: #에러 발생 여부 알려줌
-            #Handle API error here, e.g. retry or log
-            print(f"OpenAI API returned an API Error: {e}")
-            pass
-        except openai.APIConnectionError as e: #서비스에 연결하지 못함
-            #Handle connection error here
-            print(f"Failed to connect to OpenAI API: {e}")
-            pass
-        except openai.RateLimitError as e: 
-            #Handle rate limit error (we recommend using exponential backoff)
-            print(f"OpenAI API request exceeded rate limit: {e}")
-            pass
-        except openai.AuthenticationError as e: 
-            #Your API key or token was invalid, expired, or revoked.
-            print(f"API key or token was invalid: {e}")
-            pass
-        except openai.BadRequestError as e: 
-            #잘못된 request
-            print(f"BadRequestError : {e}")
-            pass
-        except openai.ConflictError as e: 
-            #The resource was updated by another request.
-            print(f"resource was updated by another request : {e}")
-            pass
-        except openai.InternalServerError as e: 
-            #The resource was updated by another request.
-            print(f"InternalServerError : {e}")
-            pass
-        except openai.NotFoundError as e: 
-            #Requested resource does not exist.
-            print(f"Requested resource does not exist. : {e}")
-            pass
-        except openai.UnprocessableEntityError as e: 
-            #Unable to process the request despite the format being correct
-            print(f"Unable to process the request despite the format being correct. : {e}")
-            pass
+        if response.status_code >= 500:
+            print("gpt - server error :", response.status_code)
+            print(response_dict['error'])
+        elif response.status_code >= 400:
+            print("gpt - client error :", response.status_code)
+            print(response_dict['error'])
 
-        result = response.choices[0].message.content
-        return result
+        res = response_dict['choices'][0]['message']['content']
+
+        return res
 
 
     def basic_indexing(self,filename):
@@ -197,13 +171,13 @@ class KorStt:
                         else:
                             print("No speech detected")
                     except requests.exceptions.HTTPError as e:
-                        print("HTTP error: ", e)
+                        print("stt - HTTP error: ", e)
                     except requests.exceptions.ConnectionError as e:
-                        print("Error connecting to server: ", e)
+                        print("stt - Error connecting to server: ", e)
                     except requests.exceptions.Timeout as e:
-                        print("Timeout error: ", e)
+                        print("stt - Timeout error: ", e)
                     except requests.exceptions.RequestException as e:
-                        print("Error: ", e)
+                        print("stt - Error: ", e)
                 res[k] = json.loads(response.text)
 
         for f in local_file:

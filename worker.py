@@ -5,6 +5,7 @@ from sqlalchemy import create_engine, orm
 from sqlalchemy import Column, Text, Integer, String, Boolean, ForeignKey
 from sqlalchemy.orm import Session
 from sqlalchemy.ext.declarative import declarative_base, DeclarativeMeta
+from sqlalchemy.dialects.mysql import LONGTEXT
 
 from kr_stt_work import (
     KorStt
@@ -49,7 +50,7 @@ class SttJob(base):
     startidx = Column(Text, nullable=False)
     endidx = Column(Text, nullable=False)
     silenceidx = Column(Text, nullable=False)
-    stt_result = Column(Text, nullable=True)
+    stt_result = Column(LONGTEXT, nullable=True)
     is_seq = Column(Boolean, default=False, nullable=False)
 
 class AlchemyEncoder(json.JSONEncoder):

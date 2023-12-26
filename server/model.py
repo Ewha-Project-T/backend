@@ -7,6 +7,7 @@ import sys
 import hashlib
 import base64
 from datetime import datetime,timedelta
+from sqlalchemy.dialects.mysql import LONGTEXT
 
 class User(db.Model):
     __tablename__ = "USER"
@@ -164,7 +165,7 @@ class SttJob(db.Model):
     startidx = db.Column(db.Text, nullable=False)
     endidx = db.Column(db.Text, nullable=False)
     silenceidx = db.Column(db.Text, nullable=False)
-    stt_result = db.Column(db.Text, nullable=True)
+    stt_result = db.Column(LONGTEXT, nullable=True)
     is_seq = db.Column(db.Boolean, default=False, nullable=False)
 
     stt = db.relationship("Stt", back_populates="sttjob")

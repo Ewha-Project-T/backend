@@ -334,7 +334,7 @@ def get_zip_url(lecutre_no:int, user_no:int):
             files.append(path)
             #json 파일 만들기
             with open(path, "w") as f:
-                f.write(text_ae)
+                f.write(parse.unquote(text_ae))
         _,uuid=get_prob_wav_url(assignment.assignment_no,user_no,assignment.lecture_no)
         for index,i in enumerate(uuid):
             stt=Stt.query.filter_by(wav_file=i["uuid"]).first()

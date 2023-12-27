@@ -1,4 +1,5 @@
 from openai import OpenAI
+import openai
 from pydub import AudioSegment
 import os
 from dotenv import load_dotenv
@@ -36,6 +37,30 @@ class Original_stt:
             os.remove(chunk_path)
         return " ".join(combined_text)
 
+    def process_stt_result(text):
+        result = text
+        openai.api_key = os.getenv("OPENAI_API_KEY")
+
+        prompt_message = (
+            "Correct punctuations. Do not add or remove the script \n" + result
+        )
+        try:
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=[{"role": "user", "content": prompt_message}],
+                temperature=0,
+                top_p=1,
+                frequency_penalty=0,
+                presence_penalty=0,
+            )
+
+            result = response.choices[0].message.content
+            return result
+        except Exception as e:
+            print("Error during GPT-4 call:", e)
+            return None
+
+    
     def execute(self,filename):
         # Need to add path
         file_path = f"{os.environ['UPLOAD_PATH']}/{filename}.mp3"
@@ -49,7 +74,8 @@ class Original_stt:
                 transcription = client.audio.transcriptions.create(
                     model="whisper-1", file=audio_file, response_format="text"
                 )
-        transcription=transcription.replace(" ","。") #온점 누락 임시방편
+        # transcription=transcription.replace(" ","。") #온점 누락 임시방편
+        transcription=self.process_stt_result(transcription)
         data = {
             "text": transcription,
             "denotations": []

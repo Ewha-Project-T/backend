@@ -221,13 +221,36 @@ def get_all_graphs(as_no:int, user_no:int):
         "Accuracy" : avg_accuracy(lecture.lecture_no, assignment.assignment_no),
         "DeliveryDetail" : detail_delivery(lecture.lecture_no, assignment.assignment_no),
         "AccuracyDetail" : detail_accuracy(lecture.lecture_no, assignment.assignment_no),
+        "as_type": assignment.as_type,
         "isSuccess": True,
     }
     return res
 
-def avg_delivery(lecture_no:int, assingment_no:int):
+def get_my_graphs(as_no, user_no):
+    assignment = Assignment.query.filter_by(assignment_no=as_no).first()
+    if not assignment:
+        return {"message": "과제가 존재하지 않습니다.", "isSuccess": False}
+    attendee = Attendee.query.filter_by(lecture_no=assignment.lecture_no, user_no=user_no).first()
+    if not attendee:
+        return {"message": "과제를 열람할 권한이 없습니다.", "isSuccess": False}
+    lecture = Lecture.query.filter_by(lecture_no=assignment.lecture_no).first()
+    if not lecture:
+        return {"message": "해당 강의가 존재하지 않습니다.", "isSuccess": False}
+    res = {
+        "Delivery" : avg_delivery(lecture.lecture_no, assignment.assignment_no,1, attendee),
+        "Accuracy" : avg_accuracy(lecture.lecture_no, assignment.assignment_no,1, attendee),
+        "DeliveryDetail" : my_delivery(attendee, lecture.lecture_no, assignment.assignment_no),
+        "AccuracyDetail" : my_accuracy(attendee, lecture.lecture_no, assignment.assignment_no),
+        "as_type": assignment.as_type,
+        "isSuccess": True,
+    }
+    return res
+
+def avg_delivery(lecture_no:int, assingment_no:int, flag:int = 0, me=None):
     attendees = Attendee.query.filter_by(lecture_no=lecture_no).all()[1:]
     res = []
+    my_score = []
+    avg = [0.0 for i in range(4)]
     for attendee in attendees:
         data = dict()
         data["name"] = attendee.user.name
@@ -242,12 +265,25 @@ def avg_delivery(lecture_no:int, assingment_no:int):
             # value가 None인지 확인하고, None인 경우 0.0으로 설정
             value = 0.0 if value is None else float(value)
             data["data"].append(float(value))
+            for j in range(4):
+                avg[j] += float(value)
         res.append(data)
+        if me:
+            if me.attendee_no == attendee.attendee_no:
+                my_score.append(data)
+    if len(attendees) != 0:
+        for i in range(4):
+            avg[i] = round(avg[i] / len(attendees),2)
+    if flag:
+        my_score.append({"name": "평균", "data": avg})
+        return my_score
     return res
 
-def avg_accuracy(lecture_no:int, assingment_no:int):
+def avg_accuracy(lecture_no:int, assingment_no:int, flag:int = 0, me=None):
     attendees = Attendee.query.filter_by(lecture_no=lecture_no).all()[1:]
     res = []
+    my_score = []
+    avg = [0.0 for i in range(6)]
     for attendee in attendees:
         data = dict()
         data["name"] = attendee.user.name
@@ -260,7 +296,18 @@ def avg_accuracy(lecture_no:int, assingment_no:int):
                      ).with_entities(func.avg(getattr(Feedback2, i))).scalar()
             value = 0.0 if value is None else float(value)
             data["data"].append(float(value))
+            for j in range(6):
+                avg[j] += float(value)
         res.append(data)
+        if me:
+            if me.attendee_no == attendee.attendee_no:
+                my_score.append(data)
+    if len(attendees) != 0:
+        for i in range(4):
+            avg[i] = round(avg[i] / len(attendees),2)
+    if flag:
+        my_score.append({"name": "평균", "data": avg})
+        return my_score
     return res
 
 def detail_delivery(lecture_no:int, assignment_no:int):
@@ -289,6 +336,57 @@ def detail_delivery(lecture_no:int, assignment_no:int):
         res.append(data)
 
     #뒤에서 3번째까지만 보여주기
+    return res
+
+def my_delivery(attendee, lecture_no, assignment_no):
+    assignments = Assignment.query.filter_by(lecture_no=lecture_no).filter(Assignment.assignment_no <= assignment_no).all()
+
+    res = []
+    data = dict()
+    data["name"] = attendee.user.name
+    data["data"] = []
+    for index, assignment in enumerate(assignments, start=1):  # start=1로 설정하여 1부터 시작
+        tmp = dict()
+        tmp["name"] = str(index) + "회차"
+        tmp["data"] = []
+        for i in ["silence", "filler", "backtracking", "others"]:
+            value = Feedback2.query.filter_by(
+                lecture_no=lecture_no, 
+                attendee_no=attendee.attendee_no,
+                assignment_no=assignment.assignment_no
+            ).with_entities(getattr(Feedback2, i)).scalar()
+            value = 0.0 if value is None else float(value)
+            tmp["data"].append(float(value))
+        data["data"].append(tmp)
+    data["data"] = data["data"][-3:]
+    res.append(data)
+
+    #뒤에서 3번째까지만 보여주기
+    return res
+
+def my_accuracy(attendee, lecture_no, assignment_no):
+    assignments = Assignment.query.filter_by(lecture_no=lecture_no).filter(Assignment.assignment_no <= assignment_no).all()
+
+    res = []
+    data = dict()
+    data["name"] = attendee.user.name
+    data["data"] = []
+    for index, assignment in enumerate(assignments, start=1):  # start=1로 설정하여 1부터 시작
+            tmp = dict()
+            tmp["name"] = str(index) + "회차"
+            tmp["data"] = []
+            for i in ["translation_error", "omission", "expression", "intonation", "grammar_error", "others"]:
+                value = Feedback2.query.filter_by(
+                    lecture_no=lecture_no, 
+                    attendee_no=attendee.attendee_no,
+                    assignment_no=assignment.assignment_no
+                ).with_entities(getattr(Feedback2, i)).scalar()
+                value = 0.0 if value is None else float(value)
+                tmp["data"].append(float(value))
+            data["data"].append(tmp)
+    data["data"] = data["data"][-3:]
+    res.append(data)
+
     return res
 
 def detail_accuracy(lecture_no:int, assignment_no:int):

@@ -1,5 +1,5 @@
 from server.apis.mail import Email, Verify_email
-from .react_feedback import Feedback_info, Feedback_professor_graph, Feedback_review, Feedback_textae, assignment_zip_down
+from .react_feedback import Feedback_info, Feedback_professor_graph, Feedback_review, Feedback_student_graph, Feedback_textae, assignment_zip_down
 from .login import Login,Join, LoginRefresh, Logout
 from .lecture import Attend, Lecture, Lecture_mod, Lecture_mod_del, Student,Major, Lecture_add
 from .assignment import Prob, Prob_del, Prob_submit, Prob_feedback,Prob_mod,Prob_add, prob_upload, Prob_submit_list, prob_upload_file
@@ -39,6 +39,7 @@ def load_api(api_module):
     api_module.add_resource(TranslateAssignment, '/api/prob/translate', endpoint='react_Prob_translate')
     api_module.add_resource(React_Prob_submit, '/api/prob/submit', endpoint='react_prob_submit')
     api_module.add_resource(Feedback_professor_graph, '/api/feedback/professor/graph', endpoint='feedback_professor_graph')
+    api_module.add_resource(Feedback_student_graph, '/api/feedback/student/graph', endpoint='feedback_student_graph')
     api_module.add_resource(assignment_zip_down,'/api/feedback/json',endpoint='assignment_zip_down')#zip 다운로드
     ############################
     ######옛날 것인데 사용중########

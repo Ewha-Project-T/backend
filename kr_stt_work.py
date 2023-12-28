@@ -1,4 +1,4 @@
-#error handling / annotation 변경
+# gpt4_turbo + seed
 
 from pydub import AudioSegment, silence
 from nltk.tokenize import sent_tokenize
@@ -20,11 +20,13 @@ class KorStt:
         response = requests.post(
             "https://api.openai.com/v1/chat/completions",
             headers={"Authorization": "Bearer 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"},
-            json = {"model": "gpt-4", "messages": [{"role": "user",
-                                                    "content": """Mark '<f>' on the before hesitating expressions and mark '</f>' after that expressions such as '음', '아', or '그' (example: <f>음</f>).
+            json = {"model": "gpt-4-1106-preview", "seed": 1230, "messages": [{"role": "user",
+                                                    "content": """Let's imagine a situation where a person is speaking. First, let's find some fillers.
+                                                     Mark '<f>' on the before hesitating expressions and mark '</f>' after that expressions such as '음', '아', or '그' (example: <f>음</f>).
                                                      However, do not mark '어' or '그' included in words such as '어떻게', '그리고', '그러나', etc.
+                                                     Next, let's find cancellations that can be deleted due to stuttering and repeating words.
                                                      And mark '<c>' before stuttering and repeated expressions that can be deleted because they are not needed in the sentence and mark '</c>' after that expressions, such as '다릅' in '다릅 틀립니다.', '있었' in '있었 있었습니다'. (example: <c>다릅</c> 틀립니다.).
-                                                     Except for marking, the results must be output identically to the input sentence. Keep spacing and punctuation the same as the input sentence./n""" + result}]}
+                                                     Except for marking marks, you must never change the given lines. Keep spacing and punctuation the same as the input sentence./n""" + result}]}
         )
 
         response_dict =  response.json()

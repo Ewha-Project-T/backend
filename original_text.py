@@ -37,7 +37,7 @@ class Original_stt:
             os.remove(chunk_path)
         return " ".join(combined_text)
 
-    def process_stt_result(text):
+    def process_stt_result(self, text):
         result = text
         openai.api_key = os.getenv("OPENAI_API_KEY")
 

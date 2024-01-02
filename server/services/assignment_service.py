@@ -454,10 +454,10 @@ def get_as_name(as_no):
 
 def get_stt_result(uuid):
     text,denotations,attributes = "", [], []
-
+    Tid = 1
     for i in uuid:
         print("uiud",i)
-        index = len(text)
+        index = len(text)    
         stt=Stt.query.filter_by(wav_file=i["uuid"]).first()
         stt_job=SttJob.query.filter_by(stt_no=stt.stt_no).first()
         if stt_job==None:
@@ -467,6 +467,8 @@ def get_stt_result(uuid):
         stt_result=json.loads(stt_job.stt_result)
         text += stt_result["text"]
         for denotation in stt_result["denotations"]:
+            denotation["id"] = "T"+str(Tid)
+            Tid += 1
             denotation["span"]["begin"] += index
             denotation["span"]["end"] += index
             denotations.append(denotation)

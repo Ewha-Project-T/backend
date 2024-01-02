@@ -428,11 +428,11 @@ class React_Prob_submit(Resource):
         user_info=get_jwt_identity()
         if(uuid[0]=="0"):
             text=args['text']
-            check_assignment(as_no,lecture_no,uuid,user_info,text)
-            return jsonify({"SubmitSuccess" : 1})
+            res = check_assignment(as_no,lecture_no,uuid,user_info,text)
+            return jsonify(res)
         else:
-            check_assignment(as_no,lecture_no,uuid,user_info)
-            return jsonify({"SubmitSuccess" : 1})
+            res = check_assignment(as_no,lecture_no,uuid,user_info)
+            return jsonify(res)
 
 
 # class Feedback2(Resource):

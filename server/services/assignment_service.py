@@ -120,6 +120,9 @@ def edit_assignment(as_no,limit_time, as_name, as_type, keyword, prob_translang_
     Prob_region.query.filter_by(assignment_no=as_no).delete()
 
     attendees = Attendee.query.filter_by(lecture_no = assignment_to_edit.lecture_no).all()
+    for attendee in attendees: # 수강생들에게 과제를 할당
+        assignment_manage = Assignment_management(assignment_no = assignment_to_edit.assignment_no, attendee_no = attendee.attendee_no)
+        db.session.add(assignment_manage)
     attendees_no = [attendee.attendee_no for attendee in attendees]
     now_attendees = Assignment_management.query.filter_by(assignment_no = as_no).all()
     now_attendees_no = [now_attendee.attendee_no for now_attendee in now_attendees]
@@ -300,10 +303,10 @@ def get_assignment(as_no:int):
     ]
 
     return assignment, audio_region_list
-def  check_assignment(as_no,lecture_no,uuid,user_info,text=""):
+def check_assignment(as_no,lecture_no,uuid,user_info,text=""):
     acc=Prob_region.query.filter_by(assignment_no=as_no).all()
     if(len(acc)!=len(uuid) and text==""):
-        return
+        return {"isSuccess":False,"message":"구간과 파일의 수가 일치하지 않습니다."}
     attend=Attendee.query.filter_by(user_no=user_info["user_no"],lecture_no=lecture_no).first()
     submit_cnt=Assignment_check.query.filter_by(assignment_no=as_no,attendee_no=attend.attendee_no,assignment_check=1).count()
     print(submit_cnt)
@@ -316,15 +319,16 @@ def  check_assignment(as_no,lecture_no,uuid,user_info,text=""):
         ae_text, ae_denotations, ae_attributes = "", "", ""
     acc=Assignment_check(assignment_no=as_no,attendee_no=attend.attendee_no,assignment_check=1,ae_text = ae_text,ae_denotations = ae_denotations,ae_attributes=ae_attributes,submit_time=(datetime.now()+timedelta(hours=6)),submit_cnt=submit_cnt+1)
     db.session.add(acc)
-    db.session.commit()
     acc_locale=Assignment.query.filter_by(assignment_no=as_no).first()
     locale=acc_locale.dest_translang
     if(text==""):
         for uu in uuid:
             acc2=Assignment_check_list(check_no=acc.check_no,acl_uuid=uu)
             db.session.add(acc2)
-            db.session.commit()
+            # db.session.commit()
             # do_stt_work.delay(filename=uu,locale=major_convert[locale])
+    db.session.commit()
+    return {"SubmitSuccess" : 1, "isSuccess":True,"message":"제출 성공"}
 
 def assignment_detail(as_no:int, user_no:int):
     assignment = Assignment.query.filter_by(assignment_no = as_no).first()

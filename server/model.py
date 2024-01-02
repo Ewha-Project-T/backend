@@ -102,7 +102,7 @@ class Assignment_check(db.Model):
     assignment_check = db.Column(db.Integer, default=0)
     professor_review= db.Column(db.Text)
     user_trans_result= db.Column(db.Text) # 추후 삭제 예정
-    ae_text = db.Column(db.Text)
+    ae_text = db.Column(LONGTEXT, nullable=True)
     ae_denotations = db.Column(db.Text)
     ae_attributes = db.Column(db.Text)
     submit_time=db.Column(db.DateTime, onupdate=datetime.utcnow()+timedelta(hours=9))#테이블 삭제시 오류날수도

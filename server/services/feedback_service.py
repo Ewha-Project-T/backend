@@ -221,6 +221,8 @@ def save_feedback(assignment:Assignment,attendee:Attendee):
         objs = [obj.strip() for obj in denotation["obj"].lower().split(",")]
         for obj in objs:
             if obj in value.keys():
+                if obj=="pause":
+                    value["silence"]+=1
                 value[obj]+=1
             else:
                 value["others"]+=1

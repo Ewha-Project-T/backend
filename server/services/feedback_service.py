@@ -220,6 +220,8 @@ def save_feedback(assignment:Assignment,attendee:Attendee):
     for denotation in ast.literal_eval(assignment_check.ae_denotations):
         objs = [obj.strip() for obj in denotation["obj"].lower().split(",")]
         for obj in objs:
+            if obj=="pause":
+                obj="silence"
             if obj in value.keys():
                 if obj=="pause":
                     value["silence"]+=1

@@ -86,7 +86,8 @@ def put_json_textae(as_no,user_no,ae_denotations,ae_attributes):
     if ae_attributes != "None":
         check.ae_attributes = ae_attributes#.replace("'",'&apos;')
     else:
-        check.ae_attributes = "[]"
+        if ae_attributes != "['Flag']":
+            check.ae_attributes = "[]"
     
     db.session.commit()
     return "success", True

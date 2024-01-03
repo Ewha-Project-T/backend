@@ -76,10 +76,19 @@ def put_json_textae(as_no,user_no,ae_denotations,ae_attributes):
         return "학생이 최종 제출하지 않았습니다.", False
 
     if ae_denotations != "None":
-        ae_denotations = str(sorted(ast.literal_eval(ae_denotations), key=donotations_sort_key)) # sort by begin, end
-        check.ae_denotations = ae_denotations
+        print(ae_denotations, type(ae_denotations))
+        if ae_denotations != "['Flag']":
+            ae_denotations = str(sorted(ast.literal_eval(ae_denotations), key=donotations_sort_key)) # sort by begin, end
+            check.ae_denotations = ae_denotations
+    else:
+        check.ae_denotations = "[]"
+        check.ae_attributes = "[]"
     if ae_attributes != "None":
-        check.ae_attributes = ae_attributes#.replace("'",'&apos;')
+        if ae_attributes != "['Flag']":
+            check.ae_attributes = ae_attributes#.replace("'",'&apos;')
+    else:
+            check.ae_attributes = "[]"
+    
     db.session.commit()
     return "success", True
 
@@ -190,6 +199,17 @@ def save_feedback_review(as_no:int, student_no:int, user_no:int,review:str):
     db.session.commit()
     return {"message": "피드백이 저장되었습니다.", "isSuccess": True}
 
+def update_graph(as_no:int, user_no:int):
+    assignment = Assignment.query.filter_by(assignment_no=as_no).first()
+    if not assignment:
+        return {"message": "과제가 존재하지 않습니다.", "isSuccess": False}
+    attendee = Attendee.query.filter_by(lecture_no=assignment.lecture_no, user_no=user_no).first()
+    if not attendee:
+        return {"message": "과제를 열람할 권한이 없습니다.", "isSuccess": False}
+    save_feedback(assignment,attendee)
+    db.session.commit()
+    return
+
 def save_feedback(assignment:Assignment,attendee:Attendee):
     feedback = Feedback2.query.filter_by(assignment_no=assignment.assignment_no, attendee_no=attendee.attendee_no).first()
     if not feedback:
@@ -259,7 +279,7 @@ def avg_delivery(lecture_no:int, assingment_no:int, flag:int = 0, me=None):
             value = Feedback2.query.filter_by(
                 lecture_no=lecture_no, 
                 attendee_no=attendee.attendee_no
-            ).filter(Feedback2.assignment_no <= assingment_no
+            ).filter(Feedback2.assignment_no == assingment_no
                      ).with_entities(func.avg(getattr(Feedback2, i))).scalar()
             
             # value가 None인지 확인하고, None인 경우 0.0으로 설정
@@ -292,7 +312,7 @@ def avg_accuracy(lecture_no:int, assingment_no:int, flag:int = 0, me=None):
             value = Feedback2.query.filter_by(
                 lecture_no=lecture_no, 
                 attendee_no=attendee.attendee_no
-            ).filter(Feedback2.assignment_no <= assingment_no
+            ).filter(Feedback2.assignment_no == assingment_no
                      ).with_entities(func.avg(getattr(Feedback2, i))).scalar()
             value = 0.0 if value is None else float(value)
             data["data"].append(float(value))

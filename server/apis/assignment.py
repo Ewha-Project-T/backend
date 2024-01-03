@@ -305,7 +305,7 @@ class prob_upload(Resource):
         """Check if the file has an MP3 signature."""
         f.seek(0)  # Ensure we're reading from the beginning
         header = f.read(3)
-        return header == b'ID3' or header[:2] == b'\xff\xfb'
+        return header == b'ID3' or header[:2] == b'\xff\xfb' or header[:2]==b'\xff\xf2' or header[:2]==b'\xff\xf3'
 
 ALLOWED_EXTENSIONS = {'hwp','pdf','docx','doc','ppt','pptx','xls','xlsx','txt'}
 def allowed_file(filename):

@@ -48,7 +48,6 @@ class Original_stt:
     def process_stt_result(self, text):
         if text is None:
             return None
-
         result = text
         openai.api_key = os.getenv("OPENAI_API_KEY")
 

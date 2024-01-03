@@ -76,10 +76,13 @@ def put_json_textae(as_no,user_no,ae_denotations,ae_attributes):
         return "학생이 최종 제출하지 않았습니다.", False
 
     if ae_denotations != "None":
-        ae_denotations = str(sorted(ast.literal_eval(ae_denotations), key=donotations_sort_key)) # sort by begin, end
-        check.ae_denotations = ae_denotations
+        print(ae_denotations, type(ae_denotations))
+        if ae_denotations != "['Flag']":
+            ae_denotations = str(sorted(ast.literal_eval(ae_denotations), key=donotations_sort_key)) # sort by begin, end
+            check.ae_denotations = ae_denotations
     else:
         check.ae_denotations = "[]"
+        check.ae_attributes = "[]"
     if ae_attributes != "None":
         check.ae_attributes = ae_attributes#.replace("'",'&apos;')
     else:

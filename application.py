@@ -34,7 +34,7 @@ sentry_sdk.init(
 )
 """
 app.config['SECRET_KEY'] = str(binascii.hexlify(urandom(16)))
-app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=4)
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=7)
 #app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=1)
 app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{env['SQL_USER']}:{env['SQL_PASSWORD']}@{env['SQL_HOST']}:{env['SQL_PORT']}/{env['SQL_DATABASE']}"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False

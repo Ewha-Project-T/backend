@@ -1,4 +1,4 @@
-# gpt4_turbo + seed
+# 0104 수정
 
 from pydub import AudioSegment, silence
 from nltk.tokenize import sent_tokenize
@@ -21,11 +21,11 @@ class KorStt:
             "https://api.openai.com/v1/chat/completions",
             headers={"Authorization": "Bearer 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"},
             json = {"model": "gpt-4-1106-preview", "seed": 1230, "messages": [{"role": "user",
-                                                    "content": """Let's imagine a situation where a person is speaking. First, let's find some fillers.
-                                                     Mark '<f>' on the before hesitating expressions and mark '</f>' after that expressions such as '음', '아', or '그' (example: <f>음</f>).
-                                                     However, do not mark '어' or '그' included in words such as '어떻게', '그리고', '그러나', etc.
-                                                     Next, let's find cancellations that can be deleted due to stuttering and repeating words.
-                                                     And mark '<c>' before stuttering and repeated expressions that can be deleted because they are not needed in the sentence and mark '</c>' after that expressions, such as '다릅' in '다릅 틀립니다.', '있었' in '있었 있었습니다'. (example: <c>다릅</c> 틀립니다.).
+                                                    "content": """Filler is a word used when there is hesitation in the middle of a speech. It is usually one syllable.
+                                                     Mark '<f>' before filler and mark '</f>' after filler such as '음', '아', or '그' (example: <f>음</f>).
+                                                     However, do not mark '어' or '그' included in words such as '어떻게', '어떤', '그리고', '그러나', '그런', '그러한' etc.
+                                                     Cancellation is a word that can be removed by repeatedly uttering it.
+                                                     And mark '<c>' before cancellation and mark '</c>' after cancellation, such as '다릅' in '다릅 틀립니다.', '있었' in '있었 있었습니다'. (example: <c>다릅</c> 틀립니다.).
                                                      Except for marking marks, you must never change the given lines. Keep spacing and punctuation the same as the input sentence./n""" + result}]}
         )
 
@@ -50,6 +50,20 @@ class KorStt:
         sound = silence.detect_nonsilent(
             myaudio, min_silence_len=1000, silence_thresh=dBFS - 16, seek_step=100)  # 1초 이상의 silence
         sound = [[(start), (stop)] for start, stop in sound]
+        
+        stt_num = [1 for i in range(len(sound))]
+        stt_long = []
+
+        for i in range(len(sound)):
+            if sound[i][1] - sound[i][0] > 59000:
+                stt_long.append(i)
+
+        for j in range(len(stt_long)):
+            tmp = (sound[stt_long[j] + j][1] - sound[stt_long[j] + j][0]) / 2
+            sound.insert(stt_long[j] + (j+1) , [sound[stt_long[j] + j][0] + tmp, sound[stt_long[j] + j][1]])
+            sound[stt_long[j] + j][1] = sound[stt_long[j] + j][0] + tmp
+            stt_num.insert(stt_long[j] + (j+1), 0)
+        
         length = len(sound)
         startidx = []
         endidx = []
@@ -59,11 +73,11 @@ class KorStt:
             endidx.append(sound[i][1] + 200)
             if i < len(sound) - 1:
                 silenceidx.append(sound[i + 1][0] - sound[i][1])
-        return length, sound, startidx, endidx, silenceidx, myaudio
+                
+        return length, sound, startidx, endidx, silenceidx, myaudio, stt_num
 
 
-    def basic_do_stt(self, res, sound, myaudio, startidx, endidx, silenceidx):
-        text = ''
+    def basic_do_stt(self, res, sound, myaudio, startidx, endidx, silenceidx, stt_num):
         delay_result = 0
         pause_result = 0
         pause_idx = []
@@ -73,11 +87,13 @@ class KorStt:
 
         i = -1
 
+        if sound[0][0] > 1000:
+            pause_final += "(pause)"
+
         for dic in res:
             i += 1
             if dic.get("RecognitionStatus") == "Success":
                 stt = dic.get("DisplayText")
-                text = text + stt
                 if len(stt)>0:
                     start_idx.append(startidx[i])
                     end_idx.append(endidx[i])
@@ -86,13 +102,12 @@ class KorStt:
                     pause_final += sentence
                     pause_final += ' '
 
-                if i < len(sound) - 1:
+                if ((i < len(sound) - 1) and (stt_num[i] == 1)):
                     pause_final += "(pause)"
-                    text = text+' '
                     pause_result += silenceidx[i]
                     pause_idx.append(silenceidx[i])
             
-        return pause_final, text, pause_result, pause_idx, start_idx, end_idx
+        return pause_final, pause_result, pause_idx, start_idx, end_idx
 
     def basic_annotation_stt(self, result, stt, pause_final, pause_idx):
         f_s = [m.start(0) for m in re.finditer('\<f\>', stt)]
@@ -108,12 +123,12 @@ class KorStt:
             target = f_s + c_s
             target.sort()
             if stt[(target[i]+1)] == 'f':
-                result['annotations'].append({'start': f_s[f_cnt] - i*7, 'end': f_e[f_cnt] -3 - i*7, 'type': 'FILLER'})
+                result['annotations'].append({'start': f_s[f_cnt] - i*7 + 1, 'end': f_e[f_cnt] -3 - i*7 + 1, 'type': 'FILLER'})
                 f_cnt += 1
-              
+
             else:
-                result['annotations'].append({'start': c_s[c_cnt] - i*7, 'end': c_e[c_cnt] -3 - i*7, 'type': 'CANCELLATION'})
-                c_cnt += 1 
+                result['annotations'].append({'start': c_s[c_cnt] - i*7 + 1, 'end': c_e[c_cnt] -3 - i*7 + 1, 'type': 'CANCELLATION'})
+                c_cnt += 1
 
         p = [m.start(0) for m in re.finditer('\(pause\)', pause_final)]
 
@@ -122,10 +137,14 @@ class KorStt:
             tmp = p[i] - i*7
             pidx.append(tmp)
 
-        for i in range(len(pidx)):  # pause, delay 구분 없이 pause 로 통일
-            if pidx[i] == 0:
-                continue
-            result['annotations'].append({'start': pidx[i]-1, 'end': pidx[i], 'type': 'PAUSE', 'duration': pause_idx[i]})
+        for i in range(len(pidx)):
+            if pidx[0] == 0:
+                if i == 0:
+                    result['annotations'].append({'start': pidx[i], 'end': pidx[i] + 1, 'type': 'PAUSE', 'duration': 1000})
+                else:
+                  result['annotations'].append({'start': pidx[i], 'end': pidx[i] + 1, 'type': 'PAUSE', 'duration': pause_idx[i-1]})
+            else:
+                result['annotations'].append({'start': pidx[i], 'end': pidx[i] + 1, 'type': 'PAUSE', 'duration': pause_idx[i]})
 
         if stt.endswith("\n"):
             stt = stt[:-1]
@@ -134,7 +153,7 @@ class KorStt:
         return result
 
 
-    def request_api(self,length,myaudio,startidx,endidx):
+    def request_api(self, length, myaudio, startidx, endidx):
         domain = os.getenv("DOMAIN", "https://edu-trans.ewha.ac.kr:8443")
 
         files = []
@@ -187,7 +206,7 @@ class KorStt:
 
         return res
 
-    def parse_data(self, stt_result,stt_feedback):
+    def parse_data(self, stt_result, stt_feedback):
         cnt=1
         text=""
         denotations="["
@@ -213,22 +232,24 @@ class KorStt:
 
     def execute(self,filename):
         result = {'textFile': '', 'timestamps': [], 'annotations': []}
-        length, sound, startidx, endidx, silenceidx, myaudio = self.basic_indexing(filename)
-        res=self.request_api(length,myaudio,startidx,endidx)
-        if res==None:
+        length, sound, startidx, endidx, silenceidx, myaudio, stt_num = self.basic_indexing(filename)
+        res=self.request_api(length, myaudio, startidx, endidx)
+        if res==None: 
             raise Exception("INVALID-FILE")
 
-        pause_final, stt_t, pause_result, pause_idx, start_idx, end_idx = self.basic_do_stt(res, sound, myaudio, startidx, endidx, silenceidx)
+        pause_final, pause_result, pause_idx, start_idx, end_idx = self.basic_do_stt(res, sound, myaudio, startidx, endidx, silenceidx, stt_num)
 
-        stt_t = stt_t.replace('\n', '') #stt_t
-        stt = self.process_stt_result(stt_t)
+        stt_tmp = re.sub("\(pause\)", "", pause_final)
+        stt = self.process_stt_result(stt_tmp)
 
         result = {'textFile': '', 'timestamps': [], 'annotations': []}
         for i in range(len(start_idx)):
             result['timestamps'].append({'start': start_idx[i], 'end': end_idx[i]})
 
         result = self.basic_annotation_stt(result,stt,pause_final,pause_idx)
-        result['textFile'] = stt_t
+        stt_now = re.sub("\<f\>|\<c\>|\<\/f\>|\<\/c\>", "", stt)
+        
+        result['textFile'] = " " + stt_now
         stt_feedback = result['annotations']
         text,denotations = self.parse_data(result,stt_feedback)
         data = self.make_json(text,denotations)

@@ -1,4 +1,4 @@
-# 0104 수정
+# 0109 수정
 
 from pydub import AudioSegment, silence
 from nltk.tokenize import sent_tokenize
@@ -16,29 +16,67 @@ import ast
 class KorStt:
     def process_stt_result(self,stt):
         result = stt
+        result_list = []
+        stt_len = len(result)
 
-        response = requests.post(
-            "https://api.openai.com/v1/chat/completions",
-            headers={"Authorization": "Bearer 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"},
-            json = {"model": "gpt-4-1106-preview", "seed": 1230, "messages": [{"role": "user",
-                                                    "content": """Filler is a word used when there is hesitation in the middle of a speech. It is usually one syllable.
-                                                     Mark '<f>' before filler and mark '</f>' after filler such as '음', '아', or '그' (example: <f>음</f>).
-                                                     However, do not mark '어' or '그' included in words such as '어떻게', '어떤', '그리고', '그러나', '그런', '그러한' etc.
-                                                     Cancellation is a word that can be removed by repeatedly uttering it.
-                                                     And mark '<c>' before cancellation and mark '</c>' after cancellation, such as '다릅' in '다릅 틀립니다.', '있었' in '있었 있었습니다'. (example: <c>다릅</c> 틀립니다.).
-                                                     Except for marking marks, you must never change the given lines. Keep spacing and punctuation the same as the input sentence./n""" + result}]}
-        )
+        if stt_len > 2000:
+            for i in range(0, stt_len, 2000):
+                result_list.append(result[i:i + 2000])
+        else:
+            result_list.append(result)
 
-        response_dict =  response.json()
+        res = ''
 
-        if response.status_code >= 500:
-            print("gpt - server error :", response.status_code)
-            print(response_dict['error'])
-        elif response.status_code >= 400:
-            print("gpt - client error :", response.status_code)
-            print(response_dict['error'])
+        for i in range(len(result_list)):
+            result_t = result_list[i]
+            stt_flag = 0
+            last_punc = ''
+            start_blank = ''
 
-        res = response_dict['choices'][0]['message']['content']
+            if result_t[0] == ' ':
+                start_blank = ' '
+                result_t = result_t[1:]
+
+            if result_t[-1] == '.' or result_t[-1] == ',' or result_t[-1] == '?':
+                stt_flag = 1
+                last_punc = result_t[-1]
+            elif result_t[-1] == ' ':
+                stt_flag = 2
+                result_t = result_t[:-1]
+
+            response = requests.post(
+                "https://api.openai.com/v1/chat/completions",
+                headers={"Authorization": "Bearer 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"},
+                json = {"model": "gpt-4-1106-preview", "seed": 1230, "messages": [{"role": "user",
+                                                    "content": """Filler is a word used when there is hesitation during speech, such as '음', '그', '어', or '아'.
+                                                     Mark '<f>' before filler and mark '</f>' after filler. (example: <f>음</f>).
+                                                     Cancellation is a repeatedly uttering word that can be removed, such as '다릅' in '다릅 틀립니다.', '앞으로' in '앞으로 앞으로는'.
+                                                     And mark '<c>' before cancellation and mark '</c>' after cancellation. (example: <c>다릅</c> 틀립니다.).
+                                                     Except that marks, do not change, ommit, repeat or add words.
+                                                     Keep spacing and punctuation the same as the input sentence. If there are no such expressions, return the original sentence. \n""" + result_t}]}
+
+            )
+
+            response_dict =  response.json()
+
+            if response.status_code >= 500:
+                print("gpt - server error :", response.status_code)
+                print(response_dict['error'])
+            elif response.status_code >= 400:
+                print("gpt - client error :", response.status_code)
+                print(response_dict['error'])
+
+            res_t = response_dict['choices'][0]['message']['content']
+
+            if i < len(result_list) - 1:
+                if stt_flag == 1:
+                    res += start_blank + res_t + last_punc
+                elif stt_flag == 2:
+                    res += start_blank + res_t + ' '
+                else:
+                    res += start_blank + res_t
+            else:
+                res += start_blank + res_t
 
         return res
 
@@ -52,17 +90,23 @@ class KorStt:
         sound = [[(start), (stop)] for start, stop in sound]
         
         stt_num = [1 for i in range(len(sound))]
-        stt_long = []
+        flag = 0
 
-        for i in range(len(sound)):
-            if sound[i][1] - sound[i][0] > 59000:
-                stt_long.append(i)
+        while (flag == 0):
+            stt_long = []
 
-        for j in range(len(stt_long)):
-            tmp = (sound[stt_long[j] + j][1] - sound[stt_long[j] + j][0]) / 2
-            sound.insert(stt_long[j] + (j+1) , [sound[stt_long[j] + j][0] + tmp, sound[stt_long[j] + j][1]])
-            sound[stt_long[j] + j][1] = sound[stt_long[j] + j][0] + tmp
-            stt_num.insert(stt_long[j] + (j+1), 0)
+            for i in range(len(sound)):
+                if sound[i][1] - sound[i][0] > 59000:
+                    stt_long.append(i)
+
+            if len(stt_long) == 0:
+              flag = 1
+
+            for j in range(len(stt_long)):
+                tmp = (sound[stt_long[j] + j][1] - sound[stt_long[j] + j][0]) / 2
+                sound.insert(stt_long[j] + (j+1) , [sound[stt_long[j] + j][0] + tmp, sound[stt_long[j] + j][1]])
+                sound[stt_long[j] + j][1] = sound[stt_long[j] + j][0] + tmp
+                stt_num.insert(stt_long[j] + (j+1), 0)
         
         length = len(sound)
         startidx = []
@@ -85,10 +129,15 @@ class KorStt:
         end_idx = []
         pause_final = ''
 
+        stt_list = []
+
         i = -1
 
         if sound[0][0] > 1000:
             pause_final += "(pause)"
+            pause_idx.append(startidx[0])
+
+        pause_cnt = 0
 
         for dic in res:
             i += 1
@@ -101,9 +150,11 @@ class KorStt:
                 for sentence in sentences:
                     pause_final += sentence
                     pause_final += ' '
+                    stt_list.append(sentence)
 
                 if ((i < len(sound) - 1) and (stt_num[i] == 1)):
                     pause_final += "(pause)"
+                    pause_cnt += 1
                     pause_result += silenceidx[i]
                     pause_idx.append(silenceidx[i])
             
@@ -138,16 +189,8 @@ class KorStt:
             pidx.append(tmp)
 
         for i in range(len(pidx)):
-            if pidx[0] == 0:
-                if i == 0:
-                    result['annotations'].append({'start': pidx[i], 'end': pidx[i] + 1, 'type': 'PAUSE', 'duration': 1000})
-                else:
-                  result['annotations'].append({'start': pidx[i], 'end': pidx[i] + 1, 'type': 'PAUSE', 'duration': pause_idx[i-1]})
-            else:
-                result['annotations'].append({'start': pidx[i], 'end': pidx[i] + 1, 'type': 'PAUSE', 'duration': pause_idx[i]})
+            result['annotations'].append({'start': pidx[i], 'end': pidx[i] + 1, 'type': 'PAUSE', 'duration': pause_idx[i]})
 
-        if stt.endswith("\n"):
-            stt = stt[:-1]
         result['textFile']=stt
 
         return result

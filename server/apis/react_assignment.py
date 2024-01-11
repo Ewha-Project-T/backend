@@ -43,9 +43,7 @@ class React_Porb_professor(Resource):
         args = parser.parse_args()
         lecture_no = args['lecture_no']
 
-        return jsonify({
-            "prob_list" : prob_list_professor(lecture_no,user_info["user_no"])
-        })
+        return jsonify(prob_list_professor(lecture_no,user_info["user_no"]))
     
 class React_Prob_add(Resource):
     @jwt_required()

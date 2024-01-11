@@ -26,9 +26,10 @@ def prob_list_student(lecture_no:int,user_no:int):
 
 def prob_list_professor(lecture_no:int,user_no:int):
     assignments = Assignment.query.filter(Assignment.lecture_no == lecture_no).all()
+    lecutre_name = Lecture.query.filter_by(lecture_no = lecture_no).first().lecture_name
     res = [{'as_no': assignment.assignment_no, 'as_name': assignment.as_name,"open_time":assignment.open_time , "limit_time": assignment.limit_time, "reaveal" : True if assignment.open_time <= datetime.utcnow()+timedelta(hours=9) else False} for assignment in assignments]
     db.session.remove()
-    return res
+    return {"lecture_name" : lecutre_name, "prob_list" : res}
 
 #major_convert={"한일통역":"ja-JP","한일번역":"ja-JP","한중통역":"zh-CN","한중번역":"zh-CN","한영통역":"en-US","한영번역":"en-US","한불통역":"fr-FR","한불번역":"fr-FR"}#임시용
 major_convert={"ko":"ko-KR","jp":"ja-JP","en":"en-US","cn":"zh-CN","fr":"fr-FR"}

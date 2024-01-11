@@ -156,7 +156,7 @@ class KorStt:
             
         return pause_final, pause_result, pause_idx, start_idx, end_idx
 
-    def basic_annotation_stt(self, result, stt, pause_final, pause_idx):
+    def basic_annotation_stt(self, result, stt, pause_idx):
         stt_fc = re.sub('\(pause\)', '', stt)
 
         f_s = [m.start(0) for m in re.finditer('\<f\>', stt_fc)]

@@ -138,8 +138,11 @@ def get_feedback_info(as_no: int, student_no: int, user_no: int):
             return {"message": "교수님의 음원 STT 작업 진행중입니다.", "isSuccess": False}
         if stt_job.stt_result is None:
             return {"message": "STT 작업 진행 중 입니다.", "isSuccess": False}
-        result = json.loads(stt_job.stt_result)
-        text += result["text"]
+        try:
+            result = json.loads(stt_job.stt_result)
+            text += result["text"]
+        except:
+            text += stt_job.stt_result
         # denotations_json += result["denotations"]
         # attributes_json += result["attributes"]
 
@@ -222,6 +225,8 @@ def save_feedback(assignment:Assignment,attendee:Attendee):
         for obj in objs:
             if obj=="pause":
                 obj="silence"
+            if obj == "canclellation":
+                obj = "backtracking"
             if obj in value.keys():
                 if obj=="pause":
                     value["silence"]+=1

@@ -269,8 +269,18 @@ def get_all_graphs(as_no:int, user_no:int):
         "Accuracy" : avg_accuracy(lecture.lecture_no, assignment.assignment_no),
         "DeliveryDetail" : detail_delivery(lecture.lecture_no, assignment.assignment_no),
         "AccuracyDetail" : detail_accuracy(lecture.lecture_no, assignment.assignment_no),
-        "DeliveryAvg" : {"data": [ avg_delivery(lecture.lecture_no, assignment.assignment_no,1, attendee) for attendee in attendees]},
-        "AccuracyAvg" : {"data": [ avg_accuracy(lecture.lecture_no, assignment.assignment_no,1, attendee) for attendee in attendees]},
+        "DeliveryAvg" : [
+            {
+                "name": attendee.user.name,
+                "data":avg_delivery(lecture.lecture_no, assignment.assignment_no,1, attendee)
+            } for attendee in attendees
+        ],
+        "AccuracyAvg" : [
+            {
+                "name": attendee.user.name,
+                "data": avg_accuracy(lecture.lecture_no, assignment.assignment_no, 1, attendee)
+            } for attendee in attendees
+        ],
         "as_type": assignment.as_type,
         "isSuccess": True,
     }

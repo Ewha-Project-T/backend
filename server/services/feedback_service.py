@@ -34,6 +34,8 @@ def get_json_textae(as_no,user_no):
             return "STT 작업중 입니다.", False, False
         if(text==-1):
             return "STT 오류!!", False, False
+        if(text==-2):
+            return {"text": "STT 오류!!", "denotations": [], "attributes":[]}, "A1", assignment_management.review
         check.ae_text,check.ae_denotations,check.ae_attributes=text,denotations,attributes
         db.session.commit()
         # text,denotations,attributes=parse_data(stt_result,stt_feedback)
@@ -142,7 +144,8 @@ def get_feedback_info(as_no: int, student_no: int, user_no: int):
             result = json.loads(stt_job.stt_result)
             text += result["text"]
         except:
-            text += stt_job.stt_result
+            if len(stt_job.stt_result) > 1:
+                text += stt_job.stt_result
         # denotations_json += result["denotations"]
         # attributes_json += result["attributes"]
 

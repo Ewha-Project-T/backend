@@ -82,8 +82,8 @@ def create_assignment(lecture_no :int,limit_time,as_name:str,as_type:str,keyword
             region = region.replace("'",'"')
             region = json.loads(region)
             split_url=split_wav_save2(prob_sound_path,float(region["start"]),float(region["end"]))
-            mapping_sst_user(new_assignment.assignment_no, split_url,user_info)
-            task = do_original_text_stt_work.delay(filename=split_url,locale=prob_translang_source)
+            returned_swtt_no=mapping_sst_user(new_assignment.assignment_no, split_url,user_info)
+            task = do_original_text_stt_work.delay(filename=split_url,locale=prob_translang_source,stt_no=returned_stt_no)
             pr = Prob_region(assignment_no=new_assignment.assignment_no,region_index=region["id"],start=region["start"][:9],end=region["end"][:9],upload_url=split_url, job_id=task.id)
             db.session.add(pr)
     db.session.commit()
@@ -146,8 +146,8 @@ def edit_assignment(as_no,limit_time, as_name, as_type, keyword, prob_translang_
             region = region.replace("'",'"')
             region = json.loads(region)
             split_url=split_wav_save2(prob_sound_path,float(region["start"][:9]),float(region["end"][:9]))
-            mapping_sst_user(assignment_to_edit.assignment_no, split_url,user_info)
-            task = do_original_text_stt_work.delay(filename=split_url,locale=prob_translang_source)
+            returned_stt_no=mapping_sst_user(assignment_to_edit.assignment_no, split_url,user_info)
+            task = do_original_text_stt_work.delay(filename=split_url,locale=prob_translang_source,stt_no=returned_stt_no)
             pr = Prob_region(assignment_no=assignment_to_edit.assignment_no,region_index=region["id"],start=region["start"][:9],end=region["end"][:9],upload_url=split_url, job_id=task.id)
             db.session.add(pr)
     # 변경 사항 커밋
@@ -465,6 +465,8 @@ def get_stt_result(uuid):
             return None, None, None
         if stt_job.stt_result==None:
             return -1, "STT 오류", -1
+        if stt_job.stt_result=="STT error":
+            return -2, "STT 오류", -1
         stt_result=json.loads(stt_job.stt_result)
         text += stt_result["text"]
         for denotation in stt_result["denotations"]:

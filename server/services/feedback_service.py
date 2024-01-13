@@ -159,7 +159,8 @@ def get_feedback_info(as_no: int, student_no: int, user_no: int):
             text += result["text"]
         except:
             if len(stt_job.stt_result) > 1:
-                text += stt_job.stt_result
+                text = stt_job.stt_result
+                break
         # denotations_json += result["denotations"]
         # attributes_json += result["attributes"]
 

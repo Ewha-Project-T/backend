@@ -263,11 +263,14 @@ def get_all_graphs(as_no:int, user_no:int):
     lecture = Lecture.query.filter_by(lecture_no=assignment.lecture_no).first()
     if not lecture:
         return {"message": "해당 강의가 존재하지 않습니다.", "isSuccess": False}
+    attendees = Attendee.query.filter_by(lecture_no=lecture.lecture_no).all()[1:]
     res = {
         "Delivery" : avg_delivery(lecture.lecture_no, assignment.assignment_no),
         "Accuracy" : avg_accuracy(lecture.lecture_no, assignment.assignment_no),
         "DeliveryDetail" : detail_delivery(lecture.lecture_no, assignment.assignment_no),
         "AccuracyDetail" : detail_accuracy(lecture.lecture_no, assignment.assignment_no),
+        "DeliveryAvg" : {"data": [ avg_delivery(lecture.lecture_no, assignment.assignment_no,1, attendee) for attendee in attendees]},
+        "AccuracyAvg" : {"data": [ avg_accuracy(lecture.lecture_no, assignment.assignment_no,1, attendee) for attendee in attendees]},
         "as_type": assignment.as_type,
         "isSuccess": True,
     }
@@ -302,7 +305,7 @@ def avg_delivery(lecture_no:int, assingment_no:int, flag:int = 0, me=None):
         data = dict()
         data["name"] = attendee.user.name
         data["data"] = []
-        for i in ["silence", "filler", "backtracking", "others"]:
+        for index, i in enumerate(["silence", "filler", "backtracking", "others"]):
             value = Feedback2.query.filter_by(
                 lecture_no=lecture_no, 
                 attendee_no=attendee.attendee_no
@@ -312,8 +315,7 @@ def avg_delivery(lecture_no:int, assingment_no:int, flag:int = 0, me=None):
             # value가 None인지 확인하고, None인 경우 0.0으로 설정
             value = 0.0 if value is None else float(value)
             data["data"].append(float(value))
-            for j in range(4):
-                avg[j] += float(value)
+            avg[index] += float(value)
         res.append(data)
         if me:
             if me.attendee_no == attendee.attendee_no:
@@ -335,7 +337,7 @@ def avg_accuracy(lecture_no:int, assingment_no:int, flag:int = 0, me=None):
         data = dict()
         data["name"] = attendee.user.name
         data["data"] = []
-        for i in ["translation_error", "omission", "expression", "intonation", "grammar_error", "others"]:
+        for index, i in enumerate(["translation_error", "omission", "expression", "intonation", "grammar_error", "others"]):
             value = Feedback2.query.filter_by(
                 lecture_no=lecture_no, 
                 attendee_no=attendee.attendee_no
@@ -343,14 +345,13 @@ def avg_accuracy(lecture_no:int, assingment_no:int, flag:int = 0, me=None):
                      ).with_entities(func.avg(getattr(Feedback2, i))).scalar()
             value = 0.0 if value is None else float(value)
             data["data"].append(float(value))
-            for j in range(6):
-                avg[j] += float(value)
+            avg[index] += float(value)
         res.append(data)
         if me:
             if me.attendee_no == attendee.attendee_no:
                 my_score.append(data)
     if len(attendees) != 0:
-        for i in range(4):
+        for i in range(6):
             avg[i] = round(avg[i] / len(attendees),2)
     if flag:
         my_score.append({"name": "평균", "data": avg})

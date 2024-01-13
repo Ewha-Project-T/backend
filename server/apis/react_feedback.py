@@ -1,9 +1,10 @@
+from curses.panel import update_panels
 import json
 from flask import jsonify, Flask, request, make_response
 from flask_restful import reqparse, Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from ..services.feedback_service import get_all_graphs, get_feedback_info, get_feedback_review, get_json_textae, get_my_graphs, get_zip_url, put_json_textae, save_feedback_review, update_graph
+from ..services.feedback_service import get_all_graphs, get_feedback_info, get_feedback_review, get_json_textae, get_my_graphs, get_zip_url, put_json_textae, save_feedback_review, update_graph, update_open
 
 class Feedback_textae(Resource):
     parser = reqparse.RequestParser()
@@ -135,6 +136,17 @@ class Feedback_graph_update(Resource):
         args = parser.parse_args()
         user_info = get_jwt_identity()
         res = update_graph(as_no=args['as_no'], user_no=args['student_no'])
+        return jsonify({"isSuccess":True})
+    
+class Feedback_open(Resource):
+    @jwt_required()
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('as_no', type=int, required=True)
+        parser.add_argument('open', type=bool, required=True)
+        args = parser.parse_args()
+        user_info = get_jwt_identity()
+        res = update_open(as_no=args['as_no'], user_no=user_info['user_no'], open=args['open'])
         return jsonify({"isSuccess":True})
 
 class assignment_zip_down(Resource): # 과제 압축파일 다운로드 개발 후 삭제

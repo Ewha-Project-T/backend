@@ -231,6 +231,16 @@ def update_graph(as_no:int, user_no:int):
     db.session.commit()
     return
 
+def update_open(as_no:int, user_no:int, open:bool):
+    assignment = Assignment.query.filter_by(assignment_no=as_no).first()
+    if not assignment:
+        return {"message": "과제가 존재하지 않습니다.", "isSuccess": False}
+    if not assignment.user_no == user_no:
+        return {"message": "과제를 열람할 권한이 없습니다.", "isSuccess": False}
+    assignment.open = open
+    db.session.commit()
+    return
+
 def save_feedback(assignment:Assignment,attendee:Attendee):
     feedback = Feedback2.query.filter_by(assignment_no=assignment.assignment_no, attendee_no=attendee.attendee_no).first()
     if not feedback:

@@ -83,6 +83,7 @@ class Assignment(db.Model):
     keyword_open= db.Column(db.Boolean, default=0)
     file_path = db.Column(db.String(100))
     file_name = db.Column(db.String(100))
+    open = db.Column(db.Boolean, default=False)
     
     user = db.relationship("User",back_populates="assignment")
     lecture = db.relationship("Lecture",back_populates="assignment")

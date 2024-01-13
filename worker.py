@@ -103,6 +103,7 @@ def do_stt_work(self, filename, locale="ko"):
 
     stt_db = session.query(Stt).filter_by(wav_file=filename).first()
     if not stt_db:
+        session.rollback()
         return False
 
     print("request id = ",self.request.id, "stt_no = ", stt_db.stt_no)
@@ -114,38 +115,43 @@ def do_stt_work(self, filename, locale="ko"):
         endidx="",
         silenceidx="",
     )
-    job.stt_result = result_stt_json
+    job.stt_result = result_stt_json if result_stt_json != None else "STT error"
     session.add(job)
     session.commit()
     return result_stt_json
 
 @celery.task(base=DBTask, bind=True)
-def do_original_text_stt_work(self, filename, locale="ko"):
+def do_original_text_stt_work(self, filename, locale="ko",stt_no=None):
     result_stt_json = None
     session = self.session
     self.update_state(state='INDEXING')
     stt=Original_stt()
     self.update_state(state='STT')
+    print("filename = ", filename)
     try:
         result_stt_json=stt.execute(filename)
     except Exception as e:
         print(e)
         self.update_state(state=e.args[0])
+    print("result_stt_json = ", result_stt_json)
+    if not stt_no:
+        stt_db = session.query(Stt).filter_by(wav_file=filename).first()
+        if not stt_db:
+            print("not stt_db")
+            session.rollback()
+            return False
+        stt_no=stt_db.stt_no
 
-    stt_db = session.query(Stt).filter_by(wav_file=filename).first()
-    if not stt_db:
-        return False
-
-    print("request id = ",self.request.id, "stt_no = ", stt_db.stt_no)
+    print("request id = ",self.request.id, "stt_no = ", stt_no)
     job = SttJob(
         job_id=self.request.id,
-        stt_no=stt_db.stt_no,
+        stt_no=stt_no,
         sound="",
         startidx="",
         endidx="",
         silenceidx="",
     )
-    job.stt_result = result_stt_json
+    job.stt_result = "Origin text error" if result_stt_json == None else result_stt_json
     session.add(job)
     session.commit()
     return result_stt_json

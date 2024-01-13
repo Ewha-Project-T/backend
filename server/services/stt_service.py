@@ -47,6 +47,7 @@ def mapping_sst_user(assignment, file,userinfo):
     stt = Stt(user_no=userinfo["user_no"], assignment_no=assignment, wav_file=file)
     db.session.add(stt)
     db.session.commit()
+    return stt.stt_no
 
 def is_stt_userfile(assignment, file,userinfo) -> bool:
     stt = Stt.query.filter_by(user_no=userinfo["user_no"], assignment_no=assignment, wav_file=file).first()

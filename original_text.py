@@ -53,7 +53,7 @@ class Original_stt:
             print("No text or invalid text for GPT-4 processing.")
             return None
 
-        prompt_message = "Correct punctuations. Do not add or remove the script \n" + text
+        prompt_message = "Correct punctuations. Do not add or remove the original spoken words. \n" + text
         try:
             response = client.chat.completions.create(
                 model="gpt-3.5-turbo-1106",

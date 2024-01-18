@@ -1,4 +1,4 @@
-# 0110 수정 -> 인덱스 에러 수정 / api 에러 방지
+# 0118 수정 -> 빈 파일 오류 수정
 
 from pydub import AudioSegment, silence
 from nltk.tokenize import sent_tokenize
@@ -19,65 +19,70 @@ class KorStt:
         result_list = []
         stt_len = len(result)
 
-        if stt_len > 2000:
-            for i in range(0, stt_len, 2000):
-                result_list.append(result[i:i + 2000])
-        else:
-            result_list.append(result)
+        ## 빈 파일 핸들링
+        if stt_len == 0:
+            res = ' '
 
-        res = ''
+        else:     
+            if stt_len > 2000:
+                for i in range(0, stt_len, 2000):
+                    result_list.append(result[i:i + 2000])
+            else:
+                result_list.append(result)
 
-        for i in range(len(result_list)):
-            result_t = result_list[i]
-            stt_flag = 0
-            last_punc = ''
-            start_blank = ''
+            res = ''
 
-            if result_t[0] == ' ':
-                start_blank = ' '
-                result_t = result_t[1:]
+            for i in range(len(result_list)):
+                result_t = result_list[i]
+                stt_flag = 0
+                last_punc = ''
+                start_blank = ''
 
-            if result_t[-1] == '.' or result_t[-1] == ',' or result_t[-1] == '?':
-                stt_flag = 1
-                last_punc = result_t[-1]
-            elif result_t[-1] == ' ':
-                stt_flag = 2
-                result_t = result_t[:-1]
+                if result_t[0] == ' ':
+                    start_blank = ' '
+                    result_t = result_t[1:]
 
-            response = requests.post(
-                "https://api.openai.com/v1/chat/completions",
-                headers={"Authorization": "Bearer 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"},
-                json = {"model": "gpt-4-1106-preview", "seed": 1230, "messages": [{"role": "user",
-                                                    "content": """Filler is a word used when there is hesitation during speech, such as '음', '그', '어', or '아'.
-                                                     Mark '<f>' before filler and mark '</f>' after filler. (example: <f>음</f>).
-                                                     Cancellation refers to a word that was uttered first among words that were accidentally uttered repeatedly, such as '다릅' in '다릅 틀립니다.', '앞으로' in '앞으로 앞으로는'.
-                                                     Mark '<c>' before cancellation and mark '</c>' after cancellation. (example: <c>다릅</c> 틀립니다.).
-                                                     (pause) is not a filler or cancellation.
-                                                     Except that marks, do not change, ommit, repeat or add words.
-                                                     Keep spacing and punctuation the same as the input sentence. If there are no such expressions, return the original sentence. \n""" + result_t}]}
+                if result_t[-1] == '.' or result_t[-1] == ',' or result_t[-1] == '?':
+                    stt_flag = 1
+                    last_punc = result_t[-1]
+                elif result_t[-1] == ' ':
+                    stt_flag = 2
+                    result_t = result_t[:-1]
 
-            )
+                response = requests.post(
+                    "https://api.openai.com/v1/chat/completions",
+                    headers={"Authorization": "Bearer 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"},
+                    json = {"model": "gpt-4-1106-preview", "seed": 1230, "messages": [{"role": "user",
+                                                        "content": """Filler is a word used when there is hesitation during speech, such as '음', '그', '어', or '아'.
+                                                        Mark '<f>' before filler and mark '</f>' after filler. (example: <f>음</f>).
+                                                        Cancellation refers to a word that was uttered first among words that were accidentally uttered repeatedly, such as '다릅' in '다릅 틀립니다.', '앞으로' in '앞으로 앞으로는'.
+                                                        Mark '<c>' before cancellation and mark '</c>' after cancellation. (example: <c>다릅</c> 틀립니다.).
+                                                        (pause) is not a filler or cancellation.
+                                                        Except that marks, do not change, ommit, repeat or add words.
+                                                        Keep spacing and punctuation the same as the input sentence. If there are no such expressions, return the original sentence. \n""" + result_t}]}
 
-            response_dict =  response.json()
+                )
 
-            if response.status_code >= 500:
-                print("gpt - server error :", response.status_code)
-                print(response_dict['error'])
-            elif response.status_code >= 400:
-                print("gpt - client error :", response.status_code)
-                print(response_dict['error'])
+                response_dict =  response.json()
 
-            res_t = response_dict['choices'][0]['message']['content']
+                if response.status_code >= 500:
+                    print("gpt - server error :", response.status_code)
+                    print(response_dict['error'])
+                elif response.status_code >= 400:
+                    print("gpt - client error :", response.status_code)
+                    print(response_dict['error'])
 
-            if i < len(result_list) - 1:
-                if stt_flag == 1:
-                    res += start_blank + res_t + last_punc
-                elif stt_flag == 2:
-                    res += start_blank + res_t + ' '
+                res_t = response_dict['choices'][0]['message']['content']
+
+                if i < len(result_list) - 1:
+                    if stt_flag == 1:
+                        res += start_blank + res_t + last_punc
+                    elif stt_flag == 2:
+                        res += start_blank + res_t + ' '
+                    else:
+                        res += start_blank + res_t
                 else:
                     res += start_blank + res_t
-            else:
-                res += start_blank + res_t
 
         return res
 
@@ -251,7 +256,7 @@ class KorStt:
 
         return res
 
-    def parse_data(self, stt_result, stt_feedback):
+    def parse_data(self, stt_result,stt_feedback):
         cnt=1
         text=""
         denotations="["
@@ -259,7 +264,8 @@ class KorStt:
         for j in range(len(stt_feedback)):
             denotations +='{ "id": "T'+str(cnt)+'", "span": { "begin": '+str(stt_feedback[j]['start'])+', "end": '+str(stt_feedback[j]['end'])+' }, "obj": "'+str(stt_feedback[j]['type'])+'" },'
             cnt+=1
-        denotations=denotations[:-1]
+        if len(stt_feedback)>0:
+            denotations=denotations[:-1]
         denotations+="]"
         return text, denotations
 

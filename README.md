@@ -13,12 +13,11 @@ pip install -r requirements.txt
 
 ```
 root
-ㄴ docs : API docs 관련 문서. API 제작 후, `@swag_from` 으로 경로명시 해줄 것.
 ㄴ server : 서버 관련한 파일들이 존재. 코딩해야할 곳
     ㄴ apis : API 코드들이 모여있는곳
     ㄴ (추후 문서 파싱이라던지 여러 작업들을 따로 빼놓을 디렉토리를 구상하여 깔끔하게 정돈해주세요)
 ```
-
+<!--
 ## API Documentation
 
 **Flask + Swagger** 를 이용하여 내가 만든 API 를 문서화 시킬 수 있습니다.
@@ -29,7 +28,7 @@ root
 
 swagger 보기:
 url/apidocs/#/경로로 이동
-
+-->
 ## 도커 사용법
 ```
 먼저 git clone 을 통해 https://github.com/Ewha-Project-T/ewha_deploy을 복사해줍니다.

@@ -82,7 +82,7 @@ def create_assignment(lecture_no :int,limit_time,as_name:str,as_type:str,keyword
             region = region.replace("'",'"')
             region = json.loads(region)
             split_url=split_wav_save2(prob_sound_path,float(region["start"]),float(region["end"]))
-            returned_swtt_no=mapping_sst_user(new_assignment.assignment_no, split_url,user_info)
+            returned_stt_no=mapping_sst_user(new_assignment.assignment_no, split_url,user_info)
             task = do_original_text_stt_work.delay(filename=split_url,locale=prob_translang_source,stt_no=returned_stt_no)
             pr = Prob_region(assignment_no=new_assignment.assignment_no,region_index=region["id"],start=region["start"][:9],end=region["end"][:9],upload_url=split_url, job_id=task.id)
             db.session.add(pr)

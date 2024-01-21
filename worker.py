@@ -52,6 +52,7 @@ class SttJob(base):
     silenceidx = Column(Text, nullable=False)
     stt_result = Column(LONGTEXT, nullable=True)
     is_seq = Column(Boolean, default=False, nullable=False)
+    stt_seq = Column(Integer, default=0,nullable=True)
 
 class AlchemyEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -85,7 +86,7 @@ class DBTask(Task):
         return self._session
 
 @celery.task(base=DBTask, bind=True)
-def do_stt_work(self, filename, locale="ko"):
+def do_stt_work(self, filename, locale="ko", stt_seq=0):
     result_stt_json = None
     session = self.session
     self.update_state(state='INDEXING')
@@ -114,6 +115,7 @@ def do_stt_work(self, filename, locale="ko"):
         startidx="",
         endidx="",
         silenceidx="",
+        stt_seq=stt_seq,
     )
     job.stt_result = result_stt_json if result_stt_json != None else "STT error"
     session.add(job)
@@ -121,7 +123,7 @@ def do_stt_work(self, filename, locale="ko"):
     return result_stt_json
 
 @celery.task(base=DBTask, bind=True)
-def do_original_text_stt_work(self, filename, locale="ko",stt_no=None):
+def do_original_text_stt_work(self, filename, locale="ko",stt_no=None,stt_seq=0):
     result_stt_json = None
     session = self.session
     self.update_state(state='INDEXING')
@@ -150,6 +152,7 @@ def do_original_text_stt_work(self, filename, locale="ko",stt_no=None):
         startidx="",
         endidx="",
         silenceidx="",
+        stt_seq=stt_seq,
     )
     job.stt_result = "Origin text error" if result_stt_json == None else result_stt_json
     session.add(job)

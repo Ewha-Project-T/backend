@@ -866,6 +866,7 @@ def assignment_cancel(as_no:int, user_no:int,student_no:int):
     if assignment_management == None:
         return {"message" : "과제를 제출한 기록이 없습니다.", "isSuccess" : False}
     assignment_management.end_submission = False
+    assignment_management.review = None
     db.session.commit()
 
     return {"message" : "과제 취소 완료"}

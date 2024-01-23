@@ -51,7 +51,7 @@ class KorStt:
 
                 response = requests.post(
                     "https://api.openai.com/v1/chat/completions",
-                    headers={"Authorization": "Bearer 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"},
+                    headers={"Authorization": "Bearer " + os.getenv("OPENAI_API_KEY")},
                     json = {"model": "gpt-4-1106-preview", "seed": 1230, "messages": [{"role": "user",
                                                         "content": """Filler is a word used when there is hesitation during speech, such as '음', '그', '어', or '아'.
                                                         Mark '<f>' before filler and mark '</f>' after filler. (example: <f>음</f>).

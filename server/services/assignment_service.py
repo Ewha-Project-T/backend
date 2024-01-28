@@ -609,15 +609,19 @@ def get_prob_submit_list(as_no,lecture_no):
         tmp["submit_count"] = check.submission_count
         tmp["chance_count"] = check.chance_count
         tmp["open"] = check.review_open
-        as_check=Assignment_check.query.filter_by(assignment_no=as_no,attendee_no=value.attendee_no,assignment_check=1).order_by(Assignment_check.check_no.desc()).first()
+        as_check=Assignment_check.query.filter_by(assignment_no=as_no,attendee_no=value.attendee_no).order_by(Assignment_check.check_no.desc()).first()
         if as_check==None:
             tmp["status"] = "미작성"
-        elif as_check.ae_text=="" and as_check.ae_denotations=="" and as_check.ae_attributes=="":
+            tmp["test"] = 0
+        elif as_check.ae_denotations=="":
             tmp["status"] = "미작성"
+            tmp["test"] = 1
         else:
             tmp["status"] = "작성중"
+            tmp["test"] = 2
         if check.review!=None:
             tmp["status"] = "작성 완료"
+            tmp["test"] = 3
         submit_list.append(tmp)
 
     return submit_list

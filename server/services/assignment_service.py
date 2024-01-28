@@ -630,7 +630,7 @@ def get_prob_submit_list(as_no,lecture_no):
         else:
             tmp["status"] = "작성중"
             tmp["test"] = 2
-        if check.review!=None:
+        if check.review!=None and check.review!="":
             tmp["status"] = "작성 완료"
             tmp["test"] = 3
         trans_file = make_trans_file(as_check, user.name)

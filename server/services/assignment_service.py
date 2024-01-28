@@ -917,7 +917,7 @@ def make_trans_file(assignment_check:Assignment_check, student_name:str):
         return None
 
     # Create a unique filename using uuid
-    filetmp = assignment_check.check_no+ "_" + student_name
+    filetmp = f"{assignment_check.check_no}_{student_name}"
     filepath = f"{os.environ['UPLOAD_PATH']}/{filetmp}.txt"
 
     # Write the translation result to the file

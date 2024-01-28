@@ -344,10 +344,15 @@ def assignment_detail(as_no:int, user_no:int):
     res["my_count"] = assignment_management.submission_count
     res["chance_count"] = assignment_management.chance_count
     res["lecture_name"] = lecture.lecture_name  
+    
     if not assignment.keyword_open and attendee.permission == 3:
         res["keyword"] = "(비공개)\n" + res["keyword"]
     elif not assignment.keyword_open and attendee.permission != 3:
         res["keyword"] = "(비공개)"
+
+    assignment_check = Assignment_check.query.filter_by(assignment_no = as_no, attendee_no = attendee.attendee_no).order_by(Assignment_check.check_no.desc()).first()
+    if assignment_check != None:
+        res["file"] = make_trans_file(assignment_check, assignment.as_name, attendee.user.name)
     return res
 
 def assignment_detail_record(as_no:int, user_no:int):
@@ -903,7 +908,7 @@ def make_trans_file(assignment_check:Assignment_check, assignment_name:str, stud
         return None
 
     # Create a unique filename using uuid
-    filetmp = assignment_name + "_" + student_name
+    filetmp = assignment_check.check_no+ "_" + assignment_name + "_" + student_name
     filepath = f"{os.environ['UPLOAD_PATH']}/{filetmp}.txt"
 
     # Write the translation result to the file

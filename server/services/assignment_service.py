@@ -622,6 +622,9 @@ def get_prob_submit_list(as_no,lecture_no):
         if check.review!=None:
             tmp["status"] = "작성 완료"
             tmp["test"] = 3
+        trans_file = make_trans_file(as_check, as_check.assignment.as_name, user.name)
+        if trans_file:
+            tmp["file"] = trans_file
         submit_list.append(tmp)
 
     return submit_list
@@ -892,3 +895,20 @@ def assignment_chance(as_no:int, user_no:int,student_no:int):
     db.session.commit()
 
     return {"message" : "과제 기회 추가 완료"}
+
+def make_trans_file(assignment_check:Assignment_check, assignment_name:str, student_name:str):
+    if assignment_check is None:
+        return None
+    if assignment_check.user_trans_result is None:
+        return None
+
+    # Create a unique filename using uuid
+    filetmp = assignment_name + "_" + student_name
+    filepath = f"{os.environ['UPLOAD_PATH']}/{filetmp}.txt"
+
+    # Write the translation result to the file
+    with open(filepath, 'w') as file:
+        file.write(assignment_check.user_trans_result)
+    
+    # Return the path of the created file
+    return filepath

@@ -353,7 +353,12 @@ def assignment_detail(as_no:int, user_no:int):
 
     assignment_check = Assignment_check.query.filter_by(assignment_no = as_no, attendee_no = attendee.attendee_no).order_by(Assignment_check.check_no.desc()).first()
     if assignment_check != None:
-        res["file"] = make_trans_file(assignment_check, assignment.as_name, attendee.user.name)
+        trans_file = make_trans_file(assignment_check, attendee.user.name)
+        if trans_file != None:
+            res["file"] = trans_file
+        audio_file = make_student_audio_zip(assignment_check, attendee.user.name)
+        if audio_file != None:
+            res["file"] = audio_file
     return res
 
 def assignment_detail_record(as_no:int, user_no:int):

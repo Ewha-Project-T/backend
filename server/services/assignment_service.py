@@ -1,4 +1,5 @@
 from distutils.command.upload import upload
+import zipfile
 from server.services.stt_service import mapping_sst_user
 from ..model import Assignment_feedback, Assignment_management, Attendee, SttJob, User, Lecture, Assignment,Prob_region,Assignment_check,Assignment_check_list,Stt,Feedback2
 from server import db
@@ -630,6 +631,9 @@ def get_prob_submit_list(as_no,lecture_no):
         trans_file = make_trans_file(as_check, user.name)
         if trans_file:
             tmp["file"] = trans_file
+        audio_file = make_student_audio_zip(as_check, user.name)
+        if audio_file:
+            tmp["file"] = audio_file
         submit_list.append(tmp)
 
     return submit_list
@@ -918,5 +922,21 @@ def make_trans_file(assignment_check:Assignment_check, student_name:str):
     # Return the path of the created file
     return filepath
 
-def make_student_audio_zip(assignment:Assignment):
-    return
+def make_student_audio_zip(assignment_check:Assignment_check, student_name:str):
+    if assignment_check is None:
+        return None
+    assignment_check_list = Assignment_check_list.query.filter_by(check_no=assignment_check.check_no).all()
+    if not assignment_check_list:
+        return None
+    url = ["./upload/" + assignment_check_list.upload_url + ".mp3" if hasattr(assignment_check_list, "upload_url") else "./upload/" + assignment_check_list.acl_uuid + ".mp3" for index, assignment_check_list in enumerate(assignment_check_list)]
+    # zip파일로 만들기 url들을 반복문을 통해
+
+    # Create a unique filename using uuid
+    filetmp = assignment_check.check_no
+    filepath = f"{os.environ['UPLOAD_PATH']}/{filetmp}_{student_name}.zip"
+
+    # Write the translation result to the file
+    with zipfile.ZipFile(filepath, 'w') as file:
+        for index, url in enumerate(url):
+            file.write(url, f"{student_name}_구간{index+1}.mp3")
+    return filepath

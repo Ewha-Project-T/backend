@@ -21,7 +21,7 @@ def prob_list_student(lecture_no:int,user_no:int):
     res = []
     for assignment in assignments:
         assignment_management = Assignment_management.query.filter_by(assignment_no = assignment.assignment_no, attendee_no = attendee.attendee_no).first()
-        res.append({'as_no': assignment.assignment_no, 'as_name': assignment.as_name, "limit_time": assignment.limit_time, "end_submission": assignment_management.end_submission, "professor_review" : assignment_management.review})
+        res.append({'as_no': assignment.assignment_no, 'as_name': assignment.as_name, "limit_time": assignment.limit_time, "end_submission": assignment_management.end_submission if assignment_management else False, "professor_review" : assignment_management.review if assignment_management else False})
     db.session.remove()
     return res
 
@@ -347,7 +347,7 @@ def assignment_detail(as_no:int, user_no:int):
     res["lecture_name"] = lecture.lecture_name  
     
     if not assignment.keyword_open and attendee.permission == 3:
-        res["keyword"] = "(비공개)\n" + res["keyword"]
+        res["keyword"] = "(비공개)" + res["keyword"]
     elif not assignment.keyword_open and attendee.permission != 3:
         res["keyword"] = "(비공개)"
 
@@ -359,6 +359,7 @@ def assignment_detail(as_no:int, user_no:int):
         audio_file = make_student_audio_zip(assignment_check, attendee.user.name)
         if audio_file != None:
             res["file"] = audio_file
+    # print(res)
     return res
 
 def assignment_detail_record(as_no:int, user_no:int):
@@ -615,6 +616,8 @@ def get_prob_submit_list(as_no,lecture_no):
         tmp["email"]=user.email
         tmp["name"]=user.name
         check=Assignment_management.query.filter_by(assignment_no=as_no,attendee_no=value.attendee_no).first()
+        if check==None:
+            continue
         tmp["check"] = check.end_submission
         tmp["submit_time"] = check.end_submission_time
         tmp["submit_count"] = check.submission_count

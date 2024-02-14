@@ -1,5 +1,6 @@
 from distutils.command.upload import upload
 import zipfile
+import arrow
 from server.services.stt_service import mapping_sst_user
 from ..model import Assignment_feedback, Assignment_management, Attendee, SttJob, User, Lecture, Assignment,Prob_region,Assignment_check,Assignment_check_list,Stt,Feedback2
 from server import db
@@ -620,6 +621,7 @@ def get_prob_submit_list(as_no,lecture_no):
             continue
         tmp["check"] = check.end_submission
         tmp["submit_time"] = check.end_submission_time
+        tmp["submit_time_diff"] = arrow.get(check.end_submission_time).humanize()
         tmp["submit_count"] = check.submission_count
         tmp["chance_count"] = check.chance_count
         tmp["open"] = check.review_open

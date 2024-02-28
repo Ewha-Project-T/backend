@@ -80,6 +80,8 @@ def modify_lecture(no,name,year,semester,major,separated,professor,attendee,user
     professor_acc=Attendee.query.filter_by(user_no=user_info["user_no"],lecture_no=no,permission=3).first()
     attend_list.append(professor_acc.attendee_no)
     for attendee_user in attendee:#참석자 수정 시작
+        if attendee_user == None:
+            continue
         attendee_user=attendee_user.replace("'",'"')
         user=json.loads(attendee_user)
         user_email=user["email"]

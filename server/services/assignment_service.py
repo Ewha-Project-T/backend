@@ -621,7 +621,8 @@ def get_prob_submit_list(as_no,lecture_no):
             continue
         tmp["check"] = check.end_submission
         tmp["submit_time"] = check.end_submission_time
-        tmp["submit_time_diff"] = arrow.get(check.end_submission_time).humanize()
+        if check.end_submission_time != None:
+            tmp["submit_time_diff"] = arrow.get(check.end_submission_time).humanize()
         tmp["submit_count"] = check.submission_count
         tmp["chance_count"] = check.chance_count
         tmp["open"] = check.review_open

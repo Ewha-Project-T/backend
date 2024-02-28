@@ -393,6 +393,7 @@ def assignment_detail_record(as_no:int, user_no:int):
         "isSuccess": True,
         "keyword": assignment.keyword,
         "as_name": assignment.as_name,
+        "as_speed": assignment.speed,
         "as_type": assignment.as_type,
         "audio_regions_url": audio_regions_url,
     }

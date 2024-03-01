@@ -314,7 +314,7 @@ class React_Prob_detail(Resource):
                 return jsonify({
                     "msg" : "수강하지 않은 학생입니다.",
                     "isSuccess": False,
-                }), 400
+                })
             return jsonify(res)
         
 class React_Prob_record(Resource):

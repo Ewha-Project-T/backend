@@ -53,14 +53,14 @@ class KorStt:
                     "https://api.openai.com/v1/chat/completions",
                     headers={"Authorization": "Bearer " + os.getenv("OPENAI_API_KEY")},
                     json = {"model": "gpt-4-1106-preview", "seed": 1230, "messages": [{"role": "user",
-                                                        "content": """Filler is a word used when there is hesitation during speech, such as '음', '그', '어', or '아'.
+                                                        "content": """Filler is a word used when there is hesitation during speech, such as '음', '어', '어떤', '저희', '그런', '아마', '지금', '이제', '인제', '자', '또', '그', '아', '에', '뭐', '이런', '여기', '좀' or '저'.
                                                         Mark '<f>' before filler and mark '</f>' after filler. (example: <f>음</f>).
                                                         Cancellation refers to a word that was uttered first among words that were accidentally uttered repeatedly, such as '다릅' in '다릅 틀립니다.', '앞으로' in '앞으로 앞으로는'.
                                                         Mark '<c>' before cancellation and mark '</c>' after cancellation. (example: <c>다릅</c> 틀립니다.).
                                                         (pause) is not a filler or cancellation.
+                                                        postposition is not a filler.
                                                         Except that marks, do not change, ommit, repeat or add words.
                                                         Keep spacing and punctuation the same as the input sentence. If there are no such expressions, return the original sentence. \n""" + result_t}]}
-
                 )
 
                 response_dict =  response.json()

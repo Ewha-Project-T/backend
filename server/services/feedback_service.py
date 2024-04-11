@@ -55,6 +55,11 @@ def get_json_textae(as_no,user_no):
         # url=make_json_url(text,denotations_json,attributes_json,check,1)
         # textae = make_json(text,denotations_json,attributes_json)
     else:
+        # stt 넣기 용
+        _,uuid=get_prob_wav_url(as_no,user_no,assignment.lecture_no)
+        get_stt_result(uuid)
+        print("assgin_check_no",check.check_no)
+        # stt 넣기 끝
         text,denotations,attributes = check.ae_text,check.ae_denotations,check.ae_attributes
         # url=make_json_url(check.ae_text,check.ae_denotations, check.ae_attributes, check,0)
     if denotations != "None":
@@ -133,6 +138,7 @@ def get_feedback_info(as_no: int, student_no: int, user_no: int):
     res = dict()
     res["as_type"] = assignment.as_type
     res["assignment_name"] = assignment.as_name
+    res["dest_translang"] = assignment.dest_translang
     if assignment.as_type == "번역":
         res["student_name"] = user.name
         res["submit_time"] = assignment_manage.end_submission_time
@@ -503,6 +509,8 @@ def get_zip_url(lecutre_no:int, user_no:int):
                 f.write(parse.unquote(text_ae))
         _,uuid=get_prob_wav_url(assignment.assignment_no,user_no,assignment.lecture_no)
         if uuid:
+            text,denotations,attributes = "", [], []
+            Tid = 1
             for index,i in enumerate(uuid):
                 stt=Stt.query.filter_by(wav_file=i["uuid"]).first()
                 if stt is None:
@@ -518,6 +526,23 @@ def get_zip_url(lecutre_no:int, user_no:int):
                     if result == None:
                         result = ""
                     f.write(result)
+                # 합본 만들기 준비
+                stt_result=json.loads(stt_job.stt_result)
+                text += stt_result["text"]
+                for denotation in stt_result["denotations"]:
+                    denotation["id"] = "T"+str(Tid)
+                    Tid += 1
+                    denotation["span"]["begin"] += index
+                    denotation["span"]["end"] += index
+                    denotations.append(denotation)
+                # attributes += stt_result["attributes"]
+                text += "---------------------------\n"
+            # 합본 생성
+            path = os.environ["UPLOAD_PATH"] + "/" + str(assignment.assignment_no) + "_" + assignment.as_name + "_" + str(user_name) + "_원본stt합본.json"
+            with open(path, "w") as f:
+                f.write(json.dumps({"text":text, "denotations":denotations, "attributes":attributes}, ensure_ascii=False))
+            files.append(path)
+            
                 
         # file_count = len(Assignment_check_list.query.filter_by(check_no=assignment_check.check_no).all())
         # stts = Stt.query.filter_by(assignment_no=assignment.assignment_no, user_no=user_no).order_by(Stt.stt_no.desc()).all()[:file_count]

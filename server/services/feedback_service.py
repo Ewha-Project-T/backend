@@ -509,7 +509,7 @@ def get_zip_url(lecutre_no:int, user_no:int):
                 f.write(parse.unquote(text_ae))
         _,uuid=get_prob_wav_url(assignment.assignment_no,user_no,assignment.lecture_no)
         if uuid:
-            text,denotations,attributes = "", [], []
+            text,denotations,attributes, index_len = "", [], [], 0
             Tid = 1
             for index,i in enumerate(uuid):
                 stt=Stt.query.filter_by(wav_file=i["uuid"]).first()
@@ -532,11 +532,12 @@ def get_zip_url(lecutre_no:int, user_no:int):
                 for denotation in stt_result["denotations"]:
                     denotation["id"] = "T"+str(Tid)
                     Tid += 1
-                    denotation["span"]["begin"] += index
-                    denotation["span"]["end"] += index
+                    denotation["span"]["begin"] += index_len
+                    denotation["span"]["end"] += index_len
                     denotations.append(denotation)
                 # attributes += stt_result["attributes"]
                 text += "---------------------------\n"
+                index_len = len(text)
             # 합본 생성
             path = os.environ["UPLOAD_PATH"] + "/" + str(assignment.assignment_no) + "_" + assignment.as_name + "_" + str(user_name) + "_원본stt합본.json"
             with open(path, "w") as f:

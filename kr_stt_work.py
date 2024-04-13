@@ -1,4 +1,4 @@
-# 0118 수정 -> 빈 파일 오류 수정
+# 0413 수정 -> 맨 앞 pause 제거
 
 from pydub import AudioSegment, silence
 from nltk.tokenize import sent_tokenize
@@ -138,9 +138,9 @@ class KorStt:
 
         i = -1
 
-        if sound[0][0] > 1000:
-            pause_final += "(pause)"
-            pause_idx.append(startidx[0])
+        #if sound[0][0] > 1000:
+        #    pause_final += "(pause)"
+        #    pause_idx.append(startidx[0])
 
         for dic in res:
             i += 1

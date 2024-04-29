@@ -169,6 +169,7 @@ class SttJob(db.Model):
     stt_result = db.Column(LONGTEXT, nullable=True)
     is_seq = db.Column(db.Boolean, default=False, nullable=False)
     stt_seq = db.Column(db.Integer, default=0,nullable=True)
+    delay = db.Column(db.Float, nullable=True, default=0.0)
 
     stt = db.relationship("Stt", back_populates="sttjob")
 

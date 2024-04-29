@@ -2,7 +2,7 @@ from celery import Celery, Task
 from pydub import AudioSegment, silence
 from nltk.tokenize import sent_tokenize
 from sqlalchemy import create_engine, orm
-from sqlalchemy import Column, Text, Integer, String, Boolean, ForeignKey
+from sqlalchemy import Column, Text, Integer, String, Boolean, ForeignKey,Float
 from sqlalchemy.orm import Session
 from sqlalchemy.ext.declarative import declarative_base, DeclarativeMeta
 from sqlalchemy.dialects.mysql import LONGTEXT
@@ -53,6 +53,7 @@ class SttJob(base):
     stt_result = Column(LONGTEXT, nullable=True)
     is_seq = Column(Boolean, default=False, nullable=False)
     stt_seq = Column(Integer, default=0,nullable=True)
+    delay = Column(Float, nullable=True, default=0.0)
 
 class AlchemyEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -97,6 +98,7 @@ def do_stt_work(self, filename, locale="ko", stt_seq=0):
     self.update_state(state='STT')
 
     try:
+        delay=get_delay(filename)
         result_stt_json=stt.execute(filename)
     except Exception as e:
         print(e)
@@ -116,10 +118,12 @@ def do_stt_work(self, filename, locale="ko", stt_seq=0):
         endidx="",
         silenceidx="",
         stt_seq=stt_seq,
+        delay=delay,
     )
     job.stt_result = result_stt_json if result_stt_json != None else "STT error"
     session.add(job)
     session.commit()
+    session.close()
     return result_stt_json
 
 @celery.task(base=DBTask, bind=True)
@@ -131,16 +135,19 @@ def do_original_text_stt_work(self, filename, locale="ko",stt_no=None,stt_seq=0)
     self.update_state(state='STT')
     print("filename = ", filename)
     try:
+        delay=get_delay(filename)
         result_stt_json=stt.execute(filename)
     except Exception as e:
         print(e)
         self.update_state(state=e.args[0])
     print("result_stt_json = ", result_stt_json)
+    print("1stt_no = ", stt_no)
     if not stt_no:
         stt_db = session.query(Stt).filter_by(wav_file=filename).first()
         if not stt_db:
             print("not stt_db")
             session.rollback()
+            session.update_state(state="STT DB error")
             return False
         stt_no=stt_db.stt_no
 
@@ -153,8 +160,22 @@ def do_original_text_stt_work(self, filename, locale="ko",stt_no=None,stt_seq=0)
         endidx="",
         silenceidx="",
         stt_seq=stt_seq,
+        delay=delay,
     )
     job.stt_result = "Origin text error" if result_stt_json == None else result_stt_json
     session.add(job)
     session.commit()
+    session.close()
     return result_stt_json
+
+
+def get_delay(audio_file):
+    filepath = f"{os.environ['UPLOAD_PATH']}/{audio_file}.mp3"
+    myaudio = AudioSegment.from_file(filepath)
+    dBFS = myaudio.dBFS
+    nonsilent_ranges = silence.detect_nonsilent(myaudio, min_silence_len=1000, silence_thresh=dBFS-16,seek_step=100)
+    if nonsilent_ranges:
+        start_time = nonsilent_ranges[0][0] / 1000  # 밀리초를 초로 변환
+        return start_time
+    else:
+        return 0

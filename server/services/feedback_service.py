@@ -163,6 +163,7 @@ def get_feedback_info(as_no: int, student_no: int, user_no: int):
         try:
             result = json.loads(stt_job.stt_result)
             text += result["text"]
+            origin_delay=stt_job.delay
         except:
             if len(stt_job.stt_result) > 1:
                 text = stt_job.stt_result
@@ -174,12 +175,16 @@ def get_feedback_info(as_no: int, student_no: int, user_no: int):
     # res["original_ae"] = json.loads(make_json(text, denotations_json, attributes_json))
     res["original_tts"] = text
     res["original_text"] = assignment.original_text
+    res["original_delay"] = origin_delay=origin_delay
     res["student_name"] = user.name
     res["submit_time"] = assignment_manage.end_submission_time
     res["limit_time"] = assignment.limit_time
 
     res["assignment_audio"] = [make_audio_format(assignment_audio) for assignment_audio in assignment_audio]
     res["student_audio"] = [make_audio_format(assignment_check_list, index) for index, assignment_check_list in enumerate(assignment_check_list)]
+    res["student_delay"] = [get_audio_delay(assignment_check_list, index) for index, assignment_check_list in enumerate(assignment_check_list)]
+    print("ttttttttt")
+    print(res["student_delay"])
     res["isSuccess"] = True
     
     return res
@@ -191,7 +196,13 @@ def make_audio_format(prob_region, id=0):
             # "label": int(prob_region.region_index) if hasattr(prob_region, "region_index") else id,
             "value": "./upload/" + url + ".mp3",
     }
-
+def get_audio_delay(prob_region, id=0):
+    url = prob_region.upload_url if hasattr(prob_region, "upload_url") else prob_region.acl_uuid
+    stt= Stt.query.filter_by(wav_file=url).first()
+    sttjob= SttJob.query.filter_by(stt_no=stt.stt_no).first()
+    return {
+        "delay":sttjob.delay
+    }
 def get_feedback_review(as_no:int, student_no:int,user_no:int):
     assignment = Assignment.query.filter_by(assignment_no=as_no).first()
     if not assignment:

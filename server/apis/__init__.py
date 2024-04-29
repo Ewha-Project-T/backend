@@ -1,4 +1,4 @@
-from server.apis.mail import Email, Verify_email
+from .mail import Email, Verify_email
 from .react_feedback import Feedback_graph_update, Feedback_info, Feedback_professor_graph, Feedback_review, Feedback_student_graph, Feedback_textae, assignment_zip_down
 from .login import Login,Join, LoginRefresh, Logout
 from .lecture import Attend, Lecture, Lecture_mod, Lecture_mod_del, Student,Major, Lecture_add
@@ -18,6 +18,7 @@ def load_api(api_module):
     
     api_module.add_resource(Studentgraphlist,'/api/feedback/studentgraphlist',endpoint='studentGraphlist')
     api_module.add_resource(Professorgraphlist,'/api/feedback/professorgraphlist',endpoint='professorgraphlist')
+    api_module.add_resource(Email,'/api/user/email',endpoint='email')
 
     ############################
     ###########신규 추가##########
@@ -90,5 +91,4 @@ def load_api(api_module):
     api_module.add_resource(Admin2,'/admin2',endpoint='admin2')
     api_module.add_resource(Logout,'/logout',endpoint='logout')
     api_module.add_resource(Prob_del,'/prob_del',endpoint='prob_del')
-    api_module.add_resource(Email,'/email',endpoint='email')
     api_module.add_resource(Verify_email,'/verify_email',endpoint='verify_email')

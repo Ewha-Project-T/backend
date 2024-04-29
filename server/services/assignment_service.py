@@ -18,13 +18,14 @@ import ast
 
 def prob_list_student(lecture_no:int,user_no:int):
     attendee = Attendee.query.filter_by(user_no = user_no, lecture_no = lecture_no).first()
+    lecture_name = Lecture.query.filter_by(lecture_no = lecture_no).first().lecture_name
     assignments = Assignment.query.filter(Assignment.lecture_no == lecture_no).filter(Assignment.open_time <= datetime.utcnow()+timedelta(hours=9)).all()
     res = []
     for assignment in assignments:
         assignment_management = Assignment_management.query.filter_by(assignment_no = assignment.assignment_no, attendee_no = attendee.attendee_no).first()
         res.append({'as_no': assignment.assignment_no, 'as_name': assignment.as_name, "limit_time": assignment.limit_time, "end_submission": assignment_management.end_submission if assignment_management else False, "professor_review" : assignment_management.review if assignment_management else False})
     db.session.remove()
-    return res
+    return {"lecture_name": lecture_name ,"prob_list": res}
 
 def prob_list_professor(lecture_no:int,user_no:int):
     assignments = Assignment.query.filter(Assignment.lecture_no == lecture_no).all()
@@ -85,6 +86,7 @@ def create_assignment(lecture_no :int,limit_time,as_name:str,as_type:str,keyword
             region = json.loads(region)
             split_url=split_wav_save2(prob_sound_path,float(region["start"]),float(region["end"]))
             returned_stt_no=mapping_sst_user(new_assignment.assignment_no, split_url,user_info)
+            db.session.commit()
             task = do_original_text_stt_work.delay(filename=split_url,locale=prob_translang_source,stt_no=returned_stt_no)
             pr = Prob_region(assignment_no=new_assignment.assignment_no,region_index=region["id"],start=region["start"][:9],end=region["end"][:9],upload_url=split_url, job_id=task.id)
             db.session.add(pr)
@@ -149,6 +151,7 @@ def edit_assignment(as_no,limit_time, as_name, as_type, keyword, prob_translang_
             region = json.loads(region)
             split_url=split_wav_save2(prob_sound_path,float(region["start"][:9]),float(region["end"][:9]))
             returned_stt_no=mapping_sst_user(assignment_to_edit.assignment_no, split_url,user_info)
+            db.session.commit()
             task = do_original_text_stt_work.delay(filename=split_url,locale=prob_translang_source,stt_no=returned_stt_no)
             pr = Prob_region(assignment_no=assignment_to_edit.assignment_no,region_index=region["id"],start=region["start"][:9],end=region["end"][:9],upload_url=split_url, job_id=task.id)
             db.session.add(pr)
@@ -477,12 +480,13 @@ def get_stt_result(uuid):
     text,denotations,attributes = "", [], []
     Tid = 1
     for i in uuid:
-        print("uiud",i)
+        print("uiud = ",i, end="")
         index = len(text)    
         stt=Stt.query.filter_by(wav_file=i["uuid"]).first()
         stt_job=SttJob.query.filter_by(stt_no=stt.stt_no).first()
         if stt_job==None:
             return None, None, None
+        print("stt_job[stt_no] = ",stt_job.stt_no)
         if stt_job.stt_result==None:
             return -1, "STT 오류", -1
         if stt_job.stt_result=="STT error":

@@ -30,9 +30,7 @@ class React_Prob_student(Resource):
         parser.add_argument('lecture_no', type=int, required=True, help="lecture_no is required")
         args = parser.parse_args()
         lecture_no = args['lecture_no']
-        return jsonify({
-            "prob_list" : prob_list_student(lecture_no,user_info["user_no"])
-        })
+        return jsonify(prob_list_student(lecture_no,user_info["user_no"]))
     
 class React_Porb_professor(Resource):
     @jwt_required()
@@ -226,7 +224,6 @@ class React_prob_handle(Resource):
         open_time=args['open_time']
         file_name=args['file_name']
         file_path=args['file_path']
-        
         new_assignmen_no = create_assignment(lecture_no,limit_time,as_name,as_type,keyword,prob_translang_source,prob_translang_destination,description,speed,original_text,prob_sound_path,prob_split_region,assign_count,open_time,file_name,file_path,user_info,keyword_open)
         if new_assignmen_no is None:
             return jsonify({

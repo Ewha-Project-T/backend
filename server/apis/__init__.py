@@ -6,7 +6,7 @@ from .assignment import Prob, Prob_del, Prob_submit, Prob_feedback,Prob_mod,Prob
 from .admin import Admin,Admin2
 from .stt import Stt, SttJob, SttSeq, SttSeqJob
 from .react_login import Login2,Logout2,CheckToken,Join2,FindPassword,FindPassword_Check
-from .react_assignment import React_Cancel_prob, React_Chance_prob, React_Porb_professor, React_Prob_Self,React_Prob_add, React_Prob_detail, React_Prob_end_submission, React_Prob_record, React_Prob_student,React_Prob_submit_list,React_Prob_submit, React_Prob_submit_list2, React_prob_handle,Studentgraphlist,Professorgraphlist, TranslateAssignment
+from .react_assignment import React_Cancel_prob, React_Chance_prob, React_Porb_professor, React_Prob_Self,React_Prob_add, React_Prob_detail, React_Prob_end_submission, React_Prob_record, React_Prob_student,React_Prob_submit_list,React_Prob_submit, React_Prob_submit_list2, React_prob_handle, React_self_prob_handle,Studentgraphlist,Professorgraphlist, TranslateAssignment
 from .react_lecture import React_Lecture,React_Lecture_mod_del,React_Student,React_Lecture_add,React_Lecture_mod
 
 
@@ -44,6 +44,7 @@ def load_api(api_module):
     api_module.add_resource(Feedback_graph_update, '/api/feedback/graph/update', endpoint='feedback_graph_update')
     api_module.add_resource(assignment_zip_down,'/api/feedback/json',endpoint='assignment_zip_down')#zip 다운로드
     api_module.add_resource(React_Prob_Self, '/api/prob/self', endpoint='react_prob_self')
+    api_module.add_resource(React_self_prob_handle, '/api/prob/self/handle', endpoint='react_self_prob_handle')
     ############################
     ######옛날 것인데 사용중########
     ############################

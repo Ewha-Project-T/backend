@@ -317,6 +317,25 @@ def get_assignment(as_no:int):
     ]
 
     return assignment, audio_region_list
+
+def get_self_assignment(as_no:int, user_no:int):
+    self_study = SelfStudy.query.filter_by(assignment_no = as_no, user_no = user_no).first()
+    if self_study == None:
+        return None, None
+    assignment = Assignment.query.filter_by(assignment_no = as_no).first()
+    audio_region = Prob_region.query.filter_by(assignment_no=as_no).all()
+    audio_region_list = [
+        {
+            "id": int(att.region_index),
+            "start": float(att.start),
+            "end": float(att.end),
+            "upload_url": "./upload/"+str(att.upload_url),
+        }
+        for att in audio_region
+    ]
+
+    return assignment, audio_region_list
+
 def check_assignment(as_no,lecture_no,uuid,user_info,text=""):
     acc=Prob_region.query.filter_by(assignment_no=as_no).all()
     if(len(acc)!=len(uuid) and text==""):

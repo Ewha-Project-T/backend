@@ -302,6 +302,21 @@ def delete_assignment(assignment_no):
     for attendee in attendees:
         db.session.delete(attendee)
     db.session.commit
+
+def delete_self_assignment(as_no: int, user_no: int):
+    self_study = SelfStudy.query.filter_by(assignment_no = as_no, user_no = user_no).first()
+    if self_study == None:
+        return None
+    
+    assignment = Assignment.query.filter_by(assignment_no=as_no).first()
+    attendees = Assignment_management.query.filter_by(assignment_no=as_no).all()
+    if assignment:
+        db.session.delete(assignment)
+    for attendee in attendees:
+        db.session.delete(attendee)
+    db.session.delete(self_study)
+    db.session.commit
+    return True
     
 def get_assignment(as_no:int):
     assignment = Assignment.query.filter_by(assignment_no = as_no).first()

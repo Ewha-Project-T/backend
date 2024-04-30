@@ -7,7 +7,7 @@ from flask_jwt_extended import (
     jwt_required, get_jwt_identity, create_access_token, get_jwt
 )
 import re
-from ..services.assignment_service import assignment_cancel, assignment_chance, assignment_detail, assignment_detail_record, assignment_detail_translate, assignment_end_submission, assignment_record, assignment_translate, edit_assignment, get_assignment, get_assignments_manage, get_self_assignment,mod_assignment_listing,check_assignment,make_as, create_assignment,prob_list_professor, prob_list_student, mod_as,delete_assignment,get_as_name,get_prob_wav_url,get_wav_url,get_stt_result,get_original_stt_result,get_as_info,get_feedback,make_json_url, prob_self_list,save_json_feedback,get_prob_submit_list,get_studentgraph,get_professorgraph
+from ..services.assignment_service import assignment_cancel, assignment_chance, assignment_detail, assignment_detail_record, assignment_detail_translate, assignment_end_submission, assignment_record, assignment_translate, delete_self_assignment, edit_assignment, get_assignment, get_assignments_manage, get_self_assignment,mod_assignment_listing,check_assignment,make_as, create_assignment,prob_list_professor, prob_list_student, mod_as,delete_assignment,get_as_name,get_prob_wav_url,get_wav_url,get_stt_result,get_original_stt_result,get_as_info,get_feedback,make_json_url, prob_self_list,save_json_feedback,get_prob_submit_list,get_studentgraph,get_professorgraph
 from ..services.lecture_service import lecture_access_check
 from werkzeug.utils import secure_filename
 from os import environ as env
@@ -241,6 +241,23 @@ class React_self_prob_handle(Resource):
         assignment["prob_split_region"] = prob_split_region
         return jsonify({
             "assignment": assignment,
+            "isSuccess": True,
+        })
+    @jwt_required()
+    def delete(self):
+        parser = reqparse.RequestParser()
+        user_info=get_jwt_identity()
+        parser.add_argument('as_no', type=int)
+        args = parser.parse_args()
+        as_no = args['as_no']
+        if delete_self_assignment(as_no, user_info["user_no"]) == None:
+            return jsonify({
+                "msg" : "과제에 접근할 수 없습니다.",
+                "isSuccess": False,
+            })
+        
+        return jsonify({
+            "msg" : "success",
             "isSuccess": True,
         })
         

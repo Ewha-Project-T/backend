@@ -89,87 +89,6 @@ class React_Prob_add(Resource):
         make_as(user_info["user_no"],lecture_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,original_text,upload_path,prob_region,user_info,prob_translang_source,prob_translang_destination)
         return{"msg" : "success","probcreateSuccess":1},200
 
-# class React_Prob_del(Resource):
-#     @jwt_required()
-#     def get(self):#과제 삭제
-#         parser = reqparse.RequestParser()
-#         parser.add_argument('lecture_no', type=int)
-#         parser.add_argument('as_no', type=int)
-#         args = parser.parse_args()
-#         lecture_no = args['lecture_no']
-#         as_no = args['as_no']
-#         user_info=get_jwt_identity()
-#         if(lecture_access_check(user_info["user_no"],lecture_no) or user_info["user_perm"]==0):
-#             delete_assignment(as_no)
-#             return{"msg" : "assignment delete success","probdeleteSuccess":1},200
-#         else:
-#             return{"msg": "access denied"}
-        
-# class React_Prob_mod(Resource):
-#     @jwt_required()
-#     def get(self):
-#         parser = reqparse.RequestParser()
-#         parser.add_argument('lecture_no', type=int)
-#         parser.add_argument('as_no', type=int)
-#         args = parser.parse_args()
-#         lecture_no = args['lecture_no']
-#         as_no = args['as_no']
-#         as_list,audio_list=mod_assignment_listing(lecture_no,as_no)
-#         user_info=get_jwt_identity()
-#         return jsonify({   "userlist":user_info,
-#                     "lectureNo": lecture_no,
-#                     "as_no" : as_no,
-#                     "as_list" : as_list,
-#                     "audio_list": audio_list,
-#                 })
-#     @jwt_required()
-#     def post(self):#강의수정권한관리 만든사람, 관리자
-#         parser = reqparse.RequestParser()
-#         parser.add_argument('lecture_no', type=int)
-#         parser.add_argument('as_no', type=int)
-#         parser.add_argument('prob_week', type=str)
-#         parser.add_argument('prob_timeEnd', type=str)
-#         parser.add_argument('prob_name', type=str)
-#         parser.add_argument('prob_type', type=str)
-#         parser.add_argument('prob_keyword', type=str)
-#         parser.add_argument('prob_translang_source',type=str)
-#         parser.add_argument('prob_translang_destination',type=str)
-#         parser.add_argument('prob_exp', type=str)
-#         parser.add_argument('prob_replay', type=str)
-#         parser.add_argument('prob_play_speed')
-#         parser.add_argument('prob_open', type=str)
-#         parser.add_argument('prob_region', type=str, action='append')
-#         parser.add_argument('original_text', type=str)
-#         parser.add_argument('prob_sound_path', type=str)
-#         args=parser.parse_args()
-#         lecture_no = args['lecture_no']
-#         as_no= args['as_no']
-#         week = args['prob_week']
-#         limit_time = args['prob_timeEnd']
-#         as_name = args['prob_name']
-#         as_type = args['prob_type']
-#         keyword = args['prob_keyword']
-#         prob_translang_source=args['prob_translang_source']
-#         prob_translang_destination=args['prob_translang_destination']
-#         description = args['prob_exp']
-#         re_limit = args['prob_replay']
-#         speed = args['prob_play_speed']
-#         disclosure = args['prob_open']
-#         upload_path= args['prob_sound_path']
-#         if(disclosure=="on"):
-#             disclosure=0
-#         else:
-#             disclosure=1
-#         prob_region=args['prob_region']
-#         original_text = args['original_text']
-#         original_text=original_text.replace("<","&lt")
-#         original_text=original_text.replace(">","&gt")
-#         user_info=get_jwt_identity()
-#         if(lecture_access_check(user_info["user_no"],lecture_no) or user_info["user_perm"]==0):
-#             mod_as(lecture_no,as_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,original_text,upload_path,prob_region,user_info,prob_translang_source,prob_translang_destination)
-#             return{"msg" : "assignment modify success","assignmentmodifySuccess" : 1},200
-#         else:
-#             return{"msg": "access denied"}
 class React_prob_handle(Resource):
     #TODO: 검증 추가 필요
     @jwt_required()
@@ -428,48 +347,6 @@ class React_Prob_submit(Resource):
         else:
             res = check_assignment(as_no,lecture_no,uuid,user_info)
             return jsonify(res)
-
-
-# class Feedback2(Resource):
-#     @jwt_required()
-#     def get(self):
-#         parser = reqparse.RequestParser()
-#         parser.add_argument('lecture_no', type=int)
-#         parser.add_argument('as_no', type=int)
-#         parser.add_argument('user_no', type=int)
-#         args = parser.parse_args()
-#         as_no=args['as_no']
-#         lecture_no = args['lecture_no']
-#         user_no = args['user_no']
-#         url,review=get_json_feedback(as_no,lecture_no,user_no)
-#         if review is -1:
-#             return jsonify({"msg": url, "isSuccess":False})
-#         if review is -2:
-#             return jsonify({"msg": url, "isSuccess":False})
-#         return jsonify({"url":url,"isSuccess":True})
-#     #TODO: api테스트 완료 후 jwt 적용
-#     @jwt_required()
-#     def post(self):
-#         parser = reqparse.RequestParser()
-#         parser.add_argument('lecture_no', type=int)
-#         parser.add_argument('as_no', type=int)
-#         parser.add_argument('user_no', type=int)
-#         parser.add_argument('ae_denotations', type=str,action='append')
-#         parser.add_argument('ae_attributes', type=str, action='append')
-#         parser.add_argument('result', type=str) # 총평
-#         parser.add_argument('DeliverIndividualList', type=int, action='append')
-#         parser.add_argument('ContentIndividualList', type=int, action='append')
-#         args = parser.parse_args()
-#         as_no=args['as_no']
-#         lecture_no = args['lecture_no']
-#         user_no = args['user_no']
-#         ae_denotations = str(args['ae_denotations']).replace('"',"")
-#         ae_attributes = str(args['ae_attributes']).replace('"',"")
-#         result=args['result']
-#         dlist=args['DeliverIndividualList']
-#         clist=args['ContentIndividualList']
-#         save_json_feedback(as_no,lecture_no,user_no,ae_attributes,ae_denotations,result,dlist,clist)
-#         return jsonify({"isSuccess":True})
 
 class Studentgraphlist(Resource):
     @jwt_required()

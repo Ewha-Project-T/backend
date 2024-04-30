@@ -2,7 +2,7 @@ from distutils.command.upload import upload
 import zipfile
 import arrow
 from server.services.stt_service import mapping_sst_user
-from ..model import Assignment_feedback, Assignment_management, Attendee, SttJob, User, Lecture, Assignment,Prob_region,Assignment_check,Assignment_check_list,Stt,Feedback2
+from ..model import Assignment_feedback, Assignment_management, Attendee, SelfStudy, SttJob, User, Lecture, Assignment,Prob_region,Assignment_check,Assignment_check_list,Stt,Feedback2
 from server import db
 from functools import wraps
 from flask_jwt_extended import create_refresh_token, create_access_token, verify_jwt_in_request, get_jwt, get_jwt_identity
@@ -33,6 +33,14 @@ def prob_list_professor(lecture_no:int,user_no:int):
     res = [{'as_no': assignment.assignment_no, 'as_name': assignment.as_name,"open_time":assignment.open_time , "limit_time": assignment.limit_time, "reaveal" : True if assignment.open_time <= datetime.utcnow()+timedelta(hours=9) else False} for assignment in assignments]
     db.session.remove()
     return {"lecture_name" : lecutre_name, "prob_list" : res}
+
+def prob_self_list(user_no:int):
+    self_studies = SelfStudy.query.filter_by(user_no = user_no).all()
+    res = []
+    for self_study in self_studies:
+        assignment = Assignment.query.filter_by(assignment_no = self_study.assignment_no).first()
+        res.append({'as_no': assignment.assignment_no, 'as_name': assignment.as_name,"open_time":assignment.open_time})
+    return {"lecture_name" : "자습", "prob_list" : res}
 
 #major_convert={"한일통역":"ja-JP","한일번역":"ja-JP","한중통역":"zh-CN","한중번역":"zh-CN","한영통역":"en-US","한영번역":"en-US","한불통역":"fr-FR","한불번역":"fr-FR"}#임시용
 major_convert={"ko":"ko-KR","jp":"ja-JP","en":"en-US","cn":"zh-CN","fr":"fr-FR"}

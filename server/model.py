@@ -49,6 +49,13 @@ class Lecture(db.Model):
 
     attendee= db.relationship("Attendee",back_populates="lecture",cascade="all, delete",passive_deletes=True,)
     assignment= db.relationship("Assignment",back_populates="lecture",cascade="all, delete",passive_deletes=True,)
+
+class SelfStudy(db.Model):
+    __tablename__ = "SELF_STUDY"
+    self_study_no = db.Column(db.Integer, primary_key=True)
+    user_no = db.Column(db.Integer, db.ForeignKey("USER.user_no", ondelete="CASCADE"), nullable=False)
+    assignment_no = db.Column(db.Integer, db.ForeignKey("ASSIGNMENT.assignment_no", ondelete="CASCADE"), nullable=False)
+
 class Attendee(db.Model):
     __tablename__="ATTENDEE"
     attendee_no = db.Column(db.Integer, primary_key=True)

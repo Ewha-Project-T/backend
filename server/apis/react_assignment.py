@@ -293,6 +293,57 @@ class React_self_prob_handle(Resource):
             "new_assignmen_no": new_assignmen_no,
         })
     @jwt_required()
+    def put(self):
+        parser = reqparse.RequestParser()
+        user_info=get_jwt_identity()
+        
+        parser.add_argument('as_no', type=int)
+        # parser.add_argument('limit_time', type=str,  required=True, help="limit_time is required")
+        parser.add_argument('as_name', type=str, required=True, help="as_name is required")
+        parser.add_argument('as_type', type=str, required=True, help="as_type is required")
+        parser.add_argument('keyword', type=str)
+        parser.add_argument('prob_translang_source',type=str)
+        parser.add_argument('prob_translang_destination',type=str)
+        parser.add_argument('description', type=str)
+        parser.add_argument('speed', type=float)
+        parser.add_argument('original_text', type=str)
+        parser.add_argument('prob_sound_path', type=str)
+        parser.add_argument('prob_split_region', type=str, action='append') # 음성파일 분할된 구간
+        # parser.add_argument('assign_count', type=int)
+        # parser.add_argument('keyword_open', type=int)
+        # parser.add_argument('open_time', type=str)
+        parser.add_argument('file_name', type=str)
+        parser.add_argument('file_path', type=str)
+        args=parser.parse_args()
+        as_no = args['as_no']
+        limit_time = datetime.now()
+        as_name = args['as_name']
+        as_type = args['as_type']
+        keyword = args['keyword']
+        prob_translang_source=args['prob_translang_source']
+        prob_translang_destination=args['prob_translang_destination']
+        description = args['description']
+        speed = args['speed']
+        original_text = args['original_text']
+        prob_sound_path = args['prob_sound_path']
+        prob_split_region=args['prob_split_region']
+        assign_count=2_100_000_000
+        keyword_open=1
+        open_time=datetime.now()
+        file_name=args['file_name']
+        file_path=args['file_path']
+        edit_prob = edit_assignment(as_no,limit_time,as_name,as_type,keyword,prob_translang_source,prob_translang_destination,description,speed,original_text,prob_sound_path,prob_split_region,assign_count,open_time,file_name,file_path,user_info,keyword_open, True)
+        if edit_prob is None:
+            return jsonify({
+                "msg" : "과제가 없거나, 파일이 존재하지 않습니다.",
+                "isSuccess": False,
+            }), 400
+        return jsonify({
+            "msg" : "success",
+            "isSuccess": True,
+            "edit_prob": edit_prob,
+        })
+    @jwt_required()
     def delete(self):
         parser = reqparse.RequestParser()
         user_info=get_jwt_identity()

@@ -103,7 +103,13 @@ def create_assignment(lecture_no :int,limit_time,as_name:str,as_type:str,keyword
         db.session.add(self_study)
     db.session.commit()
     return new_assignment.assignment_no
-def edit_assignment(as_no,limit_time, as_name, as_type, keyword, prob_translang_source, prob_translang_destination, description, speed, original_text, prob_sound_path, prob_split_region, assign_count, open_time, file_name, file_path, user_info, keyword_open):
+def edit_assignment(as_no,limit_time, as_name, as_type, keyword, prob_translang_source, prob_translang_destination, description, speed, original_text, prob_sound_path, prob_split_region, assign_count, open_time, file_name, file_path, user_info, keyword_open, is_self_study:bool = False):
+    if is_self_study:
+        self_study = SelfStudy.query.filter_by(assignment_no = as_no, user_no = user_info["user_no"]).first()
+        if self_study == None:
+            self_study = SelfStudy(assignment_no = as_no, user_no = user_info["user_no"])
+            return None
+        
     # TODO 검증 필요
     if prob_sound_path and os.path.exists(prob_sound_path) == False:
         return None

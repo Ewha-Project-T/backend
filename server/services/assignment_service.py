@@ -69,7 +69,7 @@ def make_as(user_no,lecture_no,week,limit_time,as_name,as_type,keyword,descripti
             db.session.commit
 
 # major_convert={"ko":"ko-KR","jp":"ja-JP","en":"en-US","cn":"zh-CN","fr":"fr-FR"}
-def create_assignment(lecture_no :int,limit_time,as_name:str,as_type:str,keyword:str,prob_translang_source:str,prob_translang_destination:str,description:str,speed:float,original_text:str,prob_sound_path:str,prob_split_region,assign_count:int,open_time,file_name:str,file_path:str,user_info,keyword_open:int = True):
+def create_assignment(lecture_no :int,limit_time,as_name:str,as_type:str,keyword:str,prob_translang_source:str,prob_translang_destination:str,description:str,speed:float,original_text:str,prob_sound_path:str,prob_split_region,assign_count:int,open_time,file_name:str,file_path:str,user_info,keyword_open:int = True, is_self_study:bool = False):
     #TODO 검증 필요
     if prob_sound_path and os.path.exists(prob_sound_path) == False:
         return None
@@ -98,6 +98,9 @@ def create_assignment(lecture_no :int,limit_time,as_name:str,as_type:str,keyword
             task = do_original_text_stt_work.delay(filename=split_url,locale=prob_translang_source,stt_no=returned_stt_no)
             pr = Prob_region(assignment_no=new_assignment.assignment_no,region_index=region["id"],start=region["start"][:9],end=region["end"][:9],upload_url=split_url, job_id=task.id)
             db.session.add(pr)
+    if is_self_study:
+        self_study = SelfStudy(assignment_no = new_assignment.assignment_no, user_no = user_info["user_no"])
+        db.session.add(self_study)
     db.session.commit()
     return new_assignment.assignment_no
 def edit_assignment(as_no,limit_time, as_name, as_type, keyword, prob_translang_source, prob_translang_destination, description, speed, original_text, prob_sound_path, prob_split_region, assign_count, open_time, file_name, file_path, user_info, keyword_open):

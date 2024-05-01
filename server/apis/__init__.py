@@ -45,6 +45,7 @@ def load_api(api_module):
     api_module.add_resource(assignment_zip_down,'/api/feedback/json',endpoint='assignment_zip_down')#zip 다운로드
     api_module.add_resource(React_Prob_Self, '/api/prob/self', endpoint='react_prob_self')
     api_module.add_resource(React_self_prob_handle, '/api/prob/self/handle', endpoint='react_self_prob_handle')
+    api_module.add_resource(React_Prob_detail, '/api/prob/self/detail', endpoint='react_self_prob_detail')
     ############################
     ######옛날 것인데 사용중########
     ############################

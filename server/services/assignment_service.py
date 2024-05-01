@@ -422,6 +422,38 @@ def assignment_detail(as_no:int, user_no:int):
     # print(res)
     return res
 
+def assignment_self_detail(as_no:int, user_no:int):
+    assignment = Assignment.query.filter_by(assignment_no = as_no).first()
+    selfStudy = SelfStudy.query.filter_by(assignment_no = as_no, user_no = user_no).first()
+    if selfStudy == None:
+        return None
+    
+    assignment_management = Assignment_management.query.filter_by(assignment_no = as_no).first()
+    lecture = Lecture.query.filter_by(lecture_no = assignment.lecture_no).first()
+    res = {"keyword" : assignment.keyword, "detail" : assignment.description, "file_name":assignment.file_name, "file_path":assignment.file_path, "as_name":assignment.as_name, "as_type":assignment.as_type}
+    if assignment_management == None:
+        #assignment_management 생성
+        assignment_management = Assignment_management(assignment_no = as_no)
+        db.session.add(assignment_management)
+        db.session.commit()
+    # res["feedback"] = res["feedback"] = True if assignment_management.review else False #assignment_management.review_open
+    res["end_submission"] = assignment_management.end_submission
+    # res["my_count"] = assignment_management.submission_count
+    # res["chance_count"] = assignment_management.chance_count
+    # res["lecture_name"] = lecture.lecture_name  
+    
+
+    assignment_check = Assignment_check.query.filter_by(assignment_no = as_no).order_by(Assignment_check.check_no.desc()).first()
+    if assignment_check != None:
+        trans_file = make_trans_file(assignment_check, user_no)
+        if trans_file != None:
+            res["file"] = trans_file
+        audio_file = make_student_audio_zip(assignment_check, user_no)
+        if audio_file != None:
+            res["file"] = audio_file
+    # print(res)
+    return res
+
 def assignment_detail_record(as_no:int, user_no:int):
     assignment = Assignment.query.filter_by(assignment_no = as_no).first()
     if assignment == None:
@@ -774,27 +806,6 @@ def make_json_url(text,denotations,attributes,check,flag):
     url =  domain + "/" + filepath
     return url
 
-# def get_json_feedback(as_no,lecture_no,user_no):
-#     attend=Attendee.query.filter_by(user_no=user_no,lecture_no=lecture_no).first()
-#     check=Assignment_check.query.filter_by(assignment_no=as_no,attendee_no=attend.attendee_no,assignment_check=1).order_by(Assignment_check.check_no.desc()).first()
-#     assignment_management = Assignment_management.query.filter_by(assignment_no = as_no, attendee_no = attend.attendee_no).first()
-#     if(assignment_management==None):
-#         return "학생 정보가 존재하지 않습니다.", -1
-#     if assignment_management.end_submission is False:
-#         return "학생이 최종 제출하지 않았습니다.", -2
-#     if(check.ae_text == "" and check.ae_denotations == "" and check.ae_attributes == ""):
-#         wav_url,uuid=get_prob_wav_url(as_no,user_no,lecture_no)
-#         stt_result,stt_feedback=get_stt_result(uuid)
-#         if(stt_result==None):
-#             return "error:stt",""
-#         text,denotations,attributes=parse_data(stt_result,stt_feedback)
-#         denotations_json = json.loads(denotations)
-#         attributes_json = json.loads(attributes)
-#         url=make_json_url(text,denotations_json,attributes_json,check,1)
-#     else:
-#         # utr=make_json(check.ae_text, check.ae_denotations, check.ae_attributes)
-#         url=make_json_url(check.ae_text,check.ae_denotations, check.ae_attributes, check,0)
-#     return url, assignment_management.review#json, 교수평가
 
 def save_json_feedback(as_no,lecture_no,user_no,ae_attributes,ae_denotations,result,dlist,clist)->None:
     attend=Attendee.query.filter_by(user_no=user_no,lecture_no=lecture_no).first()

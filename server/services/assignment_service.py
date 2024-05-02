@@ -494,6 +494,35 @@ def assignment_detail_record(as_no:int, user_no:int):
 
     return res
 
+def assignment_self_detail_record(as_no:int, user_no:int):
+    assignment = Assignment.query.filter_by(assignment_no = as_no).first()
+    if assignment == None:
+        return {"message" : "과제가 존재하지 않습니다.", "isSuccess" : False}
+    self_study = SelfStudy.query.filter_by(assignment_no = as_no, user_no = user_no).first()
+    if self_study == None:
+        return {"message" : "수강생이 아닙니다.", "isSuccess" : False}
+
+    audio_region = Prob_region.query.filter_by(assignment_no=as_no).all()
+    audio_regions_url = [
+        {
+            "region_index": int(att.region_index),
+            "start": float(att.start),
+            "end": float(att.end),
+            "upload_url": "./upload/"+str(att.upload_url)+".mp3",
+        }
+        for att in audio_region
+    ]
+
+    res = {
+        "isSuccess": True,
+        "keyword": assignment.keyword,
+        "as_name": assignment.as_name,
+        "as_speed": assignment.speed,
+        "as_type": assignment.as_type,
+        "audio_regions_url": audio_regions_url,
+    }
+    return res
+
 def assignment_record(as_no:int, user_no:int, prob_submits:list):
     assignment = Assignment.query.filter_by(assignment_no = as_no).first()
     if assignment == None:
@@ -519,6 +548,25 @@ def assignment_record(as_no:int, user_no:int, prob_submits:list):
     return {"message" : "제출 완료",
             "submission_count" : assignment_management.submission_count
             }
+
+def assignment_self_record(as_no:int, user_no:int, prob_submits:list):
+    self_study = SelfStudy.query.filter_by(assignment_no = as_no, user_no = user_no).first()
+    if self_study == None:
+        return {"message" : "수강생이 아닙니다.", "isSuccess" : False}
+    assignment = Assignment.query.filter_by(assignment_no = as_no, user_no = user_no).first()
+    if assignment == None:
+        return {"message" : "과제가 존재하지 않습니다.", "isSuccess" : False}
+
+    
+    assignment_check = Assignment_check(assignment_no = as_no, submit_time = datetime.utcnow()+timedelta(hours=9))
+    db.session.add(assignment_check)
+
+    for prob_submit in prob_submits:
+        assignment_check_list = Assignment_check_list(check_no = assignment_check.check_no, acl_uuid = prob_submit)
+        db.session.add(assignment_check_list)
+    db.session.commit()
+    return {"message" : "제출 완료", "isSuccess" : True}
+
 def assignment_end_submission(as_no:int, user_no:int):
     assignment = Assignment.query.filter_by(assignment_no = as_no).first()
     if assignment == None:

@@ -377,7 +377,7 @@ class React_Prob_detail(Resource):
                 })
             return jsonify(res)
         
-class React_Prob_detail(Resource):
+class React_Prob_self_detail(Resource):
     @jwt_required()
     def get(self):
         user_info=get_jwt_identity()

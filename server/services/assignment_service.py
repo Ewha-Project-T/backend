@@ -360,21 +360,29 @@ def get_self_assignment(as_no:int, user_no:int):
 
     return assignment, audio_region_list
 
-def check_assignment(as_no,lecture_no,uuid,user_info,text=""):
+def check_assignment(as_no,lecture_no,uuid,user_info, is_self:bool, text=""):
     acc=Prob_region.query.filter_by(assignment_no=as_no).all()
     if(len(acc)!=len(uuid) and text==""):
         return {"isSuccess":False,"message":"구간과 파일의 수가 일치하지 않습니다."}
-    attend=Attendee.query.filter_by(user_no=user_info["user_no"],lecture_no=lecture_no).first()
-    submit_cnt=Assignment_check.query.filter_by(assignment_no=as_no,attendee_no=attend.attendee_no,assignment_check=1).count()
-    print(submit_cnt)
-    if(submit_cnt==None):
-        submit_cnt=0
+    if is_self:
+        self_study = SelfStudy.query.filter_by(assignment_no = as_no, user_no = user_info["user_no"]).first()
+        if self_study == None:
+            return {"isSuccess":False,"message":"과제가 존재하지 않습니다."}
+    else:
+        attend=Attendee.query.filter_by(user_no=user_info["user_no"],lecture_no=lecture_no).first()
+        submit_cnt=Assignment_check.query.filter_by(assignment_no=as_no,attendee_no=attend.attendee_no,assignment_check=1).count()
+        print(submit_cnt)
+        if(submit_cnt==None):
+            submit_cnt=0
     #acc=Assignment_check(assignment_no=as_no,attendee_no=attend.attendee_no,assignment_check=1,user_trans_result=text,submit_time=(datetime.now()+timedelta(hours=6)),submit_cnt=submit_cnt+1)
     if text != "":
         ae_text, ae_denotations, ae_attributes = parse_ae_json(text)
     else:
         ae_text, ae_denotations, ae_attributes = "", "", ""
-    acc=Assignment_check(assignment_no=as_no,attendee_no=attend.attendee_no,assignment_check=1,ae_text = ae_text,ae_denotations = ae_denotations,ae_attributes=ae_attributes,submit_time=(datetime.now()+timedelta(hours=6)),submit_cnt=submit_cnt+1)
+    if is_self:
+        acc=Assignment_check(assignment_no=as_no,assignment_check=1,ae_text = ae_text,ae_denotations = ae_denotations,ae_attributes=ae_attributes,submit_time=(datetime.now()+timedelta(hours=6)),submit_cnt=0)
+    else:
+        acc=Assignment_check(assignment_no=as_no,attendee_no=attend.attendee_no,assignment_check=1,ae_text = ae_text,ae_denotations = ae_denotations,ae_attributes=ae_attributes,submit_time=(datetime.now()+timedelta(hours=6)),submit_cnt=submit_cnt+1)
     db.session.add(acc)
     acc_locale=Assignment.query.filter_by(assignment_no=as_no).first()
     locale=acc_locale.dest_translang

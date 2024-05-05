@@ -534,6 +534,27 @@ class React_Prob_submit(Resource):
             res = check_assignment(as_no,lecture_no,uuid,user_info)
             return jsonify(res)
 
+class React_Prob_self_submit(Resource):
+    @jwt_required()
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('lecture_no', type=int)
+        parser.add_argument('as_no', type=int)
+        parser.add_argument('submitUUID',type=str,action='append')
+        parser.add_argument('text',type=str)
+        args = parser.parse_args()
+        as_no=args['as_no']
+        lecture_no = args['lecture_no']
+        uuid=args['submitUUID']
+        user_info=get_jwt_identity()
+        if(uuid[0]=="0"):
+            text=args['text']
+            res = check_assignment(as_no,lecture_no,uuid,user_info, True,text)
+            return jsonify(res)
+        else:
+            res = check_assignment(as_no,lecture_no,uuid,user_info, True)
+            return jsonify(res)
+
 class Studentgraphlist(Resource):
     @jwt_required()
     def get(self):

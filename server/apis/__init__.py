@@ -6,7 +6,7 @@ from .assignment import Prob, Prob_del, Prob_submit, Prob_feedback,Prob_mod,Prob
 from .admin import Admin,Admin2
 from .stt import Stt, SttJob, SttSeq, SttSeqJob
 from .react_login import Login2,Logout2,CheckToken,Join2,FindPassword,FindPassword_Check
-from .react_assignment import React_Cancel_prob, React_Chance_prob, React_Porb_professor, React_Prob_Self,React_Prob_add, React_Prob_detail, React_Prob_end_submission, React_Prob_record, React_Prob_self_detail, React_Prob_self_record, React_Prob_self_submit, React_Prob_student,React_Prob_submit_list,React_Prob_submit, React_Prob_submit_list2, React_prob_handle, React_self_prob_handle,Studentgraphlist,Professorgraphlist, TranslateAssignment
+from .react_assignment import React_Cancel_prob, React_Chance_prob, React_Porb_professor, React_Prob_Self,React_Prob_add, React_Prob_detail, React_Prob_end_submission, React_Prob_record, React_Prob_self_detail, React_Prob_self_end_submission, React_Prob_self_record, React_Prob_self_submit, React_Prob_student,React_Prob_submit_list,React_Prob_submit, React_Prob_submit_list2, React_prob_handle, React_self_prob_handle,Studentgraphlist,Professorgraphlist, TranslateAssignment
 from .react_lecture import React_Lecture,React_Lecture_mod_del,React_Student,React_Lecture_add,React_Lecture_mod
 
 
@@ -48,6 +48,7 @@ def load_api(api_module):
     api_module.add_resource(React_Prob_self_detail, '/api/prob/self/detail', endpoint='react_self_prob_detail')
     api_module.add_resource(React_Prob_self_record, '/api/prob/self/record', endpoint='react_self_Prob_record')
     api_module.add_resource(React_Prob_self_submit, '/api/prob/self/submit', endpoint='react_self_prob_submit')
+    api_module.add_resource(React_Prob_self_end_submission, '/api/prob/self/end', endpoint='React_self_Prob_end_submission')
     ############################
     ######옛날 것인데 사용중########
     ############################

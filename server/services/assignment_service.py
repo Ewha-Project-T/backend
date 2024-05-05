@@ -575,7 +575,7 @@ def assignment_self_record(as_no:int, user_no:int, prob_submits:list):
     db.session.commit()
     return {"message" : "제출 완료", "isSuccess" : True}
 
-def assignment_end_submission(as_no:int, user_no:int):
+def assignment_end_submission(as_no:int, user_no:int, is_self:bool = False):
     assignment = Assignment.query.filter_by(assignment_no = as_no).first()
     if assignment == None:
         return {"message" : "과제가 존재하지 않습니다.", "isSuccess" : False}
@@ -583,13 +583,23 @@ def assignment_end_submission(as_no:int, user_no:int):
         return {"message" : "아직 과제가 공개되지 않았습니다.", "isSuccess" : False}
     if assignment.limit_time < datetime.utcnow()+timedelta(hours=9):
         return {"message" : "제출 기간이 지났습니다.", "isSuccess" : False}
-    attendee = Attendee.query.filter_by(user_no = user_no, lecture_no = assignment.lecture_no).first()
-    if attendee == None:
-        return {"message" : "수강생이 아닙니다.", "isSuccess" : False}
-    assignment_check = Assignment_check.query.filter_by(assignment_no = as_no, attendee_no = attendee.attendee_no).order_by(Assignment_check.check_no.desc()).first()
+    if is_self == False:
+        attendee = Attendee.query.filter_by(user_no = user_no, lecture_no = assignment.lecture_no).first()
+        if attendee == None:
+            return {"message" : "수강생이 아닙니다.", "isSuccess" : False}
+        assignment_check = Assignment_check.query.filter_by(assignment_no = as_no, attendee_no = attendee.attendee_no).order_by(Assignment_check.check_no.desc()).first()
+    else:
+        assignment_check = Assignment_check.query.filter_by(assignment_no = as_no).order_by(Assignment_check.check_no.desc()).first()
+
     if assignment_check == None:
         return {"message" : "제출할 과제가 없습니다.", "isSuccess" : False}
-    assignment_management = Assignment_management.query.filter_by(assignment_no = as_no, attendee_no = attendee.attendee_no).first()
+    if is_self:
+        self_study = SelfStudy.query.filter_by(assignment_no = as_no, user_no = user_no).first()
+        if self_study == None:
+            return {"message" : "수강생이 아닙니다.", "isSuccess" : False}
+        assignment_management = Assignment_management.query.filter_by(assignment_no = as_no).first()
+    else:
+        assignment_management = Assignment_management.query.filter_by(assignment_no = as_no, attendee_no = attendee.attendee_no).first()
     if assignment_management.end_submission is True:
         return {"message" : "이미 최종 제출하였습니다.", "isSuccess" : False}
     assignment_management.end_submission = True

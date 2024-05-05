@@ -458,6 +458,19 @@ class React_Prob_end_submission(Resource):
         if not res.get("submission_count") :
             return res, 200
         return jsonify(res)
+    
+class React_Prob_self_end_submission(Resource):
+    @jwt_required()
+    def put(self):
+        user_info=get_jwt_identity()
+        parser = reqparse.RequestParser()
+        parser.add_argument('as_no', type=int)
+        args = parser.parse_args()
+        as_no = args['as_no']
+        res = assignment_end_submission(as_no, user_info["user_no"], True)
+        if not res.get("submission_count") :
+            return res, 200
+        return jsonify(res)
 
 class React_Prob_submit_list(Resource):
         @jwt_required()

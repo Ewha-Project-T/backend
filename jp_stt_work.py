@@ -20,6 +20,9 @@ client = OpenAI()
 class JpStt:
     def process_stt_result(self,stt):
         result = stt
+        if not result:
+            print("No text provided for annotation.")
+            return ""
         openai.api_key = os.getenv("OPENAI_API_KEY")
 
         prompt_message = (
@@ -88,22 +91,24 @@ class JpStt:
         pause_idx = []
         start_idx = []
         end_idx = []
+        first_voice_detected = False
+
         for i in range(len(res)):
             dic = res[i]
-            # print(dic)
             if dic.get("result") == "COMPLETED":
                 words = dic["text"]
                 stt = self.process_stt_result(words)
-                text = text + stt
-                if len(stt) > 0:
+                if stt:
+                    text += stt
                     start_idx.append(startidx[i])
                     end_idx.append(endidx[i])
+                    first_voice_detected = True
                 sentences = sent_tokenize(stt)
                 for sentence in sentences:
                     print(sentence.replace(" ", ""))
-                if i < length - 1:
-                    pause_duration = silenceidx[i]  # in milliseconds
-                    print("(pause: " + str(silenceidx[i]) + "sec)") 
+                if i < length - 1 and first_voice_detected:
+                    pause_duration = silenceidx[i]
+                    print("(pause: " + str(pause_duration) + "ms)")
                     pause_placeholder = " "
                     text += pause_placeholder + "\n"
                     pause_result += pause_duration

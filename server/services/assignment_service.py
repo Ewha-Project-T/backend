@@ -1019,22 +1019,29 @@ def assignment_translate(as_no:int, user_no:int, translate_text:str):
             "isSuccess" : True
             }
 
-def assignment_cancel(as_no:int, user_no:int,student_no:int):
+def assignment_cancel(as_no:int, user_no:int,student_no:int = None):
     assignment = Assignment.query.filter_by(assignment_no = as_no).first()
     if assignment == None:
         return {"message" : "과제가 존재하지 않습니다.", "isSuccess" : False}
     if assignment.user_no != user_no:
+        print(assignment.user_no, user_no, assignment.assignment_no, as_no)
         return {"message" : "과제를 생성한 교수가 아닙니다.", "isSuccess" : False}
-    attendee = Attendee.query.filter_by(user_no = student_no, lecture_no = assignment.lecture_no).first()
-    if attendee == None:
-        return {"message" : "수강생이 아닙니다.", "isSuccess" : False}
-    assignment_management = Assignment_management.query.filter_by(assignment_no = as_no, attendee_no = attendee.attendee_no).first()
+    if student_no != None:
+        attendee = Attendee.query.filter_by(user_no = student_no, lecture_no = assignment.lecture_no).first()
+        if attendee == None:
+            return {"message" : "수강생이 아닙니다.", "isSuccess" : False}
+        assignment_management = Assignment_management.query.filter_by(assignment_no = as_no, attendee_no = attendee.attendee_no).first()
+    else:
+        assignment_management = Assignment_management.query.filter_by(assignment_no = as_no).first()
     if assignment_management == None:
         return {"message" : "과제를 제출한 기록이 없습니다.", "isSuccess" : False}
     assignment_management.end_submission = False
     assignment_management.review = None
 
-    assignment_check = Assignment_check.query.filter_by(assignment_no = as_no, attendee_no = attendee.attendee_no).order_by(Assignment_check.check_no.desc()).first()
+    if student_no != None:
+        assignment_check = Assignment_check.query.filter_by(assignment_no = as_no, attendee_no = attendee.attendee_no).order_by(Assignment_check.check_no.desc()).first()
+    else:
+        assignment_check = Assignment_check.query.filter_by(assignment_no = as_no).order_by(Assignment_check.check_no.desc()).first()
     if assignment_check != None:
         assignment_check.ae_text = ""
         assignment_check.ae_denotations = ""

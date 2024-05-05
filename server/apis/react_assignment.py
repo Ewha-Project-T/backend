@@ -637,6 +637,17 @@ class React_Cancel_prob(Resource):
         user_info=get_jwt_identity()
         res = assignment_cancel(as_no, user_info["user_no"], student_no)
         return jsonify(res)
+    
+class React_Cancel_self_prob(Resource):
+    @jwt_required()
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('as_no', type=int)
+        args = parser.parse_args()
+        as_no = args['as_no']
+        user_info=get_jwt_identity()
+        res = assignment_cancel(as_no, user_info["user_no"])
+        return jsonify(res)
 
 class React_Chance_prob(Resource):
     @jwt_required()

@@ -579,11 +579,11 @@ def assignment_end_submission(as_no:int, user_no:int, is_self:bool = False):
     assignment = Assignment.query.filter_by(assignment_no = as_no).first()
     if assignment == None:
         return {"message" : "과제가 존재하지 않습니다.", "isSuccess" : False}
-    if assignment.open_time > datetime.utcnow()+timedelta(hours=9):
-        return {"message" : "아직 과제가 공개되지 않았습니다.", "isSuccess" : False}
-    if assignment.limit_time < datetime.utcnow()+timedelta(hours=9):
-        return {"message" : "제출 기간이 지났습니다.", "isSuccess" : False}
     if is_self == False:
+        if assignment.open_time > datetime.utcnow()+timedelta(hours=9):
+            return {"message" : "아직 과제가 공개되지 않았습니다.", "isSuccess" : False}
+        if assignment.limit_time < datetime.utcnow()+timedelta(hours=9):
+            return {"message" : "제출 기간이 지났습니다.", "isSuccess" : False}
         attendee = Attendee.query.filter_by(user_no = user_no, lecture_no = assignment.lecture_no).first()
         if attendee == None:
             return {"message" : "수강생이 아닙니다.", "isSuccess" : False}

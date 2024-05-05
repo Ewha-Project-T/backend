@@ -267,7 +267,7 @@ def get_wav_url(as_no):
 def get_original_stt_result(prob_result):
     original_result=[]
     for i in prob_result:
-        acc=SttJob.query.filter_by(job_id=i["job_id"]).order_by(SttJob.stt_no.desc()).first()
+        acc=SttJob.query.filter_by(job_id=i["job_id"]).order_by(SttJob.stt_seq.desc()).first()
         if acc==None:
             return None
         tmp={}
@@ -614,7 +614,7 @@ def get_stt_result(uuid):
         print("uiud = ",i, end="")
         index = len(text)    
         stt=Stt.query.filter_by(wav_file=i["uuid"]).first()
-        stt_job=SttJob.query.filter_by(stt_no=stt.stt_no).first()
+        stt_job=SttJob.query.filter_by(stt_no=stt.stt_no).order_by(SttJob.stt_seq.desc()).first()
         if stt_job==None:
             return None, None, None
         print("stt_job[stt_no] = ",stt_job.stt_no)

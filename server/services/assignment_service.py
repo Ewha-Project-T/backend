@@ -1015,6 +1015,13 @@ def assignment_cancel(as_no:int, user_no:int,student_no:int):
         return {"message" : "과제를 제출한 기록이 없습니다.", "isSuccess" : False}
     assignment_management.end_submission = False
     assignment_management.review = None
+
+    assignment_check = Assignment_check.query.filter_by(assignment_no = as_no, attendee_no = attendee.attendee_no).order_by(Assignment_check.check_no.desc()).first()
+    if assignment_check != None:
+        assignment_check.ae_text = ""
+        assignment_check.ae_denotations = ""
+        assignment_check.ae_attributes = ""
+
     db.session.commit()
 
     return {"message" : "과제 취소 완료"}

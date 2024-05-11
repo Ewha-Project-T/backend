@@ -4,7 +4,7 @@ from flask import jsonify, Flask, request, make_response
 from flask_restful import reqparse, Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from ..services.feedback_service import get_all_graphs, get_feedback_info, get_feedback_review, get_json_textae, get_my_graphs, get_self_feedback_info, get_zip_url, put_json_textae, save_feedback_review, update_graph, update_open
+from ..services.feedback_service import get_all_graphs, get_feedback_info, get_feedback_review, get_json_textae, get_my_graphs, get_self_feedback_info, get_self_json_textae, get_zip_url, put_json_textae, save_feedback_review, update_graph, update_open
 
 class Feedback_textae(Resource):
     parser = reqparse.RequestParser()
@@ -55,6 +55,33 @@ class Feedback_textae(Resource):
     #     clist=args['ContentIndividualList']
     #     save_json_feedback(as_no,lecture_no,user_no,ae_attributes,ae_denotations,result,dlist,clist)
     #     return jsonify({"isSuccess":True})
+
+class Feedback_self_textae(Resource):
+    parser = reqparse.RequestParser()
+    parser.add_argument('as_no', type=int)
+    parser.add_argument('user_no', type=int)
+    @jwt_required()
+    def get(self):
+        args = self.parser.parse_args()
+        as_no=args['as_no']
+        user_no = args['user_no']
+        textae, new_attribute, review=get_self_json_textae(as_no,user_no)
+        if review is False:
+            return jsonify({"message": textae,"isSuccess":False})
+        return jsonify({"textae": textae, "new_attribute": new_attribute,"isSuccess":True})
+    @jwt_required()
+    def put(self):
+        self.parser.add_argument('ae_denotations', type=str, action='append')
+        self.parser.add_argument('ae_attributes', type=str, action='append')
+        args = self.parser.parse_args()
+        as_no=args['as_no']
+        user_no = args['user_no']
+        ae_denotations = str(args['ae_denotations']).replace('"',"")
+        ae_attributes = str(args['ae_attributes']).replace('"',"")
+        msg, status= put_json_textae(as_no,user_no,ae_denotations,ae_attributes)
+        if status is False:
+            return jsonify({"msg": msg, "isSuccess":False})
+        return jsonify({"msg": msg, "isSuccess":True})
 
 class Feedback_info(Resource):
     parser = reqparse.RequestParser()

@@ -71,6 +71,68 @@ def get_json_textae(as_no,user_no):
             attribute["obj"] = parse.unquote(attribute["obj"])
     new_attribute = "A"+ str(find_max_attribute_number(ast.literal_eval(attributes))+1)
     return textae, new_attribute,assignment_management.review#json, 교수평가
+
+def get_self_json_textae(as_no,user_no):
+    assignment = Assignment.query.filter_by(assignment_no=as_no).first()
+    if not assignment:
+        return "과제가 존재하지 않습니다.", False, False
+    check=Assignment_check.query.filter_by(assignment_no=as_no).order_by(Assignment_check.check_no.desc()).first()
+    if not check:
+        return "제출한 과제가 없습니다.", False, False
+    assignment_management = Assignment_management.query.filter_by(assignment_no = as_no).first()
+    if assignment_management==None:
+        return "학생 정보가 존재하지 않습니다.", False, False
+    if assignment_management.end_submission is False:
+        return "학생이 최종 제출하지 않았습니다.", False, False
+    
+    if assignment.as_type == "번역":
+        text,denotations,attributes = check.user_trans_result,check.ae_denotations,check.ae_attributes
+    elif(check.ae_text == "" and check.ae_denotations == "" and check.ae_attributes == ""):
+        _,uuid=get_prob_wav_url(as_no,user_no,assignment.lecture_no, True)
+        # stt_result,stt_feedback=get_stt_result(uuid)
+        text,denotations,attributes = get_stt_result(uuid)
+        if(text==None):
+            return "STT 작업중 입니다.", False, False
+        if(text==-1):
+            return "STT 오류!!", False, False
+        if(text==-2):
+            return {"text": "STT 오류!!", "denotations": [], "attributes":[] ,"config":{"function availability": {
+        "block": False, 
+        "help": False, 
+        "line-height-auto": False, 
+        "logo": False, 
+        "read": False, 
+        "relation": False, 
+        "replicate": False, 
+        "replicate-auto": False, 
+        "setting": False, 
+        "simple": False, 
+        "write": False, 
+        "write-auto": False
+      }}}, "A1", assignment_management.review
+        check.ae_text,check.ae_denotations,check.ae_attributes=text,denotations,attributes
+        db.session.commit()
+        # text,denotations,attributes=parse_data(stt_result,stt_feedback)
+        # url=make_json_url(text,denotations_json,attributes_json,check,1)
+        # textae = make_json(text,denotations_json,attributes_json)
+    else:
+        # stt 넣기 용
+        _,uuid=get_prob_wav_url(as_no,user_no,assignment.lecture_no)
+        get_stt_result(uuid)
+        print("assgin_check_no",check.check_no)
+        # stt 넣기 끝
+        text,denotations,attributes = check.ae_text,check.ae_denotations,check.ae_attributes
+        # url=make_json_url(check.ae_text,check.ae_denotations, check.ae_attributes, check,0)
+    if denotations != "None":
+        denotations = str(sorted(ast.literal_eval(denotations), key=donotations_sort_key)) # sort by begin, end
+    textae = make_json(text,denotations, attributes)
+    textae = json.loads(textae)
+    for attribute in textae["attributes"]:
+        if type(attribute["obj"]) != bool:
+            attribute["obj"] = parse.unquote(attribute["obj"])
+    new_attribute = "A"+ str(find_max_attribute_number(ast.literal_eval(attributes))+1)
+    return textae, new_attribute,assignment_management.review#json, 교수평가
+
 # attribute = [{'id': 'A1', 'subj': 'T1', 'pred': 'Unsure', 'obj': True}, {'id': 'A10', 'subj': 'T10', 'pred': 'Unsure', 'obj': True}, {'id': 'A11', 'subj': 'T11', 'pred': 'Unsure', 'obj': True}, {'id': 'A12', 'subj': 'T12', 'pred': 'Unsure', 'obj': True}, {'id': 'A13', 'subj': 'T13', 'pred': 'Unsure', 'obj': True}, {'id': 'A16', 'subj': 'T43', 'pred': 'Note', 'obj': 'asdfasdfasdfasdf'}, {'id': 'A2', 'subj': 'T2', 'pred': 'Unsure', 'obj': True}, {'id': 'A3', 'subj': 'T3', 'pred': 'Unsure', 'obj': True}, {'id': 'A4', 'subj': 'T4', 'pred': 'Unsure', 'obj': True}, {'id': 'A5', 'subj': 'T5', 'pred': 'Unsure', 'obj': True}, {'id': 'A6', 'subj': 'T6', 'pred': 'Unsure', 'obj': True}, {'id': 'A7', 'subj': 'T7', 'pred': 'Unsure', 'obj': True}, {'id': 'A8', 'subj': 'T8', 'pred': 'Unsure', 'obj': True}, {'id': 'A9', 'subj': 'T9', 'pred': 'Unsure', 'obj': True}]
 def find_max_attribute_number(attributes):
     max_attribute = 0

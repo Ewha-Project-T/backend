@@ -285,9 +285,12 @@ def get_original_stt_result(prob_result):
         original_result.append(tmp)
     return original_result
 
-def get_prob_wav_url(as_no,user_no,lecture_no):
-    attend=Attendee.query.filter_by(user_no=user_no,lecture_no=lecture_no).first()
-    check=Assignment_check.query.filter_by(assignment_no=as_no,attendee_no=attend.attendee_no,assignment_check=1).order_by(Assignment_check.check_no.desc()).first()
+def get_prob_wav_url(as_no,user_no,lecture_no, is_self:bool = False):
+    if is_self:
+        check = Assignment_check.query.filter_by(assignment_no=as_no,assignment_check=1).order_by(Assignment_check.check_no.desc()).first()
+    else:
+        attend=Attendee.query.filter_by(user_no=user_no,lecture_no=lecture_no).first()
+        check=Assignment_check.query.filter_by(assignment_no=as_no,attendee_no=attend.attendee_no,assignment_check=1).order_by(Assignment_check.check_no.desc()).first()
     if(check==None):
         return None,None
     acc=Assignment_check_list.query.filter_by(check_no=check.check_no).all()

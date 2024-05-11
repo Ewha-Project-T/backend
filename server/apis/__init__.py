@@ -1,5 +1,5 @@
 from .mail import Email, Verify_email
-from .react_feedback import Feedback_graph_update, Feedback_info, Feedback_professor_graph, Feedback_review, Feedback_self_info, Feedback_student_graph, Feedback_textae, assignment_zip_down
+from .react_feedback import Feedback_graph_update, Feedback_info, Feedback_professor_graph, Feedback_review, Feedback_self_info, Feedback_self_textae, Feedback_student_graph, Feedback_textae, assignment_zip_down
 from .login import Login,Join, LoginRefresh, Logout
 from .lecture import Attend, Lecture, Lecture_mod, Lecture_mod_del, Student,Major, Lecture_add
 from .assignment import Prob, Prob_del, Prob_submit, Prob_feedback,Prob_mod,Prob_add, prob_upload, Prob_submit_list, prob_upload_file
@@ -51,6 +51,7 @@ def load_api(api_module):
     api_module.add_resource(React_Prob_self_end_submission, '/api/prob/self/end', endpoint='React_self_Prob_end_submission')
     api_module.add_resource(React_Cancel_self_prob, '/api/prob/self/cancel', endpoint='react_self_prob_cancel')
     api_module.add_resource(Feedback_self_info, '/api/prob/self/info', endpoint='Feedback_self_info')
+    api_module.add_resource(Feedback_self_textae, '/api/prob/self/textae', endpoint='Feedback_self_textae')
     ############################
     ######옛날 것인데 사용중########
     ############################

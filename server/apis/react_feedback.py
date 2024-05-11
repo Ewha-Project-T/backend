@@ -136,6 +136,35 @@ class Feedback_review(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('review', type=str, required=True)
         return parser.parse_args().get('review')
+    
+class Feedback_self_review(Resource):
+    def _parse_args(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('as_no', type=int, required=True)
+        return parser.parse_args()
+
+    def _get_user_info(self):
+        return get_jwt_identity()
+
+    @jwt_required()
+    def get(self):
+        args = self._parse_args()
+        user_info = self._get_user_info()
+        res = get_feedback_review(args['as_no'], None, user_info['user_no'], True)
+        return jsonify(res)
+
+    @jwt_required()
+    def post(self):
+        args = self._parse_args()
+        args.update({'review': self._parse_review()})
+        user_info = self._get_user_info()
+        res = save_feedback_review(args['as_no'], None, user_info['user_no'], args['review'])
+        return jsonify(res)
+
+    def _parse_review(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('review', type=str, required=True)
+        return parser.parse_args().get('review')
 
 class Feedback_professor_graph(Resource):
 

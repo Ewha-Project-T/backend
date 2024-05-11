@@ -5,7 +5,7 @@ from urllib import parse
 import zipfile
 from server import db
 from .assignment_service import get_prob_wav_url, get_stt_result, make_json, make_json_url, parse_data
-from ..model import Assignment_check, Assignment_check_list, Attendee, Assignment, Assignment_management, Feedback2, Lecture, Prob_region, Stt, SttJob, User
+from ..model import Assignment_check, Assignment_check_list, Attendee, Assignment, Assignment_management, Feedback2, Lecture, Prob_region, SelfStudy, Stt, SttJob, User
 from sqlalchemy import func
 
 def get_json_textae(as_no,user_no):
@@ -339,21 +339,23 @@ def get_audio_delay(prob_region, id=0):
     return {
         "delay":sttjob.delay
     }
-def get_feedback_review(as_no:int, student_no:int,user_no:int):
+def get_feedback_review(as_no:int, student_no:int,user_no:int, is_self:bool=False):
     assignment = Assignment.query.filter_by(assignment_no=as_no).first()
     if not assignment:
         return {"message": "과제가 존재하지 않습니다.", "isSuccess": False}
-    attendee = Attendee.query.filter_by(lecture_no=assignment.lecture_no, user_no=student_no).first()
-    if not attendee:
-        return {"message": "해당 강의를 수강한 학생이 아닙니다.", "isSuccess": False}
-    assignment_manage = Assignment_management.query.filter_by(assignment_no=as_no, attendee_no = attendee.attendee_no).first()
+    if is_self:
+        self = SelfStudy.query.filter_by(assignment_no=as_no, user_no=user_no).first()
+        if not self:
+            print(as_no, user_no)
+            return {"message": "해당 과제를 수강한 학생이 아닙니다.", "isSuccess": False}
+        assignment_manage = Assignment_management.query.filter_by(assignment_no=as_no).first()
+    else:
+        attendee = Attendee.query.filter_by(lecture_no=assignment.lecture_no, user_no=student_no).first()
+        if not attendee:
+            return {"message": "해당 강의를 수강한 학생이 아닙니다.", "isSuccess": False}
+        assignment_manage = Assignment_management.query.filter_by(assignment_no=as_no, attendee_no = attendee.attendee_no).first()
     if assignment.user_no != user_no and assignment_manage.attendee_no != attendee.attendee_no:
-        print(assignment.user_no, user_no, assignment_manage.attendee_no, attendee.attendee_no)
         return {"message": "과제를 열람할 권한이 없습니다.", "isSuccess": False}
-    if assignment_manage.end_submission is False:
-        return {"message": "아직 과제가 제출되지 않았습니다.", "isSuccess": False}
-    if assignment_manage.review is False and assignment_manage.attendee_no == attendee.attendee_no:
-        return {"message": "교수의 피드백이 아직 제출되지 않았습니다.", "isSuccess": False}
     res = dict()
     res["review"] = assignment_manage.review
     return res

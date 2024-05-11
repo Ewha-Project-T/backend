@@ -220,6 +220,7 @@ def get_feedback_info(as_no: int, student_no: int, user_no: int):
         return {"message": "해당 학생의 오디오 파일이 존재하지 않습니다.", "isSuccess": False}
     stt = Stt.query.filter_by(assignment_no=as_no, user_no = professor_no).all()
     text,denotations_json,attributes_json ="",[],[]
+    res["student_delay"] = []
     for st in stt:
         stt_job = SttJob.query.filter_by(stt_no=st.stt_no).first()
         if stt_job is None:
@@ -234,6 +235,7 @@ def get_feedback_info(as_no: int, student_no: int, user_no: int):
             if len(stt_job.stt_result) > 1:
                 text = stt_job.stt_result
                 break
+        res["student_delay"].append(stt_job.delay)
         # denotations_json += result["denotations"]
         # attributes_json += result["attributes"]
 
@@ -248,9 +250,7 @@ def get_feedback_info(as_no: int, student_no: int, user_no: int):
 
     res["assignment_audio"] = [make_audio_format(assignment_audio) for assignment_audio in assignment_audio]
     res["student_audio"] = [make_audio_format(assignment_check_list, index) for index, assignment_check_list in enumerate(assignment_check_list)]
-    res["student_delay"] = [get_audio_delay(assignment_check_list, index) for index, assignment_check_list in enumerate(assignment_check_list)]
-    print("ttttttttt")
-    print(res["student_delay"])
+    # res["student_delay"] = [get_audio_delay(assignment_check_list, index) for index, assignment_check_list in enumerate(assignment_check_list)]
     res["isSuccess"] = True
     
     return res

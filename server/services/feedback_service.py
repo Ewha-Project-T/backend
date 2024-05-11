@@ -141,17 +141,21 @@ def find_max_attribute_number(attributes):
             max_attribute = int(attribute['id'][1:])
     return max_attribute
 
-def put_json_textae(as_no,user_no,ae_denotations,ae_attributes):
+def put_json_textae(as_no,user_no,ae_denotations,ae_attributes, is_self:bool = False):
     assignment = Assignment.query.filter_by(assignment_no=as_no).first()
     if not assignment:
         return "과제가 존재하지 않습니다.", False
-    attend=Attendee.query.filter_by(user_no=user_no,lecture_no=assignment.lecture_no).first()
-    if not attend:
-        return "수강생이 아닙니다.", False
-    check=Assignment_check.query.filter_by(assignment_no=as_no,attendee_no=attend.attendee_no).order_by(Assignment_check.check_no.desc()).first()
+    if is_self:
+        check=Assignment_check.query.filter_by(assignment_no=as_no).order_by(Assignment_check.check_no.desc()).first()
+        assignment_management = Assignment_management.query.filter_by(assignment_no = as_no).first()
+    else:
+        attend=Attendee.query.filter_by(user_no=user_no,lecture_no=assignment.lecture_no).first()
+        if not attend:
+            return "수강생이 아닙니다.", False
+        check=Assignment_check.query.filter_by(assignment_no=as_no,attendee_no=attend.attendee_no).order_by(Assignment_check.check_no.desc()).first()
+        assignment_management = Assignment_management.query.filter_by(assignment_no = as_no, attendee_no = attend.attendee_no).first()
     if not check:
         return "과제를 제출하지 않았습니다.", False
-    assignment_management = Assignment_management.query.filter_by(assignment_no = as_no, attendee_no = attend.attendee_no).first()
     if assignment_management==None:
         return "학생 정보가 존재하지 않습니다.", False
     if assignment_management.end_submission is False:

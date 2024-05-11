@@ -59,13 +59,12 @@ class Feedback_textae(Resource):
 class Feedback_self_textae(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument('as_no', type=int)
-    parser.add_argument('user_no', type=int)
     @jwt_required()
     def get(self):
         args = self.parser.parse_args()
         as_no=args['as_no']
-        user_no = args['user_no']
-        textae, new_attribute, review=get_self_json_textae(as_no,user_no)
+        user_info = get_jwt_identity()
+        textae, new_attribute, review=get_self_json_textae(as_no,user_info['user_no'])
         if review is False:
             return jsonify({"message": textae,"isSuccess":False})
         return jsonify({"textae": textae, "new_attribute": new_attribute,"isSuccess":True})
@@ -75,10 +74,10 @@ class Feedback_self_textae(Resource):
         self.parser.add_argument('ae_attributes', type=str, action='append')
         args = self.parser.parse_args()
         as_no=args['as_no']
-        user_no = args['user_no']
+        user_info = get_jwt_identity()
         ae_denotations = str(args['ae_denotations']).replace('"',"")
         ae_attributes = str(args['ae_attributes']).replace('"',"")
-        msg, status= put_json_textae(as_no,user_no,ae_denotations,ae_attributes)
+        msg, status= put_json_textae(as_no,user_info['user_no'],ae_denotations,ae_attributes, True)
         if status is False:
             return jsonify({"msg": msg, "isSuccess":False})
         return jsonify({"msg": msg, "isSuccess":True})

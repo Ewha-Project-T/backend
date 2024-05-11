@@ -158,7 +158,7 @@ class Feedback_self_review(Resource):
         args = self._parse_args()
         args.update({'review': self._parse_review()})
         user_info = self._get_user_info()
-        res = save_feedback_review(args['as_no'], None, user_info['user_no'], args['review'])
+        res = save_feedback_review(args['as_no'], None, user_info['user_no'], args['review'], True)
         return jsonify(res)
 
     def _parse_review(self):

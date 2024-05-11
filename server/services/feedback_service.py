@@ -360,18 +360,24 @@ def get_feedback_review(as_no:int, student_no:int,user_no:int, is_self:bool=Fals
     res["review"] = assignment_manage.review
     return res
 
-def save_feedback_review(as_no:int, student_no:int, user_no:int,review:str):
+def save_feedback_review(as_no:int, student_no:int, user_no:int,review:str, is_self:bool=False):
     assignment = Assignment.query.filter_by(assignment_no=as_no).first()
     if not assignment:
         return {"message": "과제가 존재하지 않습니다.", "isSuccess": False}
     if not assignment.user_no == user_no:
         return {"message": "과제를 열람할 권한이 없습니다.", "isSuccess": False}
-    attendee = Attendee.query.filter_by(lecture_no=assignment.lecture_no, user_no=student_no).first()
-    if not attendee:
-        return {"message": "해당 강의를 수강한 학생이 아닙니다.", "isSuccess": False}
-    assignment_manage = Assignment_management.query.filter_by(assignment_no=as_no, attendee_no = attendee.attendee_no).first()
+    if is_self:
+        self = SelfStudy.query.filter_by(assignment_no=as_no, user_no=user_no).first()
+        if not self:
+            return {"message": "해당 과제를 수강한 학생이 아닙니다.", "isSuccess": False}
+        assignment_manage = Assignment_management.query.filter_by(assignment_no=as_no).first()
+    else:
+        attendee = Attendee.query.filter_by(lecture_no=assignment.lecture_no, user_no=student_no).first()
+        if not attendee:
+            return {"message": "해당 강의를 수강한 학생이 아닙니다.", "isSuccess": False}
+        assignment_manage = Assignment_management.query.filter_by(assignment_no=as_no, attendee_no = attendee.attendee_no).first()
+        save_feedback(assignment,attendee)
     assignment_manage.review = review
-    save_feedback(assignment,attendee)
     db.session.commit()
     return {"message": "피드백이 저장되었습니다.", "isSuccess": True}
 

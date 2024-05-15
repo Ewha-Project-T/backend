@@ -624,7 +624,34 @@ class TranslateAssignment(Resource):
         if res.get("isSuccess") == False:
             return jsonify(res)
         return jsonify(res)
-    
+
+class TranslateSelfAssignment(Resource):
+    @jwt_required()
+    def get(self):
+        user_info=get_jwt_identity()
+        parser = reqparse.RequestParser()
+        parser.add_argument('as_no', type=int)
+        args = parser.parse_args()
+        as_no = args['as_no']
+        res = assignment_detail_translate(as_no, user_info["user_no"], True)
+        if res.get("message") :
+            print("error",res)
+            return res
+        return jsonify(res)
+    @jwt_required()
+    def post(self):
+        user_info=get_jwt_identity()
+        parser = reqparse.RequestParser()
+        parser.add_argument('as_no', type=int)
+        parser.add_argument('translate_text', type=str)
+        args = parser.parse_args()
+        as_no = args['as_no']
+        translate_text = args['translate_text']
+        res = assignment_translate(as_no, user_info["user_no"], translate_text, True)
+        if res.get("isSuccess") == False:
+            return jsonify(res)
+        return jsonify(res)    
+
 class React_Cancel_prob(Resource):
     @jwt_required()
     def post(self):

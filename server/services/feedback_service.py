@@ -117,7 +117,7 @@ def get_self_json_textae(as_no,user_no):
         # textae = make_json(text,denotations_json,attributes_json)
     else:
         # stt 넣기 용
-        _,uuid=get_prob_wav_url(as_no,user_no,assignment.lecture_no)
+        _,uuid=get_prob_wav_url(as_no,user_no,assignment.lecture_no, True)
         get_stt_result(uuid)
         print("assgin_check_no",check.check_no)
         # stt 넣기 끝

@@ -363,7 +363,7 @@ def get_self_assignment(as_no:int, user_no:int):
 
     return assignment, audio_region_list
 
-def check_assignment(as_no,lecture_no,uuid,user_info, is_self:bool, text=""):
+def check_assignment(as_no,lecture_no,uuid,user_info, text="",is_self:bool = False):
     acc=Prob_region.query.filter_by(assignment_no=as_no).all()
     if(len(acc)!=len(uuid) and text==""):
         return {"isSuccess":False,"message":"구간과 파일의 수가 일치하지 않습니다."}
@@ -635,6 +635,8 @@ def get_stt_result(uuid):
         print("uiud = ",i, end="")
         index = len(text)    
         stt=Stt.query.filter_by(wav_file=i["uuid"]).first()
+        if stt==None:
+            return None, None, None
         stt_job=SttJob.query.filter_by(stt_no=stt.stt_no).order_by(SttJob.stt_seq.desc()).first()
         if stt_job==None:
             return None, None, None

@@ -458,6 +458,19 @@ class React_Prob_end_submission(Resource):
         if not res.get("submission_count") :
             return res, 200
         return jsonify(res)
+    
+class React_Prob_self_end_submission(Resource):
+    @jwt_required()
+    def put(self):
+        user_info=get_jwt_identity()
+        parser = reqparse.RequestParser()
+        parser.add_argument('as_no', type=int)
+        args = parser.parse_args()
+        as_no = args['as_no']
+        res = assignment_end_submission(as_no, user_info["user_no"], True)
+        if not res.get("submission_count") :
+            return res, 200
+        return jsonify(res)
 
 class React_Prob_submit_list(Resource):
         @jwt_required()
@@ -534,6 +547,27 @@ class React_Prob_submit(Resource):
             res = check_assignment(as_no,lecture_no,uuid,user_info)
             return jsonify(res)
 
+class React_Prob_self_submit(Resource):
+    @jwt_required()
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('lecture_no', type=int)
+        parser.add_argument('as_no', type=int)
+        parser.add_argument('submitUUID',type=str,action='append')
+        parser.add_argument('text',type=str)
+        args = parser.parse_args()
+        as_no=args['as_no']
+        lecture_no = args['lecture_no']
+        uuid=args['submitUUID']
+        user_info=get_jwt_identity()
+        if(uuid[0]=="0"):
+            text=args['text']
+            res = check_assignment(as_no,lecture_no,uuid,user_info, text, True)
+            return jsonify(res)
+        else:
+            res = check_assignment(as_no,lecture_no,uuid,user_info, "", True)
+            return jsonify(res)
+
 class Studentgraphlist(Resource):
     @jwt_required()
     def get(self):
@@ -590,7 +624,34 @@ class TranslateAssignment(Resource):
         if res.get("isSuccess") == False:
             return jsonify(res)
         return jsonify(res)
-    
+
+class TranslateSelfAssignment(Resource):
+    @jwt_required()
+    def get(self):
+        user_info=get_jwt_identity()
+        parser = reqparse.RequestParser()
+        parser.add_argument('as_no', type=int)
+        args = parser.parse_args()
+        as_no = args['as_no']
+        res = assignment_detail_translate(as_no, user_info["user_no"], True)
+        if res.get("message") :
+            print("error",res)
+            return res
+        return jsonify(res)
+    @jwt_required()
+    def post(self):
+        user_info=get_jwt_identity()
+        parser = reqparse.RequestParser()
+        parser.add_argument('as_no', type=int)
+        parser.add_argument('translate_text', type=str)
+        args = parser.parse_args()
+        as_no = args['as_no']
+        translate_text = args['translate_text']
+        res = assignment_translate(as_no, user_info["user_no"], translate_text, True)
+        if res.get("isSuccess") == False:
+            return jsonify(res)
+        return jsonify(res)    
+
 class React_Cancel_prob(Resource):
     @jwt_required()
     def post(self):
@@ -602,6 +663,17 @@ class React_Cancel_prob(Resource):
         student_no = args['user_no']
         user_info=get_jwt_identity()
         res = assignment_cancel(as_no, user_info["user_no"], student_no)
+        return jsonify(res)
+    
+class React_Cancel_self_prob(Resource):
+    @jwt_required()
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('as_no', type=int)
+        args = parser.parse_args()
+        as_no = args['as_no']
+        user_info=get_jwt_identity()
+        res = assignment_cancel(as_no, user_info["user_no"])
         return jsonify(res)
 
 class React_Chance_prob(Resource):

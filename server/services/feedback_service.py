@@ -183,8 +183,6 @@ def get_feedback_info(as_no: int, student_no: int, user_no: int):
     res["assignment_audio"] = [make_audio_format(assignment_audio) for assignment_audio in assignment_audio]
     res["student_audio"] = [make_audio_format(assignment_check_list, index) for index, assignment_check_list in enumerate(assignment_check_list)]
     res["student_delay"] = [get_audio_delay(assignment_check_list, index) for index, assignment_check_list in enumerate(assignment_check_list)]
-    print("ttttttttt")
-    print(res["student_delay"])
     res["isSuccess"] = True
     
     return res
@@ -200,8 +198,11 @@ def get_audio_delay(prob_region, id=0):
     url = prob_region.upload_url if hasattr(prob_region, "upload_url") else prob_region.acl_uuid
     stt= Stt.query.filter_by(wav_file=url).first()
     sttjob= SttJob.query.filter_by(stt_no=stt.stt_no).first()
+    delay=0
+    if sttjob!=None:
+        delay=sttjob.delay
     return {
-        "delay":sttjob.delay
+        "delay":delay
     }
 def get_feedback_review(as_no:int, student_no:int,user_no:int):
     assignment = Assignment.query.filter_by(assignment_no=as_no).first()

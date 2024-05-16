@@ -5,7 +5,7 @@ from .lecture import Attend, Lecture, Lecture_mod, Lecture_mod_del, Student,Majo
 from .assignment import Prob, Prob_del, Prob_submit, Prob_feedback,Prob_mod,Prob_add, prob_upload, Prob_submit_list, prob_upload_file
 from .admin import Admin,Admin2
 from .stt import Stt, SttJob, SttSeq, SttSeqJob
-from .react_login import Login2,Logout2,CheckToken,Join2,FindPassword,FindPassword_Check
+from .react_login import Login2,Logout2,CheckToken,Join2,FindPassword,FindPassword_Check,Find_id
 from .react_assignment import React_Cancel_prob, React_Chance_prob, React_Porb_professor, React_Prob_Self,React_Prob_add, React_Prob_detail, React_Prob_end_submission, React_Prob_record, React_Prob_self_detail, React_Prob_self_record, React_Prob_student,React_Prob_submit_list,React_Prob_submit, React_Prob_submit_list2, React_prob_handle, React_self_prob_handle,Studentgraphlist,Professorgraphlist, TranslateAssignment
 from .react_lecture import React_Lecture,React_Lecture_mod_del,React_Student,React_Lecture_add,React_Lecture_mod
 
@@ -19,7 +19,8 @@ def load_api(api_module):
     api_module.add_resource(Studentgraphlist,'/api/feedback/studentgraphlist',endpoint='studentGraphlist')
     api_module.add_resource(Professorgraphlist,'/api/feedback/professorgraphlist',endpoint='professorgraphlist')
     api_module.add_resource(Email,'/api/user/email',endpoint='email')
-
+    api_module.add_resource(Verify_email,'/api/user/verify_email',endpoint='verify_email')
+    api_module.add_resource(Find_id,'/api/user/find_id',endpoint='find_id')
     ############################
     ###########신규 추가##########
     ############################
@@ -95,4 +96,3 @@ def load_api(api_module):
     api_module.add_resource(Admin2,'/admin2',endpoint='admin2')
     api_module.add_resource(Logout,'/logout',endpoint='logout')
     api_module.add_resource(Prob_del,'/prob_del',endpoint='prob_del')
-    api_module.add_resource(Verify_email,'/verify_email',endpoint='verify_email')

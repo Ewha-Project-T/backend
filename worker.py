@@ -103,6 +103,7 @@ def do_stt_work(self, filename, locale="ko", stt_seq=0):
     except Exception as e:
         print(e)
         self.update_state(state=e.args[0])
+        session.rollback()
 
     stt_db = session.query(Stt).filter_by(wav_file=filename).first()
     if not stt_db:

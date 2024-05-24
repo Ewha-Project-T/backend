@@ -30,7 +30,8 @@ def prob_list_student(lecture_no:int,user_no:int):
 def prob_list_professor(lecture_no:int,user_no:int):
     assignments = Assignment.query.filter(Assignment.lecture_no == lecture_no).all()
     lecutre_name = Lecture.query.filter_by(lecture_no = lecture_no).first().lecture_name
-    res = [{'as_no': assignment.assignment_no, 'as_name': assignment.as_name,"open_time":assignment.open_time , "limit_time": assignment.limit_time, "reaveal" : True if assignment.open_time <= datetime.utcnow()+timedelta(hours=9) else False} for assignment in assignments]
+    lecutre_student_count = Attendee.query.filter_by(lecture_no = lecture_no).count()
+    res = [{'as_no': assignment.assignment_no, 'as_name': assignment.as_name,"open_time":assignment.open_time , "limit_time": assignment.limit_time, "reaveal" : True if assignment.open_time <= datetime.utcnow()+timedelta(hours=9) else False, "student_count": lecutre_student_count - 1, "done_count" : Assignment_management.query.filter_by(end_submission = 1, assignment_no = assignment.assignment_no).count()} for assignment in assignments]
     db.session.remove()
     return {"lecture_name" : lecutre_name, "prob_list" : res}
 

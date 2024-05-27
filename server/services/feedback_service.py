@@ -288,11 +288,13 @@ def get_self_feedback_info(as_no: int, user_no: int):
     if not assignment_check_list:
         return {"message": "해당 학생의 오디오 파일이 존재하지 않습니다.", "isSuccess": False}
     stt = Stt.query.filter_by(assignment_no=as_no, user_no = professor_no).all()
+    prob_region_count = Prob_region.query.filter_by(assignment_no=as_no).count()
     text,denotations_json,attributes_json ="",[],[]
     res["student_delay"] = []
-    for st in stt:
+    for st in stt[:prob_region_count]:
         stt_job = SttJob.query.filter_by(stt_no=st.stt_no).first()
         if stt_job is None:
+            print(st.stt_no)
             return {"message": "교수님의 음원 STT 작업 진행중입니다.", "isSuccess": False}
         if stt_job.stt_result is None:
             return {"message": "STT 작업 진행 중 입니다.", "isSuccess": False}

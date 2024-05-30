@@ -1,4 +1,5 @@
-from ..model import Attendee, User, Lecture
+from datetime import datetime, timedelta
+from ..model import Assignment, Attendee, User, Lecture
 from server import db
 from functools import wraps
 from flask_jwt_extended import create_refresh_token, create_access_token, verify_jwt_in_request, get_jwt, get_jwt_identity
@@ -33,6 +34,10 @@ def lecture_listing(user_no=None):
                 tmp["major"]=vars(lec)["major"]
                 tmp["separated"]=vars(lec)["separated"]
                 tmp["professor"]=vars(lec)["professor"]
+                #교수용 강의 리스트 추가 항목
+                if at.permission==3:
+                    tmp["attendee_count"] = Attendee.query.filter_by(lecture_no=lec.lecture_no).count() - 1
+                    tmp["assignment_count"] = Assignment.query.filter(Assignment.lecture_no == lec.lecture_no, Assignment.open_time <= datetime.now()+timedelta(hours=6)).count()
                 lecture_list_result.append(tmp)
         return lecture_list_result
 

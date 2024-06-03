@@ -9,6 +9,7 @@ from flask_jwt_extended import create_refresh_token, create_access_token, verify
 from pydub import AudioSegment, silence
 from worker import do_stt_work, do_original_text_stt_work
 from datetime import datetime,timedelta
+from sqlalchemy import or_, and_
 
 import json
 import os
@@ -1125,3 +1126,47 @@ def make_student_audio_zip(assignment_check:Assignment_check, student_name:str):
         for index, url in enumerate(url):
             file.write(url, f"{student_name}_구간{index+1}.mp3")
     return filepath
+
+def get_calendar(user_info, date_str: str):
+    # date 형식 : "2021-06-01"
+    try:
+        if date_str is None:
+            date = datetime.now() + timedelta(hours=6)
+        else:
+            date = datetime.strptime(date_str, "%Y-%m-%d")
+    except ValueError:
+        return {"message": "날짜 형식이 잘못되었습니다.", "isSuccess": False}
+
+    # 이번 달 1일 - 7일
+    start_date = date.replace(day=1) - timedelta(days=7)
+    # 다음 달 1일 + 7일
+    if date.month == 12:
+        end_date = date.replace(year=date.year + 1, month=1, day=7)
+    else:
+        end_date = date.replace(month=date.month + 1, day=1) + timedelta(days=6)
+
+    # limit_time 또는 open_time이 start_date와 end_date 사이에 있는 과제들을 가져옴
+    assignments = Assignment.query.filter(
+        or_(
+            and_(Assignment.open_time >= start_date, Assignment.open_time <= end_date),
+            and_(Assignment.limit_time >= start_date, Assignment.limit_time <= end_date)
+        )
+    ).all()
+
+    # attendee에서 user_no에 해당하는 lecture_no를 가져옴
+    attendees = Attendee.query.filter_by(user_no=user_info['user_no']).all()
+    lecture_no_set = {att.lecture_no for att in attendees}
+
+    # assignment.lecture_no가 lecture_no_set에 있는 경우 날짜를 가져옴
+    date_set = set()
+    for assignment in assignments:
+        if assignment.lecture_no in lecture_no_set:
+            #교수가 아니면 open_time이 현재 이후인 과제를 안보여줌
+            if user_info['user_perm'] != 3 and assignment.open_time > datetime.now() + timedelta(hours=6):
+                continue
+            if start_date <= assignment.open_time <= end_date:
+                date_set.add(assignment.open_time.date().strftime("%Y-%m-%d"))
+            if start_date <= assignment.limit_time <= end_date:
+                date_set.add(assignment.limit_time.date().strftime("%Y-%m-%d"))
+
+    return {"date": list(date_set), "isSuccess": True}

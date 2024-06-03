@@ -58,6 +58,7 @@ class SelfStudy(db.Model):
 
 class Attendee(db.Model):
     __tablename__="ATTENDEE"
+    db.UniqueConstraint('user_no', 'lecture_no', name='lecture_user_unique')
     attendee_no = db.Column(db.Integer, primary_key=True)
     user_no = db.Column(db.Integer, db.ForeignKey("USER.user_no", ondelete="CASCADE"), nullable=True)
     lecture_no = db.Column(db.Integer, db.ForeignKey("LECTURE.lecture_no",ondelete="CASCADE"), nullable=True)

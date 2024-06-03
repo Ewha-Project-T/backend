@@ -57,8 +57,8 @@ def load_api(api_module):
     api_module.add_resource(Feedback_self_textae, '/api/prob/self/textae', endpoint='Feedback_self_textae')
     api_module.add_resource(Feedback_self_review, '/api/prob/self/review', endpoint='react_self_prob_review')
     api_module.add_resource(TranslateSelfAssignment, '/api/prob/self/translate', endpoint='react_self_Prob_translate')
-    api_module.add_resource(Feedback_self_graph, '/api/feedback/self/graph', endpoint='feedback_self_graph')
-    api_module.add_resource(Feedback_self_graph_update, '/api/feedback/self/graph/update', endpoint='feedback_self_graph_update')
+    api_module.add_resource(Feedback_self_graph, '/api/prob/self/graph', endpoint='feedback_self_graph')
+    api_module.add_resource(Feedback_self_graph_update, '/api/prob/self/graph/update', endpoint='feedback_self_graph_update')
     ############################
     ######옛날 것인데 사용중########
     ############################

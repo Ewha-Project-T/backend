@@ -265,7 +265,7 @@ class React_self_prob_handle(Resource):
         parser.add_argument('file_name', type=str)
         parser.add_argument('file_path', type=str)
         args=parser.parse_args()
-        limit_time = str(datetime.now())
+        limit_time = None
         as_name = args['as_name']
         as_type = args['as_type']
         keyword = args['keyword']
@@ -278,7 +278,7 @@ class React_self_prob_handle(Resource):
         prob_split_region=args['prob_split_region']
         assign_count=2100000000
         keyword_open=1
-        open_time=str(datetime.now())
+        open_time=None
         file_name=args['file_name']
         file_path=args['file_path']
         new_assignmen_no = create_assignment(0,limit_time,as_name,as_type,keyword,prob_translang_source,prob_translang_destination,description,speed,original_text,prob_sound_path,prob_split_region,assign_count,open_time,file_name,file_path,user_info,keyword_open, True)

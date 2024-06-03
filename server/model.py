@@ -76,8 +76,8 @@ class Assignment(db.Model):
     user_no = db.Column(db.Integer, db.ForeignKey("USER.user_no", ondelete="CASCADE"), nullable=True)
     lecture_no = db.Column(db.Integer, db.ForeignKey("LECTURE.lecture_no", ondelete="CASCADE"), nullable=True)
     week = db.Column(db.String(20)) # 추후 삭제 예정
-    open_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow()+timedelta(hours=9))
-    limit_time = db.Column(db.DateTime, nullable=False)
+    open_time = db.Column(db.DateTime)#, nullable=False, default=datetime.utcnow()+timedelta(hours=9))
+    limit_time = db.Column(db.DateTime)#, nullable=False)
     as_name = db.Column(db.String(50), nullable=False)
     as_type = db.Column(db.String(10), nullable=False)
     keyword = db.Column(db.Text)

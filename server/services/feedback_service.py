@@ -494,7 +494,7 @@ def get_my_graphs(as_no, user_no, is_self:bool=False):
     "isSuccess": True,
     }
 
-    if is_self:
+    if not is_self:
         res["Delivery"] = avg_delivery(lecture.lecture_no, assignment.assignment_no, 1, attendee)
         res["Accuracy"] = avg_accuracy(lecture.lecture_no, assignment.assignment_no, 1, attendee)
 

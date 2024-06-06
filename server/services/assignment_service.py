@@ -32,7 +32,13 @@ def prob_list_professor(lecture_no:int,user_no:int):
     assignments = Assignment.query.filter(Assignment.lecture_no == lecture_no).all()
     lecutre_name = Lecture.query.filter_by(lecture_no = lecture_no).first().lecture_name
     lecutre_student_count = Attendee.query.filter_by(lecture_no = lecture_no).count()
-    res = [{'as_no': assignment.assignment_no, 'as_name': assignment.as_name,"open_time":assignment.open_time , "limit_time": assignment.limit_time, "reaveal" : True if assignment.open_time <= datetime.utcnow()+timedelta(hours=9) else False, "student_count": lecutre_student_count - 1, "done_count" : Assignment_management.query.filter_by(end_submission = 1, assignment_no = assignment.assignment_no).count()} for assignment in assignments]
+    res = [{'as_no': assignment.assignment_no, 
+            'as_name': assignment.as_name,
+            "open_time":assignment.open_time,
+            "limit_time": assignment.limit_time, 
+            "reaveal" : True if assignment.open_time <= datetime.utcnow()+timedelta(hours=9) else False, 
+            "student_count": lecutre_student_count - 1, 
+            "done_count" : Assignment_management.query.filter_by(end_submission = 1, assignment_no = assignment.assignment_no).count()} for assignment in assignments]
     db.session.remove()
     return {"lecture_name" : lecutre_name, "prob_list" : res}
 
@@ -1170,3 +1176,56 @@ def get_calendar(user_info, date_str: str):
                 date_set.add(assignment.limit_time.date().strftime("%Y-%m-%d"))
 
     return {"date": list(date_set), "isSuccess": True}
+
+def get_date(user_info, date_str: str):
+    # date 형식 : "2021-06-01"
+    try:
+        if date_str is None:
+            date = datetime.now() + timedelta(hours=6)
+        else:
+            date = datetime.strptime(date_str, "%Y-%m-%d")
+    except ValueError:
+        return {"message": "날짜 형식이 잘못되었습니다.", "isSuccess": False}
+
+    #date에 해당하는 과제들을 가져옴
+    assignments = Assignment.query.filter(
+        or_(
+            and_(Assignment.open_time >= date, Assignment.open_time <= date + timedelta(days=1)),
+            and_(Assignment.limit_time >= date, Assignment.limit_time <= date + timedelta(days=1))
+        )
+    ).all()
+
+    # attendee에서 user_no에 해당하는 lecture_no를 가져옴
+    attendees = Attendee.query.filter_by(user_no=user_info['user_no']).all()
+
+# lecture_no를 키로 하고 해당하는 attendee_no를 값으로 하는 dictionary 생성
+    lecture_attendee_map = {att.lecture_no: att.attendee_no for att in attendees}
+
+    # 과제를 필터링하여 assignment_list에 추가
+    assignment_list = []
+    for assignment in assignments:
+        if assignment.lecture_no in lecture_attendee_map:
+            # 교수가 아니면 open_time이 현재 이후인 과제를 안보여줌
+            if user_info['user_perm'] != 3 and assignment.open_time > datetime.now() + timedelta(hours=6):
+                continue
+
+            assignment_tmp = {
+                "assignment_no": assignment.assignment_no,
+                "as_name": assignment.as_name,
+                "as_type": assignment.as_type,
+                "open_time": assignment.open_time,
+                "limit_time": assignment.limit_time,
+                "lecture_no": assignment.lecture_no
+            }
+
+            # 교수일 경우 추가 할 정보
+            if user_info['user_perm'] == 3:
+                assignment_tmp["student_count"] = Attendee.query.filter_by(lecture_no=assignment.lecture_no, permission=1).count()
+                assignment_tmp["done_count"] = Assignment_management.query.filter_by(end_submission=1, assignment_no=assignment.assignment_no).count()
+            else:
+                attendee_no = lecture_attendee_map[assignment.lecture_no]
+                assignment_tmp["done"] = Assignment_management.query.filter_by(assignment_no=assignment.assignment_no, end_submission=1, attendee_no=attendee_no).count()
+
+            assignment_list.append(assignment_tmp)
+
+    return {"assignments": assignment_list, "isSuccess": True}

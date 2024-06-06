@@ -592,7 +592,7 @@ def detail_delivery(lecture_no:int, assignment_no:int):
 
 def my_delivery(attendee, lecture_no, assignment_no, is_self:bool):
     assignments = Assignment.query.filter_by(lecture_no=lecture_no).filter(Assignment.assignment_no <= assignment_no).all()
-
+    now_assignment = assignments[-1]
     res = []
     data = dict()
     if is_self:
@@ -601,6 +601,9 @@ def my_delivery(attendee, lecture_no, assignment_no, is_self:bool):
         data["name"] = attendee.user.name
     data["data"] = []
     for index, assignment in enumerate(assignments, start=1):  # start=1로 설정하여 1부터 시작
+        if is_self:
+                if now_assignment.as_type != assignment.as_type:
+                    continue
         tmp = dict()
         tmp["name"] = str(index) + "회차"
         tmp["data"] = []

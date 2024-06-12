@@ -67,10 +67,17 @@ def signup_email_validate(sender_email,code,mail_func):
     pw = os.environ['EMAIL_PW']
     email = os.environ['EMAIL_ADDRESS']
     subject = '[인증코드 발송]Ewha Edu Translation Platform 인증 코드 안내'
-    with  open('./templates/mail_check.html','rt',encoding='UTF-8') as f:
-        message = f.read().replace('[code]',code)
-        message = message.replace('[email]',sender_email)
-        message = message.replace('[func]',mail_func)
+    if(mail_func=="find_passcheck"):
+        subject='[비밀번호 찾기]Ewha Edu Translation Platform 비밀번호 찾기 안내'
+        with  open('./templates/mail_check_findpass.html','rt',encoding='UTF-8') as f:
+            message = f.read().replace('[code]',code)
+            message = message.replace('[email]',sender_email)
+            message = message.replace('[func]',mail_func)
+    else:    
+        with  open('./templates/mail_check.html','rt',encoding='UTF-8') as f:
+            message = f.read().replace('[code]',code)
+            message = message.replace('[email]',sender_email)
+            message = message.replace('[func]',mail_func)
 
     send_mail(send_from=email, send_to=[sender_email],
           subject=subject, message=message,

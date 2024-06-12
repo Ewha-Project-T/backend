@@ -121,22 +121,22 @@ class Join2(Resource):
         if re.match("^[A-Za-z0-9]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[A-Za-z0-9])*\.[A-Za-z]{2,3}$", user_email):
             result=register(user_email,user_pw,user_name,user_major, user_perm)#,user_ident)
             if(result==RegisterResult.SUCCESS):
-                msg="register success"
+                msg="이메일로 발송된 메일에서 인증을 진행 해주세요."
                 return jsonify({ "registerSuccess" : 1,"msg":msg})
 
             elif(result==RegisterResult.USEREMAIL_EXIST):
-                msg="user email exist"
+                msg="이메일이 이미 존재합니다."
                 return jsonify({ "registerSuccess" : 0,"msg":msg})
 
             elif(result==RegisterResult.INVALID_PERM):
-                msg="invalid permission"
+                msg="유효하지 않은 값입니다."
                 return jsonify({ "registerSuccess" : 0,"msg":msg})
 
             else:
-                msg="bad parameters"
+                msg="유효하지 않은 값입니다."
                 return jsonify({ "registerSuccess" : 0,"msg":msg})
         else:
-            msg="invalid email"
+            msg="유효하지 않은 이메일입니다."
             return jsonify({ "registerSuccess" : 0,"msg":msg})
 	
 
@@ -146,20 +146,13 @@ class FindPassword(Resource):
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('email', type=str, help="Email is required")
-        parser.add_argument('name', type=str, help="name is required")
-        parser.add_argument('major', type=str, help="major id is required")
-
         args = parser.parse_args()
         user_email = args['email']
-        user_name=args['name']
-        user_major= args['major']
-
-        if(findpassword_email_check(user_email,user_name,user_major)):
-            signup_email_validate(user_email,gen_verify_email_code(user_email),"findpass_check")#email, code, func->url/[func] 추후현식이 경로로 바꾸기 [func]부분
-
-            msg="email send success"
+        if(findpassword_email_check(user_email)):
+            signup_email_validate(user_email,gen_verify_email_code(user_email),"find_passcheck")
+            msg="이메일로 발송된 메일에서 비밀번호 찾기를 진행 해주세요."
             return jsonify({ "Success" : 1,"msg":msg})
-        msg="invalid email"
+        msg="잘못된 이메일 입니다."
         return jsonify({"Success": 0, "msg":msg})
     
 class FindPassword_Check(Resource):
@@ -177,24 +170,32 @@ class FindPassword_Check(Resource):
         password= args['password']
         if(findpassword_code_check(email,code)):
             change_pass(email,password)
-            msg="password change success"
-            return jsonify({"Success": 1, "msg":msg})
-        msg="invalid code"
-        return jsonify({"Success": 0, "msg":msg})
+            msg="비밀번호가 변경되었습니다."
+            return jsonify({"emailcheckSuccess": 1, "msg":msg})
+        msg="잘못된 입력값입니다."
+        return jsonify({"emailcheckSuccess": 0, "msg":msg})
 
 class Find_id(Resource):
     def get(self):
         return jsonify({"msg":"find id page"})
     def post(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('ident', type=str, help="ident is required")
-
+        parser.add_argument('name', type=str, help="ident is required")
+        parser.add_argument('major', type=str, help="ident is required")
+        parser.add_argument('perm', type=str, help="ident is required")
+        
         args = parser.parse_args()
-        ident = args['ident']
-        user_id=find_id(ident)
+        name = args['name']
+        major = args['major']
+        if args['perm'] not in perm_list:
+            permission=1
+        else:
+            permission=perm_list[args['perm']]
+
+        user_id=find_id(name,major,permission)
         if(user_id):
-            msg="id find Success"
+            msg="아이디를 찾았습니다."
             return jsonify({"Success":1,"msg":msg,"user_id":user_id})
 
-        msg="id not found"
+        msg="아이디를 찾지 못했습니다."
         return jsonify({"Success":0,"msg":msg})

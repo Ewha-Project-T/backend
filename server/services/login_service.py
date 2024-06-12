@@ -4,6 +4,7 @@ from functools import wraps
 from flask_jwt_extended import create_refresh_token, create_access_token, verify_jwt_in_request, get_jwt, get_jwt_identity
 import hashlib
 import base64
+import os
 
 class LoginResult:
     SUCCESS = 0
@@ -89,8 +90,8 @@ def admin_required(): #관리자 권한
 
     return wrapper
 
-def findpassword_email_check(user_email,user_name,user_major):
-    acc = User.query.filter_by(email=user_email,name=user_name,major=user_major).first()
+def findpassword_email_check(user_email):
+    acc = User.query.filter_by(email=user_email).first()
     if acc ==None:
         return 0
     return 1
@@ -102,13 +103,39 @@ def findpassword_code_check(email,code):
     if(acc.access_code!=code):
         return 0
     return 1
-
+def encrypt_password(password):
+    salt = os.urandom(32)
+    encrypt_passwd = base64.b64encode(salt + hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 100000, dklen=128))
+    return encrypt_passwd
 def change_pass(email,password):
     acc = User.query.filter_by(email=email).first()
-    acc.password=password
+    acc.password=encrypt_password(password)
     db.session.commit()
-def find_id(ident):
-    acc = User.query.filter_by( user_identifier=ident).first()
-    if(acc==None):
+def find_id(name, major, permission):
+    results = []
+    acc = User.query.filter_by(name=name, major=major, permission=permission).all()
+    if not acc:
         return 0
-    return acc.email
+    num=0
+    for user in acc:
+        user_info = {
+            "idx": num,
+            "email": mask_email(user.email)
+        }
+        results.append(user_info)
+        num+=1
+    return results
+
+
+def mask_email(email):
+    user_name, domain = email.split('@')
+    if len(user_name) > 4:
+        user_name_masked = user_name[:2] + '*' * (len(user_name) - 4) + user_name[-2:]
+    else:
+        user_name_masked = user_name[0] + '*' * (len(user_name) - 2) + user_name[-1] if len(user_name) > 1 else user_name + '*'
+    return user_name_masked + '@' + domain
+
+
+
+
+

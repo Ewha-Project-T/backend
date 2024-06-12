@@ -36,7 +36,7 @@ class Email(Resource):
             msg="이메일 인증이 필요합니다.\n가입하신 이메일에서 확인해주세요."
         return jsonify({"location":"/login", "msg":msg,"emailcheckSuccess" : 1})
 class Verify_email(Resource):
-    def get(self):
+    def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('email', type=str)
         parser.add_argument('code', type=str)
@@ -46,12 +46,12 @@ class Verify_email(Resource):
         s_code = get_access_code(email)
         if(s_code==0):
             msg="인증코드가 만료 되었습니다.\n로그인을 진행해 인증코드를 새로 발급 받아주세요"
-            return redirect(host_url+ url_for('login',msg=msg))
+            return jsonify({"location":"/login", "msg":msg,"emailcheckSuccess" : 0})
         if code == s_code:
             msg="인증 되었습니다."
             access_check_success(email)
-            return redirect(host_url+ url_for('login',msg=msg))
+            return jsonify({"location":"/login", "msg":msg,"emailcheckSuccess" : 1})
         else:
             msg="인증코드가 유효하지 않습니다."
-            return redirect(host_url+ url_for('login',msg=msg))
+            return jsonify({"location":"/login", "msg":msg,"emailcheckSuccess" : 0})
     

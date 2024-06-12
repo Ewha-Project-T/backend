@@ -288,11 +288,13 @@ def get_self_feedback_info(as_no: int, user_no: int):
     if not assignment_check_list:
         return {"message": "해당 학생의 오디오 파일이 존재하지 않습니다.", "isSuccess": False}
     stt = Stt.query.filter_by(assignment_no=as_no, user_no = professor_no).all()
+    prob_region_count = Prob_region.query.filter_by(assignment_no=as_no).count()
     text,denotations_json,attributes_json ="",[],[]
     res["student_delay"] = []
-    for st in stt:
+    for st in stt[:prob_region_count]:
         stt_job = SttJob.query.filter_by(stt_no=st.stt_no).first()
         if stt_job is None:
+            print(st.stt_no)
             return {"message": "교수님의 음원 STT 작업 진행중입니다.", "isSuccess": False}
         if stt_job.stt_result is None:
             return {"message": "STT 작업 진행 중 입니다.", "isSuccess": False}
@@ -384,14 +386,17 @@ def save_feedback_review(as_no:int, student_no:int, user_no:int,review:str, is_s
     db.session.commit()
     return {"message": "피드백이 저장되었습니다.", "isSuccess": True}
 
-def update_graph(as_no:int, user_no:int):
+def update_graph(as_no:int, user_no:int, is_self:bool=False):
     assignment = Assignment.query.filter_by(assignment_no=as_no).first()
     if not assignment:
         return {"message": "과제가 존재하지 않습니다.", "isSuccess": False}
-    attendee = Attendee.query.filter_by(lecture_no=assignment.lecture_no, user_no=user_no).first()
+    if is_self:
+        attendee = user_no
+    else:
+        attendee = Attendee.query.filter_by(lecture_no=assignment.lecture_no, user_no=user_no).first()
     if not attendee:
         return {"message": "과제를 열람할 권한이 없습니다.", "isSuccess": False}
-    save_feedback(assignment,attendee)
+    save_feedback(assignment,attendee, is_self)
     db.session.commit()
     return
 
@@ -405,12 +410,21 @@ def update_open(as_no:int, user_no:int, open:bool):
     db.session.commit()
     return
 
-def save_feedback(assignment:Assignment,attendee:Attendee):
-    feedback = Feedback2.query.filter_by(assignment_no=assignment.assignment_no, attendee_no=attendee.attendee_no).first()
+def save_feedback(assignment:Assignment,attendee:Attendee, is_self:bool):
+    if is_self:
+        feedback = Feedback2.query.filter_by(assignment_no=assignment.assignment_no, attendee_no=attendee, lecture_no = 0).first()
+    else:
+        feedback = Feedback2.query.filter_by(assignment_no=assignment.assignment_no, attendee_no=attendee.attendee_no).first()
     if not feedback:
-        feedback = Feedback2(assignment_no=assignment.assignment_no, attendee_no=attendee.attendee_no, lecture_no=assignment.lecture_no)
-        db.session.add(feedback)    
-    assignment_check = Assignment_check.query.filter_by(assignment_no=assignment.assignment_no, attendee_no=attendee.attendee_no).order_by(Assignment_check.check_no.desc()).first()
+        if is_self:
+            feedback = Feedback2(assignment_no=assignment.assignment_no, attendee_no=None, lecture_no = 0)
+        else:
+            feedback = Feedback2(assignment_no=assignment.assignment_no, attendee_no=attendee.attendee_no, lecture_no=assignment.lecture_no)
+        db.session.add(feedback)
+    if is_self:
+        assignment_check = Assignment_check.query.filter_by(assignment_no=assignment.assignment_no, attendee_no=None).order_by(Assignment_check.check_no.desc()).first()
+    else:
+        assignment_check = Assignment_check.query.filter_by(assignment_no=assignment.assignment_no, attendee_no=attendee.attendee_no).order_by(Assignment_check.check_no.desc()).first()
     value = { "translation_error":0,"omission":0,"expression":0,"intonation":0,"grammar_error":0,"silence":0,"filler":0,"backtracking":0,"others":0}
     for denotation in ast.literal_eval(assignment_check.ae_denotations):
         objs = [obj.strip() for obj in denotation["obj"].lower().split(",")]
@@ -460,24 +474,30 @@ def get_all_graphs(as_no:int, user_no:int):
     }
     return res
 
-def get_my_graphs(as_no, user_no):
+def get_my_graphs(as_no, user_no, is_self:bool=False):
     assignment = Assignment.query.filter_by(assignment_no=as_no).first()
     if not assignment:
         return {"message": "과제가 존재하지 않습니다.", "isSuccess": False}
-    attendee = Attendee.query.filter_by(lecture_no=assignment.lecture_no, user_no=user_no).first()
-    if not attendee:
-        return {"message": "과제를 열람할 권한이 없습니다.", "isSuccess": False}
+    if is_self:
+        attendee = user_no
+    else:
+        attendee = Attendee.query.filter_by(lecture_no=assignment.lecture_no, user_no=user_no).first()
+        if not attendee:
+            return {"message": "과제를 열람할 권한이 없습니다.", "isSuccess": False}
     lecture = Lecture.query.filter_by(lecture_no=assignment.lecture_no).first()
     if not lecture:
         return {"message": "해당 강의가 존재하지 않습니다.", "isSuccess": False}
     res = {
-        "Delivery" : avg_delivery(lecture.lecture_no, assignment.assignment_no,1, attendee),
-        "Accuracy" : avg_accuracy(lecture.lecture_no, assignment.assignment_no,1, attendee),
-        "DeliveryDetail" : my_delivery(attendee, lecture.lecture_no, assignment.assignment_no),
-        "AccuracyDetail" : my_accuracy(attendee, lecture.lecture_no, assignment.assignment_no),
-        "as_type": assignment.as_type,
-        "isSuccess": True,
+    "DeliveryDetail": my_delivery(attendee, lecture.lecture_no, assignment.assignment_no, is_self),
+    "AccuracyDetail": my_accuracy(attendee, lecture.lecture_no, assignment.assignment_no, is_self),
+    "as_type": assignment.as_type,
+    "isSuccess": True,
     }
+
+    if not is_self:
+        res["Delivery"] = avg_delivery(lecture.lecture_no, assignment.assignment_no, 1, attendee)
+        res["Accuracy"] = avg_accuracy(lecture.lecture_no, assignment.assignment_no, 1, attendee)
+
     return res
 
 def avg_delivery(lecture_no:int, assingment_no:int, flag:int = 0, me=None):
@@ -570,21 +590,27 @@ def detail_delivery(lecture_no:int, assignment_no:int):
     #뒤에서 3번째까지만 보여주기
     return res
 
-def my_delivery(attendee, lecture_no, assignment_no):
+def my_delivery(attendee, lecture_no, assignment_no, is_self:bool):
     assignments = Assignment.query.filter_by(lecture_no=lecture_no).filter(Assignment.assignment_no <= assignment_no).all()
-
+    now_assignment = assignments[-1]
     res = []
     data = dict()
-    data["name"] = attendee.user.name
+    if is_self:
+        data["name"] = "자습"
+    else:
+        data["name"] = attendee.user.name
     data["data"] = []
     for index, assignment in enumerate(assignments, start=1):  # start=1로 설정하여 1부터 시작
+        if is_self:
+                if now_assignment.as_type != assignment.as_type:
+                    continue
         tmp = dict()
         tmp["name"] = str(index) + "회차"
         tmp["data"] = []
         for i in ["silence", "filler", "backtracking", "others"]:
             value = Feedback2.query.filter_by(
                 lecture_no=lecture_no, 
-                attendee_no=attendee.attendee_no,
+                attendee_no= None if is_self else attendee.attendee_no,
                 assignment_no=assignment.assignment_no
             ).with_entities(getattr(Feedback2, i)).scalar()
             value = 0.0 if value is None else float(value)
@@ -596,21 +622,27 @@ def my_delivery(attendee, lecture_no, assignment_no):
     #뒤에서 3번째까지만 보여주기
     return res
 
-def my_accuracy(attendee, lecture_no, assignment_no):
+def my_accuracy(attendee, lecture_no, assignment_no, is_self:bool):
     assignments = Assignment.query.filter_by(lecture_no=lecture_no).filter(Assignment.assignment_no <= assignment_no).all()
-
+    now_assignment = assignments[-1]
     res = []
     data = dict()
-    data["name"] = attendee.user.name
+    if is_self:
+        data["name"] = "자습"
+    else:
+        data["name"] = attendee.user.name
     data["data"] = []
     for index, assignment in enumerate(assignments, start=1):  # start=1로 설정하여 1부터 시작
+            if is_self:
+                if now_assignment.as_type != assignment.as_type:
+                    continue
             tmp = dict()
             tmp["name"] = str(index) + "회차"
             tmp["data"] = []
             for i in ["translation_error", "omission", "expression", "intonation", "grammar_error", "others"]:
                 value = Feedback2.query.filter_by(
                     lecture_no=lecture_no, 
-                    attendee_no=attendee.attendee_no,
+                    attendee_no= None if is_self else attendee.attendee_no,
                     assignment_no=assignment.assignment_no
                 ).with_entities(getattr(Feedback2, i)).scalar()
                 value = 0.0 if value is None else float(value)

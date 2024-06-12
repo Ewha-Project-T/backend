@@ -7,7 +7,7 @@ from flask_jwt_extended import (
     jwt_required, get_jwt_identity, create_access_token, get_jwt
 )
 import re
-from ..services.assignment_service import assignment_cancel, assignment_chance, assignment_detail, assignment_detail_record, assignment_detail_translate, assignment_end_submission, assignment_record, assignment_self_detail, assignment_self_detail_record, assignment_self_record, assignment_translate, delete_self_assignment, edit_assignment, get_assignment, get_assignments_manage, get_self_assignment,mod_assignment_listing,check_assignment,make_as, create_assignment,prob_list_professor, prob_list_student, mod_as,delete_assignment,get_as_name,get_prob_wav_url,get_wav_url,get_stt_result,get_original_stt_result,get_as_info,get_feedback,make_json_url, prob_self_list,save_json_feedback,get_prob_submit_list,get_studentgraph,get_professorgraph
+from ..services.assignment_service import assignment_cancel, assignment_chance, assignment_detail, assignment_detail_record, assignment_detail_translate, assignment_end_submission, assignment_record, assignment_self_detail, assignment_self_detail_record, assignment_self_record, assignment_translate, delete_self_assignment, edit_assignment, get_assignment, get_assignments_manage, get_calendar, get_date, get_self_assignment,mod_assignment_listing,check_assignment,make_as, create_assignment,prob_list_professor, prob_list_student, mod_as,delete_assignment,get_as_name,get_prob_wav_url,get_wav_url,get_stt_result,get_original_stt_result,get_as_info,get_feedback,make_json_url, prob_self_list,save_json_feedback,get_prob_submit_list,get_studentgraph,get_professorgraph
 from ..services.lecture_service import lecture_access_check
 from werkzeug.utils import secure_filename
 from os import environ as env
@@ -265,7 +265,7 @@ class React_self_prob_handle(Resource):
         parser.add_argument('file_name', type=str)
         parser.add_argument('file_path', type=str)
         args=parser.parse_args()
-        limit_time = str(datetime.now())
+        limit_time = None
         as_name = args['as_name']
         as_type = args['as_type']
         keyword = args['keyword']
@@ -278,7 +278,7 @@ class React_self_prob_handle(Resource):
         prob_split_region=args['prob_split_region']
         assign_count=2100000000
         keyword_open=1
-        open_time=str(datetime.now())
+        open_time=None
         file_name=args['file_name']
         file_path=args['file_path']
         new_assignmen_no = create_assignment(0,limit_time,as_name,as_type,keyword,prob_translang_source,prob_translang_destination,description,speed,original_text,prob_sound_path,prob_split_region,assign_count,open_time,file_name,file_path,user_info,keyword_open, True)
@@ -687,4 +687,28 @@ class React_Chance_prob(Resource):
         student_no = args['user_no']
         user_info=get_jwt_identity()
         res = assignment_chance(as_no, user_info["user_no"], student_no)
+        return jsonify(res)
+
+class React_Prob_calendar(Resource):
+    @jwt_required()
+    def get(self):
+        user_info=get_jwt_identity()
+        parser = reqparse.RequestParser()
+        parser.add_argument('date', type=str)
+        args = parser.parse_args()
+        date = args['date']
+        res = get_calendar(user_info, date)
+
+        return jsonify(res)
+
+class React_Prob_date(Resource):
+    @jwt_required()
+    def get(self):
+        user_info=get_jwt_identity()
+        parser = reqparse.RequestParser()
+        parser.add_argument('date', type=str)
+        args = parser.parse_args()
+        date = args['date']
+        res = get_date(user_info, date)
+
         return jsonify(res)

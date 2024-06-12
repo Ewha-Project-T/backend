@@ -46,6 +46,7 @@ class Lecture(db.Model):
     major = db.Column(db.String(50), nullable=False)
     separated = db.Column(db.String(5), nullable=False)
     professor = db.Column(db.String(50), nullable=False)
+    code = db.Column(db.String(4))
 
     attendee= db.relationship("Attendee",back_populates="lecture",cascade="all, delete",passive_deletes=True,)
     assignment= db.relationship("Assignment",back_populates="lecture",cascade="all, delete",passive_deletes=True,)
@@ -58,6 +59,9 @@ class SelfStudy(db.Model):
 
 class Attendee(db.Model):
     __tablename__="ATTENDEE"
+    __table_args__ = (
+        db.UniqueConstraint('user_no', 'lecture_no', name='unique_attendee'),
+      )
     attendee_no = db.Column(db.Integer, primary_key=True)
     user_no = db.Column(db.Integer, db.ForeignKey("USER.user_no", ondelete="CASCADE"), nullable=True)
     lecture_no = db.Column(db.Integer, db.ForeignKey("LECTURE.lecture_no",ondelete="CASCADE"), nullable=True)
@@ -73,8 +77,8 @@ class Assignment(db.Model):
     user_no = db.Column(db.Integer, db.ForeignKey("USER.user_no", ondelete="CASCADE"), nullable=True)
     lecture_no = db.Column(db.Integer, db.ForeignKey("LECTURE.lecture_no", ondelete="CASCADE"), nullable=True)
     week = db.Column(db.String(20)) # 추후 삭제 예정
-    open_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow()+timedelta(hours=9))
-    limit_time = db.Column(db.DateTime, nullable=False)
+    open_time = db.Column(db.DateTime)#, nullable=False, default=datetime.utcnow()+timedelta(hours=9))
+    limit_time = db.Column(db.DateTime)#, nullable=False)
     as_name = db.Column(db.String(50), nullable=False)
     as_type = db.Column(db.String(10), nullable=False)
     keyword = db.Column(db.Text)

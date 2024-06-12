@@ -193,6 +193,19 @@ class Feedback_student_graph(Resource):
         res = get_my_graphs(args['as_no'], user_info['user_no'])
         return jsonify(res)
 
+class Feedback_self_graph(Resource):
+    def _parse_args(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('as_no', type=int, required=True)
+        return parser.parse_args()
+        
+    @jwt_required()
+    def get(self):
+        args = self._parse_args()
+        user_info = get_jwt_identity()
+        res = get_my_graphs(args['as_no'], user_info['user_no'], True)
+        return jsonify(res)
+
 class Feedback_graph_update(Resource):
     @jwt_required()
     def get(self):
@@ -202,6 +215,16 @@ class Feedback_graph_update(Resource):
         args = parser.parse_args()
         user_info = get_jwt_identity()
         res = update_graph(as_no=args['as_no'], user_no=args['student_no'])
+        return jsonify({"isSuccess":True})
+
+class Feedback_self_graph_update(Resource):
+    @jwt_required()
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('as_no', type=int, required=True)
+        args = parser.parse_args()
+        user_info = get_jwt_identity()
+        res = update_graph(as_no=args['as_no'], user_no=user_info['user_no'], is_self=True)
         return jsonify({"isSuccess":True})
     
 class Feedback_open(Resource):

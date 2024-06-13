@@ -66,6 +66,7 @@ class Attendee(db.Model):
     user_no = db.Column(db.Integer, db.ForeignKey("USER.user_no", ondelete="CASCADE"), nullable=True)
     lecture_no = db.Column(db.Integer, db.ForeignKey("LECTURE.lecture_no",ondelete="CASCADE"), nullable=True)
     permission = db.Column(db.Integer, default=1)
+    register_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow()+timedelta(hours=9))
 
     user = db.relationship("User", back_populates="attendee")
     lecture = db.relationship("Lecture",back_populates="attendee")
@@ -211,4 +212,16 @@ class Assignment_management(db.Model):
     review_open = db.Column(db.Boolean, default=False)
     end_submission = db.Column(db.Boolean, default=False)
     end_submission_time = db.Column(db.DateTime, nullable=True)
-    
+
+class Attendee_waitlist(db.Model):
+    __tablename__="ATTENDEE_WAITLIST"
+    __table_args__ = (
+        db.UniqueConstraint('user_no', 'lecture_no', name='unique_attendee'),
+      )
+    idx = db.Column(db.Integer, primary_key = True)
+    lecture_no = db.Column(db.Integer, db.ForeignKey("LECTURE.lecture_no", ondelete="CASCADE"), nullable=False)
+    user_no = db.Column(db.Integer, db.ForeignKey("USER.user_no", ondelete="CASCADE"), nullable=False)
+    status = db.Column(db.Boolean, default=True) # true: 대기중, false: 거절
+
+    user = db.relationship("User", back_populates="attendee_waitlist")
+    lecture = db.relationship("Lecture",back_populates="attendee_waitlist")

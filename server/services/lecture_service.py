@@ -235,6 +235,19 @@ def generate_random_number():
     random_number = ''.join(random.choice(digits) for _ in range(4))
     return random_number
 
+def get_enrolments(user_no:int):
+    attendee_waitlist = Attendee_waitlist.query.filter_by(user_no=user_no).all()
+    lecture_list = []
+    for wait_lecture in attendee_waitlist:
+        lecture_list.append({
+            "status": wait_lecture.status,
+            "lecture_no": wait_lecture.lecture_no,
+            "lecture_name": wait_lecture.lecture.lecture_name,
+            "class": f"{wait_lecture.lecture.major} {wait_lecture.lecture.separated}",
+            "professor": wait_lecture.lecture.professor,
+            })
+    return {"lecture_list": lecture_list, "isSuccess": True}
+
 def request_enrolment(user_no:int, code:str):
     pattern = re.compile(r"^\d{4}-\d{4}$")
 

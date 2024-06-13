@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import random
 from ..model import Assignment, Attendee, User, Lecture
 from server import db
 from functools import wraps
@@ -197,3 +198,25 @@ def mod_lecutre_listing(lecture_no):
         attend_list_result.append(tmp)
 
     return lecture_list_result,attend_list_result
+
+def modify_enrolment(user_no:int, lecture_no:int, status:bool):
+    attendee = Attendee.query.filter_by(user_no=user_no, lecture_no=lecture_no).first()
+    if not attendee:
+        return {"message": "수강 확인", "isSuccess": False}
+    if attendee.permission != 3:
+        return {"message": "권한 확인", "isSuccess": False}
+    lecutre = Lecture.query.filter_by(lecture_no=lecture_no).first()
+    if not lecutre:
+        return {"message": "강의 확인", "isSuccess": False}
+    if not status:
+        lecutre.code = None
+        db.session.commit()
+        return {"message": "수강 코드 삭제", "isSuccess": True}
+    lecutre.code = generate_random_number()
+    db.session.commit()
+    return {"code": f"{lecture_no:04d}-"+str(lecutre.code), "isSuccess": True}
+    
+def generate_random_number():
+    digits = '0123456789'
+    random_number = ''.join(random.choice(digits) for _ in range(4))
+    return random_number

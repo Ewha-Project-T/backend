@@ -8,7 +8,7 @@ from flask_jwt_extended import (
     jwt_required, get_jwt_identity, create_access_token, get_jwt
 )
 import re
-from ..services.lecture_service import lecture_listing, make_lecture,modify_lecture,delete_lecture, search_student,major_listing,attendee_add,attendee_listing,lecture_access_check,mod_lecutre_listing
+from ..services.lecture_service import lecture_listing, make_lecture, modify_enrolment,modify_lecture,delete_lecture, search_student,major_listing,attendee_add,attendee_listing,lecture_access_check,mod_lecutre_listing
 from ..services.login_service import get_all_user
 
 from os import environ as env
@@ -172,3 +172,17 @@ class React_Lecture_mod(Resource):
                    },200
         else:
             return{"msg": "access denied", "lecturemodifySuccess" : 0}
+
+class React_Lecture_enrolment(Resource):
+    @jwt_required()
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('lecture_no', type=int)
+        parser.add_argument('status', type=bool)
+        args = parser.parse_args()
+        lecture_no = args['lecture_no']
+        status = args['status']
+        user_info=get_jwt_identity()
+        res = modify_enrolment(user_info["user_no"],lecture_no,status)
+
+        return jsonify(res)

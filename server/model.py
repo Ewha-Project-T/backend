@@ -26,6 +26,8 @@ class User(db.Model):
     assignment= db.relationship("Assignment",back_populates="user",cascade="all, delete",passive_deletes=True,)
     attendee= db.relationship("Attendee",back_populates="user",cascade="all, delete",passive_deletes=True,)
     stt= db.relationship("Stt",back_populates="user",cascade="all, delete",passive_deletes=True,)
+    attendee_waitlist = db.relationship("Attendee_waitlist", back_populates="user", cascade="all, delete", passive_deletes=True)
+    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.password = self.encrypt_password(self.password) #DB생성시 pw 자동 암호화
@@ -50,6 +52,8 @@ class Lecture(db.Model):
 
     attendee= db.relationship("Attendee",back_populates="lecture",cascade="all, delete",passive_deletes=True,)
     assignment= db.relationship("Assignment",back_populates="lecture",cascade="all, delete",passive_deletes=True,)
+    attendee_waitlist = db.relationship("Attendee_waitlist", back_populates="lecture", cascade="all, delete-orphan", passive_deletes=True)  # 추가된 부분
+
 
 class SelfStudy(db.Model):
     __tablename__ = "SELF_STUDY"

@@ -1,6 +1,6 @@
 from .mail import Email, Verify_email
 from .react_feedback import Feedback_graph_update, Feedback_info, Feedback_professor_graph, Feedback_review, Feedback_self_graph, Feedback_self_graph_update, Feedback_self_info, Feedback_self_review, Feedback_self_textae, Feedback_student_graph, Feedback_textae, assignment_zip_down
-from .lecture import Attend, Lecture_mod, Lecture_mod_del,Major, Lecture_add
+# from .lecture import Attend, Lecture_mod, Lecture_mod_del,Major, Lecture_add
 from .assignment import Prob, Prob_del, Prob_submit, Prob_feedback,Prob_mod,Prob_add, prob_upload, Prob_submit_list, prob_upload_file
 from .admin import Admin2
 from .stt import Stt, SttJob, SttSeq, SttSeqJob
@@ -8,7 +8,7 @@ from .react_login import Login2,Logout2,CheckToken,Join2,FindPassword,FindPasswo
 from .react_assignment import React_Cancel_prob, React_Chance_prob, React_Porb_professor, React_Prob_Self,React_Prob_add, React_Prob_calendar, React_Prob_date, React_Prob_detail, React_Prob_end_submission, React_Prob_record, React_Prob_self_detail, React_Prob_self_record, React_Prob_student,React_Prob_submit_list,React_Prob_submit, React_Prob_submit_list2, React_prob_handle, React_self_prob_handle,Studentgraphlist,Professorgraphlist, TranslateAssignment
 from .react_login import Login2,Logout2,CheckToken,Join2,FindPassword,FindPassword_Check
 from .react_assignment import React_Cancel_prob, React_Cancel_self_prob, React_Chance_prob, React_Porb_professor, React_Prob_Self,React_Prob_add, React_Prob_detail, React_Prob_end_submission, React_Prob_record, React_Prob_self_detail, React_Prob_self_end_submission, React_Prob_self_record, React_Prob_self_submit, React_Prob_student,React_Prob_submit_list,React_Prob_submit, React_Prob_submit_list2, React_prob_handle, React_self_prob_handle,Studentgraphlist,Professorgraphlist, TranslateAssignment, TranslateSelfAssignment
-from .react_lecture import React_Lecture,React_Lecture_mod_del,React_Student,React_Lecture_add,React_Lecture_mod
+from .react_lecture import React_Lecture, React_Lecture_enrolment,React_Lecture_mod_del,React_Student,React_Lecture_add,React_Lecture_mod
 
 
 
@@ -61,6 +61,7 @@ def load_api(api_module):
 
     api_module.add_resource(React_Prob_calendar, '/api/calendar', endpoint='react_calendar')
     api_module.add_resource(React_Prob_date, '/api/calendar/prob', endpoint='react_date')
+    api_module.add_resource(React_Lecture_enrolment, '/api/lecture/code', endpoint='react_lecture_enrolment')
     ############################
     ######옛날 것인데 사용중########
     ############################
@@ -89,11 +90,11 @@ def load_api(api_module):
     api_module.add_resource(SttJob, '/stt/<jobid>',endpoint='stt_job')
     api_module.add_resource(SttSeq, '/stt/seq', endpoint='stt_seq')
     api_module.add_resource(SttSeqJob, '/stt/seq/<jobid>', endpoint='stt_seq_job')
-    api_module.add_resource(Lecture_mod_del,'/lecture2',endpoint='lecture2')
-    api_module.add_resource(Lecture_mod,'/lecture_mod',endpoint='lecture_mod')
-    api_module.add_resource(Major,'/major',endpoint='major')
-    api_module.add_resource(Attend,'/attend',endpoint='attend')
-    api_module.add_resource(Lecture_add, '/lecture_add', endpoint='lecture_add')
+    # api_module.add_resource(Lecture_mod_del,'/lecture2',endpoint='lecture2')
+    # api_module.add_resource(Lecture_mod,'/lecture_mod',endpoint='lecture_mod')
+    # api_module.add_resource(Major,'/major',endpoint='major')
+    # api_module.add_resource(Attend,'/attend',endpoint='attend')
+    # api_module.add_resource(Lecture_add, '/lecture_add', endpoint='lecture_add')
     api_module.add_resource(Prob, '/prob', endpoint='prob')
     api_module.add_resource(Prob_submit, '/prob_submit', endpoint='prob_submit')
     api_module.add_resource(Prob_feedback, '/prob_feedback', endpoint='prob_feedback')

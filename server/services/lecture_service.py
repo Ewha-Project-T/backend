@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 import random
-from ..model import Assignment, Attendee, User, Lecture
+import re
+from ..model import Assignment, Attendee, Attendee_waitlist, User, Lecture
 from server import db
 from functools import wraps
 from flask_jwt_extended import create_refresh_token, create_access_token, verify_jwt_in_request, get_jwt, get_jwt_identity
@@ -233,3 +234,30 @@ def generate_random_number():
     digits = '0123456789'
     random_number = ''.join(random.choice(digits) for _ in range(4))
     return random_number
+
+def request_enrolment(user_no:int, code:str):
+    pattern = re.compile(r"^\d{4}-\d{4}$")
+
+    if not pattern.match(code):
+        return {"message": "코드 확인", "isSuccess": False}
+    
+    lecture_no = int(code[:4])
+    code = int(code[5:])
+
+    lecture = Lecture.query.filter_by(lecture_no=lecture_no, code=code).first()
+    if not lecture:
+        return {"message": "코드 확인", "isSuccess": False}
+    
+    attendee = Attendee.query.filter_by(user_no=user_no, lecture_no=lecture_no).first()
+    if attendee:
+        return {"message": "수강 확인", "isSuccess": False}
+    
+    attendee_wait = Attendee_waitlist.query.filter_by(user_no=user_no, lecture_no=lecture_no).first()
+    if attendee_wait:
+        return {"message": "수강 확인", "isSuccess": False}
+    
+    attendee_wait = Attendee_waitlist(user_no=user_no, lecture_no=lecture_no)
+    db.session.add(attendee_wait)
+    db.session.commit()
+
+    return {"message": "수강 신청", "isSuccess": True}

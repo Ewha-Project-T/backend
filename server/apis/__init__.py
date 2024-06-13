@@ -1,9 +1,8 @@
 from .mail import Email, Verify_email
 from .react_feedback import Feedback_graph_update, Feedback_info, Feedback_professor_graph, Feedback_review, Feedback_self_graph, Feedback_self_graph_update, Feedback_self_info, Feedback_self_review, Feedback_self_textae, Feedback_student_graph, Feedback_textae, assignment_zip_down
-from .login import Login,Join, LoginRefresh, Logout
-from .lecture import Attend, Lecture, Lecture_mod, Lecture_mod_del, Student,Major, Lecture_add
+from .lecture import Attend, Lecture_mod, Lecture_mod_del,Major, Lecture_add
 from .assignment import Prob, Prob_del, Prob_submit, Prob_feedback,Prob_mod,Prob_add, prob_upload, Prob_submit_list, prob_upload_file
-from .admin import Admin,Admin2
+from .admin import Admin2
 from .stt import Stt, SttJob, SttSeq, SttSeqJob
 from .react_login import Login2,Logout2,CheckToken,Join2,FindPassword,FindPassword_Check,Find_id
 from .react_assignment import React_Cancel_prob, React_Chance_prob, React_Porb_professor, React_Prob_Self,React_Prob_add, React_Prob_calendar, React_Prob_date, React_Prob_detail, React_Prob_end_submission, React_Prob_record, React_Prob_self_detail, React_Prob_self_record, React_Prob_student,React_Prob_submit_list,React_Prob_submit, React_Prob_submit_list2, React_prob_handle, React_self_prob_handle,Studentgraphlist,Professorgraphlist, TranslateAssignment
@@ -78,7 +77,6 @@ def load_api(api_module):
     #api_module.add_resource(React_Prob_mod, '/api/prob/modify', endpoint='react_prob_mod')
     api_module.add_resource(React_Prob_add, '/api/prob/create', endpoint='react_prob_add')
     # api_module.add_resource(Feedback,'/r_feedback',endpoint='r_feedback')
-    api_module.add_resource(Login,'/login',endpoint='login') # GET POST PUT PATCH DELETE
     #api_module.add_resource(React_Prob_del, '/api/prob/delete', endpoint='react_prob_del')
     api_module.add_resource(React_Lecture_add,'/api/lecture/create',endpoint='react_lecture_add')
     api_module.add_resource(React_Lecture_mod,'/api/lecture/modify',endpoint='react_lecture_mod')
@@ -87,17 +85,12 @@ def load_api(api_module):
     #비밀번호변경
     api_module.add_resource(FindPassword,'/api/user/findpass',endpoint='findpassword') # GET POST PUT PATCH DELETE
     api_module.add_resource(FindPassword_Check,'/api/user/findpass_check',endpoint='findpassword_check') 
-    api_module.add_resource(LoginRefresh,'/login-refresh',endpoint='login_refresh') 
-    api_module.add_resource(Lecture,'/lecture',endpoint='lecture')
-    api_module.add_resource(Admin,'/admin',endpoint='admin')
     
     api_module.add_resource(SttJob, '/stt/<jobid>',endpoint='stt_job')
     api_module.add_resource(SttSeq, '/stt/seq', endpoint='stt_seq')
     api_module.add_resource(SttSeqJob, '/stt/seq/<jobid>', endpoint='stt_seq_job')
-    api_module.add_resource(Join, '/join', endpoint='join')
     api_module.add_resource(Lecture_mod_del,'/lecture2',endpoint='lecture2')
     api_module.add_resource(Lecture_mod,'/lecture_mod',endpoint='lecture_mod')
-    api_module.add_resource(Student,'/student',endpoint='student')
     api_module.add_resource(Major,'/major',endpoint='major')
     api_module.add_resource(Attend,'/attend',endpoint='attend')
     api_module.add_resource(Lecture_add, '/lecture_add', endpoint='lecture_add')
@@ -108,5 +101,4 @@ def load_api(api_module):
     api_module.add_resource(Prob_submit_list,'/prob_submit_list',endpoint='prob_submit_list')
     api_module.add_resource(Prob_mod,'/prob_mod',endpoint='prob_mod')
     api_module.add_resource(Admin2,'/admin2',endpoint='admin2')
-    api_module.add_resource(Logout,'/logout',endpoint='logout')
     api_module.add_resource(Prob_del,'/prob_del',endpoint='prob_del')

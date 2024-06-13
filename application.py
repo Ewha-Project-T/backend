@@ -5,13 +5,14 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from datetime import timedelta
 from server.apis import load_api
-from server.apis.login import jwt_blocklist
 from server import db
 import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
 from os import environ as env
 import binascii
 from os import urandom
+
+jwt_blocklist=set()
 app=Flask(__name__, static_folder='./static')
 #cors = CORS(app, resources={r"/*": {"origins": "https://ewaproject-lszyf.run.goorm.site"}},supports_credentials=True)
 app.config['SWAGGER'] = {

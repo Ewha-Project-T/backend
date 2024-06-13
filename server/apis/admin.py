@@ -11,16 +11,6 @@ from ..services.lecture_service import lecture_listing
 from os import environ as env
 host_url=env["HOST"]
 
-class Admin(Resource):
-    @admin_required()
-    def get(self):
-        user_info=get_jwt_identity()
-        result,user_list = user_listing()
-        if(result==AdminResult.NOT_FOUND):
-            return {"msg":"none user"},404
-        return make_response(render_template("admin_list.html",user_list=user_list,user_info=user_info))
-
-
 class Admin2(Resource):
     @admin_required()
     def get(self):#활성화 필요한 계정명단

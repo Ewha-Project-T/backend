@@ -199,6 +199,19 @@ def mod_lecutre_listing(lecture_no):
 
     return lecture_list_result,attend_list_result
 
+def get_enrolment_code(user_no:int, lecture_no:int):
+    attendee = Attendee.query.filter_by(user_no=user_no, lecture_no=lecture_no).first()
+    if not attendee:
+        return {"message": "수강 확인", "isSuccess": False}
+    if attendee.permission != 3:
+        return {"message": "권한 확인", "isSuccess": False}
+    lecutre = Lecture.query.filter_by(lecture_no=lecture_no).first()
+    if not lecutre:
+        return {"message": "강의 확인", "isSuccess": False}
+    if lecutre.code:
+        return {"code": f"{lecture_no:04d}-"+str(lecutre.code), "isSuccess": True}
+    return {"code": None, "isSuccess": True}
+
 def modify_enrolment(user_no:int, lecture_no:int, status:bool):
     attendee = Attendee.query.filter_by(user_no=user_no, lecture_no=lecture_no).first()
     if not attendee:

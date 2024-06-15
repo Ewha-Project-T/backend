@@ -49,6 +49,7 @@ class Lecture(db.Model):
     separated = db.Column(db.String(5), nullable=False)
     professor = db.Column(db.String(50), nullable=False)
     code = db.Column(db.String(4))
+    code_update_date = db.Column(db.DateTime, nullable=True)
 
     attendee= db.relationship("Attendee",back_populates="lecture",cascade="all, delete",passive_deletes=True,)
     assignment= db.relationship("Assignment",back_populates="lecture",cascade="all, delete",passive_deletes=True,)

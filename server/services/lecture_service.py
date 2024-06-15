@@ -222,13 +222,14 @@ def modify_enrolment(user_no:int, lecture_no:int, status:bool):
     lecutre = Lecture.query.filter_by(lecture_no=lecture_no).first()
     if not lecutre:
         return {"message": "강의 확인", "isSuccess": False}
+    lecutre.code_update_date = datetime.now() + timedelta(hours=6)
     if not status:
         lecutre.code = None
         db.session.commit()
-        return {"message": "수강 코드 삭제", "isSuccess": True}
+        return {"message": "수강 코드 삭제", "update_time" : lecutre.code_update_date, "isSuccess": True}
     lecutre.code = generate_random_number()
     db.session.commit()
-    return {"code": f"{lecture_no:04d}-"+str(lecutre.code), "isSuccess": True}
+    return {"code": f"{lecture_no:04d}-"+str(lecutre.code), "update_time" : lecutre.code_update_date ,"isSuccess": True}
     
 def generate_random_number():
     digits = '0123456789'

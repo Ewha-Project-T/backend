@@ -275,3 +275,20 @@ def request_enrolment(user_no:int, code:str):
     db.session.commit()
 
     return {"message": "수강 신청", "isSuccess": True}
+
+def get_apply_list(user_no:int, lecture_no:int):
+    attendee = Attendee.query.filter_by(user_no=user_no, lecture_no=lecture_no).first()
+    if not attendee:
+        return {"message": "수강 확인", "isSuccess": False}
+    if attendee.permission != 3:
+        return {"message": "권한 확인", "isSuccess": False}
+    wait_attendee = Attendee_waitlist.query.filter_by(lecture_no=lecture_no).all()
+    wait_list = []
+    for wait in wait_attendee:
+        wait_list.append({
+            "user_name": wait.user.name,
+            "major": wait.user.major,
+            "email": wait.user.email,
+            "status": wait.status
+        })
+    return {"wait_list": wait_list, "isSuccess": True}

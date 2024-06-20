@@ -1,3 +1,4 @@
+from server.apis.react_user import User
 from .mail import Email, Verify_email
 from .react_feedback import Feedback_graph_update, Feedback_info, Feedback_professor_graph, Feedback_review, Feedback_self_graph, Feedback_self_graph_update, Feedback_self_info, Feedback_self_review, Feedback_self_textae, Feedback_student_graph, Feedback_textae, assignment_zip_down
 # from .lecture import Attend, Lecture_mod, Lecture_mod_del,Major, Lecture_add
@@ -13,6 +14,7 @@ from .react_lecture import React_Lecture, React_Lecture_apply_list, React_Lectur
 
 
 def load_api(api_module):
+    api_module.add_resource(User,'/api/user',endpoint='user') # GET POST PUT PATCH DELETE
     api_module.add_resource(Join2,'/api/user/join',endpoint='join2') # GET POST PUT PATCH DELETE
     api_module.add_resource(React_Student,'/api/lecture/studentlist',endpoint='react_student')
     api_module.add_resource(React_Prob_submit_list,'/api/probsubmit/list',endpoint='react_prob_submit_list')

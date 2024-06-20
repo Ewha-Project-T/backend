@@ -410,7 +410,7 @@ def update_open(as_no:int, user_no:int, open:bool):
     db.session.commit()
     return
 
-def save_feedback(assignment:Assignment,attendee:Attendee, is_self:bool):
+def save_feedback(assignment:Assignment,attendee:Attendee, is_self:bool=False):
     if is_self:
         feedback = Feedback2.query.filter_by(assignment_no=assignment.assignment_no, attendee_no=attendee, lecture_no = 0).first()
     else:

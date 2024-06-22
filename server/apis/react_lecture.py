@@ -116,7 +116,7 @@ class React_Lecture_add(Resource):
         parser.add_argument('lecture_major', type=str, required=True, help="Major is required")
         parser.add_argument('lecture_separated', type=str, required=True, help="separated id is required")
         parser.add_argument('lecture_professor', type=str, required=True, help="professor is required")
-        parser.add_argument('lecture_attendee', type=str, action='append', required=True)
+        # parser.add_argument('lecture_attendee', type=str, action='append', required=True)
         args = parser.parse_args()
         lecture_name = args['lecture_name']
         lecture_year = args['lecture_year']
@@ -124,8 +124,8 @@ class React_Lecture_add(Resource):
         lecture_major=args['lecture_major']
         lecture_separated= args['lecture_separated']
         lecture_professor = args['lecture_professor']
-        attendee=args['lecture_attendee']
-        make_lecture(lecture_name,lecture_year,lecture_semester,lecture_major,lecture_separated,lecture_professor,attendee,user_info)#추후 에러코드관리
+        # attendee=args['lecture_attendee']
+        make_lecture(lecture_name,lecture_year,lecture_semester,lecture_major,lecture_separated,lecture_professor,user_info)#추후 에러코드관리
         return{"msg" : "lecture make success"},201
 
 class React_Lecture_mod(Resource):

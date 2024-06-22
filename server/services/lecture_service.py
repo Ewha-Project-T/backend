@@ -43,7 +43,7 @@ def lecture_listing(user_no=None):
                 lecture_list_result.append(tmp)
         return lecture_list_result
 
-def make_lecture(name,year,semester,major,separated,professor,attendee,user_info):
+def make_lecture(name,year,semester,major,separated,professor,user_info):
     acc=Lecture(lecture_name=name,year=year,semester=semester,major=major,separated=separated,professor=professor)
     db.session.add(acc)
     db.session.commit()
@@ -52,18 +52,6 @@ def make_lecture(name,year,semester,major,separated,professor,attendee,user_info
     professor=Attendee(user_no=professor_no,lecture_no=this_lecture.lecture_no,permission=3)
     db.session.add(professor)
     db.session.commit()
-    for attendee_user in attendee:
-        attendee_user=attendee_user.replace("'",'"')
-        user=json.loads(attendee_user)
-        user_email=user["email"]
-        user_name=user["name"]
-        user_acc=User.query.filter_by(email=user_email,name=user_name).first()
-        if user_acc==None:
-            continue
-        attend=Attendee(user_no=user_acc.user_no,lecture_no=this_lecture.lecture_no,permission=user_acc.permission)
-        db.session.add(attend)
-        db.session.commit()
-
 
 def modify_lecture(no,name,year,semester,major,separated,professor,attendee,user_info):
     acc=Lecture.query.filter_by(lecture_no=no).first()

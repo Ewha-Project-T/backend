@@ -8,7 +8,7 @@ from flask_jwt_extended import create_refresh_token, create_access_token, verify
 import json
 
 
-def lecture_listing(user_no=None):
+def lecture_listing(user_no=None):#강의조회
     lecture_list_result=[]
     if(user_no==None):#관리자용 전체조회
         lecture_list=Lecture.query.order_by(Lecture.lecture_no.desc()).all()
@@ -23,7 +23,7 @@ def lecture_listing(user_no=None):
             tmp["professor"]=vars(lec)["professor"]
             lecture_list_result.append(tmp)
         return lecture_list_result
-    else:
+    else:#학생 교수용 강의조회
         attend=Attendee.query.filter_by(user_no=user_no["user_no"]).order_by(Attendee.attendee_no.desc()).all()#학생교수조교용
         for at in attend:
             lecture_list=Lecture.query.filter_by(lecture_no=at.lecture_no).all()
@@ -43,7 +43,7 @@ def lecture_listing(user_no=None):
                 lecture_list_result.append(tmp)
         return lecture_list_result
 
-def make_lecture(name,year,semester,major,separated,professor,attendee,user_info):
+def make_lecture(name,year,semester,major,separated,professor,attendee,user_info):#강의생성
     acc=Lecture(lecture_name=name,year=year,semester=semester,major=major,separated=separated,professor=professor)
     db.session.add(acc)
     db.session.commit()
@@ -65,7 +65,7 @@ def make_lecture(name,year,semester,major,separated,professor,attendee,user_info
         db.session.commit()
 
 
-def modify_lecture(no,name,year,semester,major,separated,professor,attendee,user_info):
+def modify_lecture(no,name,year,semester,major,separated,professor,attendee,user_info):#강의수정
     acc=Lecture.query.filter_by(lecture_no=no).first()
     if name !="":
         acc.lecture_name=name
@@ -112,12 +112,12 @@ def modify_lecture(no,name,year,semester,major,separated,professor,attendee,user
             db.session.commit()
 
 
-def delete_lecture(lecture_no):
+def delete_lecture(lecture_no):#강의삭제
     acc = Lecture.query.filter_by(lecture_no=lecture_no).first()
     db.session.delete(acc)
     db.session.commit()
 
-def search_student(name,major):
+def search_student(name,major):#강의생성 중 수강자에서 학생찾기->이름 전공과 일치하는 학생정보 조회
     acc=User.query.filter_by(name=name,major=major).all()
     student_list_result=[]
     for user in acc:
@@ -130,7 +130,7 @@ def search_student(name,major):
         student_list_result.append(tmp)
     return student_list_result
 
-def major_listing(major):
+def major_listing(major):#전공에 일치하는 강의조회
     acc=Lecture.query.filter_by(major=major).all()
     major_list_result=[]
     for lecture in acc:
@@ -145,12 +145,12 @@ def major_listing(major):
         major_list_result.append(tmp)
     return major_list_result
 
-def attendee_add(user_no,lecture_no,perm):
+def attendee_add(user_no,lecture_no,perm):#수강자 추가
     acc=Attendee(user_no=user_no,lecture_no=lecture_no,permission=perm)
     db.session.add(acc)
     db.session.commit()
 
-def attendee_listing(lecture_no):
+def attendee_listing(lecture_no):#수강자 조회
     acc=Attendee.query.filter_by(lecture_no=lecture_no)
     attendee_user=[]
     attendee_list_result=[]
@@ -169,13 +169,13 @@ def attendee_listing(lecture_no):
         attendee_list_result.append(tmp)
     return attendee_list_result
 
-def lecture_access_check(user_no,lecture_no):
+def lecture_access_check(user_no,lecture_no):#강의 생성 수정 삭제중 교수권한인지 확인
     acc=Attendee.query.filter_by(lecture_no=lecture_no,user_no=user_no,permission=3).first()
     if(acc==None):
         return 0
     return 1
 
-def mod_lecutre_listing(lecture_no):
+def mod_lecutre_listing(lecture_no):#강의 수정 정보 조회 및 수강자 조회
     lecture_list_result={}
     acc=Lecture.query.filter_by(lecture_no=lecture_no).first()
     lecture_list_result["lecture_no"]=vars(acc)["lecture_no"]

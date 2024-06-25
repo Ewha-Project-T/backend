@@ -16,7 +16,7 @@ from datetime import datetime, timedelta
 
 
 def send_mail(send_from, send_to, subject, message, mtype='plain', files=[],
-              server=None, port=None, username='', password=''):
+              server=None, port=None, username='', password=''):#이메일인증 메일 전송
     server = server or os.environ['EMAIL_HOST']
     port = port or os.environ['EMAIL_PORT']
     """Compose and send email with provided info and attachments.
@@ -62,7 +62,7 @@ def send_mail(send_from, send_to, subject, message, mtype='plain', files=[],
     smtp.sendmail(send_from, send_to, msg.as_string())
     smtp.quit()
 
-def signup_email_validate(sender_email,code,mail_func):
+def signup_email_validate(sender_email,code,mail_func):#이메일 인증 메일 구성
     id = os.environ['EMAIL_ID']
     pw = os.environ['EMAIL_PW']
     email = os.environ['EMAIL_ADDRESS']
@@ -84,7 +84,7 @@ def signup_email_validate(sender_email,code,mail_func):
           mtype='html', username=email, password=pw)
 
 
-def gen_verify_email_code(user_email):
+def gen_verify_email_code(user_email):#이메일 인증 코드 생성
     salt = str(binascii.hexlify(os.urandom(16)))
     r_key = str(uuid.uuid4())
     code = hashlib.sha512(str(r_key + salt).encode('utf-8')).hexdigest()
@@ -95,7 +95,7 @@ def gen_verify_email_code(user_email):
     db.session.commit()
     return code
 
-def get_access_code(user_email):
+def get_access_code(user_email):#이메일 인증 코드 가져오기
     acc = User.query.filter_by(email=user_email).first()
     if(acc.access_code==None):
         return 0
@@ -103,7 +103,7 @@ def get_access_code(user_email):
     #    return 0
     return acc.access_code
 
-def access_check_success(user_email):
+def access_check_success(user_email):#이메일 인증 성공처리
     acc = User.query.filter_by(email=user_email).first()
     acc.access_check=1
     db.session.add(acc)

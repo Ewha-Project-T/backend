@@ -50,7 +50,6 @@ def prob_self_list(user_no:int):
         res.append({'as_no': assignment.assignment_no, 'as_name': assignment.as_name,"open_time":assignment.open_time})
     return {"lecture_name" : "자습", "prob_list" : res}
 
-#major_convert={"한일통역":"ja-JP","한일번역":"ja-JP","한중통역":"zh-CN","한중번역":"zh-CN","한영통역":"en-US","한영번역":"en-US","한불통역":"fr-FR","한불번역":"fr-FR"}#임시용
 major_convert={"ko":"ko-KR","jp":"ja-JP","en":"en-US","cn":"zh-CN","fr":"fr-FR"}
 def make_as(user_no,lecture_no,week,limit_time,as_name,as_type,keyword,description,re_limit,speed,disclosure,original_text="",upload_url="",region=None,user_info=None,prob_translang_source="ko",prob_translang_destination="ko"):
     acc=Assignment(user_no=user_no,lecture_no=lecture_no,week=week,limit_time=limit_time,as_name=as_name,as_type=as_type,keyword=keyword,description=description,re_limit=re_limit,speed=speed,disclosure=disclosure,original_text=original_text,upload_url=upload_url,translang=prob_translang_source,dest_translang=prob_translang_destination)
@@ -187,7 +186,7 @@ def edit_assignment(as_no,limit_time, as_name, as_type, keyword, prob_translang_
     return assignment_to_edit.assignment_no
 
         
-def split_wav_save(upload_url,start,end):
+def split_wav_save(upload_url,start,end):#업로드된 wave파일 분할
     uuid_str=str(uuid.uuid4())
     audio: AudioSegment = AudioSegment.from_file(upload_url)
     audio[start * 1000:end * 1000].export(f"{os.environ['UPLOAD_PATH']}/{uuid_str}.wav", format="wav")
@@ -261,7 +260,7 @@ def mod_as(lecture_no,as_no,week,limit_time,as_name,as_type,keyword,description,
         db.session.commit()
 
 
-def get_wav_url(as_no):
+def get_wav_url(as_no):#업로드된 과제의 음원 정보 조회
     acc=Prob_region.query.filter_by(assignment_no=as_no).all()
     prob_result=[]
     for lec in acc:
@@ -273,7 +272,7 @@ def get_wav_url(as_no):
         tmp["job_id"]=vars(lec)["job_id"]
         prob_result.append(tmp)
     return prob_result
-def get_original_stt_result(prob_result):
+def get_original_stt_result(prob_result):#과제의 원음 STT결과 조회
     original_result=[]
     for i in prob_result:
         acc=SttJob.query.filter_by(job_id=i["job_id"]).order_by(SttJob.stt_seq.desc()).first()
@@ -633,7 +632,7 @@ def assignment_end_submission(as_no:int, user_no:int, is_self:bool = False):
             "isSuccess" : True
             }
 
-def get_as_name(as_no):
+def get_as_name(as_no):#과제이름 조회
     acc=Assignment.query.filter_by(assignment_no=as_no).first()
     return acc.as_name
 
@@ -696,7 +695,7 @@ def mod_assignment_listing(lecture_no,assignment_no):
 
     return as_list_result,audio_list_result
 
-def get_as_info(lecture_no,assignment_no):
+def get_as_info(lecture_no,assignment_no):#과제정보조회
     as_list_result={}
     acc= Assignment.query.filter_by(lecture_no=lecture_no,assignment_no=assignment_no).first()
     if acc==None:
@@ -746,7 +745,7 @@ def set_feedback(as_no,lecture_no,professor_review,feedback,user_no):
             db.session.commit()
 
             
-def get_feedback(as_no,lecture_no,user_no):
+def get_feedback(as_no,lecture_no,user_no):#피드백 조회
     attend=Attendee.query.filter_by(user_no=user_no,lecture_no=lecture_no).first()
     check=Assignment_check.query.filter_by(assignment_no=as_no,attendee_no=attend.attendee_no,assignment_check=1).order_by(Assignment_check.check_no.desc()).first()
     pro_review=check.professor_review
@@ -832,7 +831,7 @@ def get_assignments_manage(user_info:dict,as_no:int):
     
     return 1
 
-def make_json(text,denotations,attributes):
+def make_json(text,denotations,attributes):#textae에 맞는 json형태로 변환
     data = {
         "text": text,
         "denotations": ast.literal_eval(denotations) if type(denotations) == str else denotations ,
@@ -870,7 +869,7 @@ def make_json(text,denotations,attributes):
     return json.dumps(data, indent=4,ensure_ascii=False)
 
 
-def make_json_url(text,denotations,attributes,check,flag):
+def make_json_url(text,denotations,attributes,check,flag):#textae에 전달할 json경로 생성
     domain = os.getenv("DOMAIN", "https://edu-trans.ewha.ac.kr:8443")
     filetmp = uuid.uuid4()
     filepath = f"{os.environ['UPLOAD_PATH']}/{filetmp}.json"
@@ -903,7 +902,7 @@ def save_json_feedback(as_no,lecture_no,user_no,ae_attributes,ae_denotations,res
     db.session.add(acc)
     db.session.commit()
 
-def parse_data(stt_result,stt_feedback):
+def parse_data(stt_result,stt_feedback):#json데이터에서 데이터 파싱
     cnt=1
     text=""
     denotations="["

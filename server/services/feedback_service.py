@@ -250,7 +250,7 @@ def get_feedback_info(as_no: int, student_no: int, user_no: int):
 
     res["assignment_audio"] = [make_audio_format(assignment_audio) for assignment_audio in assignment_audio]
     res["student_audio"] = [make_audio_format(assignment_check_list, index) for index, assignment_check_list in enumerate(assignment_check_list)]
-    # res["student_delay"] = [get_audio_delay(assignment_check_list, index) for index, assignment_check_list in enumerate(assignment_check_list)]
+    # res["student_delay"] = [get_audio_delay(assignment_check_list, index) for index, assignment_check_list in enumerate(assignment_check_list)] #피드백의 학생 오디오 딜레이계산
     res["isSuccess"] = True
     
     return res
@@ -321,7 +321,7 @@ def get_self_feedback_info(as_no: int, user_no: int):
 
     res["assignment_audio"] = [make_audio_format(assignment_audio) for assignment_audio in assignment_audio]
     res["student_audio"] = [make_audio_format(assignment_check_list, index) for index, assignment_check_list in enumerate(assignment_check_list)]
-    # res["student_delay"] = [get_audio_delay(assignment_check_list, index) for index, assignment_check_list in enumerate(assignment_check_list)]
+    # res["student_delay"] = [get_audio_delay(assignment_check_list, index) for index, assignment_check_list in enumerate(assignment_check_list)]#피드백의 학생 오디오 딜레이계산
     res["isSuccess"] = True
     
     return res

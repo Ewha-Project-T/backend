@@ -21,7 +21,7 @@ class RegisterResult:
     INVALID_PERM = 2
 
 
-def login(user_email, user_pw):
+def login(user_email, user_pw):#로그인
     acc = User.query.filter_by(email=user_email).first()
     if(acc == None):
         return LoginResult.ACC_IS_NOT_FOUND, acc
@@ -34,7 +34,7 @@ def login(user_email, user_pw):
         return LoginResult.SUCCESS, acc
     return LoginResult.INVALID_EMAILPW, acc
 
-def create_tokens(user: User, **kwargs):
+def create_tokens(user: User, **kwargs):#jwt토큰 생성
     identities = {
         "type": "login",
         "user_no": user.user_no,
@@ -45,7 +45,7 @@ def create_tokens(user: User, **kwargs):
     }
     return create_access_token(identities, **kwargs), create_refresh_token(identities, **kwargs)
 
-def register(user_email,user_pw,user_name,user_major, user_perm):#,user_ident): 
+def register(user_email,user_pw,user_name,user_major, user_perm):#유저생성 
     acc = User.query.filter_by(email=user_email).first()
     if acc !=None:
         return RegisterResult.USEREMAIL_EXIST
@@ -56,12 +56,12 @@ def register(user_email,user_pw,user_name,user_major, user_perm):#,user_ident):
     db.session.commit
     return RegisterResult.SUCCESS
 
-def real_time_email_check(user_email):
+def real_time_email_check(user_email):#회원가입시 이메일 중복 체크
     acc = User.query.filter_by(email=user_email).first()
     if acc !=None:
         return RegisterResult.USEREMAIL_EXIST
     return 0
-def get_all_user():
+def get_all_user():#학생계정 전체조회
     acc_list = User.query.all()
     info_list = []
     for info in acc_list:#교수와 관리자계정은 제외했음
@@ -90,28 +90,28 @@ def admin_required(): #관리자 권한
 
     return wrapper
 
-def findpassword_email_check(user_email):
+def findpassword_email_check(user_email):#비밀번호찾기 이메일 존재여부 확인
     acc = User.query.filter_by(email=user_email).first()
     if acc ==None:
         return 0
     return 1
 
-def findpassword_code_check(email,code):
+def findpassword_code_check(email,code):#비밀번호찾기 코드일치 확인
     acc = User.query.filter_by(email=email).first()
     if acc ==None:
         return 0
     if(acc.access_code!=code):
         return 0
     return 1
-def encrypt_password(password):
+def encrypt_password(password):#패스워드 암호화
     salt = os.urandom(32)
     encrypt_passwd = base64.b64encode(salt + hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 100000, dklen=128))
     return encrypt_passwd
-def change_pass(email,password):
+def change_pass(email,password):#비밀번호 변경
     acc = User.query.filter_by(email=email).first()
     acc.password=encrypt_password(password)
     db.session.commit()
-def find_id(name, major, permission):
+def find_id(name, major, permission):#아이디 찾기->아이디중 일부를 마스킹하여 전달
     results = []
     acc = User.query.filter_by(name=name, major=major, permission=permission).all()
     if not acc:
@@ -127,7 +127,7 @@ def find_id(name, major, permission):
     return results
 
 
-def mask_email(email):
+def mask_email(email):#아이디 찾기에 보여지는 이메일 마스킹
     user_name, domain = email.split('@')
     if len(user_name) > 4:
         user_name_masked = user_name[:2] + '*' * (len(user_name) - 4) + user_name[-2:]

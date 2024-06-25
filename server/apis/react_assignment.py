@@ -10,6 +10,7 @@ import re
 from ..services.assignment_service import assignment_cancel, assignment_chance, assignment_detail, assignment_detail_record, assignment_detail_translate, assignment_end_submission, assignment_record, assignment_self_detail, assignment_self_detail_record, assignment_self_record, assignment_translate, delete_self_assignment, edit_assignment, get_assignment, get_assignments_manage, get_calendar, get_date, get_self_assignment,mod_assignment_listing,check_assignment,make_as, create_assignment,prob_list_professor, prob_list_student, mod_as,delete_assignment,get_as_name,get_prob_wav_url,get_wav_url,get_stt_result,get_original_stt_result,get_as_info,get_feedback,make_json_url, prob_self_list,save_json_feedback,get_prob_submit_list,get_studentgraph,get_professorgraph
 from ..services.lecture_service import lecture_access_check
 from werkzeug.utils import secure_filename
+from werkzeug.datastructures import FileStorage
 from os import environ as env
 from datetime import datetime
 import os
@@ -711,4 +712,67 @@ class React_Prob_date(Resource):
         date = args['date']
         res = get_date(user_info, date)
 
+        return jsonify(res)
+
+###사용중이라고 주석남기셔서 옮겨둡니다.
+ALLOWED_SOUND_EXTENSIONS = {'mp3'}
+def allowed_sound_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_SOUND_EXTENSIONS
+
+
+
+class prob_upload(Resource):
+
+    parser = reqparse.RequestParser()
+    parser.add_argument('prob_sound', type=FileStorage, location='files')
+
+    @jwt_required()
+    def post(self):
+        args = self.parser.parse_args()        
+        file = args['prob_sound']
+
+        if not file or not allowed_sound_file(file.filename) or not self.is_mp3(file):
+            return {"msg": "mp3 file upload fail"}, 400
+
+        filename = str(uuid.uuid4())
+        path = f'{os.environ["UPLOAD_PATH"]}/{filename}.mp3'
+        file.save(path)
+        return jsonify({
+            "file_path": path  # 추후 파일명에 대한 해쉬처리 필요
+        })
+
+    @staticmethod
+    def is_mp3(f):
+        """Check if the file has an MP3 signature."""
+        f.seek(0)  # Ensure we're reading from the beginning
+        header = f.read(3)
+        return header == b'ID3' or header[:2] == b'\xff\xfb' or header[:2]==b'\xff\xf2' or header[:2]==b'\xff\xf3'
+
+ALLOWED_EXTENSIONS = {'hwp','pdf','docx','doc','ppt','pptx','xls','xlsx','txt'}
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+#pdf, docx upload
+class prob_upload_file(Resource):
+    @jwt_required()
+    def post(self):
+        parser = reqparse.RequestParser()      
+        parser.add_argument('prob_file', type=FileStorage, location='files')        
+        args = parser.parse_args()        
+        file= args['prob_file']
+
+        uuid_str=str(uuid.uuid4())
+        filename = uuid_str
+        file_extention = os.path.splitext(file.filename)[1].lower()
+        path = f'{os.environ["UPLOAD_PATH"]}/{filename}{file_extention}'
+        if file and allowed_file(file.filename):
+            file.save(path)
+        else:
+            return {"msg":"file upload fail"},400
+        res = {
+            "file_path": path, #추후 파일명에대한 해쉬처리 필요
+            "file_name": file.filename
+        }
         return jsonify(res)

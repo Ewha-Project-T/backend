@@ -218,7 +218,7 @@ def get_feedback_info(as_no: int, student_no: int, user_no: int):
     assignment_check_list = Assignment_check_list.query.filter_by(check_no=assignment_check.check_no).all()
     if not assignment_check_list:
         return {"message": "해당 학생의 오디오 파일이 존재하지 않습니다.", "isSuccess": False}
-    stt = Stt.query.filter_by(assignment_no=as_no, user_no = professor_no).all()
+    stt = Stt.query.filter_by(assignment_no=as_no, user_no = professor_no, is_deleted=False).all()
     text,denotations_json,attributes_json ="",[],[]
     res["student_delay"] = []
     for st in stt:
@@ -250,7 +250,7 @@ def get_feedback_info(as_no: int, student_no: int, user_no: int):
 
     res["assignment_audio"] = [make_audio_format(assignment_audio) for assignment_audio in assignment_audio]
     res["student_audio"] = [make_audio_format(assignment_check_list, index) for index, assignment_check_list in enumerate(assignment_check_list)]
-    # res["student_delay"] = [get_audio_delay(assignment_check_list, index) for index, assignment_check_list in enumerate(assignment_check_list)] #피드백의 학생 오디오 딜레이계산
+    # res["student_delay"] = [get_audio_delay(assignment_check_list, index) for index, assignment_check_list in enumerate(assignment_check_list)]
     res["isSuccess"] = True
     
     return res
@@ -287,7 +287,7 @@ def get_self_feedback_info(as_no: int, user_no: int):
     assignment_check_list = Assignment_check_list.query.filter_by(check_no=assignment_check.check_no).all()
     if not assignment_check_list:
         return {"message": "해당 학생의 오디오 파일이 존재하지 않습니다.", "isSuccess": False}
-    stt = Stt.query.filter_by(assignment_no=as_no, user_no = professor_no).all()
+    stt = Stt.query.filter_by(assignment_no=as_no, user_no = professor_no, is_deleted=False).all()
     prob_region_count = Prob_region.query.filter_by(assignment_no=as_no).count()
     text,denotations_json,attributes_json ="",[],[]
     res["student_delay"] = []
@@ -321,7 +321,7 @@ def get_self_feedback_info(as_no: int, user_no: int):
 
     res["assignment_audio"] = [make_audio_format(assignment_audio) for assignment_audio in assignment_audio]
     res["student_audio"] = [make_audio_format(assignment_check_list, index) for index, assignment_check_list in enumerate(assignment_check_list)]
-    # res["student_delay"] = [get_audio_delay(assignment_check_list, index) for index, assignment_check_list in enumerate(assignment_check_list)]#피드백의 학생 오디오 딜레이계산
+    # res["student_delay"] = [get_audio_delay(assignment_check_list, index) for index, assignment_check_list in enumerate(assignment_check_list)]
     res["isSuccess"] = True
     
     return res
@@ -335,7 +335,7 @@ def make_audio_format(prob_region, id=0):
     }
 def get_audio_delay(prob_region, id=0):
     url = prob_region.upload_url if hasattr(prob_region, "upload_url") else prob_region.acl_uuid
-    stt= Stt.query.filter_by(wav_file=url).first()
+    stt= Stt.query.filter_by(wav_file=url, is_deleted=False).first()
     print(url)
     sttjob= SttJob.query.filter_by(stt_no=stt.stt_no).first()
     delay=0
@@ -702,7 +702,7 @@ def get_zip_url(lecutre_no:int, user_no:int):
             text,denotations,attributes, index_len = "", [], [], 0
             Tid = 1
             for index,i in enumerate(uuid):
-                stt=Stt.query.filter_by(wav_file=i["uuid"]).first()
+                stt=Stt.query.filter_by(wav_file=i["uuid"], is_deleted=False).first()
                 if stt is None:
                     continue
                 stt_job=SttJob.query.filter_by(stt_no=stt.stt_no).first()

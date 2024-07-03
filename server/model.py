@@ -158,6 +158,7 @@ class Stt(db.Model):
     user_no = db.Column(db.Integer, db.ForeignKey("USER.user_no", ondelete="CASCADE"), nullable=False)
     assignment_no = db.Column(db.Integer, db.ForeignKey("ASSIGNMENT.assignment_no", ondelete="CASCADE"), nullable=False)
     wav_file = db.Column(db.String(41), nullable=False)
+    is_deleted = db.Column(db.Boolean, default=False)
 
     user=db.relationship("User", back_populates="stt")
     assignment = db.relationship("Assignment", back_populates="stt")

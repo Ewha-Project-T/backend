@@ -50,13 +50,13 @@ def mapping_sst_user(assignment, file,userinfo):
     return stt.stt_no
 
 def is_stt_userfile(assignment, file,userinfo) -> bool:
-    stt = Stt.query.filter_by(user_no=userinfo["user_no"], assignment_no=assignment, wav_file=file).first()
+    stt = Stt.query.filter_by(user_no=userinfo["user_no"], assignment_no=assignment, wav_file=file, is_deleted=False).first()
     if stt is None:
         return False
     return True
 
 def remove_userfile(assignment, file,userinfo) -> bool:
-    stt = Stt.query.filter_by(user_no=userinfo["user_no"], assignment_no=assignment, wav_file=file)
+    stt = Stt.query.filter_by(user_no=userinfo["user_no"], assignment_no=assignment, wav_file=file,is_deleted=False)
     if stt is None:
         return False
     try:
@@ -68,7 +68,7 @@ def remove_userfile(assignment, file,userinfo) -> bool:
     return True
 
 def get_userfile(userinfo):
-    stt = Stt.query.filter_by(user_no=userinfo["user_no"]).first()
+    stt = Stt.query.filter_by(user_no=userinfo["user_no"],is_deleted=False).first()
     if stt is None:
         return False
     return stt
@@ -84,7 +84,7 @@ def get_stt_from_jobid(jobid):
     if job is None:
         return False
     
-    stt = Stt.query.filter_by(stt_no=job.stt_no).first()
+    stt = Stt.query.filter_by(stt_no=job.stt_no,is_deleted=False).first()
     if stt is None:
         return False
     return stt

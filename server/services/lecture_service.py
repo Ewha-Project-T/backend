@@ -211,7 +211,7 @@ def get_enrolment_code(user_no:int, lecture_no:int):
         return {"message": "강의 확인", "isSuccess": False}
     if lecutre.code:
         return {"code": f"{lecture_no:04d}-"+str(lecutre.code), "isSuccess": True, "lecture_name": lecutre.lecture_name, "update_time": lecutre.code_update_date}
-    return {"code": None, "isSuccess": True}
+    return {"code": None, "lecture_name": lecutre.lecture_name,"isSuccess": True}
 
 def modify_enrolment(user_no:int, lecture_no:int, status:bool):
     attendee = Attendee.query.filter_by(user_no=user_no, lecture_no=lecture_no).first()

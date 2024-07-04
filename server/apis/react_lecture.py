@@ -8,7 +8,7 @@ from flask_jwt_extended import (
     jwt_required, get_jwt_identity, create_access_token, get_jwt
 )
 import re
-from ..services.lecture_service import apply_enrolment, get_apply_list, get_enrolment_code, get_enrolments, lecture_listing, make_lecture, modify_enrolment,modify_lecture,delete_lecture, request_enrolment, search_student,major_listing,attendee_add,attendee_listing,lecture_access_check,mod_lecutre_listing
+from ..services.lecture_service import apply_enrolment, get_apply_list, get_enrolment_code, get_enrolments, get_users, lecture_listing, make_lecture, modify_enrolment,modify_lecture,delete_lecture, request_enrolment, search_student,major_listing,attendee_add,attendee_listing,lecture_access_check,mod_lecutre_listing
 from ..services.login_service import get_all_user
 
 from os import environ as env
@@ -241,4 +241,15 @@ class React_Lecture_apply_list(Resource):
         status = args['status']
         user_info=get_jwt_identity()
         res = apply_enrolment(user_info["user_no"],user_no,lecture_no,status)
+        return jsonify(res)
+
+class React_Students(Resource):
+    @jwt_required()
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('lecture_no', type=int)
+        args = parser.parse_args()
+        lecture_no = args['lecture_no']
+        user_info=get_jwt_identity()
+        res = get_users(user_info["user_no"],lecture_no)
         return jsonify(res)

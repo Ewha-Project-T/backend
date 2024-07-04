@@ -310,3 +310,20 @@ def apply_enrolment(professor_no:int,user_no:int,lecture_no:int,status:bool):
         wait_attendee.status = False
     db.session.commit()
     return {"message": "수강 수락", "isSuccess": True}
+
+def get_users(user_no:int,lecture_no:int):
+    attendee = Attendee.query.filter_by(user_no=user_no, lecture_no=lecture_no).first()
+    if not attendee:
+        return {"message": "수강 확인", "isSuccess": False}
+    if attendee.permission != 3:
+        return {"message": "권한 확인", "isSuccess": False}
+    user_list = Attendee.query.filter_by(lecture_no=lecture_no, permission = 1).all()
+    users = []
+    for user in user_list:
+        users.append({
+            "user_name": user.user.name,
+            "major": user.user.major,
+            "email": user.user.email,
+            "register_time": user.register_time
+            })
+    return {"users": users, "lecture_name": attendee.lecture.lecture_name, "isSuccess": True}

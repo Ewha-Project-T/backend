@@ -292,3 +292,21 @@ def get_apply_list(user_no:int, lecture_no:int):
             "status": wait.status
         })
     return {"wait_list": wait_list, "isSuccess": True}
+
+def apply_enrolment(professor_no:int,user_no:int,lecture_no:int,status:bool):
+    attendee = Attendee.query.filter_by(user_no=professor_no, lecture_no=lecture_no).first()
+    if not attendee:
+        return {"message": "수강 확인", "isSuccess": False}
+    if attendee.permission != 3:
+        return {"message": "권한 확인", "isSuccess": False}
+    wait_attendee = Attendee_waitlist.query.filter_by(user_no=user_no, lecture_no=lecture_no).first()
+    if not wait_attendee:
+        return {"message": "신청 확인", "isSuccess": False}
+    if status:
+        new_attendee = Attendee(user_no=user_no, lecture_no=lecture_no, permission=1, register_time=datetime.now()+timedelta(hours=6))
+        db.session.add(new_attendee)
+        db.session.delete(wait_attendee)
+    else:
+        wait_attendee.status = False
+    db.session.commit()
+    return {"message": "수강 수락", "isSuccess": True}

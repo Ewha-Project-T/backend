@@ -239,11 +239,11 @@ def get_feedback_info(as_no: int, student_no: int, user_no: int):
         # denotations_json += result["denotations"]
         # attributes_json += result["attributes"]
 
-    
+    origin_delay=0
     # res["original_ae"] = json.loads(make_json(text, denotations_json, attributes_json))
     res["original_tts"] = text
     res["original_text"] = assignment.original_text
-    res["original_delay"] = origin_delay=origin_delay
+    res["original_delay"] = origin_delay
     res["student_name"] = user.name
     res["submit_time"] = assignment_manage.end_submission_time
     res["limit_time"] = assignment.limit_time

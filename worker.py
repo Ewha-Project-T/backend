@@ -96,7 +96,7 @@ def do_stt_work(self, filename, locale="ko", stt_seq=0):
     else:
         stt=KorStt()
     self.update_state(state='STT')
-
+    delay=0
     try:
         delay=get_delay(filename)
         result_stt_json=stt.execute(filename)

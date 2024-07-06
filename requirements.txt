@@ -8,7 +8,7 @@ asn1crypto==0.24.0
 async-timeout==4.0.2
 asynctest==0.13.0
 attrs==22.2.0
-azure-cognitiveservices-speech==1.19.0
+azure-cognitiveservices-speech==1.24.0
 billiard==3.6.4.0
 blinker==1.5
 cached-property==1.5.2
@@ -94,3 +94,4 @@ Werkzeug==2.0.3
 XlsxWriter==3.1.9
 yarl==1.9.3
 zipp==3.6.0
+arrow

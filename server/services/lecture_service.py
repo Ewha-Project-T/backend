@@ -209,9 +209,10 @@ def get_enrolment_code(user_no:int, lecture_no:int):
     lecutre = Lecture.query.filter_by(lecture_no=lecture_no).first()
     if not lecutre:
         return {"message": "강의 확인", "isSuccess": False}
+    res = {"code": None, "lecture_name": lecutre.lecture_name,"isSuccess": True, "lecture_name": lecutre.lecture_name, "update_time": lecutre.code_update_date}
     if lecutre.code:
-        return {"code": f"{lecture_no:04d}-"+str(lecutre.code), "isSuccess": True, "lecture_name": lecutre.lecture_name, "update_time": lecutre.code_update_date}
-    return {"code": None, "lecture_name": lecutre.lecture_name,"isSuccess": True}
+        res['code'] = f"{lecture_no:04d}-"+str(lecutre.code)
+    return res
 
 def modify_enrolment(user_no:int, lecture_no:int, status:bool):
     attendee = Attendee.query.filter_by(user_no=user_no, lecture_no=lecture_no).first()
@@ -286,6 +287,7 @@ def get_apply_list(user_no:int, lecture_no:int):
     wait_list = []
     for wait in wait_attendee:
         wait_list.append({
+            "user_no": wait.user.user_no,
             "user_name": wait.user.name,
             "major": wait.user.major,
             "email": wait.user.email,

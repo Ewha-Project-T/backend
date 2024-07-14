@@ -904,7 +904,7 @@ def save_json_feedback(as_no,lecture_no,user_no,ae_attributes,ae_denotations,res
     db.session.add(acc)
     db.session.commit()
 
-def parse_data(stt_result,stt_feedback):
+def parse_data(stt_result,stt_feedback):#json데이터에서 데이터 파싱 feedback_services에서사용
     cnt=1
     text=""
     denotations="["

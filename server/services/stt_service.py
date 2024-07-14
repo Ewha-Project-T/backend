@@ -72,7 +72,7 @@ def get_userfile(userinfo):
     if stt is None:
         return False
     return stt
-
+"""
 def get_sttjob(jobid):
     job = SttJob.query.filter_by(job_no=jobid).first()
     if job is None:
@@ -88,3 +88,4 @@ def get_stt_from_jobid(jobid):
     if stt is None:
         return False
     return stt
+    """

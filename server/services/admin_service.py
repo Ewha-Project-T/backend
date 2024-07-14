@@ -35,4 +35,3 @@ def init_pass_cnt(email):#패스워드 실패횟수 초기화->이메일값 초�
     db.session.add(acc)
     db.session.commit
 
-

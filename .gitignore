@@ -3,3 +3,4 @@ serverENV
 serverENV/
 uploads/*
 .env
+.vscode

@@ -8,4 +8,15 @@ def get_user_by_id(user_id:int):
             "email" : user.email, 
             "permission" : user.permission
             }
-    
+
+def update_user(user_no:int, user_name:str, user_major:str):
+    user = User.query.filter_by(user_no=user_no).first()
+    user.name = user_name
+    user.major = user_major
+    db.session.commit()
+    return {
+        "name" : user.name,
+        "major" : user.major,
+        "email" : user.email,
+        "isSuccess" : True,
+        }

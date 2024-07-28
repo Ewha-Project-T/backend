@@ -40,6 +40,7 @@ class Stt(base):
     stt_no = Column(Integer, primary_key=True)
     user_no = Column(Integer, ForeignKey("USER.user_no"), nullable=False)
     assignment_no = Column(Integer, ForeignKey("ASSIGNMENT.assignment_no"), nullable=False)
+    is_deleted = Column(Boolean, default=False, nullable=False)
     wav_file = Column(String(36), nullable=False)
 
 class SttJob(base):
@@ -105,7 +106,7 @@ def do_stt_work(self, filename, locale="ko", stt_seq=0):
         self.update_state(state=e.args[0])
         session.rollback()
 
-    stt_db = session.query(Stt).filter_by(wav_file=filename).first()
+    stt_db = session.query(Stt).filter_by(wav_file=filename, is_deleted=False).first()
     if not stt_db:
         session.rollback()
         return False
@@ -144,7 +145,7 @@ def do_original_text_stt_work(self, filename, locale="ko",stt_no=None,stt_seq=0)
     print("result_stt_json = ", result_stt_json)
     print("1stt_no = ", stt_no)
     if not stt_no:
-        stt_db = session.query(Stt).filter_by(wav_file=filename).first()
+        stt_db = session.query(Stt).filter_by(wav_file=filename, is_deleted=False).first()
         if not stt_db:
             print("not stt_db")
             session.rollback()

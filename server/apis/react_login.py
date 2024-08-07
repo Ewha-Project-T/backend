@@ -5,7 +5,7 @@ from flask_jwt_extended import (
 )
 import re
 from ..services.login_service import (
-    login, register, LoginResult, RegisterResult, create_tokens,real_time_email_check,findpassword_email_check,findpassword_code_check,change_pass,find_id
+    check_and_change_password, login, register, LoginResult, RegisterResult, create_tokens,real_time_email_check,findpassword_email_check,findpassword_code_check,change_pass,find_id
 )
 from ..services.mail_service import (
     gen_verify_email_code,get_access_code,access_check_success,signup_email_validate
@@ -199,3 +199,16 @@ class Find_id(Resource):
 
         msg="아이디를 찾지 못했습니다."
         return jsonify({"Success":0,"msg":msg})
+
+class Change_pw(Resource):
+    @jwt_required()
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('new_password', type=str, help="PW is required")
+        parser.add_argument('old_password', type=str, help="PW is required")
+        args = parser.parse_args()
+        new_pw = args['new_password']
+        old_pw = args['old_password']
+        user = get_jwt_identity()
+        res = check_and_change_password(user["user_email"],old_pw, new_pw)
+        return jsonify(res)

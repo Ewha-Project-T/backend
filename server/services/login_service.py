@@ -107,6 +107,16 @@ def encrypt_password(password):#패스워드 암호화
     salt = os.urandom(32)
     encrypt_passwd = base64.b64encode(salt + hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 100000, dklen=128))
     return encrypt_passwd
+def check_and_change_password(email:str,old_password:str, new_password:str):#비밀번호 변경
+    login_result, acc = login(email,old_password)
+    if(old_password==new_password):
+        return {"msg":"동일한 비밀번호로 변경할 수 없습니다.", "isSuccess":False}
+    if(login_result!=LoginResult.SUCCESS):
+        return {"msg":"비밀번호가 일치하지 않습니다.", "isSuccess":False}
+    acc.password=encrypt_password(new_password)
+    db.session.commit()
+    return {"msg":"비밀번호가 변경되었습니다.", "isSuccess":True}
+
 def change_pass(email,password):#비밀번호 변경
     acc = User.query.filter_by(email=email).first()
     acc.password=encrypt_password(password)

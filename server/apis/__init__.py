@@ -4,7 +4,7 @@ from .react_feedback import Feedback_graph_update, Feedback_info, Feedback_profe
 # from .lecture import Attend, Lecture_mod, Lecture_mod_del,Major, Lecture_add
 from .admin import Admin2
 from .stt import Stt, SttJob, SttSeq, SttSeqJob
-from .react_login import Login2,Logout2,CheckToken,Join2,FindPassword,FindPassword_Check,Find_id
+from .react_login import Change_pw, Login2,Logout2,CheckToken,Join2,FindPassword,FindPassword_Check,Find_id
 from .react_assignment import React_Cancel_prob, React_Chance_prob, React_Porb_professor, React_Prob_Self,React_Prob_add, React_Prob_calendar, React_Prob_date, React_Prob_detail, React_Prob_end_submission, React_Prob_record, React_Prob_self_detail, React_Prob_self_record, React_Prob_student,React_Prob_submit_list,React_Prob_submit, React_Prob_submit_list2, React_prob_handle, React_self_prob_handle,Studentgraphlist,Professorgraphlist, TranslateAssignment
 from .react_login import Login2,Logout2,CheckToken,Join2,FindPassword,FindPassword_Check
 from .react_assignment import React_Cancel_prob, React_Cancel_self_prob, React_Chance_prob, React_Porb_professor, React_Prob_Self,React_Prob_add, React_Prob_detail, React_Prob_end_submission, React_Prob_record, React_Prob_self_detail, React_Prob_self_end_submission, React_Prob_self_record, React_Prob_self_submit, React_Prob_student,React_Prob_submit_list,React_Prob_submit, React_Prob_submit_list2, React_prob_handle, React_self_prob_handle,Studentgraphlist,Professorgraphlist, TranslateAssignment, TranslateSelfAssignment, prob_upload, prob_upload_file
@@ -66,6 +66,7 @@ def load_api(api_module):
     api_module.add_resource(React_Lecture_request, '/api/lecture/request', endpoint='react_lecture_request')
     api_module.add_resource(React_Lecture_apply_list, '/api/lecture/apply', endpoint='react_lecture_apply_list')
     api_module.add_resource(React_Students, '/api/lecture/students', endpoint='react_students')
+    api_module.add_resource(Change_pw, '/api/user/pw', endpoint='change_pw')
     ############################
     ######옛날 것인데 사용중########
     ############################

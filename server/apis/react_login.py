@@ -202,7 +202,7 @@ class Find_id(Resource):
 
 class Change_pw(Resource):
     @jwt_required()
-    def get(self):
+    def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('new_password', type=str, help="PW is required")
         parser.add_argument('old_password', type=str, help="PW is required")

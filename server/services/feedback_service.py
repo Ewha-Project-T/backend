@@ -7,6 +7,7 @@ from server import db
 from .assignment_service import get_prob_wav_url, get_stt_result, make_json, make_json_url, parse_data
 from ..model import Assignment_check, Assignment_check_list, Attendee, Assignment, Assignment_management, Feedback2, Lecture, Prob_region, SelfStudy, Stt, SttJob, User
 from sqlalchemy import func
+from sqlalchemy.orm import aliased
 
 def get_json_textae(as_no,user_no):
     assignment = Assignment.query.filter_by(assignment_no=as_no).first()
@@ -702,11 +703,21 @@ def get_zip_url(lecutre_no:int, user_no:int):
             text,denotations,attributes, index_len = "", [], [], 0
             Tid = 1
             for index,i in enumerate(uuid):
-                stt=Stt.query.filter_by(wav_file=i["uuid"], is_deleted=False).first()
+                stt_job_alias = aliased(SttJob)  # Aliasing for clarity if needed
+
+                stt = (Stt.query
+                    .join(stt_job_alias, stt_job_alias.stt_no == Stt.stt_no)  # Joining on stt_no
+                    .filter(stt_job_alias.stt_no.isnot(None))  # Ensuring stt_job is not null
+                    .filter(Stt.wav_file == i["uuid"], Stt.is_deleted == False)
+                    .order_by(Stt.stt_no.desc())
+                    .first())
+                # stt=Stt.query.filter_by(wav_file=i["uuid"], is_deleted=False).order_by(Stt.stt_no.desc()).first()
                 if stt is None:
+                    print("stt is None")
                     continue
                 stt_job=SttJob.query.filter_by(stt_no=stt.stt_no).first()
                 if stt_job is None:
+                    print("stt_job is None",stt.stt_no)
                     continue
                 result=stt_job.stt_result
                 path = os.environ["UPLOAD_PATH"] + "/" + str(assignment.assignment_no) + "_" + assignment.as_name+ "_" + str(user_name) + "_원본stt" + str(index) + ".json"
@@ -717,7 +728,11 @@ def get_zip_url(lecutre_no:int, user_no:int):
                         result = ""
                     f.write(result)
                 # 합본 만들기 준비
-                stt_result=json.loads(stt_job.stt_result)
+                try:
+                    stt_result=json.loads(stt_job.stt_result)
+                except:
+                    print(stt_job.stt_result)
+                    continue
                 text += stt_result["text"]
                 for denotation in stt_result["denotations"]:
                     denotation["id"] = "T"+str(Tid)

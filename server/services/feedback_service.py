@@ -413,7 +413,7 @@ def update_open(as_no:int, user_no:int, open:bool):
 
 def save_feedback(assignment:Assignment,attendee:Attendee, is_self:bool=False):
     if is_self:
-        feedback = Feedback2.query.filter_by(assignment_no=assignment.assignment_no, attendee_no=attendee, lecture_no = 0).first()
+        feedback = Feedback2.query.filter_by(assignment_no=assignment.assignment_no, lecture_no = 0).first()
     else:
         feedback = Feedback2.query.filter_by(assignment_no=assignment.assignment_no, attendee_no=attendee.attendee_no).first()
     if not feedback:
@@ -423,7 +423,7 @@ def save_feedback(assignment:Assignment,attendee:Attendee, is_self:bool=False):
             feedback = Feedback2(assignment_no=assignment.assignment_no, attendee_no=attendee.attendee_no, lecture_no=assignment.lecture_no)
         db.session.add(feedback)
     if is_self:
-        assignment_check = Assignment_check.query.filter_by(assignment_no=assignment.assignment_no, attendee_no=None).order_by(Assignment_check.check_no.desc()).first()
+        assignment_check = Assignment_check.query.filter_by(assignment_no=assignment.assignment_no).order_by(Assignment_check.check_no.desc()).first()
     else:
         assignment_check = Assignment_check.query.filter_by(assignment_no=assignment.assignment_no, attendee_no=attendee.attendee_no).order_by(Assignment_check.check_no.desc()).first()
     value = { "translation_error":0,"omission":0,"expression":0,"intonation":0,"grammar_error":0,"silence":0,"filler":0,"backtracking":0,"others":0}
@@ -609,11 +609,14 @@ def my_delivery(attendee, lecture_no, assignment_no, is_self:bool):
         tmp["name"] = str(index) + "회차"
         tmp["data"] = []
         for i in ["silence", "filler", "backtracking", "others"]:
-            value = Feedback2.query.filter_by(
+            query = Feedback2.query.filter_by(
                 lecture_no=lecture_no, 
-                attendee_no= None if is_self else attendee.attendee_no,
                 assignment_no=assignment.assignment_no
-            ).with_entities(getattr(Feedback2, i)).scalar()
+            )
+            if not is_self:
+                query = query.filter_by(attendee_no=attendee.attendee_no)
+
+            value = query.with_entities(getattr(Feedback2, i)).scalar()
             value = 0.0 if value is None else float(value)
             tmp["data"].append(float(value))
         data["data"].append(tmp)
@@ -641,11 +644,13 @@ def my_accuracy(attendee, lecture_no, assignment_no, is_self:bool):
             tmp["name"] = str(index) + "회차"
             tmp["data"] = []
             for i in ["translation_error", "omission", "expression", "intonation", "grammar_error", "others"]:
-                value = Feedback2.query.filter_by(
+                query = Feedback2.query.filter_by(
                     lecture_no=lecture_no, 
-                    attendee_no= None if is_self else attendee.attendee_no,
                     assignment_no=assignment.assignment_no
-                ).with_entities(getattr(Feedback2, i)).scalar()
+                )
+                if not is_self:
+                    query = query.filter_by(attendee_no=attendee.attendee_no)
+                value = query.with_entities(getattr(Feedback2, i)).scalar()
                 value = 0.0 if value is None else float(value)
                 tmp["data"].append(float(value))
             data["data"].append(tmp)

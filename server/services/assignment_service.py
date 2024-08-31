@@ -1076,8 +1076,8 @@ def assignment_cancel(as_no:int, user_no:int,student_no:int = None):
         assignment_check = Assignment_check.query.filter_by(assignment_no = as_no).order_by(Assignment_check.check_no.desc()).first()
     if assignment_check != None:
         assignment_check.ae_text = ""
-        assignment_check.ae_denotations = ""
-        assignment_check.ae_attributes = ""
+        assignment_check.ae_denotations = "" if assignment.as_type != "번역" else "[]"
+        assignment_check.ae_attributes = "" if assignment.as_type != "번역" else "[]"
     stt = Stt.query.filter_by(assignment_no = as_no, user_no=student_no, is_deleted=False).all()
     for i in stt:
         i.is_deleted = True

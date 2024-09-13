@@ -71,7 +71,7 @@ def get_json_textae(as_no,user_no):
         if type(attribute["obj"]) != bool:
             attribute["obj"] = parse.unquote(attribute["obj"])
     new_attribute = "A"+ str(find_max_attribute_number(ast.literal_eval(attributes))+1)
-    return textae, new_attribute,assignment_management.review#json, 교수평가
+    return change_textae_denotations_to_korean(textae), new_attribute,assignment_management.review#json, 교수평가
 
 def get_self_json_textae(as_no,user_no):
     assignment = Assignment.query.filter_by(assignment_no=as_no).first()
@@ -132,7 +132,27 @@ def get_self_json_textae(as_no,user_no):
         if type(attribute["obj"]) != bool:
             attribute["obj"] = parse.unquote(attribute["obj"])
     new_attribute = "A"+ str(find_max_attribute_number(ast.literal_eval(attributes))+1)
-    return textae, new_attribute,assignment_management.review#json, 교수평가
+    return change_textae_denotations_to_korean(textae), new_attribute,assignment_management.review#json, 교수평가
+
+def change_textae_denotations_to_korean(textae):
+    # obj 값을 한글로 변환하는 맵핑
+    obj_to_korean = {
+        "expression": "표현",
+        "translation_error": "오역",
+        "grammar_error": "문법 오류",
+        "pause": "침묵",
+        "filler": "필러",
+        "omission": "누락",
+        "cancellation": "취소",
+        "others": "기타"
+    }
+
+    for denotation in textae["denotations"]:
+        try:
+            denotation["obj"] = obj_to_korean[denotation["obj"].lower()]
+        except:
+            pass
+    return textae
 
 # attribute = [{'id': 'A1', 'subj': 'T1', 'pred': 'Unsure', 'obj': True}, {'id': 'A10', 'subj': 'T10', 'pred': 'Unsure', 'obj': True}, {'id': 'A11', 'subj': 'T11', 'pred': 'Unsure', 'obj': True}, {'id': 'A12', 'subj': 'T12', 'pred': 'Unsure', 'obj': True}, {'id': 'A13', 'subj': 'T13', 'pred': 'Unsure', 'obj': True}, {'id': 'A16', 'subj': 'T43', 'pred': 'Note', 'obj': 'asdfasdfasdfasdf'}, {'id': 'A2', 'subj': 'T2', 'pred': 'Unsure', 'obj': True}, {'id': 'A3', 'subj': 'T3', 'pred': 'Unsure', 'obj': True}, {'id': 'A4', 'subj': 'T4', 'pred': 'Unsure', 'obj': True}, {'id': 'A5', 'subj': 'T5', 'pred': 'Unsure', 'obj': True}, {'id': 'A6', 'subj': 'T6', 'pred': 'Unsure', 'obj': True}, {'id': 'A7', 'subj': 'T7', 'pred': 'Unsure', 'obj': True}, {'id': 'A8', 'subj': 'T8', 'pred': 'Unsure', 'obj': True}, {'id': 'A9', 'subj': 'T9', 'pred': 'Unsure', 'obj': True}]
 def find_max_attribute_number(attributes):

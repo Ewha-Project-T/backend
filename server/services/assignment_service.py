@@ -47,7 +47,7 @@ def prob_self_list(user_no:int):
     res = []
     for self_study in self_studies:
         assignment = Assignment.query.filter_by(assignment_no = self_study.assignment_no).first()
-        res.append({'as_no': assignment.assignment_no, 'as_name': assignment.as_name,"open_time":assignment.open_time})
+        res.append({'as_no': assignment.assignment_no, 'as_name': assignment.as_name,"open_time":assignment.open_time, "end_submission": Assignment_management.query.filter_by(assignment_no = assignment.assignment_no).first().end_submission})
     return {"lecture_name" : "자습", "prob_list" : res}
 
 #major_convert={"한일통역":"ja-JP","한일번역":"ja-JP","한중통역":"zh-CN","한중번역":"zh-CN","한영통역":"en-US","한영번역":"en-US","한불통역":"fr-FR","한불번역":"fr-FR"}#임시용

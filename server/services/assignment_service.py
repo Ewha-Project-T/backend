@@ -844,6 +844,7 @@ def make_json(text,denotations,attributes):
             "function availability": { 
                 "logo": False, 
                 "relation": False,
+                "text-edit":False,
                 "block": False, 
                 "simple": False, 
                 "replicate": False, 
